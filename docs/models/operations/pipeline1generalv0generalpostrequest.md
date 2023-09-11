@@ -1,0 +1,9 @@
+# Pipeline1GeneralV0GeneralPostRequest
+
+
+## Fields
+
+| Field                                                                                                          | Type                                                                                                           | Required                                                                                                       | Description                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `body_pipeline_1_general_v0_general_post`                                                                      | [Optional[shared.BodyPipeline1GeneralV0GeneralPost]](../../models/shared/bodypipeline1generalv0generalpost.md) | :heavy_minus_sign:                                                                                             | N/A                                                                                                            |
+| `unstructured_api_key`                                                                                         | *Optional[str]*                                                                                                | :heavy_minus_sign:                                                                                             | N/A                                                                                                            |
