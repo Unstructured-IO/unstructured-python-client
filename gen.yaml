@@ -3,7 +3,7 @@ generation:
   comments:
     disableComments: false
     omitDescriptionIfSummaryPresent: false
-  baseServerURL: ""
+  baseServerURL: "https://api.unstructured.io"
   sdkClassName: Unstructured
   singleTagPerOp: false
   tagNamespacingDisabled: false
