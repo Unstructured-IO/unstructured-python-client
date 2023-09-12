@@ -23,9 +23,11 @@ jobs:
       mode: direct
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
-        - https://app.speakeasyapi.dev/v1/apis/Unstructured/version/v0.1/schema/download
+        - https://api.unstructured.io/general/openapi.json
+      publish_python: true
       speakeasy_version: latest
     secrets:
       github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      openapi_doc_auth_token: ${{ secrets.SPEAKEASY_API_KEY }}
+      openapi_doc_auth_token: ${{ secrets.SPEC_TOKEN }}
+      pypi_token: ${{ secrets.PYPI_TOKEN }}
       speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
