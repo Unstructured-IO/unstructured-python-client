@@ -10,7 +10,7 @@
 ## SDK Installation
 
 ```bash
-pip install git+https://github.com/Unstructured-IO/unstructured-client.git
+pip install git+https://github.com/Unstructured-IO/unstructured-python-client.git
 ```
 <!-- End SDK Installation -->
 
