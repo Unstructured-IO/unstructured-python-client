@@ -23,7 +23,7 @@ jobs:
       mode: direct
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
-        - http://api.unstructured.io/general/openapi.json
+        - https://api.unstructured.io/general/openapi.json
       publish_python: true
       speakeasy_version: latest
     secrets:
