@@ -5,10 +5,14 @@
 import unstructured
 from unstructured.models import operations, shared
 
-s = unstructured.Unstructured()
+s = unstructured.Unstructured(
+    security=shared.Security(
+        api_key_auth="YOUR_API_KEY",
+    ),
+)
 
-req = operations.Pipeline1GeneralV0042GeneralPostRequest(
-    body_pipeline_1_general_v0_0_42_general_post=shared.BodyPipeline1GeneralV0042GeneralPost(
+req = operations.PartitionRequest(
+    document_submission=shared.DocumentSubmission(
         coordinates=[
             'corrupti',
         ],
@@ -45,9 +49,9 @@ req = operations.Pipeline1GeneralV0042GeneralPostRequest(
     unstructured_api_key='iure',
 )
 
-res = s.pipeline_1_general_v0_0_42_general_post(req)
+res = s.document.partition(req)
 
-if res.pipeline_1_general_v0_0_42_general_post_200_application_json_any is not None:
+if res.success is not None:
     # handle response
 ```
 <!-- End SDK Example Usage -->

@@ -1,4 +1,4 @@
-# Pipeline1GeneralV0GeneralPostResponse
+# PartitionResponse
 
 
 ## Fields
@@ -8,4 +8,4 @@
 | `content_type`                                                                        | *str*                                                                                 | :heavy_check_mark:                                                                    | N/A                                                                                   |
 | `status_code`                                                                         | *int*                                                                                 | :heavy_check_mark:                                                                    | N/A                                                                                   |
 | `raw_response`                                                                        | [requests.Response](https://requests.readthedocs.io/en/latest/api/#requests.Response) | :heavy_minus_sign:                                                                    | N/A                                                                                   |
-| `pipeline_1_general_v0_general_post_200_application_json_any`                         | *Optional[Any]*                                                                       | :heavy_minus_sign:                                                                    | Successful Response                                                                   |
+| `success`                                                                             | [Optional[shared.Success]](../../models/shared/success.md)                            | :heavy_minus_sign:                                                                    | Successful Response                                                                   |

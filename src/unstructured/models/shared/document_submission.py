@@ -7,7 +7,7 @@ from typing import Optional
 
 
 @dataclasses.dataclass
-class BodyPipeline1GeneralV0042GeneralPost:
+class DocumentSubmission:
     coordinates: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'coordinates' }})
     encoding: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
     files: Optional[list[bytes]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'files', 'json': True }})
