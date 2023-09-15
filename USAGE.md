@@ -3,7 +3,7 @@
 
 ```python
 import unstructured
-from unstructured.models import operations, shared
+from unstructured.models import shared
 
 s = unstructured.Unstructured(
     security=shared.Security(
@@ -11,47 +11,31 @@ s = unstructured.Unstructured(
     ),
 )
 
-req = operations.PartitionRequest(
-    document_submission=shared.DocumentSubmission(
-        coordinates=[
-            'corrupti',
-        ],
-        encoding=[
-            'provident',
-        ],
-        files=[
-            'distinctio'.encode(),
-        ],
-        gz_uncompressed_content_type='quibusdam',
-        hi_res_model_name=[
-            'unde',
-        ],
-        include_page_breaks=[
-            'nulla',
-        ],
-        ocr_languages=[
-            'corrupti',
-        ],
-        output_format='illum',
-        pdf_infer_table_structure=[
-            'vel',
-        ],
-        skip_infer_table_types=[
-            'error',
-        ],
-        strategy=[
-            'deserunt',
-        ],
-        xml_keep_tags=[
-            'suscipit',
-        ],
+req = shared.PartitionParameters(
+    coordinates=False,
+    encoding='utf-8',
+    files=shared.PartitionParametersFiles(
+        content='corrupti'.encode(),
+        files='provident',
     ),
-    unstructured_api_key='iure',
+    gz_uncompressed_content_type='application/pdf',
+    hi_res_model_name='yolox',
+    include_page_breaks=False,
+    ocr_languages=[
+        'eng',
+    ],
+    output_format='application/json',
+    pdf_infer_table_structure=False,
+    skip_infer_table_types=[
+        'pdf',
+    ],
+    strategy='hi_res',
+    xml_keep_tags=False,
 )
 
-res = s.document.partition(req)
+res = s.general.partition(req)
 
-if res.success is not None:
+if res.partition_200_application_json_any is not None:
     # handle response
 ```
 <!-- End SDK Example Usage -->

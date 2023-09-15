@@ -3,18 +3,7 @@
 from __future__ import annotations
 import dataclasses
 import requests as requests_http
-from ..shared import document_submission as shared_document_submission
-from ..shared import success as shared_success
-from typing import Optional
-
-
-
-@dataclasses.dataclass
-class PartitionRequest:
-    document_submission: Optional[shared_document_submission.DocumentSubmission] = dataclasses.field(default=None, metadata={'request': { 'media_type': 'multipart/form-data' }})
-    unstructured_api_key: Optional[str] = dataclasses.field(default=None, metadata={'header': { 'field_name': 'unstructured-api-key', 'style': 'simple', 'explode': False }})
-    
-
+from typing import Any, Optional
 
 
 
@@ -22,8 +11,8 @@ class PartitionRequest:
 class PartitionResponse:
     content_type: str = dataclasses.field()
     status_code: int = dataclasses.field()
-    raw_response: Optional[requests_http.Response] = dataclasses.field(default=None)
-    success: Optional[shared_success.Success] = dataclasses.field(default=None)
+    partition_200_application_json_any: Optional[Any] = dataclasses.field(default=None)
     r"""Successful Response"""
+    raw_response: Optional[requests_http.Response] = dataclasses.field(default=None)
     
 
