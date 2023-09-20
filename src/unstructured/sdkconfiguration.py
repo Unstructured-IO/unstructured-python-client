@@ -25,8 +25,8 @@ class SDKConfiguration:
     server: str = ''
     language: str = 'python'
     openapi_doc_version: str = '0.0.1'
-    sdk_version: str = '0.1.3'
-    gen_version: str = '2.115.2'
+    sdk_version: str = '0.1.4'
+    gen_version: str = '2.118.1'
     retry_config: RetryConfig = None
 
     def get_server_details(self) -> tuple[str, dict[str, str]]:
