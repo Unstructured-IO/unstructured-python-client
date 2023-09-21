@@ -2,10 +2,10 @@
 
 
 ```python
-import unstructured
-from unstructured.models import shared
+import unstructuredclient
+from unstructuredclient.models import shared
 
-s = unstructured.Unstructured(
+s = unstructuredclient.UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),

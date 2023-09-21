@@ -5,7 +5,7 @@ import dataclasses
 from ..errors import validationerror as errors_validationerror
 from dataclasses_json import Undefined, dataclass_json
 from typing import Optional
-from unstructured import utils
+from unstructuredclient import utils
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)

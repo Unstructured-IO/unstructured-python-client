@@ -11,10 +11,10 @@ Pipeline 1
 ### Example Usage
 
 ```python
-import unstructured
-from unstructured.models import shared
+import unstructuredclient
+from unstructuredclient.models import shared
 
-s = unstructured.Unstructured(
+s = unstructuredclient.UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),
@@ -24,8 +24,8 @@ req = shared.PartitionParameters(
     coordinates=False,
     encoding='utf-8',
     files=shared.PartitionParametersFiles(
-        content='distinctio'.encode(),
-        files='quibusdam',
+        content='unde'.encode(),
+        files='nulla',
     ),
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',

@@ -17,13 +17,11 @@ pip install unstructured-client
 
 ## SDK Example Usage
 <!-- Start SDK Example Usage -->
-
-
 ```python
-import unstructured
-from unstructured.models import shared
+import unstructuredclient
+from unstructuredclient.models import shared
 
-s = unstructured.Unstructured(
+s = unstructuredclient.UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),
@@ -33,8 +31,8 @@ req = shared.PartitionParameters(
     coordinates=False,
     encoding='utf-8',
     files=shared.PartitionParametersFiles(
-        content='corrupti'.encode(),
-        files='provident',
+        content='distinctio'.encode(),
+        files='quibusdam',
     ),
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',
@@ -66,6 +64,32 @@ if res.partition_200_application_json_any is not None:
 
 * [partition](docs/sdks/general/README.md#partition) - Pipeline 1
 <!-- End SDK Available Operations -->
+
+
+
+<!-- Start Dev Containers -->
+
+
+
+<!-- End Dev Containers -->
+
+
+
+<!-- Start Pagination -->
+# Pagination
+
+Some of the endpoints in this SDK support pagination. To use pagination, you make your SDK calls as usual, but the
+returned response object will have a `Next` method that can be called to pull down the next group of results. If the
+return value of `Next` is `None`, then there are no more pages to be fetched.
+
+Here's an example of one such pagination call:
+
+
+<!-- End Pagination -->
+
+<!-- Placeholder for Future Speakeasy SDK Sections -->
+
+
 
 ### Maturity
 
