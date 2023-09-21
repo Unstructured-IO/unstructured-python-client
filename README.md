@@ -6,6 +6,7 @@
     
 </div>
 
+Not ready for primetime yet - come back soon!
 <!-- Start SDK Installation -->
 ## SDK Installation
 
