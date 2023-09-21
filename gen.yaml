@@ -9,7 +9,7 @@ generation:
     disableComments: false
     omitDescriptionIfSummaryPresent: false
   baseServerURL: ""
-  sdkClassName: UnstructuredClient
+  sdkClassName: unstructured_client
   singleTagPerOp: false
   tagNamespacingDisabled: false
 features:
