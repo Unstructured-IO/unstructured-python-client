@@ -1,3 +1,10 @@
+<h3 align="center">
+  <img
+    src="https://raw.githubusercontent.com/Unstructured-IO/unstructured/main/img/unstructured_logo.png"
+    height="200"
+  >
+</h3>
+
 # unstructured-client
 
 <div align="left">
