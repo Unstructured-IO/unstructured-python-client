@@ -11,10 +11,10 @@ Pipeline 1
 ### Example Usage
 
 ```python
-import unstructuredclient
-from unstructuredclient.models import shared
+import unstructured_client
+from unstructured_client.models import shared
 
-s = unstructuredclient.UnstructuredClient(
+s = unstructured_client.UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),

@@ -4,7 +4,7 @@ from __future__ import annotations
 import dataclasses
 from dataclasses_json import Undefined, dataclass_json
 from typing import Any
-from unstructuredclient import utils
+from unstructured_client import utils
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)

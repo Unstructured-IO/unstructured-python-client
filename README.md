@@ -18,10 +18,10 @@ pip install unstructured-client
 ## SDK Example Usage
 <!-- Start SDK Example Usage -->
 ```python
-import unstructuredclient
-from unstructuredclient.models import shared
+import unstructured_client
+from unstructured_client.models import shared
 
-s = unstructuredclient.UnstructuredClient(
+s = unstructured_client.UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),
@@ -69,8 +69,6 @@ if res.partition_200_application_json_any is not None:
 
 <!-- Start Dev Containers -->
 
-
-
 <!-- End Dev Containers -->
 
 
@@ -83,8 +81,6 @@ returned response object will have a `Next` method that can be called to pull do
 return value of `Next` is `None`, then there are no more pages to be fetched.
 
 Here's an example of one such pagination call:
-
-
 <!-- End Pagination -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->

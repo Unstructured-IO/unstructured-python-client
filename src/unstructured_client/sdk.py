@@ -3,8 +3,8 @@
 import requests as requests_http
 from .general import General
 from .sdkconfiguration import SDKConfiguration
-from unstructuredclient import utils
-from unstructuredclient.models import shared
+from unstructured_client import utils
+from unstructured_client.models import shared
 
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""

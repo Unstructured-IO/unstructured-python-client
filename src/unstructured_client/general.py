@@ -2,8 +2,8 @@
 
 from .sdkconfiguration import SDKConfiguration
 from typing import Any, Optional
-from unstructuredclient import utils
-from unstructuredclient.models import errors, operations, shared
+from unstructured_client import utils
+from unstructured_client.models import errors, operations, shared
 
 class General:
     sdk_configuration: SDKConfiguration
