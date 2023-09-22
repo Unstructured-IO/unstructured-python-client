@@ -50,11 +50,14 @@ with open(filename, "rb") as f:
     )
     
     res = s.general.partition(req)
+    print(res.elements[0])
 
-    for element in res.elements:
-      print(element)
-
-# {'type': 'Title', 'element_id': '015301d4f56aa4b20ec10ac889d2343f', 'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1}, 'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'}
+# {
+#  'type': 'Title',
+#  'element_id': '015301d4f56aa4b20ec10ac889d2343f',
+#  'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1},
+#  'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'
+# }
 # ...
 # ...
 ```
@@ -67,10 +70,10 @@ If you are self hosting the API, or developing locally, you can change the serve
 s = UnstructuredClient()
 
 # Using a local server
-s.config_server_url("http://localhost:8000")
+s.general.sdk_configuration.server_url = "http://localhost:8000"
 
 # Using your own server
-s.config_server_url("https://my-hosted-api")
+s.general.sdk_configuration.server_url = "https://your-server"
 ```
 
 <!-- Start Dev Containers -->
