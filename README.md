@@ -25,7 +25,7 @@ pip install unstructured-client
 <!-- End SDK Installation -->
 
 ## Usage
-Only the `files` parameter is required. See the [general partition]([General](docs/sdks/general/README.md)) page for all available parameters. 
+Only the `files` parameter is required. See the [general partition](docs/sdks/general/README.md) page for all available parameters. 
 
 ```python
 from unstructured_client import UnstructuredClient
