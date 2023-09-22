@@ -46,8 +46,8 @@ class General:
         
         if http_res.status_code == 200:
             if utils.match_content_type(content_type, 'application/json'):
-                out = utils.unmarshal_json(http_res.text, Optional[Any])
-                res.partition_200_application_json_any = out
+                out = utils.unmarshal_json(http_res.text, Optional[list[Any]])
+                res.elements = out
             else:
                 raise errors.SDKError(f'unknown content-type received: {content_type}', http_res.status_code, http_res.text, http_res)
         elif http_res.status_code == 422:

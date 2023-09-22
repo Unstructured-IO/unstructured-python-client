@@ -11,7 +11,7 @@ from typing import Any, Optional
 class PartitionResponse:
     content_type: str = dataclasses.field()
     status_code: int = dataclasses.field()
-    partition_200_application_json_any: Optional[Any] = dataclasses.field(default=None)
+    elements: Optional[list[Any]] = dataclasses.field(default=None)
     r"""Successful Response"""
     raw_response: Optional[requests_http.Response] = dataclasses.field(default=None)
     

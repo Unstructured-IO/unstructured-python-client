@@ -44,7 +44,7 @@ req = shared.PartitionParameters(
 
 res = s.general.partition(req)
 
-if res.partition_200_application_json_any is not None:
+if res.elements is not None:
     # handle response
 ```
 
