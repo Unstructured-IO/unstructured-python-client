@@ -39,7 +39,7 @@ s = UnstructuredClient(
     ),
 )
 
-filename = "/path/to/document"
+filename = "sample-docs/layout-parser-paper.pdf"
 
 with open(filename, "rb") as f:
     req = shared.PartitionParameters(
@@ -51,8 +51,12 @@ with open(filename, "rb") as f:
     
     res = s.general.partition(req)
 
-    if res.elements is not None:
-      # handle response
+    for element in res.elements:
+      print(element)
+
+# {'type': 'Title', 'element_id': '015301d4f56aa4b20ec10ac889d2343f', 'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1}, 'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'}
+# ...
+# ...
 ```
 
 ## Change the base URL
