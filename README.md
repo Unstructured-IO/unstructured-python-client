@@ -5,15 +5,17 @@
   >
 </h3>
 
-# unstructured-client
-
-<div align="left">
+<div align="center">
     <a href="https://speakeasyapi.dev/"><img src="https://custom-icon-badges.demolab.com/badge/-Built%20By%20Speakeasy-212015?style=for-the-badge&logoColor=FBE331&logo=speakeasy&labelColor=545454" /></a>
     <a href="https://github.com/Unstructured-IO/unstructured-client.git/actions"><img src="https://img.shields.io/github/actions/workflow/status/speakeasy-sdks/bolt-php/speakeasy_sdk_generation.yml?style=for-the-badge" /></a>
-    
 </div>
 
-Not ready for primetime yet - come back soon!
+<h2 align="center">
+  <p>Python SDK for the Unstructured API</p>
+</h2>
+
+This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). 
+
 <!-- Start SDK Installation -->
 ## SDK Installation
 
@@ -22,77 +24,56 @@ pip install unstructured-client
 ```
 <!-- End SDK Installation -->
 
-## SDK Example Usage
-<!-- Start SDK Example Usage -->
+## Usage
+Only the `files` parameter is required. See the [general partition]([General](docs/sdks/general/README.md)) page for all available parameters. 
+
 ```python
-import unstructured_client
+from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-s = unstructured_client.UnstructuredClient(
+# Note - in an upcoming release, the Security object is removed
+# You'll pass the api key directly
+s = UnstructuredClient(
     security=shared.Security(
         api_key_auth="YOUR_API_KEY",
     ),
 )
 
-req = shared.PartitionParameters(
-    coordinates=False,
-    encoding='utf-8',
-    files=shared.PartitionParametersFiles(
-        content='distinctio'.encode(),
-        files='quibusdam',
-    ),
-    gz_uncompressed_content_type='application/pdf',
-    hi_res_model_name='yolox',
-    include_page_breaks=False,
-    ocr_languages=[
-        'eng',
-    ],
-    output_format='application/json',
-    pdf_infer_table_structure=False,
-    skip_infer_table_types=[
-        'pdf',
-    ],
-    strategy='hi_res',
-    xml_keep_tags=False,
-)
+filename = "/path/to/document"
 
-res = s.general.partition(req)
+with open(filename, "rb") as f:
+    req = shared.PartitionParameters(
+        files=shared.PartitionParametersFiles(
+            content=f.read(),
+            files=filename,
+        )
+    )
+    
+    res = s.general.partition(req)
 
-if res.partition_200_application_json_any is not None:
-    # handle response
+    if res.partition_200_application_json_any is not None:
+      # handle response
 ```
-<!-- End SDK Example Usage -->
 
-<!-- Start SDK Available Operations -->
-## Available Resources and Operations
+## Change the base URL
 
+If you are self hosting the API, or developing locally, you can change the server URL when setting up the client.
 
-### [General](docs/sdks/general/README.md)
+```python
+s = UnstructuredClient()
 
-* [partition](docs/sdks/general/README.md#partition) - Pipeline 1
-<!-- End SDK Available Operations -->
+# Using a local server
+s.config_server_url("http://localhost:8000")
 
-
+# Using your own server
+s.config_server_url("https://my-hosted-api")
+```
 
 <!-- Start Dev Containers -->
 
 <!-- End Dev Containers -->
 
-
-
-<!-- Start Pagination -->
-# Pagination
-
-Some of the endpoints in this SDK support pagination. To use pagination, you make your SDK calls as usual, but the
-returned response object will have a `Next` method that can be called to pull down the next group of results. If the
-return value of `Next` is `None`, then there are no more pages to be fetched.
-
-Here's an example of one such pagination call:
-<!-- End Pagination -->
-
 <!-- Placeholder for Future Speakeasy SDK Sections -->
-
-
 
 ### Maturity
 
