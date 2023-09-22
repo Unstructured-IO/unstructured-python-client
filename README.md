@@ -58,8 +58,6 @@ with open(filename, "rb") as f:
 #  'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1},
 #  'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'
 # }
-# ...
-# ...
 ```
 
 ## Change the base URL
