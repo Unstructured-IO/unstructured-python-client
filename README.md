@@ -30,6 +30,7 @@ Only the `files` parameter is required. See the [general partition](docs/sdks/ge
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
+from unstructured_client.models.errors import SDKError
 
 # Note - in an upcoming release, the Security object is removed
 # You'll pass the api key directly
@@ -40,17 +41,22 @@ s = UnstructuredClient(
 )
 
 filename = "sample-docs/layout-parser-paper.pdf"
+file = open(filename, "rb")
 
-with open(filename, "rb") as f:
-    req = shared.PartitionParameters(
-        files=shared.PartitionParametersFiles(
-            content=f.read(),
-            files=filename,
-        )
-    )
-    
+req = shared.PartitionParameters(
+    files=shared.PartitionParametersFiles(
+        content=file.read(),
+        files=filename,
+    ),
+    # Other partition params
+    strategy="fast",
+)
+
+try:
     res = s.general.partition(req)
     print(res.elements[0])
+except SDKError as e:
+    print(e)
 
 # {
 #  'type': 'Title',
