@@ -80,73 +80,12 @@ s.general.sdk_configuration.server_url = "https://your-server"
 
 
 
-## SDK Example Usage
-<!-- Start SDK Example Usage -->
 
+<!-- No SDK Example Usage -->
 
-```python
-import unstructured_client
-from unstructured_client.models import shared
+<!-- No SDK Available Operations -->
 
-s = unstructured_client.UnstructuredClient(
-    security=shared.Security(
-        api_key_auth="YOUR_API_KEY",
-    ),
-)
-
-req = shared.PartitionParameters(
-    coordinates=False,
-    encoding='utf-8',
-    files=shared.PartitionParametersFiles(
-        content='distinctio'.encode(),
-        files='quibusdam',
-    ),
-    gz_uncompressed_content_type='application/pdf',
-    hi_res_model_name='yolox',
-    include_page_breaks=False,
-    ocr_languages=[
-        'eng',
-    ],
-    output_format='application/json',
-    pdf_infer_table_structure=False,
-    skip_infer_table_types=[
-        'pdf',
-    ],
-    strategy='hi_res',
-    xml_keep_tags=False,
-)
-
-res = s.general.partition(req)
-
-if res.elements is not None:
-    # handle response
-```
-<!-- End SDK Example Usage -->
-
-
-
-<!-- Start SDK Available Operations -->
-## Available Resources and Operations
-
-
-### [general](docs/sdks/general/README.md)
-
-* [partition](docs/sdks/general/README.md#partition) - Pipeline 1
-<!-- End SDK Available Operations -->
-
-
-
-<!-- Start Pagination -->
-# Pagination
-
-Some of the endpoints in this SDK support pagination. To use pagination, you make your SDK calls as usual, but the
-returned response object will have a `Next` method that can be called to pull down the next group of results. If the
-return value of `Next` is `None`, then there are no more pages to be fetched.
-
-Here's an example of one such pagination call:
-
-
-<!-- End Pagination -->
+<!-- No Pagination -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
