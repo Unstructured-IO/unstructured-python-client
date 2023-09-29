@@ -7,6 +7,15 @@ from typing import Optional
 
 
 @dataclasses.dataclass
+class PartitionParametersFiles:
+    content: bytes = dataclasses.field(metadata={'multipart_form': { 'content': True }})
+    files: str = dataclasses.field(metadata={'multipart_form': { 'field_name': 'files' }})
+    
+
+
+
+
+@dataclasses.dataclass
 class PartitionParameters:
     chunking_strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'chunking_strategy' }})
     r"""Use one of the supported strategies to chunk the returned elements. Currently supports: by_title"""
@@ -16,8 +25,8 @@ class PartitionParameters:
     r"""If true, return coordinates for each element. Default: false"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
     r"""The encoding method used to decode the text input. Default: utf-8"""
-    files: Optional[list[bytes]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'files', 'json': True }})
-    r"""The file(s) to extract"""
+    files: Optional[PartitionParametersFiles] = dataclasses.field(default=None, metadata={'multipart_form': { 'file': True }})
+    r"""The file to extract"""
     gz_uncompressed_content_type: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'gz_uncompressed_content_type' }})
     r"""If file is gzipped, use this content type after unzipping"""
     hi_res_model_name: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'hi_res_model_name' }})
