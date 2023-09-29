@@ -44,6 +44,7 @@ filename = "sample-docs/layout-parser-paper.pdf"
 file = open(filename, "rb")
 
 req = shared.PartitionParameters(
+    # Note that this currently only supports a single file
     files=shared.PartitionParametersFiles(
         content=file.read(),
         files=filename,
