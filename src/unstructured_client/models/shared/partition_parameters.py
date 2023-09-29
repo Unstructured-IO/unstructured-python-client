@@ -17,6 +17,10 @@ class PartitionParametersFiles:
 
 @dataclasses.dataclass
 class PartitionParameters:
+    chunking_strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'chunking_strategy' }})
+    r"""Use one of the supported strategies to chunk the returned elements. Currently supports: by_title"""
+    combine_under_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'combine_under_n_chars' }})
+    r"""If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500"""
     coordinates: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'coordinates' }})
     r"""If true, return coordinates for each element. Default: false"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
@@ -29,8 +33,12 @@ class PartitionParameters:
     r"""The name of the inference model used when strategy is hi_res"""
     include_page_breaks: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'include_page_breaks' }})
     r"""If True, the output will include page breaks if the filetype supports it. Default: false"""
-    ocr_languages: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'ocr_languages' }})
+    languages: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
     r"""The languages present in the document, for use in partitioning and/or OCR"""
+    multipage_sections: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'multipage_sections' }})
+    r"""If chunking strategy is set, determines if sections can span multiple sections. Default: true"""
+    new_after_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'new_after_n_chars' }})
+    r"""If chunking strategy is set, cut off new sections after reaching a length of n chars. Default: 1500"""
     output_format: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'output_format' }})
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     pdf_infer_table_structure: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'pdf_infer_table_structure' }})
