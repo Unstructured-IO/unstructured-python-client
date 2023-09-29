@@ -3,6 +3,7 @@
 import base64
 import json
 import re
+import sys
 from dataclasses import Field, dataclass, fields, is_dataclass, make_dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -392,16 +393,21 @@ SERIALIZATION_METHOD_TO_CONTENT_TYPE = {
 }
 
 
-def serialize_request_body(request: dataclass, request_field_name: str, serialization_method: str) -> Tuple[
+def serialize_request_body(request: dataclass, request_field_name: str, nullable: bool, optional: bool, serialization_method: str, encoder=None) -> Tuple[
         str, any, any]:
     if request is None:
-        return None, None, None
+        if not nullable and optional:
+            return None, None, None
 
     if not is_dataclass(request) or not hasattr(request, request_field_name):
         return serialize_content_type(request_field_name, SERIALIZATION_METHOD_TO_CONTENT_TYPE[serialization_method],
-                                      request)
+                                      request, encoder)
 
     request_val = getattr(request, request_field_name)
+
+    if request_val is None:
+        if not nullable and optional:
+            return None, None, None
 
     request_fields: Tuple[Field, ...] = fields(request)
     request_metadata = None
@@ -418,9 +424,9 @@ def serialize_request_body(request: dataclass, request_field_name: str, serializ
                                   request_val)
 
 
-def serialize_content_type(field_name: str, media_type: str, request: dataclass) -> Tuple[str, any, list[list[any]]]:
+def serialize_content_type(field_name: str, media_type: str, request: dataclass, encoder=None) -> Tuple[str, any, list[list[any]]]:
     if re.match(r'(application|text)\/.*?\+*json.*', media_type) is not None:
-        return media_type, marshal_json(request), None
+        return media_type, marshal_json(request, encoder), None
     if re.match(r'multipart\/.*', media_type) is not None:
         return serialize_multipart_form(media_type, request)
     if re.match(r'application\/x-www-form-urlencoded.*', media_type) is not None:
@@ -677,7 +683,7 @@ def _serialize_header(explode: bool, obj: any) -> str:
     return ''
 
 
-def unmarshal_json(data, typ):
+def unmarshal_json(data, typ, decoder=None):
     unmarshal = make_dataclass('Unmarshal', [('res', typ)],
                                bases=(DataClassJsonMixin,))
     json_dict = json.loads(data)
@@ -686,15 +692,19 @@ def unmarshal_json(data, typ):
     except AttributeError as attr_err:
         raise AttributeError(
             f'unable to unmarshal {data} as {typ}') from attr_err
-    return out.res
+
+    return out.res if decoder is None else decoder(out.res)
 
 
-def marshal_json(val):
+def marshal_json(val, encoder=None):
     marshal = make_dataclass('Marshal', [('res', type(val))],
                              bases=(DataClassJsonMixin,))
     marshaller = marshal(res=val)
     json_dict = marshaller.to_dict()
-    return json.dumps(json_dict["res"])
+
+    val = json_dict["res"] if encoder is None else encoder(json_dict["res"])
+
+    return json.dumps(val)
 
 
 def match_content_type(content_type: str, pattern: str) -> boolean:
@@ -768,6 +778,56 @@ def decimaldecoder(val):
     return Decimal(str(val))
 
 
+def map_encoder(optional: bool, value_encoder: Callable):
+    def map_encode(val: dict):
+        if optional and val is None:
+            return None
+
+        encoded = {}
+        for key, value in val.items():
+            encoded[key] = value_encoder(value)
+
+        return encoded
+
+    return map_encode
+
+
+def map_decoder(value_decoder: Callable):
+    def map_decode(val: dict):
+        decoded = {}
+        for key, value in val.items():
+            decoded[key] = value_decoder(value)
+
+        return decoded
+
+    return map_decode
+
+
+def list_encoder(optional: bool, value_encoder: Callable):
+    def list_encode(val: list):
+        if optional and val is None:
+            return None
+
+        encoded = []
+        for value in val:
+            encoded.append(value_encoder(value))
+
+        return encoded
+
+    return list_encode
+
+
+def list_decoder(value_decoder: Callable):
+    def list_decode(val: list):
+        decoded = []
+        for value in val:
+            decoded.append(value_decoder(value))
+
+        return decoded
+
+    return list_decode
+
+
 def get_field_name(name):
     def override(_, _field_name=name):
         return _field_name
@@ -796,3 +856,10 @@ def _populate_from_globals(param_name: str, value: any, param_type: str, gbls: d
                         value = global_value
 
     return value
+
+
+def decoder_with_discriminator(field_name):
+    def decode_fx(obj):
+        kls = getattr(sys.modules['sdk.models.shared'], obj[field_name])
+        return unmarshal_json(json.dumps(obj), kls)
+    return decode_fx
