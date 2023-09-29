@@ -26,10 +26,9 @@ req = shared.PartitionParameters(
     combine_under_n_chars=500,
     coordinates=False,
     encoding='utf-8',
-    files=shared.PartitionParametersFiles(
-        content='+WmI5Q)|yy'.encode(),
-        files='um',
-    ),
+    files=[
+        '+WmI5Q)|yy'.encode(),
+    ],
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',
     include_page_breaks=False,
