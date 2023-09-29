@@ -72,13 +72,21 @@ except SDKError as e:
 If you are self hosting the API, or developing locally, you can change the server URL when setting up the client.
 
 ```python
-s = UnstructuredClient()
-
 # Using a local server
-s.general.sdk_configuration.server_url = "http://localhost:8000"
+s = unstructured_client.UnstructuredClient(
+    server_url="http://localhost:8000",
+    security=shared.Security(
+        api_key_auth=api_key,
+    ),
+)
 
 # Using your own server
-s.general.sdk_configuration.server_url = "https://your-server"
+s = unstructured_client.UnstructuredClient(
+    server_url="https://your-server",
+    security=shared.Security(
+        api_key_auth=api_key,
+    ),
+)
 ```
 
 <!-- Start Dev Containers -->
