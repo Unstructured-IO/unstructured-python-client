@@ -13,6 +13,7 @@ from unstructured_client import utils
 @dataclasses.dataclass
 class HTTPValidationError(Exception):
     detail: Optional[list[errors_validationerror.ValidationError]] = dataclasses.field(default=None, metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('detail'), 'exclude': lambda f: f is None }})
+    
 
     def __str__(self) -> str:
         return utils.marshal_json(self)

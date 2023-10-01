@@ -14,6 +14,7 @@ class ValidationError(Exception):
     loc: list[Union[str, int]] = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('loc') }})
     msg: str = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('msg') }})
     type: str = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('type') }})
+    
 
     def __str__(self) -> str:
         return utils.marshal_json(self)
