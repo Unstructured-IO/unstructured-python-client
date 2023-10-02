@@ -20,7 +20,7 @@ jobs:
       force: ${{ github.event.inputs.force }}
       languages: |
         - python
-      mode: direct
+      mode: pr
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
         - https://app.speakeasyapi.dev/v1/apis/Unstructured/version/v0.1/schema/download
