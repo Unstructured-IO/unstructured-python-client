@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import dataclasses
+from ..shared import validationerror_loc as shared_validationerror_loc
 from dataclasses_json import Undefined, dataclass_json
 from typing import Union
 from unstructured_client import utils
