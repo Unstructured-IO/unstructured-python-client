@@ -3,4 +3,4 @@
 from .httpvalidationerror import *
 from .validationerror import *
 from .sdkerror import SDKError
-__all__ = ["HTTPValidationError","ValidationError","SDKError"]
+__all__ = ["HTTPValidationError","ValidationError","ValidationErrorLoc","SDKError"]

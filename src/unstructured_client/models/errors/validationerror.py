@@ -7,6 +7,12 @@ from typing import Union
 from unstructured_client import utils
 
 
+
+@dataclasses.dataclass
+class ValidationErrorLoc:
+    pass
+
+
 @dataclass_json(undefined=Undefined.EXCLUDE)
 
 @dataclasses.dataclass
