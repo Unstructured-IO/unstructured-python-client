@@ -40,5 +40,6 @@ res = s.general.partition(req)
 
 if res.elements is not None:
     # handle response
+    pass
 ```
 <!-- End SDK Example Usage -->
