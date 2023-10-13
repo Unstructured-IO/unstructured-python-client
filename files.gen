@@ -20,8 +20,8 @@ src/unstructured_client/models/shared/__init__.py
 USAGE.md
 docs/models/operations/partitionresponse.md
 docs/models/errors/httpvalidationerror.md
+docs/models/errors/validationerrorloc.md
 docs/models/errors/validationerror.md
-docs/models/shared/validationerrorloc.md
 docs/models/shared/partitionparametersfiles.md
 docs/models/shared/partitionparameters.md
 docs/models/shared/security.md

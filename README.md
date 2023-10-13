@@ -32,13 +32,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.models.errors import SDKError
 
-# Note - in an upcoming release, the Security object is removed
-# You'll pass the api key directly
-s = UnstructuredClient(
-    security=shared.Security(
-        api_key_auth="YOUR_API_KEY",
-    ),
-)
+s = UnstructuredClient(api_key_auth="YOUR_API_KEY")
 
 filename = "sample-docs/layout-parser-paper.pdf"
 file = open(filename, "rb")
