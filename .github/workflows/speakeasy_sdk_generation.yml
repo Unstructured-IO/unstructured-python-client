@@ -21,6 +21,7 @@ jobs:
       languages: |
         - python
       mode: pr
+      create_release: true
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
         - https://app.speakeasyapi.dev/v1/apis/Unstructured/version/v0.1/schema/download
