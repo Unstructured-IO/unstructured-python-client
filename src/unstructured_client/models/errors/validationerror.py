@@ -3,9 +3,8 @@
 from __future__ import annotations
 import dataclasses
 from dataclasses_json import Undefined, dataclass_json
-from typing import Union
+from typing import List, Union
 from unstructured_client import utils
-
 
 
 @dataclasses.dataclass
@@ -17,7 +16,7 @@ class ValidationErrorLoc:
 
 @dataclasses.dataclass
 class ValidationError(Exception):
-    loc: list[Union[str, int]] = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('loc') }})
+    loc: List[Union[str, int]] = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('loc') }})
     msg: str = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('msg') }})
     type: str = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('type') }})
     

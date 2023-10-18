@@ -2,6 +2,7 @@
 
 import random
 import time
+from typing import List
 
 import requests
 
@@ -32,9 +33,9 @@ class RetryConfig:
 
 class Retries:
     config: RetryConfig
-    status_codes: list[str]
+    status_codes: List[str]
 
-    def __init__(self, config: RetryConfig, status_codes: list[str]):
+    def __init__(self, config: RetryConfig, status_codes: List[str]):
         self.config = config
         self.status_codes = status_codes
 

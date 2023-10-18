@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 import dataclasses
-from typing import Optional
-
+from typing import List, Optional
 
 
 @dataclasses.dataclass
@@ -11,7 +10,6 @@ class PartitionParametersFiles:
     content: bytes = dataclasses.field(metadata={'multipart_form': { 'content': True }})
     files: str = dataclasses.field(metadata={'multipart_form': { 'field_name': 'files' }})
     
-
 
 
 
@@ -33,7 +31,7 @@ class PartitionParameters:
     r"""The name of the inference model used when strategy is hi_res"""
     include_page_breaks: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'include_page_breaks' }})
     r"""If True, the output will include page breaks if the filetype supports it. Default: false"""
-    languages: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
+    languages: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
     r"""The languages present in the document, for use in partitioning and/or OCR"""
     multipage_sections: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'multipage_sections' }})
     r"""If chunking strategy is set, determines if sections can span multiple sections. Default: true"""
@@ -43,7 +41,7 @@ class PartitionParameters:
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     pdf_infer_table_structure: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'pdf_infer_table_structure' }})
     r"""If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>."""
-    skip_infer_table_types: Optional[list[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
+    skip_infer_table_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
     r"""The document types that you want to skip table extraction with. Default: ['pdf', 'jpg', 'png']"""
     strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
