@@ -759,6 +759,8 @@ def bigintencoder(optional: bool):
 
 
 def bigintdecoder(val):
+    if isinstance(val, float):
+        raise ValueError(f"{val} is a float")
     return int(val)
 
 
@@ -828,6 +830,24 @@ def list_decoder(value_decoder: Callable):
 
     return list_decode
 
+def union_encoder(all_encoders: Dict[str, Callable]):
+    def selective_encoder(val: any):
+        if type(val) in all_encoders:
+            return all_encoders[type(val)](val)
+        return val
+    return selective_encoder
+
+def union_decoder(all_decoders: List[Callable]):
+    def selective_decoder(val: any):
+        decoded = val
+        for decoder in all_decoders:
+            try:
+                decoded = decoder(val)
+                break
+            except (TypeError, ValueError):
+                continue
+        return decoded
+    return selective_decoder
 
 def get_field_name(name):
     def override(_, _field_name=name):
