@@ -25,7 +25,7 @@ req = shared.PartitionParameters(
     encoding='utf-8',
     files=shared.PartitionParametersFiles(
         content='+WmI5Q)|yy'.encode(),
-        files='Washington',
+        files='string',
     ),
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',
