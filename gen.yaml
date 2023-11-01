@@ -1,8 +1,8 @@
 configVersion: 1.0.0
 management:
-  docChecksum: 25324f1821b1070aa4a416ec8ddca590
+  docChecksum: bf57420eebd40f2b1d166092f01e3927
   docVersion: 0.0.1
-  speakeasyVersion: 1.109.0
+  speakeasyVersion: 1.109.2
   generationVersion: 2.173.0
 generation:
   comments:
@@ -23,7 +23,7 @@ features:
     retries: 2.82.0
     serverIDs: 2.81.1
 python:
-  version: 0.12.1
+  version: 0.12.2
   author: Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API

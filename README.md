@@ -104,7 +104,7 @@ s = unstructured_client.UnstructuredClient(
 
 <!-- Start Custom HTTP Client -->
 # Custom HTTP Client
- 
+
 The Python SDK makes API calls using the (requests)[https://pypi.org/project/requests/] HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with a custom `requests.Session` object.
 
 
@@ -118,8 +118,6 @@ http_client = requests.Session()
 http_client.headers.update({'x-custom-header': 'someValue'})
 s = unstructured_client.UnstructuredClient(client: http_client)
 ```
-
-
 <!-- End Custom HTTP Client -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
