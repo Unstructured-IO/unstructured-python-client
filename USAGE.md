@@ -26,6 +26,7 @@ req = shared.PartitionParameters(
         'g',
         ']',
     ],
+    max_characters=1500,
     new_after_n_chars=1500,
     output_format='application/json',
     skip_infer_table_types=[

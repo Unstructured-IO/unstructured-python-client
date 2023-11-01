@@ -33,10 +33,12 @@ class PartitionParameters:
     r"""If True, the output will include page breaks if the filetype supports it. Default: false"""
     languages: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
     r"""The languages present in the document, for use in partitioning and/or OCR"""
+    max_characters: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'max_characters' }})
+    r"""If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 1500"""
     multipage_sections: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'multipage_sections' }})
     r"""If chunking strategy is set, determines if sections can span multiple sections. Default: true"""
     new_after_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'new_after_n_chars' }})
-    r"""If chunking strategy is set, cut off new sections after reaching a length of n chars. Default: 1500"""
+    r"""If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500"""
     output_format: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'output_format' }})
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     pdf_infer_table_structure: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'pdf_infer_table_structure' }})
