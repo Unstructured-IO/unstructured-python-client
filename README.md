@@ -69,17 +69,13 @@ If you are self hosting the API, or developing locally, you can change the serve
 # Using a local server
 s = unstructured_client.UnstructuredClient(
     server_url="http://localhost:8000",
-    security=shared.Security(
-        api_key_auth=api_key,
-    ),
+    api_key_auth=api_key,
 )
 
 # Using your own server
 s = unstructured_client.UnstructuredClient(
     server_url="https://your-server",
-    security=shared.Security(
-        api_key_auth=api_key,
-    ),
+    api_key_auth=api_key,
 )
 ```
 
