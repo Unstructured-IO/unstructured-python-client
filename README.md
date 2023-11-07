@@ -116,6 +116,176 @@ s = unstructured_client.UnstructuredClient(client: http_client)
 ```
 <!-- End Custom HTTP Client -->
 
+
+
+<!-- Start Retries -->
+# Retries
+
+Some of the endpoints in this SDK support retries.  If you use the SDK without any configuration, it will fall back to the default retry strategy provided by the API.  However, the default retry strategy can be overridden on a per-operation basis, or across the entire SDK.
+
+To change the default retry strategy for a single API call, simply provide a retryConfig object to the call:
+
+
+## Example
+
+```python
+import unstructured_client
+from undefined.utils import BackoffStrategy, RetryConfig
+from unstructured_client.models import shared
+
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+req = shared.PartitionParameters(
+    chunking_strategy='by_title',
+    combine_under_n_chars=500,
+    encoding='utf-8',
+    files=shared.Files(
+        content='0x2cC94b2FEF'.encode(),
+        file_name='um.shtml',
+    ),
+    gz_uncompressed_content_type='application/pdf',
+    hi_res_model_name='yolox',
+    languages=[
+        '[',
+        'e',
+        'n',
+        'g',
+        ']',
+    ],
+    max_characters=1500,
+    new_after_n_chars=1500,
+    output_format='application/json',
+    skip_infer_table_types=[
+        'p',
+        'd',
+        'f',
+    ],
+    strategy='hi_res',
+)
+
+res = s.general.partition(req,
+    RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False))
+
+if res.elements is not None:
+    # handle response
+    pass
+```
+
+If you'd like to override the default retry strategy for all operations that support retries, you can provide a retryConfig at SDK initialization:
+
+
+## Example
+
+```python
+import unstructured_client
+from undefined.utils import BackoffStrategy, RetryConfig
+from unstructured_client.models import shared
+
+s = unstructured_client.UnstructuredClient(
+    retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False)
+    api_key_auth="YOUR_API_KEY",
+)
+
+req = shared.PartitionParameters(
+    chunking_strategy='by_title',
+    combine_under_n_chars=500,
+    encoding='utf-8',
+    files=shared.Files(
+        content='0x2cC94b2FEF'.encode(),
+        file_name='um.shtml',
+    ),
+    gz_uncompressed_content_type='application/pdf',
+    hi_res_model_name='yolox',
+    languages=[
+        '[',
+        'e',
+        'n',
+        'g',
+        ']',
+    ],
+    max_characters=1500,
+    new_after_n_chars=1500,
+    output_format='application/json',
+    skip_infer_table_types=[
+        'p',
+        'd',
+        'f',
+    ],
+    strategy='hi_res',
+)
+
+res = s.general.partition(req)
+
+if res.elements is not None:
+    # handle response
+    pass
+```
+
+
+<!-- End Retries -->
+
+
+
+<!-- Start Authentication -->
+
+# Authentication
+
+## Per-Client Security Schemes
+
+Your SDK supports the following security scheme globally:
+
+| Name           | Type           | Scheme         |
+| -------------- | -------------- | -------------- |
+| `api_key_auth` | apiKey         | API key        |
+
+To authenticate with the API the `api_key_auth` parameter must be set when initializing the SDK client instance. For example:
+
+```python
+import unstructured_client
+from unstructured_client.models import shared
+
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+req = shared.PartitionParameters(
+    chunking_strategy='by_title',
+    combine_under_n_chars=500,
+    encoding='utf-8',
+    files=shared.Files(
+        content='0x2cC94b2FEF'.encode(),
+        file_name='um.shtml',
+    ),
+    gz_uncompressed_content_type='application/pdf',
+    hi_res_model_name='yolox',
+    languages=[
+        '[',
+        'e',
+        'n',
+        'g',
+        ']',
+    ],
+    max_characters=1500,
+    new_after_n_chars=1500,
+    output_format='application/json',
+    skip_infer_table_types=[
+        'p',
+        'd',
+        'f',
+    ],
+    strategy='hi_res',
+)
+
+res = s.general.partition(req)
+
+if res.elements is not None:
+    # handle response
+    pass
+```
+<!-- End Authentication -->
+
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
 ### Maturity

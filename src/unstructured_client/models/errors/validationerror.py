@@ -8,7 +8,7 @@ from unstructured_client import utils
 
 
 @dataclasses.dataclass
-class ValidationErrorLoc:
+class Loc:
     pass
 
 

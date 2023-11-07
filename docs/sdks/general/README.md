@@ -1,5 +1,5 @@
 # General
-(*general*)
+(*.general*)
 
 ### Available Operations
 
@@ -23,9 +23,9 @@ req = shared.PartitionParameters(
     chunking_strategy='by_title',
     combine_under_n_chars=500,
     encoding='utf-8',
-    files=shared.PartitionParametersFiles(
-        content='+WmI5Q)|yy'.encode(),
-        files='string',
+    files=shared.Files(
+        content='0x2cC94b2FEF'.encode(),
+        file_name='um.shtml',
     ),
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',
