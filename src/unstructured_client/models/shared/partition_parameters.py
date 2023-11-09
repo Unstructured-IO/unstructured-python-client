@@ -6,9 +6,9 @@ from typing import List, Optional
 
 
 @dataclasses.dataclass
-class PartitionParametersFiles:
+class Files:
     content: bytes = dataclasses.field(metadata={'multipart_form': { 'content': True }})
-    files: str = dataclasses.field(metadata={'multipart_form': { 'field_name': 'files' }})
+    file_name: str = dataclasses.field(metadata={'multipart_form': { 'field_name': 'files' }})
     
 
 
@@ -23,7 +23,7 @@ class PartitionParameters:
     r"""If true, return coordinates for each element. Default: false"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
     r"""The encoding method used to decode the text input. Default: utf-8"""
-    files: Optional[PartitionParametersFiles] = dataclasses.field(default=None, metadata={'multipart_form': { 'file': True }})
+    files: Optional[Files] = dataclasses.field(default=None, metadata={'multipart_form': { 'file': True }})
     r"""The file to extract"""
     gz_uncompressed_content_type: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'gz_uncompressed_content_type' }})
     r"""If file is gzipped, use this content type after unzipping"""

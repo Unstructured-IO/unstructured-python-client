@@ -12,6 +12,7 @@ class General:
         self.sdk_configuration = sdk_config
         
     
+    
     def partition(self, request: shared.PartitionParameters, retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
@@ -24,7 +25,10 @@ class General:
         headers['Accept'] = 'application/json'
         headers['user-agent'] = self.sdk_configuration.user_agent
         
-        client = self.sdk_configuration.security_client
+        if callable(self.sdk_configuration.security):
+            client = utils.configure_security_client(self.sdk_configuration.client, self.sdk_configuration.security())
+        else:
+            client = utils.configure_security_client(self.sdk_configuration.client, self.sdk_configuration.security)
         
         global_retry_config = self.sdk_configuration.retry_config
         retry_config = retries
