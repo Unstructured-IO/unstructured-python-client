@@ -1,5 +1,5 @@
 # General
-(*.general*)
+(*general*)
 
 ### Available Operations
 
@@ -65,4 +65,9 @@ if res.elements is not None:
 ### Response
 
 **[operations.PartitionResponse](../../models/operations/partitionresponse.md)**
+### Errors
 
+| Error Object               | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 400-600                    | */*                        |
