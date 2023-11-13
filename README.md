@@ -39,9 +39,9 @@ file = open(filename, "rb")
 
 req = shared.PartitionParameters(
     # Note that this currently only supports a single file
-    files=shared.PartitionParametersFiles(
+    files=shared.Files(
         content=file.read(),
-        files=filename,
+        file_name=filename,
     ),
     # Other partition params
     strategy="fast",
@@ -83,19 +83,10 @@ s = unstructured_client.UnstructuredClient(
 
 <!-- End Dev Containers -->
 
-
-
-
 <!-- No SDK Example Usage -->
-
 <!-- No SDK Available Operations -->
-
 <!-- No Pagination -->
 <!-- No Error Handling -->
-
-
-
-
 <!-- No Server Selection -->
 
 <!-- Start Custom HTTP Client -->
