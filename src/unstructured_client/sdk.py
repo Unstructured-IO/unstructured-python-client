@@ -7,22 +7,24 @@ from typing import Callable, Dict, Union
 from unstructured_client import utils
 from unstructured_client.models import shared
 
+
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
     general: General
 
     sdk_configuration: SDKConfiguration
 
-    def __init__(self,
-                 api_key_auth: Union[str,Callable[[], str]],
-                 server: str = None,
-                 server_url: str = None,
-                 url_params: Dict[str, str] = None,
-                 client: requests_http.Session = None,
-                 retry_config: utils.RetryConfig = None
-                 ) -> None:
+    def __init__(
+        self,
+        api_key_auth: Union[str, Callable[[], str]],
+        server: str = None,
+        server_url: str = None,
+        url_params: Dict[str, str] = None,
+        client: requests_http.Session = None,
+        retry_config: utils.RetryConfig = None,
+    ) -> None:
         """Instantiates the SDK configuring it with the provided parameters.
-        
+
         :param api_key_auth: The api_key_auth required for authentication
         :type api_key_auth: Union[str,Callable[[], str]]
         :param server: The server by name to use for all operations
@@ -38,17 +40,18 @@ class UnstructuredClient:
         """
         if client is None:
             client = requests_http.Session()
-        
-        security = shared.Security(api_key_auth = api_key_auth)
-        
+
+        security = shared.Security(api_key_auth=api_key_auth)
+
         if server_url is not None:
             if url_params is not None:
                 server_url = utils.template_url(server_url, url_params)
 
-        self.sdk_configuration = SDKConfiguration(client, security, server_url, server, retry_config=retry_config)
-       
+        self.sdk_configuration = SDKConfiguration(
+            client, security, server_url, server, retry_config=retry_config
+        )
+
         self._init_sdks()
-    
+
     def _init_sdks(self):
         self.general = General(self.sdk_configuration)
-    

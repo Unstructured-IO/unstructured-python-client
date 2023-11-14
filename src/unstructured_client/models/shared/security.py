@@ -6,6 +6,13 @@ import dataclasses
 
 @dataclasses.dataclass
 class Security:
-    api_key_auth: str = dataclasses.field(metadata={'security': { 'scheme': True, 'type': 'apiKey', 'sub_type': 'header', 'field_name': 'unstructured-api-key' }})
-    
-
+    api_key_auth: str = dataclasses.field(
+        metadata={
+            "security": {
+                "scheme": True,
+                "type": "apiKey",
+                "sub_type": "header",
+                "field_name": "unstructured-api-key",
+            }
+        }
+    )
