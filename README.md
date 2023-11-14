@@ -34,15 +34,18 @@ from unstructured_client.models.errors import SDKError
 
 s = UnstructuredClient(api_key_auth="YOUR_API_KEY")
 
-filename = "sample-docs/layout-parser-paper.pdf"
-file = open(filename, "rb")
+filename = "sample-docs/layout-parser-paper-fast.pdf"
 
-req = shared.PartitionParameters(
+with open(filename, "rb") as f:
     # Note that this currently only supports a single file
-    files=shared.PartitionParametersFiles(
-        content=file.read(),
-        files=filename,
-    ),
+	files=shared.Files(
+		content=f.read(),
+		file_name=filename,
+	)
+    req = shared.PartitionParameters(
+		files=files,
+		strategy="fast",
+	)
     # Other partition params
     strategy="fast",
 )
@@ -54,10 +57,14 @@ except SDKError as e:
     print(e)
 
 # {
-#  'type': 'Title',
-#  'element_id': '015301d4f56aa4b20ec10ac889d2343f',
-#  'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1},
-#  'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'
+# 'type': 'UncategorizedText', 
+# 'element_id': '5d05cfc3c8e4a52fd1b3b8bd26648010', 
+# 'metadata': {
+#   'filename': 'layout-parser-paper-fast.pdf', 
+#   'filetype': 'application/pdf', 
+#   'page_number': 1
+# }, 
+# 'text': '1 2 0 2'
 # }
 ```
 
