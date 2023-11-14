@@ -42,29 +42,29 @@ with open(filename, "rb") as f:
 		content=f.read(),
 		file_name=filename,
 	)
-    req = shared.PartitionParameters(
-		files=files,
-		strategy="fast",
-	)
-    # Other partition params
-    strategy="fast",
+
+req = shared.PartitionParameters(
+    files=files,
+    strategy='ocr_only',
+	languages=["eng"],
 )
 
 try:
-    res = s.general.partition(req)
-    print(res.elements[0])
+    resp = s.general.partition(req)
+    print(resp.elements[0])
 except SDKError as e:
     print(e)
 
 # {
 # 'type': 'UncategorizedText', 
-# 'element_id': '5d05cfc3c8e4a52fd1b3b8bd26648010', 
+# 'element_id': 'fc550084fda1e008e07a0356894f5816', 
 # 'metadata': {
 #   'filename': 'layout-parser-paper-fast.pdf', 
 #   'filetype': 'application/pdf', 
+#   'languages': ['eng'], 
 #   'page_number': 1
 # }, 
-# 'text': '1 2 0 2'
+# 'text': '2103.15348v2 [cs.CV] 21 Jun 2021'
 # }
 ```
 
