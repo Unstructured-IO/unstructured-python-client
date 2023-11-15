@@ -90,19 +90,10 @@ s = unstructured_client.UnstructuredClient(
 
 <!-- End Dev Containers -->
 
-
-
-
 <!-- No SDK Example Usage -->
-
 <!-- No SDK Available Operations -->
-
 <!-- No Pagination -->
 <!-- No Error Handling -->
-
-
-
-
 <!-- No Server Selection -->
 
 <!-- Start Custom HTTP Client -->
