@@ -2,15 +2,17 @@ configVersion: 1.0.0
 management:
   docChecksum: bf57420eebd40f2b1d166092f01e3927
   docVersion: 0.0.1
-  speakeasyVersion: 1.116.0
-  generationVersion: 2.185.0
+  speakeasyVersion: 1.120.3
+  generationVersion: 2.192.1
 generation:
   comments: {}
   sdkClassName: unstructured_client
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
+  usageSnippets:
+    optionalPropertyRendering: withExample
 features:
   python:
-    core: 4.1.2
+    core: 4.1.4
     examples: 2.81.3
     globalSecurity: 2.83.0
     globalServerURLs: 2.82.0
@@ -18,7 +20,7 @@ features:
     retries: 2.82.0
     serverIDs: 2.81.1
 python:
-  version: 0.14.0
+  version: 0.14.1
   author: Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API
