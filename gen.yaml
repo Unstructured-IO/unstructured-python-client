@@ -2,8 +2,8 @@ configVersion: 1.0.0
 management:
   docChecksum: bf57420eebd40f2b1d166092f01e3927
   docVersion: 0.0.1
-  speakeasyVersion: 1.120.3
-  generationVersion: 2.192.1
+  speakeasyVersion: 1.121.1
+  generationVersion: 2.194.1
 generation:
   comments: {}
   sdkClassName: unstructured_client
@@ -15,12 +15,12 @@ features:
     core: 4.1.4
     examples: 2.81.3
     globalSecurity: 2.83.0
-    globalServerURLs: 2.82.0
+    globalServerURLs: 2.82.1
     nameOverrides: 2.81.1
     retries: 2.82.0
     serverIDs: 2.81.1
 python:
-  version: 0.14.1
+  version: 0.14.2
   author: Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API

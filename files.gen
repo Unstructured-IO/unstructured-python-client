@@ -8,9 +8,10 @@ src/unstructured_client/utils/__init__.py
 src/unstructured_client/utils/retries.py
 src/unstructured_client/utils/utils.py
 src/unstructured_client/models/errors/sdkerror.py
+tests/helpers.py
 src/unstructured_client/models/operations/partition.py
 src/unstructured_client/models/errors/httpvalidationerror.py
-src/unstructured_client/models/errors/validationerror.py
+src/unstructured_client/models/shared/validationerror.py
 src/unstructured_client/models/shared/partition_parameters.py
 src/unstructured_client/models/shared/security.py
 src/unstructured_client/models/__init__.py
@@ -20,8 +21,8 @@ src/unstructured_client/models/shared/__init__.py
 USAGE.md
 docs/models/operations/partitionresponse.md
 docs/models/errors/httpvalidationerror.md
-docs/models/errors/loc.md
-docs/models/errors/validationerror.md
+docs/models/shared/loc.md
+docs/models/shared/validationerror.md
 docs/models/shared/files.md
 docs/models/shared/partitionparameters.md
 docs/models/shared/security.md
