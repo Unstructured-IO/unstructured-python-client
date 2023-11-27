@@ -34,37 +34,30 @@ from unstructured_client.models.errors import SDKError
 
 s = UnstructuredClient(api_key_auth="YOUR_API_KEY")
 
-filename = "sample-docs/layout-parser-paper-fast.pdf"
-
-with open(filename, "rb") as f:
-    # Note that this currently only supports a single file
-	files=shared.Files(
-		content=f.read(),
-		file_name=filename,
-	)
+filename = "sample-docs/layout-parser-paper.pdf"
+file = open(filename, "rb")
 
 req = shared.PartitionParameters(
-    files=files,
-    strategy='ocr_only',
-	languages=["eng"],
+    # Note that this currently only supports a single file
+    files=shared.Files(
+        content=file.read(),
+        file_name=filename,
+    ),
+    # Other partition params
+    strategy="fast",
 )
 
 try:
-    resp = s.general.partition(req)
-    print(resp.elements[0])
+    res = s.general.partition(req)
+    print(res.elements[0])
 except SDKError as e:
     print(e)
 
 # {
-# 'type': 'UncategorizedText', 
-# 'element_id': 'fc550084fda1e008e07a0356894f5816', 
-# 'metadata': {
-#   'filename': 'layout-parser-paper-fast.pdf', 
-#   'filetype': 'application/pdf', 
-#   'languages': ['eng'], 
-#   'page_number': 1
-# }, 
-# 'text': '2103.15348v2 [cs.CV] 21 Jun 2021'
+#  'type': 'Title',
+#  'element_id': '015301d4f56aa4b20ec10ac889d2343f',
+#  'metadata': {'filename': 'layout-parser-paper.pdf', 'filetype': 'application/pdf', 'page_number': 1},
+#  'text': 'LayoutParser: A Uniﬁed Toolkit for Deep Learning Based Document Image Analysis'
 # }
 ```
 

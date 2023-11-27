@@ -13,13 +13,7 @@ class BackoffStrategy:
     exponent: float
     max_elapsed_time: int
 
-    def __init__(
-        self,
-        initial_interval: int,
-        max_interval: int,
-        exponent: float,
-        max_elapsed_time: int,
-    ):
+    def __init__(self, initial_interval: int, max_interval: int, exponent: float, max_elapsed_time: int):
         self.initial_interval = initial_interval
         self.max_interval = max_interval
         self.exponent = exponent
@@ -31,9 +25,7 @@ class RetryConfig:
     backoff: BackoffStrategy
     retry_connection_errors: bool
 
-    def __init__(
-        self, strategy: str, backoff: BackoffStrategy, retry_connection_errors: bool
-    ):
+    def __init__(self, strategy: str, backoff: BackoffStrategy, retry_connection_errors: bool):
         self.strategy = strategy
         self.backoff = backoff
         self.retry_connection_errors = retry_connection_errors
@@ -63,8 +55,7 @@ class PermanentError(Exception):
 
 
 def retry(func, retries: Retries):
-    if retries.config.strategy == "backoff":
-
+    if retries.config.strategy == 'backoff':
         def do_request():
             res: requests.Response
             try:
@@ -100,25 +91,13 @@ def retry(func, retries: Retries):
 
             return res
 
-        return retry_with_backoff(
-            do_request,
-            retries.config.backoff.initial_interval,
-            retries.config.backoff.max_interval,
-            retries.config.backoff.exponent,
-            retries.config.backoff.max_elapsed_time,
-        )
+        return retry_with_backoff(do_request, retries.config.backoff.initial_interval, retries.config.backoff.max_interval, retries.config.backoff.exponent, retries.config.backoff.max_elapsed_time)
 
     return func()
 
 
-def retry_with_backoff(
-    func,
-    initial_interval=500,
-    max_interval=60000,
-    exponent=1.5,
-    max_elapsed_time=3600000,
-):
-    start = round(time.time() * 1000)
+def retry_with_backoff(func, initial_interval=500, max_interval=60000, exponent=1.5, max_elapsed_time=3600000):
+    start = round(time.time()*1000)
     retries = 0
 
     while True:
@@ -127,16 +106,15 @@ def retry_with_backoff(
         except PermanentError as exception:
             raise exception.inner
         except Exception as exception:  # pylint: disable=broad-exception-caught
-            now = round(time.time() * 1000)
+            now = round(time.time()*1000)
             if now - start > max_elapsed_time:
                 if isinstance(exception, TemporaryError):
                     return exception.response
 
                 raise
-            sleep = (initial_interval / 1000) * exponent**retries + random.uniform(
-                0, 1
-            )
-            if sleep > max_interval / 1000:
-                sleep = max_interval / 1000
+            sleep = ((initial_interval/1000) *
+                     exponent**retries + random.uniform(0, 1))
+            if sleep > max_interval/1000:
+                sleep = max_interval/1000
             time.sleep(sleep)
             retries += 1

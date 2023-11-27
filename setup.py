@@ -32,7 +32,9 @@ setuptools.setup(
         "typing_extensions>=4.7.1",
         "urllib3>=2.0.4",
     ],
-    extras_require={"dev": ["pylint==2.16.2"]},
-    package_dir={"": "src"},
-    python_requires=">=3.8",
+    extras_require={
+        "dev":["pylint==2.16.2"]
+    },
+    package_dir={'': 'src'},
+    python_requires='>=3.8'
 )
