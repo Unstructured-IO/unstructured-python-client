@@ -1,6 +1,4 @@
 <!-- Start SDK Example Usage -->
-
-
 ```python
 import unstructured_client
 from unstructured_client.models import shared

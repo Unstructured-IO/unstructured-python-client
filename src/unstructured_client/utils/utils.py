@@ -705,7 +705,7 @@ def marshal_json(val, encoder=None):
 
     val = json_dict["res"] if encoder is None else encoder(json_dict["res"])
 
-    return json.dumps(val)
+    return json.dumps(val, separators=(',', ':'), sort_keys=True)
 
 
 def match_content_type(content_type: str, pattern: str) -> boolean:

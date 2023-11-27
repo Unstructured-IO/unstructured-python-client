@@ -2,5 +2,6 @@
 
 from .partition_parameters import *
 from .security import *
+from .validationerror import *
 
-__all__ = ["Files","PartitionParameters","Security"]
+__all__ = ["Files","PartitionParameters","Security","ValidationError"]
