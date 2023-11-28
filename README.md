@@ -38,16 +38,16 @@ filename = "sample-docs/layout-parser-paper-fast.pdf"
 
 with open(filename, "rb") as f:
     # Note that this currently only supports a single file
-	files=shared.Files(
-		content=f.read(),
-		file_name=filename,
+    files=shared.Files(
+        content=f.read(),
+        file_name=filename,
 	)
 
 req = shared.PartitionParameters(
     files=files,
     # Other partition params
     strategy='ocr_only',
-	languages=["eng"],
+    languages=["eng"],
 )
 
 try:
