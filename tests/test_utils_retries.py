@@ -14,6 +14,7 @@ def get_api_key():
         raise ValueError("UNS_API_KEY environment variable not set")
     return api_key
 
+# this test requires UNS_API_KEY be set in your shell session. Ex: `export UNS_API_KEY=<api_key>`
 def test_backoff_strategy():
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
@@ -24,7 +25,7 @@ def test_backoff_strategy():
     )
     
     with requests_mock.Mocker() as mock:
-        # mock 500 status code for POST requests to the api 
+        # mock a 500 status code for POST requests to the api 
         mock.post("https://api.unstructured.io/general/v0/general", status_code=500)
         session = UnstructuredClient(api_key_auth=get_api_key())
 
