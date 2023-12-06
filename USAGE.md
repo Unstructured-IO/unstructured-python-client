@@ -1,4 +1,4 @@
-<!-- Start SDK Example Usage -->
+<!-- Start SDK Example Usage [usage] -->
 ```python
 import unstructured_client
 from unstructured_client.models import shared
@@ -41,4 +41,4 @@ if res.elements is not None:
     # handle response
     pass
 ```
-<!-- End SDK Example Usage -->
+<!-- End SDK Example Usage [usage] -->

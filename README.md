@@ -16,13 +16,13 @@
 
 This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). 
 
-<!-- Start SDK Installation -->
+<!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
 ```bash
 pip install unstructured-client
 ```
-<!-- End SDK Installation -->
+<!-- End SDK Installation [installation] -->
 
 ## Usage
 Only the `files` parameter is required. See the [general partition](docs/sdks/general/README.md) page for all available parameters. 
@@ -86,17 +86,13 @@ s = unstructured_client.UnstructuredClient(
 )
 ```
 
-<!-- Start Dev Containers -->
-
-<!-- End Dev Containers -->
-
 <!-- No SDK Example Usage -->
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
 <!-- No Error Handling -->
 <!-- No Server Selection -->
 
-<!-- Start Custom HTTP Client -->
+<!-- Start Custom HTTP Client [http-client] -->
 ## Custom HTTP Client
 
 The Python SDK makes API calls using the (requests)[https://pypi.org/project/requests/] HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with a custom `requests.Session` object.
@@ -110,7 +106,7 @@ http_client = requests.Session()
 http_client.headers.update({'x-custom-header': 'someValue'})
 s = unstructured_client.UnstructuredClient(client: http_client)
 ```
-<!-- End Custom HTTP Client -->
+<!-- End Custom HTTP Client [http-client] -->
 
 <!-- No Retries -->
 <!-- No Authentication -->
