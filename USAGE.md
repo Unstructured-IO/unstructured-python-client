@@ -1,4 +1,4 @@
-<!-- Start SDK Example Usage -->
+<!-- Start SDK Example Usage [usage] -->
 ```python
 import unstructured_client
 from unstructured_client.models import shared
@@ -28,9 +28,7 @@ req = shared.PartitionParameters(
     new_after_n_chars=1500,
     output_format='application/json',
     skip_infer_table_types=[
-        'p',
-        'd',
-        'f',
+        'pdf',
     ],
     strategy='hi_res',
 )
@@ -41,4 +39,4 @@ if res.elements is not None:
     # handle response
     pass
 ```
-<!-- End SDK Example Usage -->
+<!-- End SDK Example Usage [usage] -->

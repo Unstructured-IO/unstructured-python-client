@@ -3,7 +3,7 @@
 import requests as requests_http
 from .general import General
 from .sdkconfiguration import SDKConfiguration
-from typing import Callable, Dict, Union
+from typing import Dict
 from unstructured_client import utils
 from unstructured_client.models import shared
 
@@ -14,7 +14,7 @@ class UnstructuredClient:
     sdk_configuration: SDKConfiguration
 
     def __init__(self,
-                 api_key_auth: Union[str,Callable[[], str]],
+                 api_key_auth: str ,
                  server: str = None,
                  server_url: str = None,
                  url_params: Dict[str, str] = None,
