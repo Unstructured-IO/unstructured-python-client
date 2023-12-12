@@ -2,3 +2,6 @@
 
 # ignore human-written test files
 tests/test_utils_retries.py
+
+# ignore Makefile
+Makefile

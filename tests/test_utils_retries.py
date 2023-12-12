@@ -11,7 +11,8 @@ from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 def get_api_key():
     api_key = os.getenv("UNS_API_KEY")
     if api_key is None:
-        raise ValueError("UNS_API_KEY environment variable not set")
+        raise ValueError("""UNS_API_KEY environment variable not set. 
+Set it in your current shell session with `export UNS_API_KEY=<api_key>`""")
     return api_key
 
 # this test requires UNS_API_KEY be set in your shell session. Ex: `export UNS_API_KEY=<api_key>`
