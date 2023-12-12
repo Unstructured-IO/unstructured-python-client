@@ -28,9 +28,7 @@ req = shared.PartitionParameters(
     new_after_n_chars=1500,
     output_format='application/json',
     skip_infer_table_types=[
-        'p',
-        'd',
-        'f',
+        'pdf',
     ],
     strategy='hi_res',
 )

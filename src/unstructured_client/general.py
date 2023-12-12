@@ -13,13 +13,13 @@ class General:
         
     
     
-    def partition(self, request: shared.PartitionParameters, retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
+    def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
         
         url = base_url + '/general/v0/general'
         headers = {}
-        req_content_type, data, form = utils.serialize_request_body(request, "request", False, True, 'multipart')
+        req_content_type, data, form = utils.serialize_request_body(request, Optional[shared.PartitionParameters], "request", False, True, 'multipart')
         if req_content_type not in ('multipart/form-data', 'multipart/mixed'):
             headers['content-type'] = req_content_type
         headers['Accept'] = 'application/json'

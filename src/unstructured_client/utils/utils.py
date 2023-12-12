@@ -12,7 +12,7 @@ from enum import Enum
 from typing import (Any, Callable, Dict, List, Optional, Tuple, Union,
                     get_args, get_origin)
 from xmlrpc.client import boolean
-
+from typing_inspect import is_optional_type
 import dateutil.parser
 import requests
 from dataclasses_json import DataClassJsonMixin
@@ -169,7 +169,7 @@ def generate_url(clazz: type, server_url: str, path: str, path_params: dataclass
         serialization = param_metadata.get('serialization', '')
         if serialization != '':
             serialized_params = _get_serialized_params(
-                param_metadata, f_name, param)
+                param_metadata, field.type, f_name, param)
             for key, value in serialized_params.items():
                 path = path.replace(
                     '{' + key + '}', value, 1)
@@ -261,7 +261,7 @@ def get_query_params(clazz: type, query_params: dataclass, gbls: Dict[str, Dict[
         f_name = metadata.get("field_name")
         serialization = metadata.get('serialization', '')
         if serialization != '':
-            serialized_parms = _get_serialized_params(metadata, f_name, value)
+            serialized_parms = _get_serialized_params(metadata, field.type, f_name, value)
             for key, value in serialized_parms.items():
                 if key in params:
                     params[key].extend(value)
@@ -304,12 +304,12 @@ def get_headers(headers_params: dataclass) -> Dict[str, str]:
     return headers
 
 
-def _get_serialized_params(metadata: Dict, field_name: str, obj: any) -> Dict[str, str]:
+def _get_serialized_params(metadata: Dict, field_type: type, field_name: str, obj: any) -> Dict[str, str]:
     params: Dict[str, str] = {}
 
     serialization = metadata.get('serialization', '')
     if serialization == 'json':
-        params[metadata.get("field_name", field_name)] = marshal_json(obj)
+        params[metadata.get("field_name", field_name)] = marshal_json(obj, field_type)
 
     return params
 
@@ -394,14 +394,14 @@ SERIALIZATION_METHOD_TO_CONTENT_TYPE = {
 }
 
 
-def serialize_request_body(request: dataclass, request_field_name: str, nullable: bool, optional: bool, serialization_method: str, encoder=None) -> Tuple[
+def serialize_request_body(request: dataclass, request_type: type, request_field_name: str, nullable: bool, optional: bool, serialization_method: str, encoder=None) -> Tuple[
         str, any, any]:
     if request is None:
         if not nullable and optional:
             return None, None, None
 
     if not is_dataclass(request) or not hasattr(request, request_field_name):
-        return serialize_content_type(request_field_name, SERIALIZATION_METHOD_TO_CONTENT_TYPE[serialization_method],
+        return serialize_content_type(request_field_name, request_type, SERIALIZATION_METHOD_TO_CONTENT_TYPE[serialization_method],
                                       request, encoder)
 
     request_val = getattr(request, request_field_name)
@@ -421,13 +421,13 @@ def serialize_request_body(request: dataclass, request_field_name: str, nullable
     if request_metadata is None:
         raise Exception('invalid request type')
 
-    return serialize_content_type(request_field_name, request_metadata.get('media_type', 'application/octet-stream'),
+    return serialize_content_type(request_field_name, request_type, request_metadata.get('media_type', 'application/octet-stream'),
                                   request_val)
 
 
-def serialize_content_type(field_name: str, media_type: str, request: dataclass, encoder=None) -> Tuple[str, any, List[List[any]]]:
+def serialize_content_type(field_name: str, request_type: any, media_type: str, request: dataclass, encoder=None) -> Tuple[str, any, List[List[any]]]:
     if re.match(r'(application|text)\/.*?\+*json.*', media_type) is not None:
-        return media_type, marshal_json(request, encoder), None
+        return media_type, marshal_json(request, request_type, encoder), None
     if re.match(r'multipart\/.*', media_type) is not None:
         return serialize_multipart_form(media_type, request)
     if re.match(r'application\/x-www-form-urlencoded.*', media_type) is not None:
@@ -478,7 +478,7 @@ def serialize_multipart_form(media_type: str, request: dataclass) -> Tuple[str, 
             form.append([field_name, [file_name, content]])
         elif field_metadata.get("json") is True:
             to_append = [field_metadata.get("field_name", field.name), [
-                None, marshal_json(val), "application/json"]]
+                None, marshal_json(val, field.type), "application/json"]]
             form.append(to_append)
         else:
             field_name = field_metadata.get(
@@ -531,7 +531,7 @@ def serialize_form_data(field_name: str, data: dataclass) -> Dict[str, any]:
             field_name = metadata.get('field_name', field.name)
 
             if metadata.get('json'):
-                form[field_name] = [marshal_json(val)]
+                form[field_name] = [marshal_json(val, field.type)]
             else:
                 if metadata.get('style', 'form') == 'form':
                     form = {**form, **_populate_form(
@@ -697,12 +697,14 @@ def unmarshal_json(data, typ, decoder=None):
     return out.res if decoder is None else decoder(out.res)
 
 
-def marshal_json(val, encoder=None):
-    marshal = make_dataclass('Marshal', [('res', type(val))],
+def marshal_json(val, typ, encoder=None):
+    if not is_optional_type(typ) and val is None:
+        raise ValueError(f"Could not marshal None into non-optional type: {typ}")
+
+    marshal = make_dataclass('Marshal', [('res', typ)],
                              bases=(DataClassJsonMixin,))
     marshaller = marshal(res=val)
     json_dict = marshaller.to_dict()
-
     val = json_dict["res"] if encoder is None else encoder(json_dict["res"])
 
     return json.dumps(val, separators=(',', ':'), sort_keys=True)
