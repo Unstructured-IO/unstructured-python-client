@@ -37,5 +37,5 @@ setuptools.setup(
     },
     package_dir={'': 'src'},
     python_requires='>=3.8',
-    "license":"MIT License",
+    license="MIT License",
 )
