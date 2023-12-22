@@ -85,7 +85,6 @@ s = unstructured_client.UnstructuredClient(
     api_key_auth=api_key,
 )
 ```
-
 <!-- No SDK Example Usage -->
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
