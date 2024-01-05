@@ -1,0 +1,53 @@
+lockVersion: 2.0.0
+id: 8b5fa338-9106-4734-abf0-e30d67044a90
+management:
+  docChecksum: bf57420eebd40f2b1d166092f01e3927
+  docVersion: 0.0.1
+  speakeasyVersion: internal
+  generationVersion: 2.225.2
+  releaseVersion: 0.15.1
+  configChecksum: 522a54d9ee1c9007d9986dcf21cb7fd1
+  repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
+  repoSubDirectory: .
+  installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
+  published: true
+features:
+  python:
+    core: 4.4.0
+    examples: 2.81.3
+    globalSecurity: 2.83.1
+    globalServerURLs: 2.82.1
+    nameOverrides: 2.81.1
+    retries: 2.82.0
+    serverIDs: 2.81.1
+    unions: 2.82.5
+generatedFiles:
+  - src/unstructured_client/sdkconfiguration.py
+  - src/unstructured_client/general.py
+  - src/unstructured_client/sdk.py
+  - pylintrc
+  - setup.py
+  - src/unstructured_client/__init__.py
+  - src/unstructured_client/utils/__init__.py
+  - src/unstructured_client/utils/retries.py
+  - src/unstructured_client/utils/utils.py
+  - src/unstructured_client/models/errors/sdkerror.py
+  - tests/helpers.py
+  - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/errors/httpvalidationerror.py
+  - src/unstructured_client/models/shared/validationerror.py
+  - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/security.py
+  - src/unstructured_client/models/__init__.py
+  - src/unstructured_client/models/errors/__init__.py
+  - src/unstructured_client/models/operations/__init__.py
+  - src/unstructured_client/models/shared/__init__.py
+  - docs/models/operations/partitionresponse.md
+  - docs/models/errors/httpvalidationerror.md
+  - docs/models/shared/loc.md
+  - docs/models/shared/validationerror.md
+  - docs/models/shared/files.md
+  - docs/models/shared/partitionparameters.md
+  - docs/models/shared/security.md
+  - USAGE.md
+  - .gitattributes
