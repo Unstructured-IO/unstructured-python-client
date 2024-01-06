@@ -11,6 +11,10 @@ req = shared.PartitionParameters(
     chunking_strategy='by_title',
     combine_under_n_chars=500,
     encoding='utf-8',
+    extract_image_block_types=[
+        'image',
+        'table',
+    ],
     files=shared.Files(
         content='0x2cC94b2FEF'.encode(),
         file_name='um.shtml',
