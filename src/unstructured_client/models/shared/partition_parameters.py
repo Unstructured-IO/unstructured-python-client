@@ -23,6 +23,8 @@ class PartitionParameters:
     r"""If true, return coordinates for each element. Default: false"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
     r"""The encoding method used to decode the text input. Default: utf-8"""
+    extract_image_block_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'extract_image_block_types' }})
+    r"""The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields"""
     files: Optional[Files] = dataclasses.field(default=None, metadata={'multipart_form': { 'file': True }})
     r"""The file to extract"""
     gz_uncompressed_content_type: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'gz_uncompressed_content_type' }})
