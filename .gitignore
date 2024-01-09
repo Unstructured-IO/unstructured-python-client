@@ -1,3 +1,6 @@
+# Pycharm
+.idea/
+
 venv/
 src/*.egg-info/
 __pycache__/
