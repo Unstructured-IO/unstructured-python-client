@@ -481,16 +481,20 @@ def serialize_multipart_form(media_type: str, request: dataclass) -> Tuple[str, 
                 None, marshal_json(val, field.type), "application/json"]]
             form.append(to_append)
         else:
-            field_name = field_metadata.get(
-                "field_name", field.name)
-            if isinstance(val, List):
-                for value in val:
-                    if value is None:
-                        continue
-                    form.append(
-                        [field_name + "[]", [None, _val_to_string(value)]])
+            field_name = field_metadata.get("field_name", field.name)
+            if field_name == "extract_image_block_types":
+                # Generate a string representation of the list with double quotes
+                # e.g. '["image", "table"]'
+                form.append([field_name, [None, _val_to_string(val).replace("'", '"')]])
             else:
-                form.append([field_name, [None, _val_to_string(val)]])
+                if isinstance(val, List):
+                    for value in val:
+                        if value is None:
+                            continue
+                        form.append(
+                            [field_name + "[]", [None, _val_to_string(value)]])
+                else:
+                    form.append([field_name, [None, _val_to_string(val)]])
     return media_type, None, form
 
 

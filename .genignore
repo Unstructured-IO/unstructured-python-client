@@ -1,5 +1,8 @@
 # https://www.speakeasyapi.dev/docs/customize-sdks/monkey-patching
 
+# Pycharm
+.idea/
+
 # ignore human-written test files
 tests/test_utils_retries.py
 
