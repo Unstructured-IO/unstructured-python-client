@@ -33,9 +33,9 @@ setuptools.setup(
         "urllib3>=1.26.18",
     ],
     extras_require={
-        "dev":["pylint==2.16.2"],
-        license="MIT License",
+        "dev":["pylint==2.16.2"]
     },
     package_dir={'': 'src'},
-    python_requires='>=3.8'
+    python_requires='>=3.8',
+    license="MIT License",
 )
