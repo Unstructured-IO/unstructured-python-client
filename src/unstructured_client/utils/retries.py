@@ -75,12 +75,12 @@ def retry(func, retries: Retries):
                         if res.status_code == parsed_code:
                             raise TemporaryError(res)
             except requests.exceptions.ConnectionError as exception:
-                if not retries.config.config.retry_connection_errors:
+                if retries.config.config.retry_connection_errors:
                     raise
 
                 raise PermanentError(exception) from exception
             except requests.exceptions.Timeout as exception:
-                if not retries.config.config.retry_connection_errors:
+                if retries.config.config.retry_connection_errors:
                     raise
 
                 raise PermanentError(exception) from exception
