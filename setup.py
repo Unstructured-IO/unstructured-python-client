@@ -36,5 +36,6 @@ setuptools.setup(
         "dev":["pylint==2.16.2"]
     },
     package_dir={'': 'src'},
+    license="MIT License",
     python_requires='>=3.8'
 )
