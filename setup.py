@@ -10,9 +10,10 @@ except FileNotFoundError:
 
 setuptools.setup(
     name="unstructured-client",
-    version="0.15.5",
+    version="0.16.0",
     author="Unstructured",
     description="Python Client SDK for Unstructured API",
+    license = "MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(where="src"),
@@ -36,6 +37,5 @@ setuptools.setup(
         "dev":["pylint==2.16.2"]
     },
     package_dir={'': 'src'},
-    license="MIT License",
     python_requires='>=3.8'
 )

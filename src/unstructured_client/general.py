@@ -36,7 +36,7 @@ class General:
             if global_retry_config:
                 retry_config = global_retry_config
             else:
-                retry_config = utils.RetryConfig('backoff', utils.BackoffStrategy(500, 60000, 1.5, 3600000), True)
+                retry_config = utils.RetryConfig('backoff', utils.BackoffStrategy(500, 60000, 1.5, 900000), True)
 
         def do_request():
             return client.request('POST', url, data=data, files=form, headers=headers)

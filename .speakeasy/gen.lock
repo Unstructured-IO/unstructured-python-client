@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 559aacf6828c62bd379326645382b3ba
+  docChecksum: 903444f359d1dfa6342c692ae3e5c7ff
   docVersion: 0.0.1
   speakeasyVersion: internal
-  generationVersion: 2.237.2
-  releaseVersion: 0.15.5
-  configChecksum: 5138d0e0d09d018eeec74356c4b3fef5
+  generationVersion: 2.239.4
+  releaseVersion: 0.16.0
+  configChecksum: df4b507bbf203791c07f410b82b53f44
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
