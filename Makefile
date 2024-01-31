@@ -24,7 +24,7 @@ install: install-test install-dev
 .PHONY: test
 test:
 	PYTHONPATH=. pytest \
-		tests
+		_test_unstructured_client
 
 ###########
 # Jupyter #
