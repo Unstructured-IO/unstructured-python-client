@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 .python-version
 .DS_Store
+
+# human-added igore files
+.ipynb_checkpoints/

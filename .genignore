@@ -1,11 +1,10 @@
 # https://www.speakeasyapi.dev/docs/customize-sdks/monkey-patching
 
 # ignore human-written files and directories
-#   tests
-tests/test_utils_retries.py
-#   directories
 src/unstructured_client/_unstructured
 _jupyter
+_sample_docs
+_test_unstructured_client
 
 # ignore Makefile
 Makefile
