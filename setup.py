@@ -10,7 +10,7 @@ except FileNotFoundError:
 
 setuptools.setup(
     name="unstructured-client",
-    version="0.16.0",
+    version="0.16.1",
     author="Unstructured",
     description="Python Client SDK for Unstructured API",
     license = "MIT",
@@ -20,7 +20,7 @@ setuptools.setup(
     install_requires=[
         "certifi>=2023.7.22",
         "charset-normalizer>=3.2.0",
-        "dataclasses-json>=0.6.1",
+        "dataclasses-json @ git+https://github.com/speakeasy-api/dataclasses-json@fix-union-deserialization",
         "idna>=3.4",
         "jsonpath-python>=1.0.6 ",
         "marshmallow>=3.19.0",
@@ -37,5 +37,6 @@ setuptools.setup(
         "dev":["pylint==2.16.2"]
     },
     package_dir={'': 'src'},
-    python_requires='>=3.8'
+    python_requires='>=3.8',
+    package_data={"unstructured-client": ["py.typed"]},
 )

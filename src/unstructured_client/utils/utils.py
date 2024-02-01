@@ -695,7 +695,7 @@ def unmarshal_json(data, typ, decoder=None):
         out = unmarshal.from_dict({"res": json_dict})
     except AttributeError as attr_err:
         raise AttributeError(
-            f'unable to unmarshal {data} as {typ}') from attr_err
+            f'unable to unmarshal {data} as {typ} - {attr_err}') from attr_err
 
     return out.res if decoder is None else decoder(out.res)
 
