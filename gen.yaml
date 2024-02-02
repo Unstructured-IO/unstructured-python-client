@@ -5,8 +5,9 @@ generation:
     optionalPropertyRendering: withExample
   fixes:
     nameResolutionDec2023: false
+    parameterOrderingFeb2024: false
 python:
-  version: 0.16.1
+  version: 0.17.0
   author: Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API
