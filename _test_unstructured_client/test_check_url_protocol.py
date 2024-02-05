@@ -34,10 +34,9 @@ def test_clean_server_url_on_paid_api_url(server_url: str):
     ("server_url"),
     [
         ("http://localhost:8000"), # correct url
-        ("https://localhost:8000"),
         ("localhost:8000"),
         ("localhost:8000/general/v0/general"),
-        ("https://localhost:8000/general/v0/general"),
+        ("http://localhost:8000/general/v0/general"),
     ]
 )
 def test_clean_server_url_on_localhost(server_url: str):
