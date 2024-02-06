@@ -45,14 +45,16 @@ def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
             if url_is_in_kwargs:
                 kwargs["server_url"] = urlunparse(cleaned_url)
             else:
-                args = args[:SERVER_URL_ARG_IDX] + (urlunparse(cleaned_url),) + args[SERVER_URL_ARG_IDX+1:] # type: ignore
-        
+                args = args[:SERVER_URL_ARG_IDX] + (urlunparse(cleaned_url),) + args[SERVER_URL_ARG_IDX + 1 :]  # type: ignore
+
         return func(*args, **kwargs)
 
     return wrapper
 
 
-def suggest_defining_url_if_401(func: Callable[_P, operations.PartitionResponse]) -> Callable[_P, operations.PartitionResponse]:
+def suggest_defining_url_if_401(
+    func: Callable[_P, operations.PartitionResponse]
+) -> Callable[_P, operations.PartitionResponse]:
 
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
@@ -60,10 +62,12 @@ def suggest_defining_url_if_401(func: Callable[_P, operations.PartitionResponse]
             return func(*args, **kwargs)
         except errors.SDKError as e:
             if e.status_code == 401:
-                general_obj: General = args[0] # type: ignore
+                general_obj: General = args[0]  # type: ignore
                 if not general_obj.sdk_configuration.server_url:
-                    warnings.warn("If intending to use the paid API, please define `server_url` in your request.")
-            
+                    warnings.warn(
+                        "If intending to use the paid API, please define `server_url` in your request."
+                    )
+
             return func(*args, **kwargs)
 
     return wrapper
