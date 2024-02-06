@@ -58,10 +58,12 @@ def suggest_defining_url_if_401(func: Callable[_P, operations.PartitionResponse]
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
         try:
             return func(*args, **kwargs)
-        except errors.SDKError:
-            general_obj: General = args[0] # type: ignore
-            if not general_obj.sdk_configuration.server_url:
-                warnings.warn("If intending to use the paid API, please define `server_url` in your request.")
+        except errors.SDKError as e:
+            if e.status_code == 401:
+                general_obj: General = args[0] # type: ignore
+                if not general_obj.sdk_configuration.server_url:
+                    warnings.warn("If intending to use the paid API, please define `server_url` in your request.")
+            
             return func(*args, **kwargs)
 
     return wrapper
