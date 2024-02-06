@@ -6,7 +6,7 @@ from typing_extensions import ParamSpec
 from urllib.parse import urlparse, urlunparse, ParseResult
 import warnings
 
-from unstructured_client.models import errors
+from unstructured_client.models import errors, operations
 
 if TYPE_CHECKING:
     from unstructured_client.general import General
@@ -52,14 +52,14 @@ def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
     return wrapper
 
 
-def suggest_defining_url_if_401(func: Callable[_P, None]) -> Callable[_P, None]:
+def suggest_defining_url_if_401(func: Callable[_P, operations.PartitionResponse]) -> Callable[_P, operations.PartitionResponse]:
 
     @functools.wraps(func)
-    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> None:
+    def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
         try:
             return func(*args, **kwargs)
         except errors.SDKError:
-            general_obj: General = args[0]
+            general_obj: General = args[0] # type: ignore
             if not general_obj.sdk_configuration.server_url:
                 warnings.warn("If intending to use the paid API, please define `server_url` in your request.")
             return func(*args, **kwargs)
