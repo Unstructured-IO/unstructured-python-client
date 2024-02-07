@@ -6,7 +6,7 @@ from .sdkconfiguration import SDKConfiguration
 from typing import Callable, Dict, Union
 from unstructured_client import utils
 from unstructured_client.models import shared
-from unstructured_client.utils._decorators import clean_server_url
+from unstructured_client.utils._decorators import clean_server_url # human code
 
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
@@ -14,7 +14,7 @@ class UnstructuredClient:
 
     sdk_configuration: SDKConfiguration
 
-    @clean_server_url
+    @clean_server_url # human code
     def __init__(self,
                  api_key_auth: Union[str, Callable[[], str]],
                  server: str = None,
