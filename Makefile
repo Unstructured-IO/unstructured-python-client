@@ -7,11 +7,14 @@ ARCH := $(shell uname -m)
 ###########
 
 .PHONY: install-test
+install-test:
 	pip install pytest
 	pip install requests_mock
 
 .PHONY: install-dev
+install-dev:
 	pip install jupyter
+	pip install pylint
 
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
@@ -25,6 +28,10 @@ install: install-test install-dev
 test:
 	PYTHONPATH=. pytest \
 		_test_unstructured_client
+
+.PHONY: lint
+lint:
+	pylint --rcfile=pylintrc src
 
 ###########
 # Jupyter #
