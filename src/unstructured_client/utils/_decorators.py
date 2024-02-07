@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 
 _P = ParamSpec("_P")
+SERVER_URL_ARG_IDX = 3
 
 
 def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
@@ -25,7 +26,6 @@ def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
 
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> None:
-        SERVER_URL_ARG_IDX = 3
         url_is_in_kwargs = True
 
         server_url: Optional[str] = cast(Optional[str], kwargs.get("server_url"))
