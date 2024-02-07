@@ -51,10 +51,7 @@ def test_clean_server_url_fixes_malformed_localhost_url(server_url: str):
 
 
 def test_clean_server_url_returns_empty_string_given_empty_string():
-    client = UnstructuredClient(
-        server_url="",
-        api_key_auth=FAKE_KEY,
-    )
+    client = UnstructuredClient( server_url="", api_key_auth=FAKE_KEY)
     assert client.general.sdk_configuration.server_url == ""
 
 

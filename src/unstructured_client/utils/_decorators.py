@@ -18,10 +18,9 @@ _P = ParamSpec("_P")
 def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
     """A decorator for fixing common types of malformed 'server_url' arguments.
 
-    This decorator addresses the common problem of users omitting or using the wrong url scheme and/or
-    adding the '/general/v0/general' path to the 'server_url'.
-    The decorator should be manually applied to the __init__ method of UnstructuredClient after merging
-    a PR from Speakeasy.
+    This decorator addresses the common problem of users omitting or using the wrong url scheme
+    and/or adding the '/general/v0/general' path to the 'server_url'. The decorator should be
+    manually applied to the __init__ method of UnstructuredClient after merging a PR from Speakeasy.
     """
 
     @functools.wraps(func)
@@ -52,7 +51,11 @@ def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
             if url_is_in_kwargs:
                 kwargs["server_url"] = urlunparse(cleaned_url)
             else:
-                args = args[:SERVER_URL_ARG_IDX] + (urlunparse(cleaned_url),) + args[SERVER_URL_ARG_IDX + 1 :]  # type: ignore
+                args = (
+                    args[:SERVER_URL_ARG_IDX]
+                    + (urlunparse(cleaned_url),)
+                    + args[SERVER_URL_ARG_IDX + 1 :]
+                )  # type: ignore
 
         return func(*args, **kwargs)
 
@@ -62,11 +65,14 @@ def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
 def suggest_defining_url_if_401(
     func: Callable[_P, operations.PartitionResponse]
 ) -> Callable[_P, operations.PartitionResponse]:
-    """A decorator to suggest defining the 'server_url' parameter if a 401 Unauthorized error is encountered.
-    
-    This decorator addresses the common problem of users not passing in the 'server_url' when using their paid api key.
-    The decorator should be manually applied to General.partition after merging a PR from Speakeasy.
+    """A decorator to suggest defining the 'server_url' parameter if a 401 Unauthorized error is
+    encountered.
+
+    This decorator addresses the common problem of users not passing in the 'server_url' when
+    using their paid api key. The decorator should be manually applied to General.partition after
+    merging a PR from Speakeasy.
     """
+
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
         try:
