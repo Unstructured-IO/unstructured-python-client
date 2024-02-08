@@ -4,16 +4,16 @@ management:
   docChecksum: 903444f359d1dfa6342c692ae3e5c7ff
   docVersion: 0.0.1
   speakeasyVersion: internal
-  generationVersion: 2.248.1
-  releaseVersion: 0.17.0
-  configChecksum: b943408cdcab76d427c2cba0f6584bf4
+  generationVersion: 2.250.16
+  releaseVersion: 0.18.0
+  configChecksum: 938a4a39baa5695a3140be3b858483d4
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   published: true
 features:
   python:
-    core: 4.4.4
+    core: 4.4.5
     examples: 2.81.3
     globalSecurity: 2.83.2
     globalServerURLs: 2.82.1
