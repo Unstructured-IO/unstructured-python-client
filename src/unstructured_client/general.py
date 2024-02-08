@@ -4,6 +4,7 @@ from .sdkconfiguration import SDKConfiguration
 from typing import Any, List, Optional
 from unstructured_client import utils
 from unstructured_client.models import errors, operations, shared
+from unstructured_client.utils._decorators import suggest_defining_url_if_401  # human code
 
 class General:
     sdk_configuration: SDKConfiguration
@@ -12,7 +13,7 @@ class General:
         self.sdk_configuration = sdk_config
         
     
-    
+    @suggest_defining_url_if_401  # human code
     def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
