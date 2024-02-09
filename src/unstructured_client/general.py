@@ -4,7 +4,7 @@ from .sdkconfiguration import SDKConfiguration
 from typing import Any, List, Optional
 from unstructured_client import utils
 from unstructured_client.models import errors, operations, shared
-from unstructured_client.utils._decorators import suggest_defining_url_if_401  # human code
+from unstructured_client.utils._human_utils import suggest_defining_url_if_401  # human code
 
 class General:
     sdk_configuration: SDKConfiguration
