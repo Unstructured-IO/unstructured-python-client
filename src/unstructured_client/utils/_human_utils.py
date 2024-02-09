@@ -76,7 +76,7 @@ def suggest_defining_url_if_401(
 
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
-        from unstructured_client.models import errors
+        from unstructured_client.models import errors  # pylint: disable=C0415
 
         try:
             return func(*args, **kwargs)
@@ -97,5 +97,5 @@ def log_retries(retry_count, sleep):
     """Function for logging retries to give users visibility into requests."""
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     logging.info(
-        f"Retry attempt {retry_count}. Sleeping {round(sleep, 1)} seconds before retry."
+        "Retry attempt %s. Sleeping %s seconds before retry.", retry_count, sleep
     )
