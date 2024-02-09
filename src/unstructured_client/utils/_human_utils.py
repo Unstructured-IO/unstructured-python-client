@@ -77,7 +77,7 @@ def suggest_defining_url_if_401(
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
         from unstructured_client.models import errors
-        
+
         try:
             return func(*args, **kwargs)
         except errors.SDKError as error:
@@ -89,11 +89,13 @@ def suggest_defining_url_if_401(
                     )
 
             return func(*args, **kwargs)
-        
+
     return wrapper
 
 
 def log_retries(retry_count, sleep):
     """Function for logging retries to give users visibility into requests."""
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    logging.info(f"Retry attempt {retry_count}. Sleeping {round(sleep, 1)} seconds before retry.")
+    logging.info(
+        f"Retry attempt {retry_count}. Sleeping {round(sleep, 1)} seconds before retry."
+    )
