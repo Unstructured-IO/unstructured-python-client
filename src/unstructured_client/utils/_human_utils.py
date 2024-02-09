@@ -97,5 +97,5 @@ def log_retries(retry_count, sleep):
     """Function for logging retries to give users visibility into requests."""
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     logging.info(
-        "Retry attempt %s. Sleeping %s seconds before retry.", retry_count, sleep
+        "Retry attempt %s. Sleeping %s seconds before retry.", retry_count, round(sleep, 1)
     )
