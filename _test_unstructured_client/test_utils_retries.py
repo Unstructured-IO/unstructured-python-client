@@ -1,5 +1,6 @@
 import pytest
 import logging
+import re
 
 import requests_mock
 
@@ -27,10 +28,7 @@ def test_retry_with_backoff_does_retry(caplog):
         session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
         with open(filename, "rb") as f:
-            files=shared.Files(
-                content=f.read(),
-                file_name=filename,
-            )
+            files=shared.Files(content=f.read(), file_name=filename)
 
         req = shared.PartitionParameters(files=files)
 
@@ -59,14 +57,10 @@ def test_backoff_strategy_logs_retries(caplog):
         session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
         with open(filename, "rb") as f:
-            files=shared.Files(
-                content=f.read(),
-                file_name=filename,
-            )
+            files=shared.Files(content=f.read(), file_name=filename)
 
         req = shared.PartitionParameters(files=files)
         with pytest.raises(Exception):
             session.general.partition(req, retries=retries)    
-
-    
-    assert "seconds before retry" in caplog.text
+    pattern = re.compile(f"{re.escape('Retry attempt #1. Sleeping')}.*{'seconds before retry'}")
+    assert bool(pattern.search(caplog.text))
