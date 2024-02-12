@@ -118,6 +118,6 @@ def retry_with_backoff(func, initial_interval=500, max_interval=60000, exponent=
                      exponent**retries + random.uniform(0, 1))
             if sleep > max_interval/1000:
                 sleep = max_interval/1000
-            log_retries(retry_count=retries, sleep=sleep)  # human code
+            log_retries(retry_count=retries+1, sleep=sleep)  # human code
             time.sleep(sleep)
             retries += 1
