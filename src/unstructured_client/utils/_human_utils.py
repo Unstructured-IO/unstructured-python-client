@@ -93,11 +93,16 @@ def suggest_defining_url_if_401(
     return wrapper
 
 
-def log_retries(retry_count: int, sleep: float):
+def log_retries(retry_count: int, sleep: float, exception: Exception):
     """Function for logging retries to give users visibility into requests."""
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', stream=sys.stdout)
     logger = logging.getLogger('unstructured-client')
     logger.setLevel(logging.INFO)
     logger.info(
-        "Retry attempt #%s. Sleeping %s seconds before retry.", retry_count, round(sleep, 1)
+        "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.", 
+        exception.response.status_code,
+        retry_count,
+        round(sleep, 1),
     )
+    if bool(exception.response.text):
+        logger.info(exception.response.text)
