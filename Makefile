@@ -33,6 +33,14 @@ test:
 lint:
 	pylint --rcfile=pylintrc src
 
+#############
+# Speakeasy #
+#############
+
+.PHONY: sdk-generate
+sdk-generate:
+	speakeasy generate sdk -s openapi.json -o ./ -l python
+
 ###########
 # Jupyter #
 ###########

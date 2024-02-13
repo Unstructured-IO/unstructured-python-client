@@ -34,7 +34,7 @@ from unstructured_client.models.errors import SDKError
 
 s = UnstructuredClient(api_key_auth="YOUR_API_KEY")
 
-filename = "sample-docs/layout-parser-paper-fast.pdf"
+filename = "_sample_docs/layout-parser-paper-fast.pdf"
 
 with open(filename, "rb") as f:
     # Note that this currently only supports a single file
@@ -124,3 +124,14 @@ While we value open-source contributions to this SDK, this library is generated 
 Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
 
 ### SDK Created by [Speakeasy](https://docs.speakeasyapi.dev/docs/using-speakeasy/client-sdks)
+
+In order to start working with this repo, you need:
+1. Install Speakeasy client locally https://github.com/speakeasy-api/speakeasy#installation
+2. Run `speakeasy auth login`
+
+Then put into local `openapi.json` the API for which you want to generate client,
+and run `make sdk-generate`. This allows to iterate development with python client.
+
+When preparing PR with changes, include in it only the human changes.
+Once it's merged, Github CI will autogenerate the Speakeasy client in a new PR.
+You will have to manually bring back the human created lines in it.
