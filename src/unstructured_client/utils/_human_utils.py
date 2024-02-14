@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import functools
-from typing import cast, Callable, TYPE_CHECKING, Optional
+import logging
+import sys
+from typing import Callable, Optional, TYPE_CHECKING, cast
 from typing_extensions import ParamSpec
-from urllib.parse import urlparse, urlunparse, ParseResult
+from urllib.parse import ParseResult, urlparse, urlunparse
 import warnings
-
-from unstructured_client.models import errors, operations
 
 if TYPE_CHECKING:
     from unstructured_client.general import General
+    from unstructured_client.models import operations
 
 
 _P = ParamSpec("_P")
@@ -75,6 +76,8 @@ def suggest_defining_url_if_401(
 
     @functools.wraps(func)
     def wrapper(*args: _P.args, **kwargs: _P.kwargs) -> operations.PartitionResponse:
+        from unstructured_client.models import errors  # pylint: disable=C0415
+
         try:
             return func(*args, **kwargs)
         except errors.SDKError as error:
@@ -88,3 +91,18 @@ def suggest_defining_url_if_401(
             return func(*args, **kwargs)
 
     return wrapper
+
+
+def log_retries(retry_count: int, sleep: float, exception: Exception):
+    """Function for logging retries to give users visibility into requests."""
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', stream=sys.stdout)
+    logger = logging.getLogger('unstructured-client')
+    logger.setLevel(logging.INFO)
+    logger.info(
+        "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.", 
+        exception.response.status_code,
+        retry_count,
+        round(sleep, 1),
+    )
+    if bool(exception.response.text):
+        logger.info(exception.response.text)

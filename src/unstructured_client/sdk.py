@@ -6,7 +6,7 @@ from .sdkconfiguration import SDKConfiguration
 from typing import Callable, Dict, Union
 from unstructured_client import utils
 from unstructured_client.models import shared
-from unstructured_client.utils._decorators import clean_server_url  # human code
+from unstructured_client.utils._human_utils import clean_server_url  # human code
 
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
