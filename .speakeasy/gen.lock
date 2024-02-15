@@ -1,19 +1,20 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 903444f359d1dfa6342c692ae3e5c7ff
-  docVersion: 0.0.1
+  docChecksum: 8e80e4d12e16961f9061ef746c01761a
+  docVersion: 0.0.64
   speakeasyVersion: internal
-  generationVersion: 2.250.19
-  releaseVersion: 0.18.0
-  configChecksum: 938a4a39baa5695a3140be3b858483d4
+  generationVersion: 2.258.0
+  releaseVersion: 0.19.0
+  configChecksum: bcbf9e2848a6a837e9453f70dbc10b07
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   published: true
 features:
   python:
-    core: 4.4.5
+    constsAndDefaults: 0.1.2
+    core: 4.4.6
     examples: 2.81.3
     globalSecurity: 2.83.2
     globalServerURLs: 2.82.1
@@ -33,21 +34,26 @@ generatedFiles:
   - src/unstructured_client/utils/utils.py
   - src/unstructured_client/models/errors/sdkerror.py
   - tests/helpers.py
-  - src/unstructured_client/models/operations/partition.py
-  - src/unstructured_client/models/errors/httpvalidationerror.py
+  - src/unstructured_client/models/operations/partition_parameters.py
+  - src/unstructured_client/models/shared/element.py
   - src/unstructured_client/models/shared/validationerror.py
-  - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/body_partition_parameters.py
   - src/unstructured_client/models/shared/security.py
+  - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/shared/__init__.py
-  - docs/models/operations/partitionresponse.md
-  - docs/models/errors/httpvalidationerror.md
+  - docs/models/operations/partitionparametersrequest.md
+  - docs/models/operations/partitionparametersresponse.md
+  - docs/models/shared/metadata.md
+  - docs/models/shared/element.md
   - docs/models/shared/loc.md
   - docs/models/shared/validationerror.md
   - docs/models/shared/files.md
-  - docs/models/shared/partitionparameters.md
+  - docs/models/shared/strategy.md
+  - docs/models/shared/bodypartitionparameters.md
   - docs/models/shared/security.md
+  - docs/models/errors/httpvalidationerror.md
   - USAGE.md
   - .gitattributes
