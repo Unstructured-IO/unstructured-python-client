@@ -99,12 +99,13 @@ def suggest_defining_url_if_401(
 
 def log_retries(retry_count: int, sleep: float, exception: Exception):
     """Function for logging retries to give users visibility into requests."""
-    logger.info(
-        "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.",
-        exception.response.status_code,
-        retry_count,
-        round(sleep, 1),
-    )
+    if hasattr(exception, "response"):
+        logger.info(
+            "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.",
+            exception.response.status_code,
+            retry_count,
+            round(sleep, 1),
+        )
 
-    if bool(exception.response.text):
-        logger.info(exception.response.text)
+        if bool(exception.response.text):
+            logger.info(exception.response.text)

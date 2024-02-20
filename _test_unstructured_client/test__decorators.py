@@ -1,4 +1,7 @@
+import os
+import pypdf
 import pytest
+import requests
 from deepdiff import DeepDiff
 
 from unstructured_client import UnstructuredClient
@@ -112,17 +115,27 @@ def test_suggest_defining_url_issues_a_warning_on_a_401():
 
 
 # Requires unstructured-api running in bg. Use `make run-web-app`. Should be automated, eg with docker.
+@pytest.mark.parametrize("call_threads", [1, 2, 5])
 @pytest.mark.parametrize(
-    "filename",
+    "filename, expected_ok",
     [
-        "_sample_docs/list-item-example.pdf",
-        "_sample_docs/layout-parser-paper-fast.pdf",
-        "_sample_docs/layout-parser-paper.pdf",
+        ("_sample_docs/list-item-example.pdf", True),
+        ("_sample_docs/layout-parser-paper-fast.pdf", True),
+        ("_sample_docs/layout-parser-paper.pdf", True),
+        ("_sample_docs/fake.doc", False),
     ],
 )
 def test_split_pdf(
+    call_threads: int,
     filename: str,
+    expected_ok: bool,
 ):
+    try:
+        response = requests.get("http://localhost:8000/general/docs")
+        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on localhost:8000"
+
     client = UnstructuredClient(
         api_key_auth=FAKE_KEY,
         server_url="localhost:8000"
@@ -141,7 +154,17 @@ def test_split_pdf(
         split_pdf_page=True,
     )
 
-    resp_split = client.general.partition(req)
+    os.environ["UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS"] = str(call_threads)
+
+    try:
+        resp_split = client.general.partition(req)
+    except pypdf.errors.PdfStreamError as exc:
+        if expected_ok:
+            raise exc
+        else:
+            # Parsing doc will cause this error and we don't want to proceed.
+            return
+
     req.split_pdf_page = False
     resp_single = client.general.partition(req)
 
