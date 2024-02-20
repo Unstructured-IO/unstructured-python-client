@@ -113,6 +113,16 @@ s = unstructured_client.UnstructuredClient(client: http_client)
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
+### Parameters
+
+`PartitionParameters` has parameters listed in `docs/models/shared/partitionparameters.md`
+
+More details about:
+1. `split_pdf_page` - when you set to True, it will cause the pdf to be split at client side, 
+   before sending to api. This currently causes the `parent_id` generation to be disabled, as that
+   requires having context of multiple pages. **Also this will fail for non-pdf files, so set it to
+   True only for pdfs.** The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var. By default it equals to 5.
+
 ### Maturity
 
 This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning usage
@@ -126,13 +136,19 @@ Feel free to open a PR or a Github issue as a proof of concept and we'll do our 
 
 ### SDK Created by [Speakeasy](https://docs.speakeasyapi.dev/docs/using-speakeasy/client-sdks)
 
-In order to start working with this repo, you need:
+In order to start working with this repo, you need to:
 1. Install Speakeasy client locally https://github.com/speakeasy-api/speakeasy#installation
 2. Run `speakeasy auth login`
+3. Run `make client-generate`. This allows to iterate development with python client.
 
-Then put into local `openapi.json` the API for which you want to generate client,
-and run `make sdk-generate`. This allows to iterate development with python client.
+There are two important files:
+1. `openapi_backend.json` is maintained to represent the API that is supported on backend.
+2. `openapi.json` is treated as a source of truth for what should be accepted in python client.
 
-When preparing PR with changes, include in it only the human changes.
-Once it's merged, Github CI will autogenerate the Speakeasy client in a new PR.
+The idea is, that it is easier to maintain this file showing exactly what we support, instead of handcrafting diffs.
+
+When `openapi_backend.json` and `openapi.json` are compared using `make diff-openapi`, the diff is created
+which forms Speakeasy overlay, which shows exactly where are the differences. This is useful for proof checking.
+
+Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR.
 You will have to manually bring back the human created lines in it.

@@ -1,8 +1,0 @@
-overlay: 1.0.0
-info:
-  title: Overlay ./_dev/openapi.json => ./_dev/openapi_client.json
-  version: 0.0.0
-actions:
-  - target: $["components"]["schemas"]["partition_parameters"]["properties"]
-    update:
-      "split_pdf_page": {"type": "boolean", "title": "Split Pdf Page", "description": "Should the pdf file be split at client. Ignored on backend."}
