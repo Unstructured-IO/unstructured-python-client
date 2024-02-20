@@ -118,6 +118,7 @@ def get_pdf_pages(file_content: bytes, split_size: int = 1):
             new_pdf.add_page(page)
 
         new_pdf.write(pdf_buffer)
+        pdf_buffer.seek(0)
 
         # 1-index the page numbers
         yield pdf_buffer, offset+1

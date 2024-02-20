@@ -28,7 +28,7 @@ install: install-test install-dev
 .PHONY: test
 test:
 	PYTHONPATH=. pytest \
-		_test_unstructured_client
+		_test_unstructured_client -v
 
 .PHONY: lint
 lint:

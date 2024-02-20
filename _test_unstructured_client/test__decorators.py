@@ -1,4 +1,5 @@
 import pytest
+from deepdiff import DeepDiff
 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
@@ -108,3 +109,49 @@ def test_suggest_defining_url_issues_a_warning_on_a_401():
             match="If intending to use the paid API, please define `server_url` in your request.",
         ):
             client.general.partition(req)
+
+
+# Requires unstructured-api running in bg. Use `make run-web-app`. Should be automated, eg with docker.
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "_sample_docs/list-item-example.pdf",
+        "_sample_docs/layout-parser-paper-fast.pdf",
+        "_sample_docs/layout-parser-paper.pdf",
+    ],
+)
+def test_split_pdf(
+    filename: str,
+):
+    client = UnstructuredClient(
+        api_key_auth=FAKE_KEY,
+        server_url="localhost:8000"
+    )
+
+    with open(filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = shared.PartitionParameters(
+        files=files,
+        strategy='fast',
+        languages=["eng"],
+        split_pdf_page=True,
+    )
+
+    resp_split = client.general.partition(req)
+    req.split_pdf_page = False
+    resp_single = client.general.partition(req)
+
+    assert len(resp_split.elements) == len(resp_single.elements)
+    assert resp_split.content_type == resp_single.content_type
+    assert resp_split.status_code == resp_single.status_code
+    # So far raw_response is not faked to be the same
+    assert resp_split.raw_response.text != resp_single.raw_response.text
+
+    # Difference in the parent_id is expected, because parent_ids are assigned when element crosses page boundary
+    diff = DeepDiff(t1=resp_split.elements, t2=resp_single.elements,
+                    exclude_regex_paths=r"root\[\d+\]\['metadata'\]\['parent_id'\]")
+    assert len(diff) == 0
