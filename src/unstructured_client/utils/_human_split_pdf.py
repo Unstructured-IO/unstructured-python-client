@@ -16,7 +16,7 @@ from unstructured_client.models.operations import PartitionResponse
 logger = logging.getLogger('unstructured-client')
 
 
-def extract_split_pdf_page(func):
+def handle_split_pdf_page(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -31,7 +31,11 @@ def extract_split_pdf_page(func):
 
         pages = get_pdf_pages(request.files.content)
 
-        call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", 5))
+        try:
+            call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", 5))
+        except ValueError:
+            call_threads = 5
+            logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
         logger.info(f"Splitting PDF by page on client. Using {call_threads} threads when calling API. "
                     f"Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS if you want to change that.")
 
