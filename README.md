@@ -48,6 +48,7 @@ req = shared.PartitionParameters(
     # Other partition params
     strategy='ocr_only',
     languages=["eng"],
+    split_pdf_page=True,
 )
 
 try:

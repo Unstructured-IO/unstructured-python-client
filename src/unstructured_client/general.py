@@ -5,15 +5,17 @@ from typing import Any, List, Optional
 from unstructured_client import utils
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.utils._human_utils import suggest_defining_url_if_401  # human code
+from unstructured_client.utils._human_split_pdf import extract_split_pdf_page  # human code
+
 
 class General:
     sdk_configuration: SDKConfiguration
 
     def __init__(self, sdk_config: SDKConfiguration) -> None:
         self.sdk_configuration = sdk_config
-        
-    
+
     @suggest_defining_url_if_401  # human code
+    @extract_split_pdf_page
     def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
@@ -67,4 +69,3 @@ class General:
 
         return res
 
-    
