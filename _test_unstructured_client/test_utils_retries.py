@@ -12,11 +12,11 @@ from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
-def test_retry_with_backoff_does_retry(caplog):
+def test_unit_retry_with_backoff_does_retry(caplog):
     caplog.set_level(logging.INFO)
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
-        initial_interval=100, max_interval=1000, exponent=1.5, max_elapsed_time=3000
+        initial_interval=10, max_interval=100, exponent=1.5, max_elapsed_time=300
     )
     retries = RetryConfig(
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
@@ -41,11 +41,11 @@ def test_retry_with_backoff_does_retry(caplog):
         assert len(mock.request_history) > 1 
 
 
-def test_backoff_strategy_logs_retries(caplog):
+def test_unit_backoff_strategy_logs_retries(caplog):
     caplog.set_level(logging.INFO)
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
-        initial_interval=100, max_interval=1000, exponent=1.5, max_elapsed_time=3000
+        initial_interval=10, max_interval=100, exponent=1.5, max_elapsed_time=300
     )
     retries = RetryConfig(
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True

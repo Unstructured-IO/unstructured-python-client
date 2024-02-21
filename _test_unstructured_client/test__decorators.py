@@ -24,7 +24,7 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "unstructured-000mock.api.unstructuredapp.io/general/v0/general",
     ],
 )
-def test_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
+def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
     client = UnstructuredClient(
         server_url=server_url,
         api_key_auth=FAKE_KEY,
@@ -46,7 +46,7 @@ def test_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
         "http://localhost:8000/general/v0/general",
     ],
 )
-def test_clean_server_url_fixes_malformed_localhost_url(server_url: str):
+def test_unit_clean_server_url_fixes_malformed_localhost_url(server_url: str):
     client = UnstructuredClient(
         server_url=server_url,
         api_key_auth=FAKE_KEY,
@@ -54,12 +54,12 @@ def test_clean_server_url_fixes_malformed_localhost_url(server_url: str):
     assert client.general.sdk_configuration.server_url == "http://localhost:8000"
 
 
-def test_clean_server_url_returns_empty_string_given_empty_string():
+def test_unit_clean_server_url_returns_empty_string_given_empty_string():
     client = UnstructuredClient( server_url="", api_key_auth=FAKE_KEY)
     assert client.general.sdk_configuration.server_url == ""
 
 
-def test_clean_server_url_returns_None_given_no_server_url():
+def test_unit_clean_server_url_returns_None_given_no_server_url():
     client = UnstructuredClient(
         api_key_auth=FAKE_KEY,
     )
@@ -75,7 +75,7 @@ def test_clean_server_url_returns_None_given_no_server_url():
         "unstructured-000mock.api.unstructuredapp.io/general/v0/general",
     ],
 )
-def test_clean_server_url_fixes_malformed_urls_with_positional_arguments(
+def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(
     server_url: str,
 ):
     client = UnstructuredClient(
@@ -89,7 +89,7 @@ def test_clean_server_url_fixes_malformed_urls_with_positional_arguments(
     )
 
 
-def test_suggest_defining_url_issues_a_warning_on_a_401():
+def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
     client = UnstructuredClient(
         api_key_auth=FAKE_KEY,
     )
@@ -125,7 +125,7 @@ def test_suggest_defining_url_issues_a_warning_on_a_401():
         ("_sample_docs/fake.doc", False),
     ],
 )
-def test_split_pdf(
+def test_integration_split_pdf(
     call_threads: int,
     filename: str,
     expected_ok: bool,
