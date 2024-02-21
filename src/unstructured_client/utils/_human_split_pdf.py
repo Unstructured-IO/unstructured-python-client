@@ -3,23 +3,24 @@ import io
 import logging
 import os
 import functools
-from itertools import repeat
 from typing import Optional, Tuple, Callable
 from concurrent.futures import ThreadPoolExecutor
 
 from pypdf import PdfReader, PdfWriter
 
 from unstructured_client import utils
-from unstructured_client.models import shared
-from unstructured_client.models.operations import PartitionResponse
+from unstructured_client.models import shared, operations
 
 logger = logging.getLogger('unstructured-client')
 
 
-def handle_split_pdf_page(func):
+def handle_split_pdf_page(func: Callable) -> Callable:
+    """
+    A decorator for splitting PDF by pages and sending each of them separately to backend.
+    """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> operations.PartitionResponse:
         if len(args) > 0:
             request = args[1]
         else:
@@ -37,7 +38,7 @@ def handle_split_pdf_page(func):
             call_threads = 5
             logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
         logger.info("Splitting PDF by page on client. Using %d threads when calling API.", call_threads)
-        logger.info("Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS if you want to change that.")
+        logger.info("Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS env var if you want to change that.")
 
         results = []
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
@@ -47,11 +48,19 @@ def handle_split_pdf_page(func):
                 retries = args[2]
             self = args[0]
 
-            for result in executor.map(call_api, pages, repeat(func), repeat(self), repeat(request), repeat(retries)):
+            call_api_partial = functools.partial(
+                call_api,
+                func=func,
+                self=self,
+                request=request,
+                retries=retries
+            )
+
+            for result in executor.map(call_api_partial, pages):
                 results.append(result)
 
             if all(result.status_code != 200 for result in results):
-                resp = PartitionResponse(
+                resp = operations.PartitionResponse(
                     raw_response=results[0].raw_response,
                     status_code=results[0].status_code,
                     elements=[],
@@ -63,7 +72,7 @@ def handle_split_pdf_page(func):
             flattened_elements = [element for response in results
                                   if response.status_code == 200 for element in response.elements]
 
-            resp = PartitionResponse(
+            resp = operations.PartitionResponse(
                 raw_response=first_success.raw_response,
                 status_code=200,
                 elements=flattened_elements,
