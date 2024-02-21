@@ -32,12 +32,12 @@ def handle_split_pdf_page(func):
         pages = get_pdf_pages(request.files.content)
 
         try:
-            call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", 5))
+            call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", "5"))
         except ValueError:
             call_threads = 5
             logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
-        logger.info(f"Splitting PDF by page on client. Using {call_threads} threads when calling API. "
-                    f"Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS if you want to change that.")
+        logger.info("Splitting PDF by page on client. Using %d threads when calling API.", call_threads)
+        logger.info("Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS if you want to change that.")
 
         results = []
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
@@ -103,22 +103,21 @@ def call_api(page_tuple: Tuple[io.BytesIO, int], func: Callable, self, request: 
         return []
 
 
-def get_pdf_pages(file_content: bytes, split_size: int = 1):
+def get_pdf_pages(file_content: bytes, split_size: int = 1) -> Tuple[io.BytesIO, int]:
     """
     Given a path to a pdf, open the pdf and split it into n file-like objects, each with split_size pages
     Yield the files with their page offset in the form (BytesIO, int)
     """
 
     pdf = PdfReader(io.BytesIO(file_content))
-    pdf_pages = pdf.pages
     offset = 0
 
-    while offset < len(pdf_pages):
+    while offset < len(pdf.pages):
         new_pdf = PdfWriter()
         pdf_buffer = io.BytesIO()
 
         end = offset + split_size
-        for page in pdf_pages[offset:end]:
+        for page in list(pdf.pages[offset:end]):
             new_pdf.add_page(page)
 
         new_pdf.write(pdf_buffer)

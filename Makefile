@@ -29,6 +29,7 @@ install: install-test install-dev
 .PHONY: test
 test: test-unit test-integration-docker
 
+.PHONY: test-unit
 test-unit:
 	PYTHONPATH=. pytest _test_unstructured_client -v -k "unit"
 
