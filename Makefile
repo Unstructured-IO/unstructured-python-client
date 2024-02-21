@@ -16,7 +16,6 @@ install-test:
 install-dev:
 	pip install jupyter
 	pip install pylint
-	sudo apt-get install jq
 
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
@@ -34,7 +33,6 @@ test-unit:
 	PYTHONPATH=. pytest _test_unstructured_client -v -k "unit"
 
 # Assumes you have unstructured-api running on localhost:8000
-# Runs the unstructured-api in docker for tests
 .PHONY: test-integration
 test-integration:
 	PYTHONPATH=. pytest _test_unstructured_client -v -k "integration"

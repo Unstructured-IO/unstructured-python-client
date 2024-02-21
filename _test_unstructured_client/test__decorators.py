@@ -114,7 +114,7 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
             client.general.partition(req)
 
 
-# Requires unstructured-api running in bg. Use `make run-web-app`. Should be automated, eg with docker.
+# Requires unstructured-api running in bg. See Makefile for how to run it.
 @pytest.mark.parametrize("call_threads", [1, 2, 5])
 @pytest.mark.parametrize(
     "filename, expected_ok",
