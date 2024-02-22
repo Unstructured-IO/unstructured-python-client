@@ -8,6 +8,7 @@ from unstructured_client import utils
 from unstructured_client.models import shared
 
 class UnstructuredClient:
+    r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
     general: General
 
     sdk_configuration: SDKConfiguration
