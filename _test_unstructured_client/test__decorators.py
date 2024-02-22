@@ -114,7 +114,6 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
             client.general.partition(req)
 
 
-# Requires unstructured-api running in bg. See Makefile for how to run it.
 @pytest.mark.parametrize("call_threads", [1, 2, 5])
 @pytest.mark.parametrize(
     "filename, expected_ok",
@@ -125,11 +124,17 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
         ("_sample_docs/fake.doc", False),
     ],
 )
-def test_integration_split_pdf(
+def test_integration_split_pdf_has_same_output_as_non_split(
     call_threads: int,
     filename: str,
     expected_ok: bool,
 ):
+    """
+    Tests that output that we get from the split-by-page pdf is the same as from non-split.
+
+    Requires unstructured-api running in bg. See Makefile for how to run it.
+    Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / call_threads.
+    """
     try:
         response = requests.get("http://localhost:8000/general/docs")
         assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"

@@ -129,14 +129,26 @@ This SDK is in beta, and there may be breaking changes between versions without 
 to a specific package version. This way, you can install the same version each time without breaking changes unless you are intentionally
 looking for the latest version.
 
+### Installation Instructions for Local Development
+
+The following instructions are intended to help you get up and running with `unstructured-python-client` locally if you are planning to contribute to the project.
+
+* Using `pyenv` to manage virtualenv's is recommended but not necessary
+   * Mac install instructions. See [here](https://github.com/Unstructured-IO/community#mac--homebrew) for more detailed instructions.
+      * `brew install pyenv-virtualenv`
+      * `pyenv install 3.10`
+   * Linux instructions are available [here](https://github.com/Unstructured-IO/community#linux).
+
+* Create a virtualenv to work in and activate it, e.g. for one named `unstructured-python-client`:
+
+  `pyenv  virtualenv 3.10 unstructured-python-client` <br />
+  `pyenv activate unstructured-python-client`
+
+* Run `make install` and `make test`
+
 ### Contributions
 
-While we value open-source contributions to this SDK, this library is generated programmatically.
-Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
-
-### SDK Created by [Speakeasy](https://docs.speakeasyapi.dev/docs/using-speakeasy/client-sdks)
-
-In order to start working with this repo, you need to:
+While we value open-source contributions to this SDK, this library is generated programmatically by Speakeasy. In order to start working with this repo, you need to:
 1. Install Speakeasy client locally https://github.com/speakeasy-api/speakeasy#installation
 2. Run `speakeasy auth login`
 3. Run `make client-generate`. This allows to iterate development with python client.
@@ -152,3 +164,7 @@ which forms Speakeasy overlay, which shows exactly where are the differences. Th
 
 Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR.
 You will have to manually bring back the human created lines in it.
+
+Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
+
+### SDK Created by [Speakeasy](https://docs.speakeasyapi.dev/docs/using-speakeasy/client-sdks)
