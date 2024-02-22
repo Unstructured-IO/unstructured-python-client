@@ -119,9 +119,9 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
 @pytest.mark.parametrize(
     "filename, expected_ok",
     [
-        ("_sample_docs/list-item-example.pdf", True),
-        ("_sample_docs/layout-parser-paper-fast.pdf", True),
-        ("_sample_docs/layout-parser-paper.pdf", True),
+        ("_sample_docs/list-item-example-1.pdf", True),       # 1 page
+        ("_sample_docs/layout-parser-paper-fast.pdf", True),  # 2 pages
+        ("_sample_docs/layout-parser-paper.pdf", True),       # 16 pages
         ("_sample_docs/fake.doc", False),
     ],
 )
@@ -162,7 +162,7 @@ def test_integration_split_pdf(
         if expected_ok:
             raise exc
         else:
-            # Parsing doc will cause this error and we don't want to proceed.
+            # Parsing fake.doc will cause this error and we don't want to proceed.
             return
 
     req.split_pdf_page = False
@@ -171,8 +171,6 @@ def test_integration_split_pdf(
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type
     assert resp_split.status_code == resp_single.status_code
-    # So far raw_response is not faked to be the same
-    assert resp_split.raw_response.text != resp_single.raw_response.text
 
     # Difference in the parent_id is expected, because parent_ids are assigned when element crosses page boundary
     diff = DeepDiff(t1=resp_split.elements, t2=resp_single.elements,

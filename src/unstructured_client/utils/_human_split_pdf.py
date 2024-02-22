@@ -86,6 +86,7 @@ def handle_split_pdf_page(func: Callable) -> Callable:
 def call_api(page_tuple: Tuple[io.BytesIO, int], func: Callable, self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None):
     """
     Given a single pdf file, send the bytes to the Unstructured api.
+
     Self is General, but can't use type here because of circular imports. The rest of parameters are like in partition().
     When we get the result, replace the page numbers in the metadata (since everything will come back as page 1)
     """
@@ -114,8 +115,9 @@ def call_api(page_tuple: Tuple[io.BytesIO, int], func: Callable, self, request: 
 
 def get_pdf_pages(file_content: bytes, split_size: int = 1) -> Tuple[io.BytesIO, int]:
     """
-    Given a path to a pdf, open the pdf and split it into n file-like objects, each with split_size pages
-    Yield the files with their page offset in the form (BytesIO, int)
+    Given a path to a pdf, open the pdf and split it into n file-like objects, each with split_size pages.
+
+    Yield the files with their page number in the int element of result tuple.
     """
 
     pdf = PdfReader(io.BytesIO(file_content))

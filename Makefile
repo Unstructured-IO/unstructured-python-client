@@ -40,6 +40,7 @@ test-integration:
 # Runs the unstructured-api in docker for tests
 .PHONY: test-integration-docker
 test-integration-docker:
+	-docker stop unstructured-api && docker kill unstructured-api
 	docker run --name unstructured-api -p 8000:8000 -d --rm ${DOCKER_IMAGE} --host 0.0.0.0 && \
 	curl -s -o /dev/null --retry 10 --retry-delay 5 --retry-all-errors http://localhost:8000/general/docs && \
 	PYTHONPATH=. pytest _test_unstructured_client -v -k "integration" && \

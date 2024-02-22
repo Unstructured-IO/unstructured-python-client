@@ -15,7 +15,7 @@ class General:
         self.sdk_configuration = sdk_config
 
     @suggest_defining_url_if_401  # human code
-    @handle_split_pdf_page
+    @handle_split_pdf_page  # human code
     def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
