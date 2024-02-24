@@ -41,5 +41,5 @@ jobs:
       run: make install-test
     - name: Run unit tests
       run: |
-        pip install unstructured-client
+        pip install -e .
         make test
