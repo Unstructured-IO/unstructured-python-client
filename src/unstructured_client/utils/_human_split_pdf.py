@@ -6,6 +6,7 @@ import functools
 from typing import Optional, Tuple, Callable, Any, List
 from concurrent.futures import ThreadPoolExecutor
 
+import pypdf
 from pypdf import PdfReader, PdfWriter
 
 from unstructured_client import utils
@@ -33,8 +34,17 @@ def handle_split_pdf_page(func: Callable) -> Callable:
         else:
             raise ValueError("Expected a request argument for the partition function.")
 
-        split_pdf_page = request.split_pdf_page
+        is_pdf_by_extension = request.files.file_name.endswith(".pdf") if request.files.file_name else False
+        split_pdf_page = request.split_pdf_page and is_pdf_by_extension
         if not split_pdf_page:
+            return func(*args, **kwargs)
+
+        try:
+            PdfReader(io.BytesIO(request.files.content), strict=True)
+        except (pypdf.errors.PdfReadError, UnicodeDecodeError) as exc:
+            logger.error(exc)
+            logger.warning("Attempted to interpret file as pdf, but error arose when splitting by pages. "
+                           "Reverting to non-split pdf handling path.")
             return func(*args, **kwargs)
 
         pages = get_pdf_pages(request.files.content)

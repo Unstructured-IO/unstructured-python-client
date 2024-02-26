@@ -119,9 +119,9 @@ s = unstructured_client.UnstructuredClient(client: http_client)
 
 More details about:
 1. `split_pdf_page` - when you set to True, it will cause the pdf to be split at client side, 
-   before sending to api. This currently causes the `parent_id` generation to be disabled, as that
-   requires having context of multiple pages. **Also this will fail for non-pdf files, so set it to
-   True only for pdfs.** The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var.
+   before sending to api. This currently causes the `parent_id`  metadata generation in elements to be disabled, as that
+   requires having context of multiple pages. This will work only for pdf files, so don't set it for other filetypes. 
+   The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var.
    By default it equals to 5. It can't be more than 15, to avoid too high resource usage and costs.
 
 ### Maturity
