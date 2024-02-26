@@ -13,6 +13,8 @@ from unstructured_client.models import shared, operations
 
 logger = logging.getLogger('unstructured-client')
 
+REQUEST_ARG_IDX = 1
+
 
 def handle_split_pdf_page(func: Callable) -> Callable:
     """
@@ -21,8 +23,10 @@ def handle_split_pdf_page(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> operations.PartitionResponse:
-        if len(args) > 0:
-            request = args[1]
+        if len(args) > 1:
+            request = args[REQUEST_ARG_IDX]
+        elif kwargs.get("request"):
+            request = kwargs.get("request")
         else:
             raise ValueError("Expected a request argument for the partition function.")
         split_pdf_page = request.split_pdf_page
