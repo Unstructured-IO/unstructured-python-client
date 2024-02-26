@@ -121,7 +121,8 @@ More details about:
 1. `split_pdf_page` - when you set to True, it will cause the pdf to be split at client side, 
    before sending to api. This currently causes the `parent_id` generation to be disabled, as that
    requires having context of multiple pages. **Also this will fail for non-pdf files, so set it to
-   True only for pdfs.** The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var. By default it equals to 5.
+   True only for pdfs.** The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var.
+   By default it equals to 5. It can't be more than 15, to avoid too high resource usage and costs.
 
 ### Maturity
 

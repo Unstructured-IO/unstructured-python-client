@@ -35,14 +35,7 @@ def handle_split_pdf_page(func: Callable) -> Callable:
             return func(*args, **kwargs)
 
         pages = get_pdf_pages(request.files.content)
-
-        try:
-            call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", "5"))
-        except ValueError:
-            call_threads = 5
-            logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
-        logger.info("Splitting PDF by page on client. Using %d threads when calling API.", call_threads)
-        logger.info("Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS env var if you want to change that.")
+        call_threads = get_split_pdf_call_threads()
 
         results = []
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
@@ -141,3 +134,21 @@ def get_pdf_pages(file_content: bytes, split_size: int = 1) -> Tuple[io.BytesIO,
         # 1-index the page numbers
         yield pdf_buffer, offset+1
         offset += split_size
+
+
+def get_split_pdf_call_threads() -> int:
+    """
+    Read from os envs the number of threads that should be used for splitting pdf on client side.
+    """
+    max_threads = 15
+    try:
+        call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", "5"))
+    except ValueError:
+        call_threads = 5
+        logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
+    if call_threads > max_threads:
+        logger.warning("Clipping UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS to %d.", max_threads)
+        call_threads = max_threads
+    logger.info("Splitting PDF by page on client. Using %d threads when calling API.", call_threads)
+    logger.info("Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS env var if you want to change that.")
+    return call_threads
