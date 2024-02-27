@@ -38,4 +38,4 @@ jobs:
     - name: Install dependencies
       run: pip install .[dev]
     - name: Lint
-      run: pylint --rcfile=pylintrc src
+      run: make lint
