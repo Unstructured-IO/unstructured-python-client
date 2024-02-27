@@ -24,8 +24,10 @@ pip install unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
 
+/docs/models/shared/partitionparameters.md
+
 ## Usage
-Only the `files` parameter is required. See the [general partition](docs/sdks/general/README.md) page for all available parameters. 
+Only the `files` parameter is required. See the [general partition](/docs/models/shared/partitionparameters.md) page for all available parameters. 
 
 ```python
 from unstructured_client import UnstructuredClient
@@ -123,4 +125,4 @@ looking for the latest version.
 While we value open-source contributions to this SDK, this library is generated programmatically.
 Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
 
-### SDK Created by [Speakeasy](https://docs.speakeasyapi.dev/docs/using-speakeasy/client-sdks)
+### SDK Created by [Speakeasy](https://www.speakeasyapi.dev/docs/sdk-design/python/methodology-python)
