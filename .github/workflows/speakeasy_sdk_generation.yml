@@ -24,7 +24,7 @@ jobs:
       create_release: true
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
-        - https://api.unstructured.io/general/openapi.json
+        - https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
       publish_python: true
       speakeasy_version: latest
     secrets:
