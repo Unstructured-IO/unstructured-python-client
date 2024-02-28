@@ -124,13 +124,13 @@ def call_api(
                 element["metadata"]["page_number"] = page_number
         return result
 
-    except errors.SDKError as e:
-        logger.error(e)
+    except errors.SDKError as err:
+        logger.error(err)
 
         result = operations.PartitionResponse(
-            status_code=e.status_code,
-            raw_response=e.raw_response,
-            content_type=e.raw_response.headers.get('Content-Type'),
+            status_code=err.status_code,
+            raw_response=err.raw_response,
+            content_type=err.raw_response.headers.get('Content-Type'),
             elements=[],
         )
         return result
