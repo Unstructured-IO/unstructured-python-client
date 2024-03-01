@@ -43,6 +43,10 @@ class PartitionParameters:
     r"""If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500"""
     output_format: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'output_format' }})
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
+    overlap: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'overlap' }})
+    r"""A prefix of this many trailing characters from prior text-split chunk is applied to second and later chunks formed from oversized elements by text-splitting. Default: None"""
+    overlap_all: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'overlap_all' }})
+    r"""When True, overlap is also applied to 'normal' chunks formed by combining whole elements. Use with caution as this can introduce noise into otherwise clean semantic units. Default: None"""
     pdf_infer_table_structure: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'pdf_infer_table_structure' }})
     r"""If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>."""
     skip_infer_table_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
