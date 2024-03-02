@@ -15,10 +15,6 @@ req = shared.PartitionParameters(
         'image',
         'table',
     ],
-    files=shared.Files(
-        content='0x2cC94b2FEF'.encode(),
-        file_name='um.shtml',
-    ),
     gz_uncompressed_content_type='application/pdf',
     hi_res_model_name='yolox',
     languages=[
@@ -31,9 +27,8 @@ req = shared.PartitionParameters(
     max_characters=1500,
     new_after_n_chars=1500,
     output_format='application/json',
-    skip_infer_table_types=[
-        'pdf',
-    ],
+    overlap=25,
+    overlap_all=True,
     strategy='hi_res',
 )
 
