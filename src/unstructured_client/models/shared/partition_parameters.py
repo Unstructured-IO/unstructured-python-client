@@ -51,6 +51,8 @@ class PartitionParameters:
     r"""If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>."""
     skip_infer_table_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
     r"""The document types that you want to skip table extraction with. Default: ['pdf', 'jpg', 'png']"""
+    split_pdf_page: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'split_pdf_page' }})
+    r"""Should the pdf file be split at client. Ignored on backend."""
     strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
     xml_keep_tags: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'xml_keep_tags' }})

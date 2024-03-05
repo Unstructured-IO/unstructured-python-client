@@ -16,6 +16,10 @@ if TYPE_CHECKING:
 _P = ParamSpec("_P")
 SERVER_URL_ARG_IDX = 3
 
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', stream=sys.stdout)
+logger = logging.getLogger('unstructured-client')
+logger.setLevel(logging.INFO)
+
 
 def clean_server_url(func: Callable[_P, None]) -> Callable[_P, None]:
     """A decorator for fixing common types of malformed 'server_url' arguments.
@@ -95,14 +99,13 @@ def suggest_defining_url_if_401(
 
 def log_retries(retry_count: int, sleep: float, exception: Exception):
     """Function for logging retries to give users visibility into requests."""
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s', stream=sys.stdout)
-    logger = logging.getLogger('unstructured-client')
-    logger.setLevel(logging.INFO)
-    logger.info(
-        "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.", 
-        exception.response.status_code,
-        retry_count,
-        round(sleep, 1),
-    )
-    if bool(exception.response.text):
-        logger.info(exception.response.text)
+    if hasattr(exception, "response"):
+        logger.info(
+            "Response status code: %s Retry attempt #%s. Sleeping %s seconds before retry.",
+            exception.response.status_code,
+            retry_count,
+            round(sleep, 1),
+        )
+
+        if bool(exception.response.text):
+            logger.info(exception.response.text)
