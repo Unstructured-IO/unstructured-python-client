@@ -6,18 +6,15 @@ from typing import Any, List, Optional
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
-from unstructured_client.utils._human_utils import suggest_defining_url_if_401  # human code
-from unstructured_client.utils._human_split_pdf import handle_split_pdf_page  # human code
-
 
 class General:
     sdk_configuration: SDKConfiguration
 
     def __init__(self, sdk_config: SDKConfiguration) -> None:
         self.sdk_configuration = sdk_config
-
-    @suggest_defining_url_if_401  # human code
-    @handle_split_pdf_page  # human code
+        
+    
+    
     def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         hook_ctx = HookContext(operation_id='partition', oauth2_scopes=[], security_source=self.sdk_configuration.security)
@@ -36,7 +33,7 @@ class General:
         else:
             client = utils.configure_security_client(self.sdk_configuration.client, self.sdk_configuration.security)
         
-
+        
         global_retry_config = self.sdk_configuration.retry_config
         retry_config = retries
         if retry_config is None:
@@ -48,7 +45,7 @@ class General:
         def do_request():
             try:
                 req = self.sdk_configuration.get_hooks().before_request(
-                    hook_ctx,
+                    hook_ctx, 
                     requests_http.Request('POST', url, data=data, files=form, headers=headers).prepare(),
                 )
                 http_res = client.send(req)
@@ -71,7 +68,7 @@ class General:
         http_res = utils.retry(do_request, utils.Retries(retry_config, [
             '5xx'
         ]))
-
+        
         content_type = http_res.headers.get('Content-Type')
         
         res = operations.PartitionResponse(status_code=http_res.status_code, content_type=content_type, raw_response=http_res)
@@ -94,3 +91,4 @@ class General:
 
         return res
 
+    
