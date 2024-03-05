@@ -23,10 +23,8 @@ pip install unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
 
-/docs/models/shared/partitionparameters.md
-
 ## Usage
-Only the `files` parameter is required. See the [general partition](/docs/models/shared/partitionparameters.md) page for all available parameters. 
+Only the `files` parameter is required. 
 
 ```python
 from unstructured_client import UnstructuredClient
@@ -49,7 +47,6 @@ req = shared.PartitionParameters(
     # Other partition params
     strategy='ocr_only',
     languages=["eng"],
-    split_pdf_page=True,
 )
 
 try:
@@ -57,20 +54,26 @@ try:
     print(resp.elements[0])
 except SDKError as e:
     print(e)
+```
+    
+Result:
 
-# {
-# 'type': 'UncategorizedText', 
-# 'element_id': 'fc550084fda1e008e07a0356894f5816', 
-# 'metadata': {
-#   'filename': 'layout-parser-paper-fast.pdf', 
-#   'filetype': 'application/pdf', 
-#   'languages': ['eng'], 
-#   'page_number': 1
-#   }
-# }
+```json
+{
+'type': 'UncategorizedText', 
+'element_id': 'fc550084fda1e008e07a0356894f5816', 
+'metadata': {
+  'filename': 'layout-parser-paper-fast.pdf', 
+  'filetype': 'application/pdf', 
+  'languages': ['eng'], 
+  'page_number': 1
+  }
+}
 ```
 
-## Change the base URL
+### UnstructuredClient
+
+#### Change the base URL
 
 If you are self hosting the API, or developing locally, you can change the server URL when setting up the client.
 
@@ -87,6 +90,24 @@ s = unstructured_client.UnstructuredClient(
     api_key_auth=api_key,
 )
 ```
+
+### PartitionParameters
+
+See the [general partition](/docs/models/shared/partitionparameters.md) page for all available parameters. 
+
+#### Splitting PDF by pages
+
+In order to speed up processing of long PDF files, set `split_pdf_page=True`. It will cause the PDF
+to be split page-by-page at client side, before sending to API, and combining individual responses
+as single result. This will work only for PDF files, so don't set it for other filetypes.
+
+Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
+requires having context of multiple pages.
+
+The amount of threads that will be used for sending individual pdf pages, is controlled by
+`UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var. By default it equals to 5. 
+It can't be more than 15, to avoid too high resource usage and costs.
+
 <!-- No SDK Example Usage -->
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
@@ -114,17 +135,6 @@ s = unstructured_client.UnstructuredClient(client: http_client)
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
-### Parameters
-
-`PartitionParameters` has parameters listed in `docs/models/shared/partitionparameters.md`
-
-More details about:
-1. `split_pdf_page` - when you set to True, it will cause the pdf to be split at client side, 
-   before sending to api. This currently causes the `parent_id`  metadata generation in elements to be disabled, as that
-   requires having context of multiple pages. This will work only for pdf files, so don't set it for other filetypes. 
-   The amount of threads that will be used for sending individual pdf pages, is controlled by `UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var.
-   By default it equals to 5. It can't be more than 15, to avoid too high resource usage and costs.
-
 ### Maturity
 
 This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning usage
@@ -143,7 +153,7 @@ The following instructions are intended to help you get up and running with `uns
 
 * Create a virtualenv to work in and activate it, e.g. for one named `unstructured-python-client`:
 
-  `pyenv  virtualenv 3.10 unstructured-python-client` <br />
+  `pyenv  virtualenv 3.10 unstructured-python-client`
   `pyenv activate unstructured-python-client`
 
 * Run `make install` and `make test`
