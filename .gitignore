@@ -8,4 +8,5 @@ __pycache__/
 # human-added igore files
 .ipynb_checkpoints/
 .idea/
-overlay.yaml
+openapi.json
+openapi_client.json

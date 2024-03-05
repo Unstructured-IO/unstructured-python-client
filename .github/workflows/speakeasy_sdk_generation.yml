@@ -25,6 +25,8 @@ jobs:
       openapi_doc_auth_header: x-api-key
       openapi_docs: |
         - https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
+      overlay_docs: |
+        - ../../overlay_client.yaml
       publish_python: true
       speakeasy_version: latest
     secrets:

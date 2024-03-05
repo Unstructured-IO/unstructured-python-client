@@ -55,11 +55,10 @@ lint:
 
 .PHONY: client-generate
 client-generate:
-	speakeasy generate sdk -s ./openapi.json -o ./ -l python
-
-diff-openapi:
-	speakeasy overlay compare --schemas=./openapi.json --schemas=./openapi_backend.json > ./overlay.yaml
-
+	wget -nv -q -O openapi.json https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
+	speakeasy overlay validate -o ./overlay_client.yaml
+	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
+	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
 ###########
 # Jupyter #
