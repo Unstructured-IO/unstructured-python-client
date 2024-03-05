@@ -58,7 +58,7 @@ except SDKError as e:
     
 Result:
 
-```json
+```
 {
 'type': 'UncategorizedText', 
 'element_id': 'fc550084fda1e008e07a0356894f5816', 
