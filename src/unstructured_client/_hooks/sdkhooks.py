@@ -2,6 +2,7 @@
 
 import requests
 from .types import SDKInitHook, BeforeRequestContext, BeforeRequestHook, AfterSuccessContext, AfterSuccessHook, AfterErrorContext, AfterErrorHook, Hooks
+from .registration import init_hooks
 from typing import List, Optional, Tuple, Union
 
 
@@ -12,7 +13,7 @@ class SDKHooks(Hooks):
     after_error_hooks: List[AfterErrorHook] = []
 
     def __init__(self):
-        pass
+        init_hooks(self)
 
     def register_sdk_init_hook(self, hook: SDKInitHook) -> None:
         self.sdk_init_hooks.append(hook)
