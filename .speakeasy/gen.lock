@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: a112aea005467aa6818696fa4e99fcfe
+  docChecksum: 0474212adfef86a6c183841a3cb9d75b
   docVersion: 0.0.1
   speakeasyVersion: internal
   generationVersion: 2.277.0
-  releaseVersion: 0.21.0
-  configChecksum: c5e7c8526f43272d7585627468d8c4e5
+  releaseVersion: 0.21.1
+  configChecksum: 3fe601c312cca97c7198069dd11d48be
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -51,6 +51,7 @@ generatedFiles:
   - docs/models/shared/security.md
   - USAGE.md
   - .gitattributes
+  - src/unstructured_client/_hooks/registration.py
   - src/unstructured_client/_hooks/sdkhooks.py
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_hooks/__init__.py
