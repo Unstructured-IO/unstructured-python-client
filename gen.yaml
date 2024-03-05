@@ -7,8 +7,14 @@ generation:
     nameResolutionDec2023: false
     parameterOrderingFeb2024: false
     requestResponseComponentNamesFeb2024: false
+  auth:
+    oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.18.0
+  version: 0.21.0
+  additionalDependencies:
+    dependencies: {}
+    extraDependencies:
+      dev: {}
   author: Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API

@@ -21,15 +21,16 @@ from dataclasses_json import DataClassJsonMixin
 class SecurityClient:
     client: requests.Session
     query_params: Dict[str, str] = {}
+    headers: Dict[str, str] = {}
 
     def __init__(self, client: requests.Session):
         self.client = client
 
-    def request(self, method, url, **kwargs):
-        params = kwargs.get('params', {})
-        kwargs["params"] = {**self.query_params, **params}
+    def send(self, request: requests.PreparedRequest, **kwargs):
+        request.prepare_url(url=request.url, params=self.query_params)
+        request.headers.update(self.headers)
 
-        return self.client.request(method, url, **kwargs)
+        return self.client.send(request, **kwargs)
 
 
 def configure_security_client(client: requests.Session, security: dataclass):
@@ -102,20 +103,19 @@ def _parse_security_scheme_value(client: SecurityClient, scheme_metadata: Dict, 
 
     if scheme_type == "apiKey":
         if sub_type == 'header':
-            client.client.headers[header_name] = value
+            client.headers[header_name] = value
         elif sub_type == 'query':
             client.query_params[header_name] = value
-        elif sub_type == 'cookie':
-            client.client.cookies[header_name] = value
         else:
             raise Exception('not supported')
     elif scheme_type == "openIdConnect":
-        client.client.headers[header_name] = _apply_bearer(value)
+        client.headers[header_name] = _apply_bearer(value)
     elif scheme_type == 'oauth2':
-        client.client.headers[header_name] = _apply_bearer(value)
+        if sub_type != 'client_credentials':
+            client.headers[header_name] = _apply_bearer(value)
     elif scheme_type == 'http':
         if sub_type == 'bearer':
-            client.client.headers[header_name] = _apply_bearer(value)
+            client.headers[header_name] = _apply_bearer(value)
         else:
             raise Exception('not supported')
     else:
@@ -145,7 +145,7 @@ def _parse_basic_auth_scheme(client: SecurityClient, scheme: dataclass):
             password = value
 
     data = f'{username}:{password}'.encode()
-    client.client.headers['Authorization'] = f'Basic {base64.b64encode(data).decode()}'
+    client.headers['Authorization'] = f'Basic {base64.b64encode(data).decode()}'
 
 
 def generate_url(clazz: type, server_url: str, path: str, path_params: dataclass,
@@ -264,7 +264,8 @@ def get_query_params(clazz: type, query_params: dataclass, gbls: Dict[str, Dict[
         f_name = metadata.get("field_name")
         serialization = metadata.get('serialization', '')
         if serialization != '':
-            serialized_parms = _get_serialized_params(metadata, field.type, f_name, value)
+            serialized_parms = _get_serialized_params(
+                metadata, field.type, f_name, value)
             for key, value in serialized_parms.items():
                 if key in params:
                     params[key].extend(value)
@@ -312,7 +313,8 @@ def _get_serialized_params(metadata: Dict, field_type: type, field_name: str, ob
 
     serialization = metadata.get('serialization', '')
     if serialization == 'json':
-        params[metadata.get("field_name", field_name)] = marshal_json(obj, field_type)
+        params[metadata.get("field_name", field_name)
+               ] = marshal_json(obj, field_type)
 
     return params
 
@@ -702,7 +704,8 @@ def unmarshal_json(data, typ, decoder=None):
 
 def marshal_json(val, typ, encoder=None):
     if not is_optional_type(typ) and val is None:
-        raise ValueError(f"Could not marshal None into non-optional type: {typ}")
+        raise ValueError(
+            f"Could not marshal None into non-optional type: {typ}")
 
     marshal = make_dataclass('Marshal', [('res', typ)],
                              bases=(DataClassJsonMixin,))
@@ -729,6 +732,16 @@ def match_content_type(content_type: str, pattern: str) -> boolean:
         if pattern in (f'{parts[0]}/*', f'*/{parts[1]}'):
             return True
 
+    return False
+
+
+def match_status_codes(status_codes: List[str], status_code: int) -> bool:
+    for code in status_codes:
+        if code == str(status_code):
+            return True
+
+        if code.endswith("XX") and code.startswith(str(status_code)[:1]):
+            return True
     return False
 
 
@@ -835,12 +848,14 @@ def list_decoder(value_decoder: Callable):
 
     return list_decode
 
+
 def union_encoder(all_encoders: Dict[str, Callable]):
     def selective_encoder(val: any):
         if type(val) in all_encoders:
             return all_encoders[type(val)](val)
         return val
     return selective_encoder
+
 
 def union_decoder(all_decoders: List[Callable]):
     def selective_decoder(val: any):
@@ -853,6 +868,7 @@ def union_decoder(all_decoders: List[Callable]):
                 continue
         return decoded
     return selective_decoder
+
 
 def get_field_name(name):
     def override(_, _field_name=name):
