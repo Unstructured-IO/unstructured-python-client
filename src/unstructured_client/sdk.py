@@ -9,6 +9,7 @@ from unstructured_client._hooks import SDKHooks
 from unstructured_client.models import shared
 from unstructured_client.utils._human_utils import clean_server_url  # human code
 
+
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
     general: General
@@ -68,4 +69,3 @@ class UnstructuredClient:
     
     def _init_sdks(self):
         self.general = General(self.sdk_configuration)
-    

@@ -36,7 +36,7 @@ class General:
         else:
             client = utils.configure_security_client(self.sdk_configuration.client, self.sdk_configuration.security)
         
-
+        
         global_retry_config = self.sdk_configuration.retry_config
         retry_config = retries
         if retry_config is None:
@@ -48,7 +48,7 @@ class General:
         def do_request():
             try:
                 req = self.sdk_configuration.get_hooks().before_request(
-                    hook_ctx,
+                    hook_ctx, 
                     requests_http.Request('POST', url, data=data, files=form, headers=headers).prepare(),
                 )
                 http_res = client.send(req)
@@ -71,7 +71,7 @@ class General:
         http_res = utils.retry(do_request, utils.Retries(retry_config, [
             '5xx'
         ]))
-
+        
         content_type = http_res.headers.get('Content-Type')
         
         res = operations.PartitionResponse(status_code=http_res.status_code, content_type=content_type, raw_response=http_res)
@@ -94,3 +94,4 @@ class General:
 
         return res
 
+    
