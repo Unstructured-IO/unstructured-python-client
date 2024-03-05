@@ -26,7 +26,7 @@ jobs:
       openapi_docs: |
         - https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
       overlay_docs: |
-        - https://raw.githubusercontent.com/Unstructured-IO/unstructured-python-client/main/overlay_client.yaml
+        - ./overlay_client.yaml
       publish_python: true
       speakeasy_version: latest
     secrets:

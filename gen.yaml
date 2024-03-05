@@ -12,7 +12,9 @@ generation:
 python:
   version: 0.21.0
   additionalDependencies:
-    dependencies: {}
+    dependencies:
+      pypdf: '>=4.0'
+      deepdiff: '>=6.0'
     extraDependencies:
       dev: {}
   author: Unstructured
