@@ -7,8 +7,6 @@ from typing import Callable, Dict, Union
 from unstructured_client import utils
 from unstructured_client._hooks import SDKHooks
 from unstructured_client.models import shared
-from unstructured_client.utils._human_utils import clean_server_url  # human code
-
 
 class UnstructuredClient:
     r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
@@ -16,7 +14,6 @@ class UnstructuredClient:
 
     sdk_configuration: SDKConfiguration
 
-    @clean_server_url  # human code
     def __init__(self,
                  api_key_auth: Union[str, Callable[[], str]],
                  server: str = None,
@@ -69,3 +66,4 @@ class UnstructuredClient:
     
     def _init_sdks(self):
         self.general = General(self.sdk_configuration)
+    
