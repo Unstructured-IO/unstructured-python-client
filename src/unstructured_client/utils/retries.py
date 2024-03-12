@@ -6,7 +6,7 @@ from typing import List
 
 import requests
 
-from unstructured_client.utils._human_utils import log_retries # human code
+from unstructured_client.utils._human_utils import log_retries  # human code
 
 class BackoffStrategy:
     initial_interval: int
