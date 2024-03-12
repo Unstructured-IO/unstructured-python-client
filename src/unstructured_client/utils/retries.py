@@ -6,6 +6,7 @@ from typing import List
 
 import requests
 
+from unstructured_client.utils._human_utils import log_retries # human code
 
 class BackoffStrategy:
     initial_interval: int
@@ -117,4 +118,6 @@ def retry_with_backoff(func, initial_interval=500, max_interval=60000, exponent=
             if sleep > max_interval/1000:
                 sleep = max_interval/1000
             time.sleep(sleep)
+            log_retries(retry_count=retries+1, sleep=sleep, exception=exception) # human code
             retries += 1
+            
