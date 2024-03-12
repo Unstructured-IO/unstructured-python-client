@@ -10,7 +10,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.21.1
+  version: 0.22.0
   additionalDependencies:
     dependencies:
       deepdiff: '>=6.0'
@@ -34,3 +34,4 @@ python:
   maxMethodParams: 0
   outputModelSuffix: output
   packageName: unstructured-client
+  responseFormat: envelope

@@ -7,12 +7,11 @@ from typing import List, Optional, Tuple, Union
 
 
 class SDKHooks(Hooks):
-    sdk_init_hooks: List[SDKInitHook] = []
-    before_request_hooks: List[BeforeRequestHook] = []
-    after_success_hooks: List[AfterSuccessHook] = []
-    after_error_hooks: List[AfterErrorHook] = []
-
     def __init__(self):
+        self.sdk_init_hooks: List[SDKInitHook] = []
+        self.before_request_hooks: List[BeforeRequestHook] = []
+        self.after_success_hooks: List[AfterSuccessHook] = []
+        self.after_error_hooks: List[AfterErrorHook] = []
         init_hooks(self)
 
     def register_sdk_init_hook(self, hook: SDKInitHook) -> None:
