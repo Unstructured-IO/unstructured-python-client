@@ -62,5 +62,5 @@ def test_unit_backoff_strategy_logs_retries(caplog):
         req = shared.PartitionParameters(files=files)
         with pytest.raises(Exception):
             session.general.partition(req, retries=retries)    
-    pattern = re.compile(f"{re.escape('Retry attempt #1. Sleeping')}.*{'seconds before retry'}")
+    pattern = re.compile("Response status code: 500. Sleeping before retry.")
     assert bool(pattern.search(caplog.text))

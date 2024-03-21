@@ -89,10 +89,7 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(
 
 
 def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
-    client = UnstructuredClient(
-        api_key_auth=FAKE_KEY,
-    )
-
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
 
     with open(filename, "rb") as f:
@@ -101,9 +98,7 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
             file_name=filename,
         )
 
-    req = shared.PartitionParameters(
-        files=files,
-    )
+    req = shared.PartitionParameters(files=files)
     
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
         with pytest.warns(
