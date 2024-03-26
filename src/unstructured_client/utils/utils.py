@@ -272,7 +272,7 @@ def get_query_params(clazz: type, query_params: Any, gbls: Optional[Dict[str, Di
     return params
 
 
-def get_headers(headers_params: Any) -> Dict[str, str]:
+def get_headers(headers_params: Any, gbls: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None) -> Dict[str, str]:
     if headers_params is None:
         return {}
 
@@ -284,8 +284,8 @@ def get_headers(headers_params: Any) -> Dict[str, str]:
         if not metadata:
             continue
 
-        value = _serialize_header(metadata.get(
-            'explode', False), getattr(headers_params, field.name))
+        value = _populate_from_globals(field.name, getattr(headers_params, field.name), 'header', gbls)
+        value = _serialize_header(metadata.get('explode', False), value)
 
         if value != '':
             headers[metadata.get('field_name', field.name)] = value
