@@ -28,7 +28,6 @@ req = shared.PartitionParameters(
     new_after_n_chars=1500,
     output_format='application/json',
     overlap=25,
-    overlap_all=True,
     strategy='hi_res',
 )
 
