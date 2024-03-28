@@ -1,3 +1,5 @@
+"""Registration of custom, human-written hooks."""
+
 import logging
 import sys
 from typing import Optional, Tuple, Union
@@ -15,6 +17,7 @@ from .types import AfterErrorContext, AfterErrorHook, Hooks, SDKInitHook
 
 
 class CleanServerUrlSDKInitHook(SDKInitHook):
+    """Hook fixing common mistakes by users in defining `server_url` in the unstructured-client"""
 
     def clean_server_url(self, base_url) -> str:
         """Fix url scheme and remove the '/general/v0/general' path."""
@@ -40,12 +43,13 @@ class CleanServerUrlSDKInitHook(SDKInitHook):
 
 
 class LogRetriesAfterErrorHook(AfterErrorHook):
+    """Hook providing visibility to users when the client retries requests"""
 
     def log_retries(self, response: Optional[requests.Response]):
         """Log retries to give users visibility into requests."""
         logging.basicConfig(
-            level=logging.INFO, 
-            format='%(levelname)s: %(message)s', 
+            level=logging.INFO,
+            format='%(levelname)s: %(message)s',
             stream=sys.stdout,
         )
         logger = logging.getLogger('unstructured-client')
@@ -58,9 +62,9 @@ class LogRetriesAfterErrorHook(AfterErrorHook):
                 logger.info(response.text)
 
     def after_error(
-        self, 
-        hook_ctx: AfterErrorContext, 
-        response: Optional[requests.Response], 
+        self,
+        hook_ctx: AfterErrorContext,
+        response: Optional[requests.Response],
         error: Optional[Exception],
     ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
         """Concrete implementation for AfterErrorHook."""
@@ -69,18 +73,19 @@ class LogRetriesAfterErrorHook(AfterErrorHook):
 
 
 class SuggestDefiningUrlIf401AfterErrorHook(AfterErrorHook):
+    """Hook advising users to check that 'server_url' is defined if a 401 error is encountered."""
 
     def warn_if_401(self, response: Optional[requests.Response]):
-        """Suggest defining the 'server_url' parameter if a 401 error is encountered."""
+        """Suggest defining 'server_url' if a 401 error is encountered."""
         if response is not None and response.status_code == 401:
             warnings.warn(
                 "If intending to use the paid API, please define `server_url` in your request."
             )
 
     def after_error(
-        self, 
-        hook_ctx: AfterErrorContext, 
-        response: Optional[requests.Response], 
+        self,
+        hook_ctx: AfterErrorContext,
+        response: Optional[requests.Response],
         error: Optional[Exception],
     ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
         """Concrete implementation for AfterErrorHook."""
