@@ -3,7 +3,7 @@ sources:
     my-source:
         inputs:
             - location: https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
-        overlays
+        overlays:
             - location: ./overlay_client.yaml
 targets:
     unstructured-python:
