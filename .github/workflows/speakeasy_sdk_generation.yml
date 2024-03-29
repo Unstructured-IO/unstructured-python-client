@@ -1,36 +1,26 @@
 name: Generate
 permissions:
-  checks: write
-  contents: write
-  pull-requests: write
-  statuses: write
+    checks: write
+    contents: write
+    pull-requests: write
+    statuses: write
 "on":
-  workflow_dispatch:
-    inputs:
-      force:
-        description: Force generation of SDKs
-        type: boolean
-        default: false
-  schedule:
-    - cron: 0 0 * * *
+    workflow_dispatch:
+        inputs:
+            force:
+                description: Force generation of SDKs
+                type: boolean
+                default: false
+    schedule:
+        - cron: 0 0 * * *
 jobs:
-  generate:
-    uses: speakeasy-api/sdk-generation-action/.github/workflows/sdk-generation.yaml@v14
-    with:
-      force: ${{ github.event.inputs.force }}
-      languages: |
-        - python
-      mode: pr
-      create_release: true
-      openapi_doc_auth_header: x-api-key
-      openapi_docs: |
-        - https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
-      overlay_docs: |
-        - ./overlay_client.yaml
-      publish_python: true
-      speakeasy_version: latest
-    secrets:
-      github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      openapi_doc_auth_token: ${{ secrets.SPEAKEASY_API_KEY }}
-      pypi_token: ${{ secrets.PYPI_TOKEN }}
-      speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
+    generate:
+        uses: speakeasy-api/sdk-generation-action/.github/workflows/workflow-executor.yaml@v15
+        with:
+            force: ${{ github.event.inputs.force }}
+            mode: pr
+            speakeasy_version: latest
+        secrets:
+            github_access_token: ${{ secrets.GITHUB_TOKEN }}
+            pypi_token: ${{ secrets.PYPI_TOKEN }}
+            speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
