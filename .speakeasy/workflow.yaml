@@ -9,6 +9,6 @@ targets:
     unstructured-python:
         target: python
         source: my-source
-        publish:
-            pypi:
-                token: $PYPI_TOKEN
+        # publish:
+        #     pypi:
+        #         token: $PYPI_TOKEN
