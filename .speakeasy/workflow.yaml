@@ -1,0 +1,14 @@
+workflowVersion: 1.0.0
+sources:
+    my-source:
+        inputs:
+            - location: https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
+        overlays:
+            - location: ./overlay_client.yaml
+targets:
+    unstructured-python:
+        target: python
+        source: my-source
+        # publish:
+        #     pypi:
+        #         token: $PYPI_TOKEN
