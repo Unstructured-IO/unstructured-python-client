@@ -57,6 +57,8 @@ class PartitionParameters:
     r"""Should the pdf file be split at client. Ignored on backend."""
     strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
+    unique_element_ids: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'unique_element_ids' }})
+    r"""When True, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False"""
     xml_keep_tags: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'xml_keep_tags' }})
     r"""If True, will retain the XML tags in the output. Otherwise it will simply extract the text from within the tags. Only applies to partition_xml."""
     

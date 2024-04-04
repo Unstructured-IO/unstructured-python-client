@@ -135,7 +135,7 @@ import requests
 
 http_client = requests.Session()
 http_client.headers.update({'x-custom-header': 'someValue'})
-s = unstructured_client.UnstructuredClient(client: http_client)
+s = unstructured_client.UnstructuredClient(client=http_client)
 ```
 <!-- End Custom HTTP Client [http-client] -->
 

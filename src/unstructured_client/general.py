@@ -4,17 +4,17 @@ import requests as requests_http
 from .sdkconfiguration import SDKConfiguration
 from typing import Any, List, Optional
 from unstructured_client import utils
-from unstructured_client._hooks import HookContext
+from unstructured_client._hooks import AfterErrorContext, AfterSuccessContext, BeforeRequestContext, HookContext
 from unstructured_client.models import errors, operations, shared
-from unstructured_client.utils._human_split_pdf import handle_split_pdf_page  # human code
 
 class General:
     sdk_configuration: SDKConfiguration
 
     def __init__(self, sdk_config: SDKConfiguration) -> None:
         self.sdk_configuration = sdk_config
-
-    @handle_split_pdf_page  # human code
+        
+    
+    
     def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
         r"""Pipeline 1"""
         hook_ctx = HookContext(operation_id='partition', oauth2_scopes=[], security_source=self.sdk_configuration.security)
@@ -46,24 +46,22 @@ class General:
         def do_request():
             nonlocal req
             try:
-                req = self.sdk_configuration.get_hooks().before_request(
-                    hook_ctx, 
-                    requests_http.Request('POST', url, params=query_params, data=data, files=form, headers=headers).prepare(),
-                )
+                req = client.prepare_request(requests_http.Request('POST', url, params=query_params, data=data, files=form, headers=headers))
+                req = self.sdk_configuration.get_hooks().before_request(BeforeRequestContext(hook_ctx), req)
                 http_res = client.send(req)
             except Exception as e:
-                _, e = self.sdk_configuration.get_hooks().after_error(hook_ctx, None, e)
-                raise e
+                _, e = self.sdk_configuration.get_hooks().after_error(AfterErrorContext(hook_ctx), None, e)
+                if e is not None:
+                    raise e
 
             if utils.match_status_codes(['422','4XX','5XX'], http_res.status_code):
-                http_res, e = self.sdk_configuration.get_hooks().after_error(hook_ctx, http_res, None)
-                if e:
+                result, e = self.sdk_configuration.get_hooks().after_error(AfterErrorContext(hook_ctx), http_res, None)
+                if e is not None:
                     raise e
+                if result is not None:
+                    http_res = result
             else:
-                result = self.sdk_configuration.get_hooks().after_success(hook_ctx, http_res)
-                if isinstance(result, Exception):
-                    raise result
-                http_res = result
+                http_res = self.sdk_configuration.get_hooks().after_success(AfterSuccessContext(hook_ctx), http_res)
 
             return http_res
 
@@ -72,17 +70,17 @@ class General:
         ]))
         
         
-        res = operations.PartitionResponse(status_code=http_res.status_code, content_type=http_res.headers.get('Content-Type'), raw_response=http_res)
+        res = operations.PartitionResponse(status_code=http_res.status_code, content_type=http_res.headers.get('Content-Type') or '', raw_response=http_res)
         
         if http_res.status_code == 200:
-            if utils.match_content_type(http_res.headers.get('Content-Type'), 'application/json'):                
+            if utils.match_content_type(http_res.headers.get('Content-Type') or '', 'application/json'):                
                 out = utils.unmarshal_json(http_res.text, Optional[List[Any]])
                 res.elements = out
             else:
                 content_type = http_res.headers.get('Content-Type')
                 raise errors.SDKError(f'unknown content-type received: {content_type}', http_res.status_code, http_res.text, http_res)
         elif http_res.status_code == 422:
-            if utils.match_content_type(http_res.headers.get('Content-Type'), 'application/json'):                
+            if utils.match_content_type(http_res.headers.get('Content-Type') or '', 'application/json'):                
                 out = utils.unmarshal_json(http_res.text, errors.HTTPValidationError)
                 raise out
             else:
