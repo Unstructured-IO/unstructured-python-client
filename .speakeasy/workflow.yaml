@@ -2,7 +2,7 @@ workflowVersion: 1.0.0
 sources:
     my-source:
         inputs:
-            - location: https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
+            - location: https://api.unstructured.io/general/openapi.json
         overlays:
             - location: ./overlay_client.yaml
 targets:
