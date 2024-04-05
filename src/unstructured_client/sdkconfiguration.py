@@ -6,7 +6,7 @@ from ._hooks import SDKHooks
 from .utils import utils
 from .utils.retries import RetryConfig
 from dataclasses import dataclass
-from typing import Callable, Dict, Tuple, Union
+from typing import Callable, Dict, Optional, Tuple, Union
 from unstructured_client.models import shared
 
 
@@ -25,23 +25,23 @@ SERVERS = {
 class SDKConfiguration:
     client: requests_http.Session
     security: Union[shared.Security,Callable[[], shared.Security]] = None
-    server_url: str = ''
-    server: str = ''
+    server_url: Optional[str] = ''
+    server: Optional[str] = ''
     language: str = 'python'
     openapi_doc_version: str = '0.0.1'
-    sdk_version: str = '0.22.1'
-    gen_version: str = '2.291.0'
-    user_agent: str = 'speakeasy-sdk/python 0.22.1 2.291.0 0.0.1 unstructured-client'
-    retry_config: RetryConfig = None
-    _hooks: SDKHooks = None
+    sdk_version: str = '0.23.0'
+    gen_version: str = '2.298.2'
+    user_agent: str = 'speakeasy-sdk/python 0.23.0 2.298.2 0.0.1 unstructured-client'
+    retry_config: Optional[RetryConfig] = None
+    _hooks: Optional[SDKHooks] = None
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:
-        if self.server_url:
+        if self.server_url is not None and self.server_url != '':
             return utils.remove_suffix(self.server_url, '/'), {}
         if not self.server:
             self.server = SERVER_PROD
 
-        if not self.server in SERVERS:
+        if self.server not in SERVERS:
             raise ValueError(f"Invalid server \"{self.server}\"")
 
         return SERVERS[self.server], {}
