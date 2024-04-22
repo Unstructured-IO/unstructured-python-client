@@ -495,11 +495,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return call_threads
 
     def _clear_operation(self, operation_id: str) -> None:
-            """
-            Clears the operation data associated with the given operation ID.
+        """
+        Clears the operation data associated with the given operation ID.
 
-            Args:
-                operation_id (str): The ID of the operation to clear.
-            """
-            self.partition_responses.pop(operation_id, None)
-            self.partition_requests.pop(operation_id, None)
+        Args:
+            operation_id (str): The ID of the operation to clear.
+        """
+        self.partition_responses.pop(operation_id, None)
+        self.partition_requests.pop(operation_id, None)
