@@ -29,6 +29,7 @@ def init_hooks(hooks: Hooks):
 
     # Register SDK Init hooks
     hooks.register_sdk_init_hook(clean_server_url_hook)
+    hooks.register_sdk_init_hook(log_retries_after_error_hook)
     hooks.register_sdk_init_hook(split_pdf_hook)
 
     # Register Before Request hooks
@@ -40,4 +41,4 @@ def init_hooks(hooks: Hooks):
     # Register After Error hooks
     hooks.register_after_error_hook(suggest_defining_url_hook)
     hooks.register_after_error_hook(log_retries_after_error_hook)
-    hooks.register_after_success_hook(split_pdf_hook)
+    hooks.register_after_error_hook(split_pdf_hook)

@@ -4,19 +4,14 @@ from typing import Optional, Tuple, Union
 
 import requests
 
-from ..types import AfterErrorContext, AfterErrorHook
+from ..types import AfterErrorContext, AfterErrorHook, SDKInitHook
 
 
-class LogRetriesAfterErrorHook(AfterErrorHook):
+class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
     """Hook providing visibility to users when the client retries requests"""
 
     def log_retries(self, response: Optional[requests.Response]):
         """Log retries to give users visibility into requests."""
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(levelname)s: %(message)s",
-            stream=sys.stdout,
-        )
         logger = logging.getLogger("unstructured-client")
         logger.setLevel(logging.INFO)
 
@@ -25,6 +20,16 @@ class LogRetriesAfterErrorHook(AfterErrorHook):
 
             if bool(response.text):
                 logger.info(response.text)
+
+    def sdk_init(
+        self, base_url: str, client: requests.Session
+    ) -> Tuple[str, requests.Session]:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(levelname)s: %(message)s",
+            stream=sys.stdout,
+        )
+        return base_url, client
 
     def after_error(
         self,
