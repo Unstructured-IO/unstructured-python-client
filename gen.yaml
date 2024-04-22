@@ -15,6 +15,7 @@ python:
     dependencies:
       deepdiff: '>=6.0'
       pypdf: '>=4.0'
+      requests-toolbelt: '>=1.0.0'
     extraDependencies:
       dev: {}
   author: Unstructured
