@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, Future
-from typing import Optional, Tuple, Union, Generator, TypeAlias, Callable
+from typing import Optional, Tuple, Union, Generator, Callable
 
 import requests
 from requests.structures import CaseInsensitiveDict
@@ -46,7 +46,7 @@ class File:
         self.content = content
 
 
-FormData: TypeAlias = dict[str, Union[str, File]]
+FormData = dict[str, Union[str, File]]
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
