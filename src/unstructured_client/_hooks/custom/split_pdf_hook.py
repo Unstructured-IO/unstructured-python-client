@@ -206,6 +206,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return (response, error)
 
         if len(responses) == 0:
+            if error is not None:
+                logger.error(error)
             self._clear_operation(operation_id)
             return (response, error)
 
@@ -325,18 +327,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         new_request = self._create_request(request, form_data, page, filename)
         prepared_request = self.client.prepare_request(new_request)
-        return self.client.send(prepared_request)
 
-        # try:
-        #     return func(
-        #         method="POST",
-        #         url=request.url or "",
-        #         data=body,
-        #         headers={**headers, "Content-Type": body.content_type},
-        #     )
-        # except Exception:
-        #     logger.error("Failed to send request for page %d", page_number)
-        #     return requests.Response()
+        try:
+            return self.client.send(prepared_request)
+        except Exception:
+            logger.error("Failed to send request for page %d", page[1])
+            return requests.Response()
 
     def _create_request(
         self,
