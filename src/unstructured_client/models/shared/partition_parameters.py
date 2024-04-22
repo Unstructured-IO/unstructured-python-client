@@ -50,9 +50,9 @@ class PartitionParameters:
     overlap_all: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'overlap_all' }})
     r"""When True, overlap is also applied to 'normal' chunks formed by combining whole elements. Use with caution as this can introduce noise into otherwise clean semantic units. Default: None"""
     pdf_infer_table_structure: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'pdf_infer_table_structure' }})
-    r"""If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>."""
+    r"""Deprecated! Use skip_infer_table_types to opt out of table extraction for any file type. If False and strategy=hi_res, no Table Elements will be extracted from pdf files regardless of skip_infer_table_types contents."""
     skip_infer_table_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
-    r"""The document types that you want to skip table extraction with. Default: ['pdf', 'jpg', 'png']"""
+    r"""The document types that you want to skip table extraction with. Default: []"""
     split_pdf_page: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'split_pdf_page' }})
     r"""Should the pdf file be split at client. Ignored on backend."""
     strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'strategy' }})

@@ -29,11 +29,13 @@ class SDKConfiguration:
     server: Optional[str] = ''
     language: str = 'python'
     openapi_doc_version: str = '0.0.1'
-    sdk_version: str = '0.23.1'
-    gen_version: str = '2.300.0'
-    user_agent: str = 'speakeasy-sdk/python 0.23.1 2.300.0 0.0.1 unstructured-client'
+    sdk_version: str = '0.23.2'
+    gen_version: str = '2.312.1'
+    user_agent: str = 'speakeasy-sdk/python 0.23.2 2.312.1 0.0.1 unstructured-client'
     retry_config: Optional[RetryConfig] = None
-    _hooks: Optional[SDKHooks] = None
+
+    def __post_init__(self):
+        self._hooks = SDKHooks()
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:
         if self.server_url is not None and self.server_url != '':
