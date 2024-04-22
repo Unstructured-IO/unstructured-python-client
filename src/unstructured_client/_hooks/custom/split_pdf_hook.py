@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, Future
-from typing import Optional, Tuple, Union, Generator, Callable
+from typing import Optional, Tuple, Union, Generator
 
 import requests
 from requests.structures import CaseInsensitiveDict
@@ -128,7 +128,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         pages = self._get_pdf_pages(file.content)
         call_api_partial = functools.partial(
             self._call_api,
-            func=self.client.send,
             request=request,
             form_data=form_data,
             filename=filename,
@@ -302,7 +301,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     def _call_api(
         self,
         page: Tuple[io.BytesIO, int],
-        func: Callable,
         request: requests.PreparedRequest,
         form_data: FormData,
         filename: str,
@@ -322,8 +320,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             requests.Response: The response from the API.
 
         """
+        if self.client is None:
+            raise RuntimeError("HTTP client not accessible!")
+
         new_request = self._create_request(request, form_data, page, filename)
-        return func(new_request)
+        prepared_request = self.client.prepare_request(new_request)
+        return self.client.send(prepared_request)
 
         # try:
         #     return func(
