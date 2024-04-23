@@ -143,8 +143,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 if page_number == all_pages_number - 1:
                     break
 
+        last_page = next(pages)
+        last_page_content, last_page_number = last_page[:2]
         last_page_request = self._create_request(
-            request, form_data, next(pages)[:2], filename
+            request, form_data, (last_page_content, last_page_number), filename
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
         return last_page_prepared_request
