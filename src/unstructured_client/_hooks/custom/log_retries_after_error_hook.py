@@ -4,7 +4,7 @@ from typing import Optional, Tuple, Union
 
 import requests
 
-from ..types import AfterErrorContext, AfterErrorHook, SDKInitHook
+from unstructured_client._hooks.types import AfterErrorContext, AfterErrorHook, SDKInitHook
 
 
 class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):

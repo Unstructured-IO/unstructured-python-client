@@ -3,7 +3,7 @@ from urllib.parse import ParseResult, urlparse, urlunparse
 
 import requests
 
-from ..types import SDKInitHook
+from unstructured_client._hooks.types import SDKInitHook
 
 
 class CleanServerUrlSDKInitHook(SDKInitHook):
