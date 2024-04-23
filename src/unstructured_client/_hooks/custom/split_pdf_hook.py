@@ -16,6 +16,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from pypdf import PdfReader, PdfWriter
 
 
+from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.types import (
     BeforeRequestContext,
     AfterSuccessContext,
@@ -26,7 +27,7 @@ from unstructured_client._hooks.types import (
     AfterErrorHook,
 )
 
-logger = logging.getLogger("unstructured-client")
+logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
@@ -124,14 +125,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.warning("HTTP client not accessible! Continuing without splitting.")
             return request
 
-        # Removing file type from the file name for easier page numbering later
-        filename = file.filename.replace(".pdf", "")
         pages = self._get_pdf_pages(file.content)
         call_api_partial = functools.partial(
             self._call_api,
             request=request,
             form_data=form_data,
-            filename=filename,
+            filename=file.filename,
         )
         call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
@@ -143,13 +142,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 # Check if the next page will be the last one
                 if page_number == all_pages_number - 1:
                     break
-        
+
         # Before request hook needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page = next(pages)
-        last_page_content, last_page_number = last_page[:2]
+        last_page_content = next(pages)[0]
         last_page_request = self._create_request(
-            request, form_data, (last_page_content, last_page_number), filename
+            request, form_data, last_page_content, file.filename
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
         return last_page_prepared_request
@@ -277,7 +275,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data: FormData = {}
 
         for part in decoded_data.parts:
-            content_disposition = part.headers[b"Content-Disposition"]
+            content_disposition = part.headers.get(b"Content-Disposition")
+            if content_disposition is None:
+                raise RuntimeError(
+                    "Content-Disposition header not found. Can't split pdf file."
+                )
             part_params = self._decode_content_disposition(content_disposition)
             name = part_params.get("name")
 
@@ -321,7 +323,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Calls the API with the provided parameters.
 
         Args:
-            page (Tuple[io.BytesIO, int]): A tuple containing the page content and
+            page_content (Tuple[io.BytesIO, int]): A tuple containing the page content and
             page number.
             func (Callable): The function to call the API.
             request (requests.PreparedRequest): The prepared request object.
@@ -334,21 +336,22 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         if self.client is None:
             raise RuntimeError("HTTP client not accessible!")
+        page_content, page_number = page
 
-        new_request = self._create_request(request, form_data, page, filename)
+        new_request = self._create_request(request, form_data, page_content, filename)
         prepared_request = self.client.prepare_request(new_request)
 
         try:
             return self.client.send(prepared_request)
         except Exception:
-            logger.error("Failed to send request for page %d", page[1])
+            logger.error("Failed to send request for page %d", page_number)
             return requests.Response()
 
     def _create_request(
         self,
         request: requests.PreparedRequest,
         form_data: FormData,
-        page: Tuple[io.BytesIO, int],
+        page_content: io.BytesIO,
         filename: str,
     ) -> requests.Request:
         """
@@ -357,23 +360,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             request (requests.PreparedRequest): The original request object.
             form_data (FormData): The form data for the request.
-            page (Tuple[io.BytesIO, int]): A tuple containing the page content
-            and page number.
+            page_content (io.BytesIO): Page content in bytes.
             filename (str): The original filename of the PDF file.
 
         Returns:
             requests.Request: The request object for a splitted part of the
             original file.
         """
-        [page_content, page_number] = page
         headers = self._prepare_request_headers(request.headers)
         payload = self._prepare_request_payload(form_data)
-        page_filename = f"{filename}-{page_number}.pdf"
         body = MultipartEncoder(
             fields={
                 **payload,
                 PARTITION_FORM_FILES_KEY: (
-                    page_filename,
+                    filename,
                     page_content,
                     "application/pdf",
                 ),
@@ -495,6 +495,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 "Clipping UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS to %d.", max_threads
             )
             call_threads = max_threads
+        elif call_threads < 1:
+            logger.warning("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS is less than 1.")
+            call_threads = 5
         logger.info(
             "Splitting PDF by page on client. Using %d threads when calling API.",
             call_threads,

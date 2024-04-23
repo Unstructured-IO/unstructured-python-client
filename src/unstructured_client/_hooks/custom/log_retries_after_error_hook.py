@@ -4,7 +4,12 @@ from typing import Optional, Tuple, Union
 
 import requests
 
-from unstructured_client._hooks.types import AfterErrorContext, AfterErrorHook, SDKInitHook
+from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
+from unstructured_client._hooks.types import (
+    AfterErrorContext,
+    AfterErrorHook,
+    SDKInitHook,
+)
 
 
 class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
@@ -12,7 +17,7 @@ class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
 
     def log_retries(self, response: Optional[requests.Response]):
         """Log retries to give users visibility into requests."""
-        logger = logging.getLogger("unstructured-client")
+        logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
         logger.setLevel(logging.INFO)
 
         if response is not None and response.status_code == 500:
