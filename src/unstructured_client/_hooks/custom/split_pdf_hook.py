@@ -124,6 +124,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.warning("HTTP client not accessible! Continuing without splitting.")
             return request
 
+        # Removing file type from the file name for easier page numbering later
         filename = file.filename.replace(".pdf", "")
         pages = self._get_pdf_pages(file.content)
         call_api_partial = functools.partial(
