@@ -140,9 +140,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 self.partition_requests[operation_id].append(
                     executor.submit(call_api_partial, (page_content, page_number))
                 )
+                # Check if the next page will be the last one
                 if page_number == all_pages_number - 1:
                     break
-
+        
+        # Before request hook needs to return a request so we skip sending the last page in parallel
+        # and return that last page at the end of this method
         last_page = next(pages)
         last_page_content, last_page_number = last_page[:2]
         last_page_request = self._create_request(
@@ -169,6 +172,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             exception if it ocurred during the execution.
         """
         operation_id = hook_ctx.operation_id
+        # Because in `before_request` method we skipped sending last page in parallel
+        # we need to pass response, which contains last page, to `_await_elements` method
         elements = self._await_elements(operation_id, response)
 
         if elements is None:
@@ -202,6 +207,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             response object; otherwise, the original response and exception.
         """
         operation_id = hook_ctx.operation_id
+        # We know that this request failed so we pass a failed or empty response to `_await_elements` method
+        # where it checks if at least on of the other requests succeeded
         elements = self._await_elements(operation_id, response or requests.Response())
         responses = self.partition_responses.get(operation_id)
 
