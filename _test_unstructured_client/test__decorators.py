@@ -35,14 +35,14 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / call_threads.
     """
     try:
-        response = requests.get("http://localhost:5000/general/docs")
+        response = requests.get("http://localhost:8000/general/docs")
         assert (
             response.status_code == 200
         ), "The unstructured-api is not running on localhost:8000"
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:5000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
 
     with open(filename, "rb") as f:
         files = shared.Files(
