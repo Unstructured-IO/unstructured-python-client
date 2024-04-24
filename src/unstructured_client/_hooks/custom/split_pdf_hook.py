@@ -27,6 +27,7 @@ from unstructured_client._hooks.types import (
     AfterSuccessHook,
     AfterErrorHook,
 )
+from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -36,21 +37,7 @@ PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 SUBSTITUTE_FILENAME = "file_for_partition.pdf"
 
 
-class File:
-    """
-    Represents a file with a filename and its content.
-
-    Attributes:
-        filename (str): The name of the file.
-        content (bytes): The content of the file.
-    """
-
-    def __init__(self, filename: str, content: bytes) -> None:
-        self.filename = filename
-        self.content = content
-
-
-FormData = dict[str, Union[str, File]]
+FormData = dict[str, Union[str, shared.Files]]
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
@@ -114,7 +101,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         file = form_data.get(PARTITION_FORM_FILES_KEY)
-        if file is None or not isinstance(file, File) or not self._is_pdf(file):
+        if file is None or not isinstance(file, shared.Files) or not self._is_pdf(file):
             return request
 
         if self.client is None:
@@ -126,7 +113,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self._call_api,
             request=request,
             form_data=form_data,
-            filename=file.filename,
+            filename=file.file_name,
         )
         call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
@@ -143,7 +130,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # and return that last page at the end of this method
         last_page_content = next(pages)[0]
         last_page_request = self._create_request(
-            request, form_data, last_page_content, file.filename
+            request, form_data, last_page_content, file.file_name
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
         return last_page_prepared_request
@@ -219,7 +206,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self._clear_operation(operation_id)
         return (updated_response, None)
 
-    def _is_pdf(self, file: File) -> bool:
+    def _is_pdf(self, file: shared.Files) -> bool:
         """
         Check if the given file is a PDF. First it checks the file extension and if
         it is equal to `.pdf` then it tries to read that file. If there is no error
@@ -231,7 +218,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             bool: True if the file is a PDF, False otherwise.
         """
-        if not file.filename.endswith(".pdf"):
+        if not file.file_name.endswith(".pdf"):
             logger.warning("Given file is not a PDF. Continuing without splitting.")
             return False
 
@@ -312,8 +299,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
             if name == PARTITION_FORM_FILES_KEY:
                 filename = part_params.get("filename") or SUBSTITUTE_FILENAME
-                form_data[PARTITION_FORM_FILES_KEY] = File(
-                    filename.split("/")[-1], part.content
+                form_data[PARTITION_FORM_FILES_KEY] = shared.Files(
+                    part.content, filename.split("/")[-1]
                 )
             else:
                 form_data[name] = part.content.decode()
