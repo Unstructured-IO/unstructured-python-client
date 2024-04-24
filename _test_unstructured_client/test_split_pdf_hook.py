@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 from concurrent.futures import Future
 from unittest import TestCase
@@ -9,7 +10,7 @@ from requests_toolbelt import MultipartDecoder, MultipartEncoder
 
 
 from unstructured_client._hooks.custom import SplitPdfHook
-from unstructured_client._hooks.custom.split_pdf_hook import File
+from unstructured_client.models import shared
 
 
 class TestSplitPdfHook(TestCase):
@@ -198,7 +199,7 @@ class TestSplitPdfHook(TestCase):
 
         # Expected results
         expected_form_data = {
-            "files": File("test_file.pdf", b"file_content"),
+            "files": shared.Files(b"file_content", "test_file.pdf"),
             "parameter_1": "value_1",
             "parameter_2": "value_2",
         }
@@ -214,7 +215,7 @@ class TestSplitPdfHook(TestCase):
             form_data.get("parameter_2"), expected_form_data.get("parameter_2")
         )
         self.assertEqual(
-            form_data.get("files").filename, expected_form_data.get("files").filename
+            form_data.get("files").file_name, expected_form_data.get("files").file_name
         )
         self.assertEqual(
             form_data.get("files").content, expected_form_data.get("files").content
@@ -231,3 +232,37 @@ class TestSplitPdfHook(TestCase):
 
         # Assert RuntimeError
         pytest.raises(RuntimeError, hook._parse_form_data, decoded_data)
+
+    def test_unit_is_pdf_valid_pdf(self):
+        hook = SplitPdfHook()
+        filename = "_sample_docs/layout-parser-paper-fast.pdf"
+
+        with open(filename, "rb") as f:
+            file = shared.Files(
+                content=f.read(),
+                file_name=filename,
+            )
+
+        result = hook._is_pdf(file)
+
+        self.assertTrue(result)
+
+    def test_unit_is_pdf_invalid_extension(self):
+        hook = SplitPdfHook()
+        file = shared.Files(b"txt_content", "test_file.txt")
+
+        with self.assertLogs(level=logging.WARNING) as cm:
+            result = hook._is_pdf(file)
+
+        self.assertFalse(result)
+        self.assertIn("Given file is not a PDF", cm.output[0])
+
+    def test_unit_is_pdf_invalid_pdf(self):
+        hook = SplitPdfHook()
+        file = shared.Files(b"invalid_pdf_content", "test_file.pdf")
+
+        with self.assertLogs(level=logging.WARNING) as cm:
+            result = hook._is_pdf(file)
+
+        self.assertFalse(result)
+        self.assertIn("Attempted to interpret file as pdf", cm.output[1])
