@@ -120,7 +120,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         last_page_content = io.BytesIO()
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
             for page_content, page_number, all_pages_number in pages:
-                # Check if the next page will be the last one
+                # Check if this page is the last one
                 if page_number == all_pages_number:
                     last_page_content = page_content
                     break
