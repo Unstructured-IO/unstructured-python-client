@@ -117,18 +117,19 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
+        last_page_content = io.BytesIO()
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
             for page_content, page_number, all_pages_number in pages:
+                # Check if the next page will be the last one
+                if page_number == all_pages_number:
+                    last_page_content = page_content
+                    break
                 self.partition_requests[operation_id].append(
                     executor.submit(call_api_partial, (page_content, page_number))
                 )
-                # Check if the next page will be the last one
-                if page_number == all_pages_number - 1:
-                    break
 
-        # Before request hook needs to return a request so we skip sending the last page in parallel
+        # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page_content = next(pages)[0]
         last_page_request = self._create_request(
             request, form_data, last_page_content, file.file_name
         )
