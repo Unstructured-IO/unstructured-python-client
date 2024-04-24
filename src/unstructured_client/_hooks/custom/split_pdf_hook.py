@@ -299,9 +299,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 continue
 
             if name == PARTITION_FORM_FILES_KEY:
-                filename = part_params.get("filename") or SUBSTITUTE_FILENAME
+                full_filename = part_params.get("filename") or SUBSTITUTE_FILENAME
+                splitted_filename = full_filename.split("/")
+
+                if len(splitted_filename) < 1:
+                    raise ValueError("Filename can't be an empty string")
+
+                filename = splitted_filename[-1]
                 form_data[PARTITION_FORM_FILES_KEY] = shared.Files(
-                    part.content, filename.split("/")[-1]
+                    part.content, filename
                 )
             else:
                 form_data[name] = part.content.decode()
