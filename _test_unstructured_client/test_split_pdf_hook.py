@@ -17,6 +17,7 @@ class TestSplitPdfHook(TestCase):
 
     def test_unit_sdk_init(self):
         hook = SplitPdfHook()
+        # This is a fake URL, test doesn't make an API call
         test_url = "http://localhost:5000"
         test_client = requests.Session()
 
