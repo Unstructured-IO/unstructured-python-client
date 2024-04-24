@@ -14,6 +14,7 @@ from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from pypdf import PdfReader, PdfWriter
+from pypdf.errors import PdfReadError
 
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -113,12 +114,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         file = form_data.get(PARTITION_FORM_FILES_KEY)
-        if (
-            file is None
-            or not isinstance(file, File)
-            or not file.filename.endswith(".pdf")
-        ):
-            logger.warning("Given file is not a PDF. Continuing without splitting.")
+        if file is None or not isinstance(file, File) or not self._is_pdf(file):
             return request
 
         if self.client is None:
@@ -222,6 +218,34 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         updated_response = self._create_response(responses[0], elements)
         self._clear_operation(operation_id)
         return (updated_response, None)
+
+    def _is_pdf(self, file: File) -> bool:
+        """
+        Check if the given file is a PDF. First it checks the file extension and if
+        it is equal to `.pdf` then it tries to read that file. If there is no error
+        then we assume it is a proper PDF.
+
+        Args:
+            file (File): The file to be checked.
+
+        Returns:
+            bool: True if the file is a PDF, False otherwise.
+        """
+        if not file.filename.endswith(".pdf"):
+            logger.warning("Given file is not a PDF. Continuing without splitting.")
+            return False
+
+        try:
+            PdfReader(io.BytesIO(file.content), strict=True)
+        except (PdfReadError, UnicodeDecodeError) as exc:
+            logger.error(exc)
+            logger.warning(
+                "Attempted to interpret file as pdf, but error arose when splitting by pages. "
+                "Reverting to non-split pdf handling path."
+            )
+            return False
+
+        return True
 
     def _get_pdf_pages(
         self,
