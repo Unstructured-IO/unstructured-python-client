@@ -299,7 +299,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 continue
 
             if name == PARTITION_FORM_FILES_KEY:
-                full_filename = part_params.get("filename") or SUBSTITUTE_FILENAME
+                full_filename = part_params.get("filename")
+
+                if full_filename is None:
+                    full_filename = SUBSTITUTE_FILENAME
+                else:
+                    full_filename = full_filename.strip()
+
                 splitted_filename = full_filename.split("/")
 
                 if len(splitted_filename) < 1:
