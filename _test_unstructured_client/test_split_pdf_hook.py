@@ -150,6 +150,7 @@ class TestSplitPdfHook(TestCase):
             "parameter_1": "value_1",
             "parameter_2": "value_2",
             "split_pdf_page": "false",
+            "starting_page_number": "7",
         }
         expected_page_filename = "test_file.pdf"
         expected_body = MultipartEncoder(
@@ -165,7 +166,7 @@ class TestSplitPdfHook(TestCase):
         expected_url = ""
 
         # Create request
-        request_obj = hook._create_request(request, form_data, page[0], filename)
+        request_obj = hook._create_request(request, form_data, page[0], filename, 7)
         request_content_type: str = request_obj.headers.get("Content-Type")
         # Assert the request object
         self.assertEqual(request_obj.method, "POST")
@@ -306,3 +307,39 @@ class TestSplitPdfHook(TestCase):
 
         self.assertFalse(result)
         self.assertIn("Attempted to interpret file as pdf", cm.output[1])
+
+    def test_unit_get_starting_page_number_valid_integer(self):
+        """Test _get_starting_page_number method with valid integer."""
+        hook = SplitPdfHook()
+        form_data = {"starting_page_number": "5"}
+
+        result = hook._get_starting_page_number(form_data)
+
+        self.assertEqual(result, 5)
+
+    def test_unit_get_starting_page_number_invalid_integer(self):
+        """Test _get_starting_page_number method with invalid integer."""
+        hook = SplitPdfHook()
+        form_data = {"starting_page_number": "abc"}
+
+        result = hook._get_starting_page_number(form_data)
+
+        self.assertEqual(result, 1)
+
+    def test_unit_get_starting_page_number_less_than_one(self):
+        """Test _get_starting_page_number method with value less than 1."""
+        hook = SplitPdfHook()
+        form_data = {"starting_page_number": "0"}
+
+        result = hook._get_starting_page_number(form_data)
+
+        self.assertEqual(result, 1)
+
+    def test_unit_get_starting_page_number_missing_key(self):
+        """Test _get_starting_page_number method with missing key."""
+        hook = SplitPdfHook()
+        form_data = {}
+
+        result = hook._get_starting_page_number(form_data)
+
+        self.assertEqual(result, 1)
