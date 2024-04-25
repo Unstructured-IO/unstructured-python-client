@@ -5,7 +5,6 @@ from concurrent.futures import Future
 from unittest import TestCase
 
 import requests
-import pytest
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
 
 
@@ -227,12 +226,36 @@ class TestSplitPdfHook(TestCase):
 
         # Prepare test data
         decoded_data = MultipartDecoder(
-            b'--boundary\r\nContent: form-data; name="files"; filename="test_file.pdf"\r\n\r\nfile_content\r\n--boundary\r\nContent: form-data; name="parameter_1"\r\n\r\nvalue_1\r\n--boundary\r\nContent: form-data; name="parameter_2"\r\n\r\nvalue_2\r\n--boundary--\r\n',
+            b'--boundary\r\nContent: form-data; name="files"; filename="test_file.pdf"\r\n\r\nfile_content\r\n--boundary--\r\n',
             "multipart/form-data; boundary=boundary",
         )
 
         # Assert RuntimeError
-        pytest.raises(RuntimeError, hook._parse_form_data, decoded_data)
+        self.assertRaises(RuntimeError, hook._parse_form_data, decoded_data)
+
+    def test_unit_parse_form_data_empty_filename_error(self):
+        hook = SplitPdfHook()
+
+        # Prepare test data
+        decoded_data = MultipartDecoder(
+            b'--boundary\r\nContent-Disposition: form-data; name="files"; filename=""\r\n\r\nfile_content\r\n--boundary--\r\n',
+            "multipart/form-data; boundary=boundary",
+        )
+
+        # Assert ValueError
+        self.assertRaises(ValueError, hook._parse_form_data, decoded_data)
+
+    def test_unit_parse_form_data_none_filename_error(self):
+        hook = SplitPdfHook()
+
+        # Prepare test data
+        decoded_data = MultipartDecoder(
+            b'--boundary\r\nContent-Disposition: form-data; name="files"\r\n\r\nfile_content\r\n--boundary--\r\n',
+            "multipart/form-data; boundary=boundary",
+        )
+
+        # Assert ValueError
+        self.assertRaises(ValueError, hook._parse_form_data, decoded_data)
 
     def test_unit_is_pdf_valid_pdf(self):
         hook = SplitPdfHook()
@@ -256,7 +279,7 @@ class TestSplitPdfHook(TestCase):
             result = hook._is_pdf(file)
 
         self.assertFalse(result)
-        self.assertIn("Given file is not a PDF", cm.output[0])
+        self.assertIn("Given file doesn't have '.pdf' extension", cm.output[0])
 
     def test_unit_is_pdf_invalid_pdf(self):
         hook = SplitPdfHook()

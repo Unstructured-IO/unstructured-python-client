@@ -34,9 +34,6 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 
-SUBSTITUTE_FILENAME = "file_for_partition.pdf"
-
-
 FormData = dict[str, Union[str, shared.Files]]
 
 
@@ -220,7 +217,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             bool: True if the file is a PDF, False otherwise.
         """
         if not file.file_name.endswith(".pdf"):
-            logger.warning("Given file is not a PDF. Continuing without splitting.")
+            logger.warning("Given file doesn't have '.pdf' extension. Continuing without splitting.")
             return False
 
         try:
@@ -299,19 +296,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 continue
 
             if name == PARTITION_FORM_FILES_KEY:
-                full_filename = part_params.get("filename")
-
-                if full_filename is None:
-                    full_filename = SUBSTITUTE_FILENAME
-                else:
-                    full_filename = full_filename.strip()
-
-                splitted_filename = full_filename.split("/")
-
-                if len(splitted_filename) < 1:
-                    raise ValueError("Filename can't be an empty string")
-
-                filename = splitted_filename[-1]
+                filename = part_params.get("filename")
+                if filename is None or not filename.strip():
+                    raise ValueError("Filename can't be an empty string.")
                 form_data[PARTITION_FORM_FILES_KEY] = shared.Files(
                     part.content, filename
                 )

@@ -1,5 +1,4 @@
 import os
-import pypdf
 import pytest
 import requests
 from deepdiff import DeepDiff
@@ -90,3 +89,33 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         ],
     )
     assert len(diff) == 0
+
+
+def test_integration_split_pdf_for_file_with_no_name():
+    """
+    Tests that the client raises an error when the file_name is empty.
+    """
+    try:
+        response = requests.get("http://localhost:8000/general/docs")
+        assert (
+            response.status_code == 200
+        ), "The unstructured-api is not running on localhost:8000"
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on localhost:8000"
+
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+
+    with open("_sample_docs/layout-parser-paper-fast.pdf", "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name="    ",
+        )
+
+    req = shared.PartitionParameters(
+        files=files,
+        strategy="fast",
+        languages=["eng"],
+        split_pdf_page=True,
+    )
+
+    pytest.raises(ValueError, client.general.partition, req)
