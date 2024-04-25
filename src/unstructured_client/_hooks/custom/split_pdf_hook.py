@@ -387,13 +387,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             form_data (FormData): The form data for the request.
             page_content (io.BytesIO): Page content in bytes.
             filename (str): The original filename of the PDF file.
+            page_number (int): Number of the page in the original PDF file.
 
         Returns:
             requests.Request: The request object for a splitted part of the
             original file.
         """
         headers = self._prepare_request_headers(request.headers)
-        payload = self._prepare_request_payload(form_data, page_number)
+        payload = self._prepare_request_payload(form_data)
         body = MultipartEncoder(
             fields={
                 **payload,
@@ -402,6 +403,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     page_content,
                     "application/pdf",
                 ),
+                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
             }
         )
         return requests.Request(
@@ -429,9 +431,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         headers.pop("Content-Length", None)
         return headers
 
-    def _prepare_request_payload(
-        self, form_data: FormData, page_number: int
-    ) -> FormData:
+    def _prepare_request_payload(self, form_data: FormData) -> FormData:
         """
         Prepares the request payload by removing unnecessary keys and updating the
         file.
@@ -448,7 +448,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
         updated_parameters = {
             PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
-            PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
         }
         payload.update(updated_parameters)
         return payload
@@ -550,6 +549,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_requests.pop(operation_id, None)
 
     def _get_starting_page_number(self, form_data: FormData) -> int:
+        """
+        Retrieves the starting page number from the given form data. In case given
+        starting page number is not a valid integer or less than 1, it will use the
+        default value.
+
+        Args:
+            form_data (FormData): The form data containing the starting page number.
+
+        Returns:
+            int: The starting page number.
+        """
         starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
         try:
             _starting_page_number = (
