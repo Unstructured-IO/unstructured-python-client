@@ -3,7 +3,7 @@ import warnings
 
 import requests
 
-from ..types import AfterErrorContext, AfterErrorHook
+from unstructured_client._hooks.types import AfterErrorContext, AfterErrorHook
 
 
 class SuggestDefiningUrlIf401AfterErrorHook(AfterErrorHook):
