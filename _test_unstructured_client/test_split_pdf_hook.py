@@ -15,6 +15,7 @@ from unstructured_client.models import shared
 class TestSplitPdfHook(TestCase):
 
     def test_unit_sdk_init(self):
+        """Test sdk init method properly sets the client."""
         hook = SplitPdfHook()
         # This is a fake URL, test doesn't make an API call
         test_url = "http://localhost:5000"
@@ -25,6 +26,7 @@ class TestSplitPdfHook(TestCase):
         self.assertEqual(hook.client, test_client)
 
     def test_unit_clear_operation(self):
+        """Test clear operation method properly clears request/response data."""
         hook = SplitPdfHook()
         operation_id = "some_id"
         hook.partition_requests[operation_id] = [Future(), Future()]
@@ -42,6 +44,7 @@ class TestSplitPdfHook(TestCase):
         assert hook.partition_responses.get(operation_id) is None
 
     def test_unit_get_split_pdf_call_threads_default(self):
+        """Test get split pdf call threads method returns the right values."""
         hook = SplitPdfHook()
 
         # Test default value
@@ -60,6 +63,8 @@ class TestSplitPdfHook(TestCase):
         assert hook._get_split_pdf_call_threads() == 5
 
     def test_unit_prepare_request_payload(self):
+        """Test prepare request payload method properly sets split_pdf_page to 'false'
+        and removes files key."""
         hook = SplitPdfHook()
         test_form_data = {
             "files": ("test_file.pdf", b"test_file_content"),
@@ -81,6 +86,7 @@ class TestSplitPdfHook(TestCase):
         self.assertEqual(payload, expected_form_data)
 
     def test_unit_prepare_request_headers(self):
+        """Test prepare request headers method properly removes Content-Type and Content-Length headers."""
         hook = SplitPdfHook()
         test_headers = {
             "Content-Type": "application/json",
@@ -97,6 +103,7 @@ class TestSplitPdfHook(TestCase):
         self.assertEqual(headers, expected_headers)
 
     def test_unit_create_response(self):
+        """Test create response method properly overrides body elements and Content-Length header."""
         hook = SplitPdfHook()
         test_elements = [{"key": "value"}, {"key_2": "value"}]
         test_response = requests.Response()
@@ -122,6 +129,7 @@ class TestSplitPdfHook(TestCase):
         )
 
     def test_unit_create_request(self):
+        """Test create request method properly sets file, Content-Type and Content-Length headers."""
         hook = SplitPdfHook()
 
         # Prepare test data
@@ -166,6 +174,7 @@ class TestSplitPdfHook(TestCase):
         self.assertTrue(request_content_type.startswith("multipart/form-data"))
 
     def test_unit_decode_content_disposition(self):
+        """Test decode content disposition method properly decodes Content-Disposition header."""
         hook = SplitPdfHook()
 
         # Test case 1: Single parameter
@@ -189,6 +198,7 @@ class TestSplitPdfHook(TestCase):
         self.assertEqual(result, expected_result)
 
     def test_unit_parse_form_data(self):
+        """Test parse form data method properly parses the form data and returns dictionary."""
         hook = SplitPdfHook()
 
         # Prepare test data
@@ -222,6 +232,7 @@ class TestSplitPdfHook(TestCase):
         )
 
     def test_unit_parse_form_data_error(self):
+        """Test parse form data method raises RuntimeError when the form data is invalid (no Content-Disposition header)."""
         hook = SplitPdfHook()
 
         # Prepare test data
@@ -234,6 +245,7 @@ class TestSplitPdfHook(TestCase):
         self.assertRaises(RuntimeError, hook._parse_form_data, decoded_data)
 
     def test_unit_parse_form_data_empty_filename_error(self):
+        """Test parse form data method raises ValueError when the form data has empty filename."""
         hook = SplitPdfHook()
 
         # Prepare test data
@@ -246,6 +258,7 @@ class TestSplitPdfHook(TestCase):
         self.assertRaises(ValueError, hook._parse_form_data, decoded_data)
 
     def test_unit_parse_form_data_none_filename_error(self):
+        """Test parse form data method raises ValueError when the form data has no filename (None)."""
         hook = SplitPdfHook()
 
         # Prepare test data
@@ -258,6 +271,7 @@ class TestSplitPdfHook(TestCase):
         self.assertRaises(ValueError, hook._parse_form_data, decoded_data)
 
     def test_unit_is_pdf_valid_pdf(self):
+        """Test is pdf method returns True for valid pdf file (has .pdf extension and can be read)."""
         hook = SplitPdfHook()
         filename = "_sample_docs/layout-parser-paper-fast.pdf"
 
@@ -272,6 +286,7 @@ class TestSplitPdfHook(TestCase):
         self.assertTrue(result)
 
     def test_unit_is_pdf_invalid_extension(self):
+        """Test is pdf method returns False for file with invalid extension."""
         hook = SplitPdfHook()
         file = shared.Files(b"txt_content", "test_file.txt")
 
@@ -282,6 +297,7 @@ class TestSplitPdfHook(TestCase):
         self.assertIn("Given file doesn't have '.pdf' extension", cm.output[0])
 
     def test_unit_is_pdf_invalid_pdf(self):
+        """Test is pdf method returns False for file with invalid pdf content."""
         hook = SplitPdfHook()
         file = shared.Files(b"invalid_pdf_content", "test_file.pdf")
 
