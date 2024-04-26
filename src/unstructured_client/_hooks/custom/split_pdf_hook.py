@@ -28,7 +28,6 @@ from unstructured_client._hooks.types import (
 )
 from unstructured_client.models import shared
 
-
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 PARTITION_FORM_FILES_KEY = "files"
