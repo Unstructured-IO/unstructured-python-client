@@ -84,8 +84,6 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         t2=resp_single.elements,
         exclude_regex_paths=[
             r"root\[\d+\]\['metadata'\]\['parent_id'\]",
-            # TODO: (Marek Połom) - Remove page number pattern after page numbering parameter is added
-            r"root\[\d+\]\['metadata'\]\['page_number'\]",
         ],
     )
     assert len(diff) == 0
