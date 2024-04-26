@@ -7,7 +7,6 @@ from unittest import TestCase
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
 
-
 from unstructured_client._hooks.custom import SplitPdfHook
 from unstructured_client.models import shared
 
