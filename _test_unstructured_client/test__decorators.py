@@ -1,5 +1,4 @@
 import os
-import pypdf
 import pytest
 import requests
 from deepdiff import DeepDiff
@@ -15,18 +14,18 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 @pytest.mark.parametrize(
     "filename, expected_ok",
     [
-        ("_sample_docs/list-item-example-1.pdf", True),       # 1 page
+        ("_sample_docs/list-item-example-1.pdf", True),  # 1 page
         ("_sample_docs/layout-parser-paper-fast.pdf", True),  # 2 pages
-        ("_sample_docs/layout-parser-paper.pdf", True),       # 16 pages
+        ("_sample_docs/layout-parser-paper.pdf", True),  # 16 pages
         ("_sample_docs/fake.doc", True),
-        ("_sample_docs/fake.doc", False),  # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
+        (
+            "_sample_docs/fake.doc",
+            False,
+        ),  # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
     ],
 )
 def test_integration_split_pdf_has_same_output_as_non_split(
-    call_threads: int,
-    filename: str,
-    expected_ok: bool,
-    caplog
+    call_threads: int, filename: str, expected_ok: bool, caplog
 ):
     """
     Tests that output that we get from the split-by-page pdf is the same as from non-split.
@@ -36,14 +35,13 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
-        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
+        assert (
+            response.status_code == 200
+        ), "The unstructured-api is not running on localhost:8000"
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(
-        api_key_auth=FAKE_KEY,
-        server_url="localhost:8000"
-    )
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -56,7 +54,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
 
     req = shared.PartitionParameters(
         files=files,
-        strategy='fast',
+        strategy="fast",
         languages=["eng"],
         split_pdf_page=True,
     )
@@ -81,6 +79,43 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     assert resp_split.status_code == resp_single.status_code
 
     # Difference in the parent_id is expected, because parent_ids are assigned when element crosses page boundary
-    diff = DeepDiff(t1=resp_split.elements, t2=resp_single.elements,
-                    exclude_regex_paths=r"root\[\d+\]\['metadata'\]\['parent_id'\]")
+    diff = DeepDiff(
+        t1=resp_split.elements,
+        t2=resp_single.elements,
+        exclude_regex_paths=[
+            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
+            # TODO: (Marek Połom) - Remove page number pattern after page numbering parameter is added
+            r"root\[\d+\]\['metadata'\]\['page_number'\]",
+        ],
+    )
     assert len(diff) == 0
+
+
+def test_integration_split_pdf_for_file_with_no_name():
+    """
+    Tests that the client raises an error when the file_name is empty.
+    """
+    try:
+        response = requests.get("http://localhost:8000/general/docs")
+        assert (
+            response.status_code == 200
+        ), "The unstructured-api is not running on localhost:8000"
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on localhost:8000"
+
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+
+    with open("_sample_docs/layout-parser-paper-fast.pdf", "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name="    ",
+        )
+
+    req = shared.PartitionParameters(
+        files=files,
+        strategy="fast",
+        languages=["eng"],
+        split_pdf_page=True,
+    )
+
+    pytest.raises(ValueError, client.general.partition, req)
