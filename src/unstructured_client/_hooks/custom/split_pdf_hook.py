@@ -16,7 +16,6 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PdfReadError
 
-
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.types import (
     BeforeRequestContext,
@@ -29,7 +28,6 @@ from unstructured_client._hooks.types import (
 )
 from unstructured_client.models import shared
 
-# TODO: (Marek Połom) - Update documentation before merging
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -123,11 +121,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
+        last_page_number = 0
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
             for page_content, page_index, all_pages_number in pages:
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
-                if page_index == all_pages_number:
+                if page_index == all_pages_number - 1:
                     last_page_content = page_content
                     last_page_number = page_number
                     break
