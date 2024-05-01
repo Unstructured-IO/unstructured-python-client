@@ -16,7 +16,6 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PdfReadError
 
-
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.types import (
     BeforeRequestContext,
@@ -33,6 +32,10 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
+PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
+
+DEFAULT_STARTING_PAGE_NUMBER = 1
+
 
 FormData = dict[str, Union[str, shared.Files]]
 
@@ -85,6 +88,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             Union[requests.PreparedRequest, Exception]: If `splitPdfPage` is set to `true`,
             the last page request; otherwise, the original request.
         """
+        if self.client is None:
+            logger.warning("HTTP client not accessible! Continuing without splitting.")
+            return request
+
         operation_id = hook_ctx.operation_id
         content_type = request.headers.get("Content-Type")
         body = request.body
@@ -101,9 +108,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if file is None or not isinstance(file, shared.Files) or not self._is_pdf(file):
             return request
 
-        if self.client is None:
-            logger.warning("HTTP client not accessible! Continuing without splitting.")
-            return request
+        starting_page_number = self._get_starting_page_number(form_data)
 
         pages = self._get_pdf_pages(file.content)
         call_api_partial = functools.partial(
@@ -115,11 +120,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
+        last_page_number = 0
         with ThreadPoolExecutor(max_workers=call_threads) as executor:
-            for page_content, page_number, all_pages_number in pages:
-                # Check if the next page will be the last one
-                if page_number == all_pages_number:
+            for page_content, page_index, all_pages_number in pages:
+                page_number = page_index + starting_page_number
+                # Check if this page is the last one
+                if page_index == all_pages_number - 1:
                     last_page_content = page_content
+                    last_page_number = page_number
                     break
                 self.partition_requests[operation_id].append(
                     executor.submit(call_api_partial, (page_content, page_number))
@@ -128,7 +136,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
         last_page_request = self._create_request(
-            request, form_data, last_page_content, file.file_name
+            request, form_data, last_page_content, file.file_name, last_page_number
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
         return last_page_prepared_request
@@ -217,7 +225,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             bool: True if the file is a PDF, False otherwise.
         """
         if not file.file_name.endswith(".pdf"):
-            logger.warning("Given file doesn't have '.pdf' extension. Continuing without splitting.")
+            logger.warning(
+                "Given file doesn't have '.pdf' extension. Continuing without splitting."
+            )
             return False
 
         try:
@@ -267,8 +277,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             new_pdf.write(pdf_buffer)
             pdf_buffer.seek(0)
 
-            # 1-index the page numbers
-            yield pdf_buffer, offset + 1, offset_end
+            yield pdf_buffer, offset, offset_end
             offset += split_size
 
     def _parse_form_data(self, decoded_data: MultipartDecoder) -> FormData:
@@ -349,7 +358,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             raise RuntimeError("HTTP client not accessible!")
         page_content, page_number = page
 
-        new_request = self._create_request(request, form_data, page_content, filename)
+        new_request = self._create_request(
+            request, form_data, page_content, filename, page_number
+        )
         prepared_request = self.client.prepare_request(new_request)
 
         try:
@@ -364,6 +375,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data: FormData,
         page_content: io.BytesIO,
         filename: str,
+        page_number: int,
     ) -> requests.Request:
         """
         Creates a request object for a part of a splitted PDF file.
@@ -373,6 +385,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             form_data (FormData): The form data for the request.
             page_content (io.BytesIO): Page content in bytes.
             filename (str): The original filename of the PDF file.
+            page_number (int): Number of the page in the original PDF file.
 
         Returns:
             requests.Request: The request object for a splitted part of the
@@ -388,6 +401,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     page_content,
                     "application/pdf",
                 ),
+                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
             }
         )
         return requests.Request(
@@ -429,7 +443,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         payload = copy.deepcopy(form_data)
         payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
         payload.pop(PARTITION_FORM_FILES_KEY, None)
-        payload.update({PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false"})
+        payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
+        updated_parameters = {
+            PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
+        }
+        payload.update(updated_parameters)
         return payload
 
     def _create_response(
@@ -527,3 +545,39 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.partition_responses.pop(operation_id, None)
         self.partition_requests.pop(operation_id, None)
+
+    def _get_starting_page_number(self, form_data: FormData) -> int:
+        """
+        Retrieves the starting page number from the given form data. In case given
+        starting page number is not a valid integer or less than 1, it will use the
+        default value.
+
+        Args:
+            form_data (FormData): The form data containing the starting page number.
+
+        Returns:
+            int: The starting page number.
+        """
+        starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
+        try:
+            _starting_page_number = (
+                form_data.get(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY)
+                or DEFAULT_STARTING_PAGE_NUMBER
+            )
+            starting_page_number = int(_starting_page_number)  # type: ignore
+        except ValueError:
+            logger.warning(
+                "'%s' is not a valid integer. Using default value '%d'.",
+                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+                DEFAULT_STARTING_PAGE_NUMBER,
+            )
+
+        if starting_page_number < 1:
+            logger.warning(
+                "'%s' is less than 1. Using default value '%d'.",
+                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+                DEFAULT_STARTING_PAGE_NUMBER,
+            )
+            starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
+
+        return starting_page_number

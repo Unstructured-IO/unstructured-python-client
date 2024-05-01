@@ -55,6 +55,8 @@ class PartitionParameters:
     r"""The document types that you want to skip table extraction with. Default: []"""
     split_pdf_page: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'split_pdf_page' }})
     r"""Should the pdf file be split at client. Ignored on backend."""
+    starting_page_number: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'starting_page_number' }})
+    r"""The real number of the first PDF page."""
     strategy: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
     unique_element_ids: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'unique_element_ids' }})
