@@ -3,7 +3,18 @@
 from __future__ import annotations
 import dataclasses
 import requests as requests_http
-from typing import Any, List, Optional
+from ...models.shared import element as shared_element
+from ...models.shared import partition_parameters as shared_partition_parameters
+from typing import List, Optional
+
+
+@dataclasses.dataclass
+class PartitionRequest:
+    UNSET='__SPEAKEASY_UNSET__'
+    partition_parameters: shared_partition_parameters.PartitionParameters = dataclasses.field(metadata={'request': { 'media_type': 'multipart/form-data' }})
+    unstructured_api_key: Optional[str] = dataclasses.field(default=UNSET, metadata={'header': { 'field_name': 'unstructured-api-key', 'style': 'simple', 'explode': False }})
+    
+
 
 
 @dataclasses.dataclass
@@ -14,7 +25,7 @@ class PartitionResponse:
     r"""HTTP response status code for this operation"""
     raw_response: requests_http.Response = dataclasses.field()
     r"""Raw HTTP response; suitable for custom response parsing"""
-    elements: Optional[List[Any]] = dataclasses.field(default=None)
+    response_partition_parameters: Optional[List[shared_element.Element]] = dataclasses.field(default=None)
     r"""Successful Response"""
     
 

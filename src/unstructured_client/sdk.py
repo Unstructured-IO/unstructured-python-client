@@ -10,7 +10,6 @@ from unstructured_client._hooks import SDKHooks
 from unstructured_client.models import shared
 
 class UnstructuredClient:
-    r"""Unstructured Pipeline API: Partition documents with the Unstructured library"""
     general: General
 
     sdk_configuration: SDKConfiguration

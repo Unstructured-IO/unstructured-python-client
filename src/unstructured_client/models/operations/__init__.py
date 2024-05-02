@@ -2,4 +2,4 @@
 
 from .partition import *
 
-__all__ = ["PartitionResponse"]
+__all__ = ["PartitionRequest","PartitionResponse"]

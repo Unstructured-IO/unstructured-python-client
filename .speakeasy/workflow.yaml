@@ -1,14 +1,14 @@
 workflowVersion: 1.0.0
+speakeasyVersion: latest
 sources:
     my-source:
         inputs:
             - location: https://api.unstructured.io/general/openapi.json
         overlays:
             - location: ./overlay_client.yaml
+        registry:
+            location: registry.speakeasyapi.dev/unstructured/unstructured5xr/my-source
 targets:
     unstructured-python:
         target: python
         source: my-source
-        # publish:
-        #     pypi:
-        #         token: $PYPI_TOKEN

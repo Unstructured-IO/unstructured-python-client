@@ -1,0 +1,30 @@
+speakeasyVersion: 1.277.4
+sources:
+    my-source:
+        sourceNamespace: my-source
+        sourceRevisionDigest: sha256:2cdcca9104196029e8767d3ac942bdab59a10bc70f0ca20ee5f1c6d80599a298
+        sourceBlobDigest: sha256:6183911555010d6d2a654aa1923db737b87677cacfb2046f286575d48b993006
+        tags:
+            - latest
+targets:
+    unstructured-python:
+        source: my-source
+        sourceNamespace: my-source
+        sourceRevisionDigest: sha256:2cdcca9104196029e8767d3ac942bdab59a10bc70f0ca20ee5f1c6d80599a298
+        sourceBlobDigest: sha256:6183911555010d6d2a654aa1923db737b87677cacfb2046f286575d48b993006
+        outLocation: /github/workspace/repo
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        my-source:
+            inputs:
+                - location: https://api.unstructured.io/general/openapi.json
+            overlays:
+                - location: ./overlay_client.yaml
+            registry:
+                location: registry.speakeasyapi.dev/unstructured/unstructured5xr/my-source
+    targets:
+        unstructured-python:
+            target: python
+            source: my-source
