@@ -2,7 +2,7 @@
 
 import requests as requests_http
 from .sdkconfiguration import SDKConfiguration
-from typing import Any, List, Optional
+from typing import List, Optional
 from unstructured_client import utils
 from unstructured_client._hooks import AfterErrorContext, AfterSuccessContext, BeforeRequestContext, HookContext
 from unstructured_client.models import errors, operations, shared
@@ -15,8 +15,10 @@ class General:
         
     
     
-    def partition(self, request: Optional[shared.PartitionParameters], retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
-        r"""Pipeline 1"""
+    def partition(self, request: operations.PartitionRequest, retries: Optional[utils.RetryConfig] = None) -> operations.PartitionResponse:
+        r"""Summary
+        Description
+        """
         hook_ctx = HookContext(operation_id='partition', oauth2_scopes=[], security_source=self.sdk_configuration.security)
         base_url = utils.template_url(*self.sdk_configuration.get_server_details())
         
@@ -27,9 +29,12 @@ class General:
         else:
             headers, query_params = utils.get_security(self.sdk_configuration.security)
         
-        req_content_type, data, form = utils.serialize_request_body(request, Optional[shared.PartitionParameters], "request", False, True, 'multipart')
+        headers = { **utils.get_headers(request), **headers }
+        req_content_type, data, form = utils.serialize_request_body(request, operations.PartitionRequest, "partition_parameters", False, False, 'multipart')
         if req_content_type is not None and req_content_type not in ('multipart/form-data', 'multipart/mixed'):
             headers['content-type'] = req_content_type
+        if data is None and form is None:
+            raise Exception('request body is required')
         headers['Accept'] = 'application/json'
         headers['user-agent'] = self.sdk_configuration.user_agent
         client = self.sdk_configuration.client
@@ -74,8 +79,8 @@ class General:
         
         if http_res.status_code == 200:
             if utils.match_content_type(http_res.headers.get('Content-Type') or '', 'application/json'):                
-                out = utils.unmarshal_json(http_res.text, Optional[List[Any]])
-                res.elements = out
+                out = utils.unmarshal_json(http_res.text, Optional[List[shared.Element]])
+                res.response_partition_parameters = out
             else:
                 content_type = http_res.headers.get('Content-Type')
                 raise errors.SDKError(f'unknown content-type received: {content_type}', http_res.status_code, http_res.text, http_res)
