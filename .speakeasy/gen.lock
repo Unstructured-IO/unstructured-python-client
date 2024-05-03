@@ -3,10 +3,10 @@ id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
   docChecksum: f6998ca683cdb4062d02e5e9308c4c75
   docVersion: 1.0.25
-  speakeasyVersion: 1.277.4
-  generationVersion: 2.318.3
-  releaseVersion: 0.24.0
-  configChecksum: b7f7f456fc43b49fe96ef995812b1f3d
+  speakeasyVersion: 1.277.8
+  generationVersion: 2.319.10
+  releaseVersion: 0.24.1
+  configChecksum: ec00b0343aebdd16e57e67bcbfeacc64
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -14,7 +14,7 @@ management:
 features:
   python:
     constsAndDefaults: 0.1.3
-    core: 4.6.5
+    core: 4.6.7
     examples: 2.81.3
     globalSecurity: 2.83.5
     globalServerURLs: 2.82.2
@@ -35,7 +35,6 @@ generatedFiles:
   - src/unstructured_client/utils/retries.py
   - src/unstructured_client/utils/utils.py
   - src/unstructured_client/models/errors/sdkerror.py
-  - tests/helpers.py
   - src/unstructured_client/models/operations/partition.py
   - src/unstructured_client/models/shared/element.py
   - src/unstructured_client/models/shared/validationerror.py
