@@ -55,7 +55,7 @@ lint:
 
 .PHONY: client-generate
 client-generate:
-	wget -nv -q -O openapi.json https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json
+	wget -nv -q -O openapi.json https://api.unstructured.io/general/openapi.json
 	speakeasy overlay validate -o ./overlay_client.yaml
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
