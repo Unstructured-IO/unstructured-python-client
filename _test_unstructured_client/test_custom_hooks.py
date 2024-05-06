@@ -3,12 +3,14 @@ import logging
 import re
 
 import requests_mock
+import requests
 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 from unstructured_client.models.errors import SDKError
 
+from _test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
@@ -136,15 +138,12 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(se
     )
 
 
-def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
+def test_unit_issues_warning_on_a_401(session_: Mock, response_: requests.Session):
     client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    session_.return_value = response_
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
-
     with open(filename, "rb") as f:
-        files = shared.Files(
-            content=f.read(),
-            file_name=filename,
-        )
+        files = shared.Files(content=f.read(), file_name=filename)
 
     req = shared.PartitionParameters(files=files)
     
@@ -154,3 +153,16 @@ def test_unit_suggest_defining_url_issues_a_warning_on_a_401():
             match="If intending to use the paid API, please define `server_url` in your request.",
         ):
             client.general.partition(req)
+
+
+# -- fixtures --------------------------------------------------------------------------------
+
+@pytest.fixture()
+def session_(request: FixtureRequest):
+    return method_mock(request, requests.Session, 'send')
+
+@pytest.fixture()
+def response_(*args, **kwargs):
+    response = requests.Response()
+    response.status_code = 401
+    return response
