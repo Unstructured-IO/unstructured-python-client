@@ -1,12 +1,16 @@
+import os
 from pathlib import Path
 import requests
 
+import pytest
+
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
 
 @pytest.fixture(scope="module")
 def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNST_API_KEY"))
+    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
     yield _client
 
 
@@ -15,7 +19,7 @@ def doc_path() -> Path:
     return Path(__file__).resolve().parent.parent / "_sample_docs"
 
 
-@pytest.mark.parameterize("strategy", ["fast", "ocr_only", "hi_res"])
+@pytest.mark.parametrize("strategy", ["fast", "ocr_only", "hi_res"])
 def test_partition_strategies(strategy, client, doc_path):
     filename = "layout-parser-paper-fast.pdf"
     with open(doc_path / filename, "rb") as f:
