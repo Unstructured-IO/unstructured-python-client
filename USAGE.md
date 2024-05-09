@@ -7,7 +7,7 @@ s = unstructured_client.UnstructuredClient(
     api_key_auth="YOUR_API_KEY",
 )
 
-req = operations.PartitionRequest(
+res = s.general.partition(request=operations.PartitionRequest(
     partition_parameters=shared.PartitionParameters(
         files=shared.Files(
             content='0x2cC94b2FEF'.encode(),
@@ -15,9 +15,7 @@ req = operations.PartitionRequest(
         ),
         strategy=shared.Strategy.HI_RES,
     ),
-)
-
-res = s.general.partition(req)
+))
 
 if res.response_partition_parameters is not None:
     # handle response
