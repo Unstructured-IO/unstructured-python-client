@@ -17,7 +17,7 @@ res = s.general.partition(request=operations.PartitionRequest(
     ),
 ))
 
-if res.response_partition_parameters is not None:
+if res.elements is not None:
     # handle response
     pass
 
