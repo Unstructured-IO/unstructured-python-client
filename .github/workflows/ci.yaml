@@ -57,3 +57,6 @@ jobs:
       run: |
         pip install  .
         make test-integration
+      env:
+        UNSTRUCTURED_API_KEY: $${{ secret.UNSTRUCTURED_API_KEY }}
+
