@@ -5,4 +5,4 @@ from .partition_parameters import *
 from .security import *
 from .validationerror import *
 
-__all__ = ["ChunkingStrategy","Element","Files","Metadata","PartitionParameters","Security","Strategy","ValidationError"]
+__all__ = ["ChunkingStrategy","Element","Files","Metadata","OutputFormat","PartitionParameters","Security","Strategy","ValidationError"]

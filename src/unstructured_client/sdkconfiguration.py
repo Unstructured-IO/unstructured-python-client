@@ -10,13 +10,13 @@ from typing import Callable, Dict, Optional, Tuple, Union
 from unstructured_client.models import shared
 
 
-SERVER_PROD = 'prod'
-r"""Hosted API"""
-SERVER_LOCAL = 'local'
+SERVER_FREE_API = 'free-api'
+r"""Hosted API Free"""
+SERVER_DEVELOPMENT = 'development'
 r"""Development server"""
 SERVERS = {
-	SERVER_PROD: 'https://api.unstructured.io',
-	SERVER_LOCAL: 'http://localhost:8000',
+	SERVER_FREE_API: 'https://api.unstructured.io',
+	SERVER_DEVELOPMENT: 'http://localhost:8000',
 }
 """Contains the list of servers available to the SDK"""
 
@@ -28,10 +28,10 @@ class SDKConfiguration:
     server_url: Optional[str] = ''
     server: Optional[str] = ''
     language: str = 'python'
-    openapi_doc_version: str = '1.0.26'
-    sdk_version: str = '0.25.1'
+    openapi_doc_version: str = '1.0.30'
+    sdk_version: str = '0.25.2'
     gen_version: str = '2.326.3'
-    user_agent: str = 'speakeasy-sdk/python 0.25.1 2.326.3 1.0.26 unstructured-client'
+    user_agent: str = 'speakeasy-sdk/python 0.25.2 2.326.3 1.0.30 unstructured-client'
     retry_config: Optional[RetryConfig] = None
 
     def __post_init__(self):
@@ -41,7 +41,7 @@ class SDKConfiguration:
         if self.server_url is not None and self.server_url != '':
             return utils.remove_suffix(self.server_url, '/'), {}
         if not self.server:
-            self.server = SERVER_PROD
+            self.server = SERVER_FREE_API
 
         if self.server not in SERVERS:
             raise ValueError(f"Invalid server \"{self.server}\"")
