@@ -10,7 +10,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.24.1
+  version: 0.25.2
   additionalDependencies:
     dependencies:
       deepdiff: '>=6.0'
@@ -33,6 +33,7 @@ python:
   inputModelSuffix: input
   license: MIT
   maxMethodParams: 0
+  methodArguments: require-security-and-request
   outputModelSuffix: output
   packageName: unstructured-client
   projectUrls: {}

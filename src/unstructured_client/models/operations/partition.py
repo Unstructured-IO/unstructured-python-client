@@ -25,7 +25,7 @@ class PartitionResponse:
     r"""HTTP response status code for this operation"""
     raw_response: requests_http.Response = dataclasses.field()
     r"""Raw HTTP response; suitable for custom response parsing"""
-    response_partition_parameters: Optional[List[shared_element.Element]] = dataclasses.field(default=None)
+    elements: Optional[List[shared_element.Element]] = dataclasses.field(default=None)
     r"""Successful Response"""
     
 

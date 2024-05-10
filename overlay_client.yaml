@@ -6,6 +6,3 @@ actions:
   - target: $["components"]["schemas"]["partition_parameters"]["properties"]
     update:
       "split_pdf_page": {"type": "boolean", "title": "Split Pdf Page", "description": "Should the pdf file be split at client. Ignored on backend."}
-  - target: $["components"]["schemas"]["partition_parameters"]["properties"]
-    update:
-      "starting_page_number": {"type": "integer", "title": "Starting Page Number", "description": "The real number of the first PDF page."}
