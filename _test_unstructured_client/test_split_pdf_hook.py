@@ -6,8 +6,11 @@ from unittest import TestCase
 
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
-
-from unstructured_client._hooks.custom import SplitPdfHook
+from unstructured_client._hooks.custom.split_pdf_hook import (
+    DEFAULT_NUM_THREADS,
+    MAX_THREADS,
+    SplitPdfHook,
+)
 from unstructured_client.models import shared
 
 
@@ -46,20 +49,37 @@ class TestSplitPdfHook(TestCase):
         """Test get split pdf call threads method returns the right values."""
         hook = SplitPdfHook()
 
-        # Test default value
-        assert hook._get_split_pdf_call_threads() == 5
+        assert hook._get_split_pdf_call_threads({}) == DEFAULT_NUM_THREADS
 
         # Test custom value
-        os.environ["UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS"] = "10"
-        assert hook._get_split_pdf_call_threads() == 10
+        assert (
+            hook._get_split_pdf_call_threads(
+                {
+                    "split_pdf_threads": 10,
+                }
+            )
+            == 10
+        )
 
         # Test over limit value
-        os.environ["UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS"] = "20"
-        assert hook._get_split_pdf_call_threads() == 15
+        assert (
+            hook._get_split_pdf_call_threads(
+                {
+                    "split_pdf_threads": "20",
+                }
+            )
+            == MAX_THREADS
+        )
 
         # Test negative value
-        os.environ["UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS"] = "-3"
-        assert hook._get_split_pdf_call_threads() == 5
+        assert (
+            hook._get_split_pdf_call_threads(
+                {
+                    "split_pdf_threads": -3,
+                }
+            )
+            == DEFAULT_NUM_THREADS
+        )
 
     def test_unit_prepare_request_payload(self):
         """Test prepare request payload method properly sets split_pdf_page to 'false'
@@ -123,9 +143,7 @@ class TestSplitPdfHook(TestCase):
 
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response._content, expected_content)
-        self.assertEqual(
-            response.headers.get("Content-Length"), expected_content_length
-        )
+        self.assertEqual(response.headers.get("Content-Length"), expected_content_length)
 
     def test_unit_create_request(self):
         """Test create request method properly sets file, Content-Type and Content-Length headers."""
@@ -184,9 +202,7 @@ class TestSplitPdfHook(TestCase):
         self.assertEqual(result, expected_result)
 
         # Test case 2: Multiple parameters
-        content_disposition = (
-            b'attachment; filename="test_file.pdf"; size=100; version="1.0"'
-        )
+        content_disposition = b'attachment; filename="test_file.pdf"; size=100; version="1.0"'
         expected_result = {"filename": "test_file.pdf", "size": "100", "version": "1.0"}
         result = hook._decode_content_disposition(content_disposition)
         self.assertEqual(result, expected_result)
@@ -218,18 +234,12 @@ class TestSplitPdfHook(TestCase):
         form_data = hook._parse_form_data(decoded_data)
 
         # Assert the parsed form data
-        self.assertEqual(
-            form_data.get("parameter_1"), expected_form_data.get("parameter_1")
-        )
-        self.assertEqual(
-            form_data.get("parameter_2"), expected_form_data.get("parameter_2")
-        )
+        self.assertEqual(form_data.get("parameter_1"), expected_form_data.get("parameter_1"))
+        self.assertEqual(form_data.get("parameter_2"), expected_form_data.get("parameter_2"))
         self.assertEqual(
             form_data.get("files").file_name, expected_form_data.get("files").file_name
         )
-        self.assertEqual(
-            form_data.get("files").content, expected_form_data.get("files").content
-        )
+        self.assertEqual(form_data.get("files").content, expected_form_data.get("files").content)
 
     def test_unit_parse_form_data_error(self):
         """Test parse form data method raises RuntimeError when the form data is invalid (no Content-Disposition header)."""
@@ -342,3 +352,4 @@ class TestSplitPdfHook(TestCase):
         result = hook._get_starting_page_number(form_data)
 
         self.assertEqual(result, 1)
+

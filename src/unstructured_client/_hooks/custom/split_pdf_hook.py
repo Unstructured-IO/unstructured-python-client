@@ -35,6 +35,10 @@ PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 
 DEFAULT_STARTING_PAGE_NUMBER = 1
+DEFAULT_NUM_THREADS = 5
+MAX_THREADS = 15
+MIN_PAGES_PER_THREAD = 2
+MAX_PAGES_PER_THREAD = 20
 
 
 FormData = dict[str, Union[str, shared.Files]]
@@ -109,6 +113,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         starting_page_number = self._get_starting_page_number(form_data)
+        call_threads = self._get_split_pdf_call_threads(form_data)
 
         pages = self._get_pdf_pages(file.content)
         call_api_partial = functools.partial(
@@ -506,35 +511,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
 
-    def _get_split_pdf_call_threads(self) -> int:
-        """
-        Read from os envs the number of threads that should be used for splitting pdf on client side.
-
-        Returns:
-            int: The number of threads to use for the API call.
-        """
-        max_threads = 15
-        try:
-            call_threads = int(os.getenv("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS", "5"))
-        except ValueError:
-            call_threads = 5
-            logger.error("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS has invalid value.")
-        if call_threads > max_threads:
-            logger.warning(
-                "Clipping UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS to %d.", max_threads
-            )
-            call_threads = max_threads
-        elif call_threads < 1:
-            logger.warning("UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS is less than 1.")
-            call_threads = 5
-        logger.info(
-            "Splitting PDF by page on client. Using %d threads when calling API.",
-            call_threads,
-        )
-        logger.info(
-            "Set UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS env var if you want to change that."
-        )
-        return call_threads
 
     def _clear_operation(self, operation_id: str) -> None:
         """
@@ -581,3 +557,44 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
 
         return starting_page_number
+
+    def _get_split_pdf_call_threads(self, form_data: FormData) -> int:
+        """Retrieves the number of threads that should be used for splitting pdf.
+
+        In case given the number is not a valid integer or less than 1, it will use the
+        default value.
+
+        Args:
+            form_data (FormData): The form data containing the number of threads.
+
+        Returns:
+            int: The number of threads to use.
+        """
+        num_threads_str = form_data.get(PARTITION_FORM_NUM_THREADS_KEY)
+
+        if num_threads_str is None:
+            return DEFAULT_NUM_THREADS
+
+        try:
+            num_threads = int(num_threads_str)
+        except ValueError:
+            logger.warning(
+                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is not a valid integer. "
+                f"Using default value '{DEFAULT_NUM_THREADS}'.",
+            )
+            return DEFAULT_NUM_THREADS
+
+        if num_threads < 1:
+            logger.warning(
+                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is less than 1. "
+                f"Using the default value ={DEFAULT_NUM_THREADS}.",
+            )
+            return DEFAULT_NUM_THREADS
+        elif num_threads > MAX_THREADS:
+            logger.warning(
+                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is greater than {MAX_THREADS}. "
+                f"Using the maximum allowed value ={MAX_THREADS}.",
+            )
+            return MAX_THREADS
+
+        return num_threads
