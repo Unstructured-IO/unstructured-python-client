@@ -5,6 +5,7 @@ import functools
 import io
 import json
 import logging
+import math
 import os
 from concurrent.futures import ThreadPoolExecutor, Future
 from typing import Optional, Tuple, Union, Generator
@@ -33,6 +34,7 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
+PARTITION_FORM_NUM_THREADS_KEY = "split_pdf_threads"
 
 DEFAULT_STARTING_PAGE_NUMBER = 1
 DEFAULT_NUM_THREADS = 5
@@ -115,14 +117,18 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         starting_page_number = self._get_starting_page_number(form_data)
         call_threads = self._get_split_pdf_call_threads(form_data)
 
-        pages = self._get_pdf_pages(file.content)
+        pdf = PdfReader(io.BytesIO(file.content))
+        split_size = self._get_optimal_split_size(
+            num_pages=len(pdf.pages), num_threads=call_threads
+        )
+        pages = self._get_pdf_pages(pdf, split_size)
+
         call_api_partial = functools.partial(
             self._call_api,
             request=request,
             form_data=form_data,
             filename=file.file_name,
         )
-        call_threads = self._get_split_pdf_call_threads()
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
@@ -247,9 +253,18 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         return True
 
+    def _get_optimal_split_size(self, num_pages: int, num_threads: int) -> int:
+        """Distributes pages to threads evenly based on the number of pages and threads."""
+        if num_pages < MAX_PAGES_PER_THREAD * num_threads:
+            split_size = math.ceil(num_pages / num_threads)
+        else:
+            split_size = MAX_PAGES_PER_THREAD
+
+        return max(split_size, MIN_PAGES_PER_THREAD)
+
     def _get_pdf_pages(
         self,
-        file_content: bytes,
+        pdf: PdfReader,
         split_size: int = 1,
     ) -> Generator[Tuple[io.BytesIO, int, int], None, None]:
         """Reads given bytes of a pdf file and split it into n file-like objects, each
@@ -266,7 +281,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             their page number and overall pages number of the original document.
         """
 
-        pdf = PdfReader(io.BytesIO(file_content))
         offset = 0
         offset_end = len(pdf.pages)
 
