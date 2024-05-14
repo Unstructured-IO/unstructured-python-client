@@ -353,3 +353,62 @@ class TestSplitPdfHook(TestCase):
 
         self.assertEqual(result, 1)
 
+    def test_small_pdf_fewer_than_max_pages_per_thread_num_threads(self):
+        description = "Small PDF, fewer than max pages per thread * num threads"
+        num_pages = 5
+        num_threads = 3
+        expected_split_size = 2
+        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
+        self.assertEqual(
+            split_size,
+            expected_split_size,
+            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
+        )
+
+    def test_large_pdf_more_than_max_pages_per_thread_num_threads(self):
+        description = "Large PDF, more than max pages per thread * num threads"
+        num_pages = 100
+        num_threads = 3
+        expected_split_size = 20
+        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
+        self.assertEqual(
+            split_size,
+            expected_split_size,
+            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
+        )
+
+    def test_small_pdf_fewer_than_min_pages_per_thread(self):
+        description = "Small PDF, fewer than min pages per thread"
+        num_pages = 1
+        num_threads = 5
+        expected_split_size = 2
+        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
+        self.assertEqual(
+            split_size,
+            expected_split_size,
+            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
+        )
+
+    def test_exact_multiple_of_num_threads(self):
+        description = "Exact multiple of num threads"
+        num_pages = 60
+        num_threads = 4
+        expected_split_size = 15
+        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
+        self.assertEqual(
+            split_size,
+            expected_split_size,
+            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
+        )
+
+    def test_large_thread_count_for_small_pdf(self):
+        description = "Large thread count for a small PDF"
+        num_pages = 3
+        num_threads = 10
+        expected_split_size = 2
+        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
+        self.assertEqual(
+            split_size,
+            expected_split_size,
+            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
+        )
