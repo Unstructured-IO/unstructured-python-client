@@ -7,25 +7,25 @@ import json
 import logging
 import math
 import os
-from concurrent.futures import ThreadPoolExecutor, Future
-from typing import Optional, Tuple, Union, Generator
+from concurrent.futures import Future, ThreadPoolExecutor
+from typing import Generator, Optional, Tuple, Union
 
 import requests
+from pypdf import PdfReader, PdfWriter
+from pypdf.errors import PdfReadError
 from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-from pypdf import PdfReader, PdfWriter
-from pypdf.errors import PdfReadError
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.types import (
-    BeforeRequestContext,
-    AfterSuccessContext,
     AfterErrorContext,
-    SDKInitHook,
-    BeforeRequestHook,
-    AfterSuccessHook,
     AfterErrorHook,
+    AfterSuccessContext,
+    AfterSuccessHook,
+    BeforeRequestContext,
+    BeforeRequestHook,
+    SDKInitHook,
 )
 from unstructured_client.models import shared
 
@@ -61,9 +61,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_responses: dict[str, list[requests.Response]] = {}
         self.partition_requests: dict[str, list[Future[requests.Response]]] = {}
 
-    def sdk_init(
-        self, base_url: str, client: requests.Session
-    ) -> Tuple[str, requests.Session]:
+    def sdk_init(self, base_url: str, client: requests.Session) -> Tuple[str, requests.Session]:
         """Initializes Split PDF Hook.
 
         Args:
@@ -314,9 +312,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         for part in decoded_data.parts:
             content_disposition = part.headers.get(b"Content-Disposition")
             if content_disposition is None:
-                raise RuntimeError(
-                    "Content-Disposition header not found. Can't split pdf file."
-                )
+                raise RuntimeError("Content-Disposition header not found. Can't split pdf file.")
             part_params = self._decode_content_disposition(content_disposition)
             name = part_params.get("name")
 
@@ -327,9 +323,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 filename = part_params.get("filename")
                 if filename is None or not filename.strip():
                     raise ValueError("Filename can't be an empty string.")
-                form_data[PARTITION_FORM_FILES_KEY] = shared.Files(
-                    part.content, filename
-                )
+                form_data[PARTITION_FORM_FILES_KEY] = shared.Files(part.content, filename)
             else:
                 form_data[name] = part.content.decode()
 
@@ -377,9 +371,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             raise RuntimeError("HTTP client not accessible!")
         page_content, page_number = page
 
-        new_request = self._create_request(
-            request, form_data, page_content, filename, page_number
-        )
+        new_request = self._create_request(request, form_data, page_content, filename, page_number)
         prepared_request = self.client.prepare_request(new_request)
 
         try:
@@ -469,9 +461,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         payload.update(updated_parameters)
         return payload
 
-    def _create_response(
-        self, response: requests.Response, elements: list
-    ) -> requests.Response:
+    def _create_response(self, response: requests.Response, elements: list) -> requests.Response:
         """
         Creates a modified response object with updated content.
 
@@ -490,9 +480,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         setattr(response_copy, "_content", content)
         return response_copy
 
-    def _await_elements(
-        self, operation_id: str, response: requests.Response
-    ) -> Optional[list]:
+    def _await_elements(self, operation_id: str, response: requests.Response) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
         elements.
@@ -524,7 +512,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_responses[operation_id] = responses
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
-
 
     def _clear_operation(self, operation_id: str) -> None:
         """
