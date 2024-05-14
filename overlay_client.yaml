@@ -5,4 +5,10 @@ info:
 actions:
   - target: $["components"]["schemas"]["partition_parameters"]["properties"]
     update:
-      "split_pdf_page": {"type": "boolean", "title": "Split Pdf Page", "description": "Should the pdf file be split at client. Ignored on backend."}
+      "split_pdf_page":
+        {
+          "type": "boolean",
+          "title": "Split Pdf Page",
+          "description": "Should the pdf file be split at client. Ignored on backend.",
+          "default": true,
+        }
