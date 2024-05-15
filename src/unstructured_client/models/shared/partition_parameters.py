@@ -5,6 +5,7 @@ import dataclasses
 from enum import Enum
 from typing import List, Optional
 
+
 class ChunkingStrategy(str, Enum):
     BASIC = 'basic'
     BY_PAGE = 'by_page'
@@ -19,10 +20,12 @@ class Files:
     
 
 
+
 class OutputFormat(str, Enum):
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     APPLICATION_JSON = 'application/json'
     TEXT_CSV = 'text/csv'
+
 
 class Strategy(str, Enum):
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
