@@ -6,7 +6,6 @@ import io
 import json
 import logging
 import math
-import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Generator, Optional, Tuple, Union
 
@@ -580,21 +579,26 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             num_threads = int(num_threads_str)
         except ValueError:
             logger.warning(
-                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is not a valid integer. "
-                f"Using default value '{DEFAULT_NUM_THREADS}'.",
+                "'%s' is not a valid integer. Using default value '%s'.",
+                PARTITION_FORM_NUM_THREADS_KEY,
+                DEFAULT_NUM_THREADS,
             )
             return DEFAULT_NUM_THREADS
 
         if num_threads < 1:
             logger.warning(
-                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is less than 1. "
-                f"Using the default value ={DEFAULT_NUM_THREADS}.",
+                "'%s' is less than 1. Using the default value = %s.",
+                PARTITION_FORM_NUM_THREADS_KEY,
+                DEFAULT_NUM_THREADS,
             )
             return DEFAULT_NUM_THREADS
-        elif num_threads > MAX_THREADS:
+
+        if num_threads > MAX_THREADS:
             logger.warning(
-                f"'{PARTITION_FORM_NUM_THREADS_KEY}' is greater than {MAX_THREADS}. "
-                f"Using the maximum allowed value ={MAX_THREADS}.",
+                "'%s' is greater than %s. Using the maximum allowed value = %s.",
+                PARTITION_FORM_NUM_THREADS_KEY,
+                MAX_THREADS,
+                MAX_THREADS,
             )
             return MAX_THREADS
 
