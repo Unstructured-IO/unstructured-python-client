@@ -53,10 +53,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: make install-test
-    - name: Run unit tests
+    - name: Run all tests
       run: |
         pip install  .
-        pytest test_unstructured_client
+        make test
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 
