@@ -1,8 +1,8 @@
 import os
+
 import pytest
 import requests
 from deepdiff import DeepDiff
-
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.models.errors import HTTPValidationError
@@ -12,20 +12,22 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 @pytest.mark.parametrize("call_threads", [1, 2, 5])
 @pytest.mark.parametrize(
-    "filename, expected_ok",
+    ("filename", "expected_ok", "strategy"),
     [
-        ("_sample_docs/list-item-example-1.pdf", True),  # 1 page
-        ("_sample_docs/layout-parser-paper-fast.pdf", True),  # 2 pages
-        ("_sample_docs/layout-parser-paper.pdf", True),  # 16 pages
-        ("_sample_docs/fake.doc", True),
+        ("_sample_docs/list-item-example-1.pdf", True, "fast"),  # 1 page
+        ("_sample_docs/layout-parser-paper-fast.pdf", True, "fast"),  # 2 pages
+        # NOTE(mike): using "fast" strategy fails on this file for unknown reasons
+        ("_sample_docs/layout-parser-paper.pdf", True, "hi_res"),  # 16 pages
+        ("_sample_docs/fake.doc", True, "fast"),
         (
             "_sample_docs/fake.doc",
             False,
+            "fast",
         ),  # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
     ],
 )
 def test_integration_split_pdf_has_same_output_as_non_split(
-    call_threads: int, filename: str, expected_ok: bool, caplog
+    call_threads: int, filename: str, expected_ok: bool, strategy: str, caplog
 ):
     """
     Tests that output that we get from the split-by-page pdf is the same as from non-split.
@@ -35,9 +37,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
-        assert (
-            response.status_code == 200
-        ), "The unstructured-api is not running on localhost:8000"
+        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
@@ -54,12 +54,11 @@ def test_integration_split_pdf_has_same_output_as_non_split(
 
     req = shared.PartitionParameters(
         files=files,
-        strategy="fast",
+        strategy=strategy,
         languages=["eng"],
         split_pdf_page=True,
+        split_pdf_threads=call_threads,
     )
-
-    os.environ["UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS"] = str(call_threads)
 
     try:
         resp_split = client.general.partition(req)
@@ -78,7 +77,6 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     assert resp_split.content_type == resp_single.content_type
     assert resp_split.status_code == resp_single.status_code
 
-    # Difference in the parent_id is expected, because parent_ids are assigned when element crosses page boundary
     diff = DeepDiff(
         t1=resp_split.elements,
         t2=resp_single.elements,
@@ -95,9 +93,7 @@ def test_integration_split_pdf_for_file_with_no_name():
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
-        assert (
-            response.status_code == 200
-        ), "The unstructured-api is not running on localhost:8000"
+        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 

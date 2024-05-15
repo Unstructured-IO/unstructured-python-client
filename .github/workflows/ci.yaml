@@ -56,7 +56,7 @@ jobs:
     - name: Run unit tests
       run: |
         pip install  .
-        pytest _test_unstructured_client/test_integration*.py
+        pytest test_unstructured_client
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 

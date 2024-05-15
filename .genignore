@@ -4,7 +4,7 @@
 src/unstructured_client/_unstructured
 _jupyter
 _sample_docs
-_test_unstructured_client
+test_unstructured_client
 
 # ignore Makefile
 Makefile
