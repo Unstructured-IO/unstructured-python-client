@@ -48,38 +48,10 @@ class TestSplitPdfHook(TestCase):
     def test_unit_get_split_pdf_call_threads_default(self):
         """Test get split pdf call threads method returns the right values."""
         hook = SplitPdfHook()
-
         assert hook._get_split_pdf_call_threads({}) == DEFAULT_NUM_THREADS
-
-        # Test custom value
-        assert (
-            hook._get_split_pdf_call_threads(
-                {
-                    "split_pdf_threads": 10,
-                }
-            )
-            == 10
-        )
-
-        # Test over limit value
-        assert (
-            hook._get_split_pdf_call_threads(
-                {
-                    "split_pdf_threads": "20",
-                }
-            )
-            == MAX_THREADS
-        )
-
-        # Test negative value
-        assert (
-            hook._get_split_pdf_call_threads(
-                {
-                    "split_pdf_threads": -3,
-                }
-            )
-            == DEFAULT_NUM_THREADS
-        )
+        assert hook._get_split_pdf_call_threads({"split_pdf_threads": 10}) == 10
+        assert hook._get_split_pdf_call_threads({"split_pdf_threads": "20"}) == MAX_THREADS
+        assert hook._get_split_pdf_call_threads({"split_pdf_threads": -3}) == DEFAULT_NUM_THREADS
 
     def test_unit_prepare_request_payload(self):
         """Test prepare request payload method properly sets split_pdf_page to 'false'
