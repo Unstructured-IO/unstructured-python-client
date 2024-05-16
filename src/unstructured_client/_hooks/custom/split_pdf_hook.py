@@ -38,8 +38,8 @@ PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 DEFAULT_STARTING_PAGE_NUMBER = 1
 DEFAULT_CONCURRENCY_LEVEL = 5
 MAX_CONCURRENCY_LEVEL = 15
-MIN_PAGES_PER_THREAD = 2
-MAX_PAGES_PER_THREAD = 20
+MIN_PAGES_PER_SPLIT = 2
+MAX_PAGES_PER_SPLIT = 20
 
 
 FormData = dict[str, Union[str, shared.Files]]
@@ -253,12 +253,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def _get_optimal_split_size(self, num_pages: int, concurrency_level: int) -> int:
         """Distributes pages to threads evenly based on the number of pages and threads."""
-        if num_pages < MAX_PAGES_PER_THREAD * concurrency_level:
+        if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
             split_size = math.ceil(num_pages / concurrency_level)
         else:
-            split_size = MAX_PAGES_PER_THREAD
+            split_size = MAX_PAGES_PER_SPLIT
 
-        return max(split_size, MIN_PAGES_PER_THREAD)
+        return max(split_size, MIN_PAGES_PER_SPLIT)
 
     def _get_pdf_pages(
         self,
