@@ -10,6 +10,8 @@ from requests_toolbelt import MultipartDecoder, MultipartEncoder
 from unstructured_client._hooks.custom.split_pdf_hook import (
     DEFAULT_CONCURRENCY_LEVEL,
     MAX_CONCURRENCY_LEVEL,
+    MAX_PAGES_PER_SPLIT,
+    MIN_PAGES_PER_SPLIT,
     SplitPdfHook,
 )
 from unstructured_client.models import shared
@@ -322,11 +324,11 @@ class TestSplitPdfHook(TestCase):
 @pytest.mark.parametrize(
     ("num_pages", "concurrency_level", "expected_split_size"),
     [
-        (5, 3, 2),  # "Small PDF, fewer than max pages per thread * num threads"
-        (100, 3, 20),  # "Large PDF, more than max pages per thread * num threads"
-        (1, 5, 2),  # "Small PDF, fewer than min pages per thread"
-        (60, 4, 15),  # Exact multiple of num threads
-        (3, 10, 2),  # Large thread count for a small PDF
+        (5, 3, 2),  # "1st worker gets 2 pages, 2nd worker gets 2 pages, 3rd worker gets 1 page"
+        (100, 3, MAX_PAGES_PER_SPLIT),  # large PDF, each worker gets 20 pages
+        (1, 5, MIN_PAGES_PER_SPLIT),  # small PDF, one worker with MIN_PAGES_PER_WORKER size
+        (60, 4, 15),  # exact multiple of no. workers
+        (3, 10, MIN_PAGES_PER_SPLIT),  # more workers than pages
     ],
 )
 def test_get_optimal_split_size(num_pages, concurrency_level, expected_split_size):
