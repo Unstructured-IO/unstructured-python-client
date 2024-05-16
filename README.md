@@ -113,8 +113,8 @@ as single result. This will work only for PDF files, so don't set it for other f
 Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
 requires having context of multiple pages.
 
-The amount of threads that will be used for sending individual pdf pages, is controlled by
-`UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var. By default it equals to 5. 
+The amount of workers that will be used for sending individual pdf pages, is controlled by
+`split_pdf_concurrency_level`. By default it equals to 5.
 It can't be more than 15, to avoid too high resource usage and costs.
 
 <!-- No SDK Example Usage -->
