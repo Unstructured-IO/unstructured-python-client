@@ -80,10 +80,10 @@ class PartitionParameters:
     r"""A value between 0.0 and 1.0 describing the minimum similarity two elements must have to be included in the same chunk. Note that similar elements may be separated to meet chunk-size criteria; this value can only guarantees that two elements with similarity below the threshold will appear in separate chunks."""
     skip_infer_table_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'skip_infer_table_types' }})
     r"""The document types that you want to skip table extraction with. Default: []"""
+    split_pdf_concurrency_level: Optional[int] = dataclasses.field(default=5, metadata={'multipart_form': { 'field_name': 'split_pdf_concurrency_level' }})
+    r"""This parameter specifies the number of workers used for sending requests when the PDF is split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page: Optional[bool] = dataclasses.field(default=True, metadata={'multipart_form': { 'field_name': 'split_pdf_page' }})
-    r"""Should the pdf file be split at client. Ignored on backend."""
-    split_pdf_threads: Optional[int] = dataclasses.field(default=5, metadata={'multipart_form': { 'field_name': 'split_pdf_threads' }})
-    r"""Number of threads used when sending requests of splitted PDF. Ignored on backend."""
+    r"""This parameter determines if the PDF file should be split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     starting_page_number: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'starting_page_number' }})
     r"""When PDF is split into pages before sending it into the API, providing this information will allow the page number to be assigned correctly. Introduced in 1.0.27."""
     strategy: Optional[Strategy] = dataclasses.field(default=Strategy.AUTO, metadata={'multipart_form': { 'field_name': 'strategy' }})
