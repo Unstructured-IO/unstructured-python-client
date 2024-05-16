@@ -4,6 +4,7 @@ import os
 from concurrent.futures import Future
 from unittest import TestCase
 
+import pytest
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
 from unstructured_client._hooks.custom.split_pdf_hook import (
@@ -44,20 +45,6 @@ class TestSplitPdfHook(TestCase):
 
         assert hook.partition_requests.get(operation_id) is None
         assert hook.partition_responses.get(operation_id) is None
-
-    def test_unit_get_split_pdf_concurrency_level_default(self):
-        """Test get split pdf call threads method returns the right values."""
-        hook = SplitPdfHook()
-        assert hook._get_split_pdf_concurrency_level({}) == DEFAULT_CONCURRENCY_LEVEL
-        assert hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": 10}) == 10
-        assert (
-            hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": "20"})
-            == MAX_CONCURRENCY_LEVEL
-        )
-        assert (
-            hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": -3})
-            == DEFAULT_CONCURRENCY_LEVEL
-        )
 
     def test_unit_prepare_request_payload(self):
         """Test prepare request payload method properly sets split_pdf_page to 'false'
@@ -331,62 +318,36 @@ class TestSplitPdfHook(TestCase):
 
         self.assertEqual(result, 1)
 
-    def test_small_pdf_fewer_than_max_pages_per_thread_num_threads(self):
-        description = "Small PDF, fewer than max pages per thread * num threads"
-        num_pages = 5
-        num_threads = 3
-        expected_split_size = 2
-        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
-        self.assertEqual(
-            split_size,
-            expected_split_size,
-            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
-        )
 
-    def test_large_pdf_more_than_max_pages_per_thread_num_threads(self):
-        description = "Large PDF, more than max pages per thread * num threads"
-        num_pages = 100
-        num_threads = 3
-        expected_split_size = 20
-        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
-        self.assertEqual(
-            split_size,
-            expected_split_size,
-            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
-        )
+@pytest.mark.parametrize(
+    ("num_pages", "concurrency_level", "expected_split_size"),
+    [
+        (5, 3, 2),  # "Small PDF, fewer than max pages per thread * num threads"
+        (100, 3, 20),  # "Large PDF, more than max pages per thread * num threads"
+        (1, 5, 2),  # "Small PDF, fewer than min pages per thread"
+        (60, 4, 15),  # Exact multiple of num threads
+        (3, 10, 2),  # Large thread count for a small PDF
+    ],
+)
+def test_get_optimal_split_size(num_pages, concurrency_level, expected_split_size):
+    split_size = SplitPdfHook()._get_optimal_split_size(num_pages, concurrency_level)
+    assert split_size == expected_split_size
 
-    def test_small_pdf_fewer_than_min_pages_per_thread(self):
-        description = "Small PDF, fewer than min pages per thread"
-        num_pages = 1
-        num_threads = 5
-        expected_split_size = 2
-        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
-        self.assertEqual(
-            split_size,
-            expected_split_size,
-            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
-        )
 
-    def test_exact_multiple_of_num_threads(self):
-        description = "Exact multiple of num threads"
-        num_pages = 60
-        num_threads = 4
-        expected_split_size = 15
-        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
-        self.assertEqual(
-            split_size,
-            expected_split_size,
-            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
-        )
-
-    def test_large_thread_count_for_small_pdf(self):
-        description = "Large thread count for a small PDF"
-        num_pages = 3
-        num_threads = 10
-        expected_split_size = 2
-        split_size = SplitPdfHook()._get_optimal_split_size(num_pages, num_threads)
-        self.assertEqual(
-            split_size,
-            expected_split_size,
-            f"{description} => Expected: {expected_split_size}, Got: {split_size}",
-        )
+@pytest.mark.parametrize(
+    "concurrency_level, expected_result",
+    [
+        ({}, DEFAULT_CONCURRENCY_LEVEL),  # no value
+        ({"split_pdf_concurrency_level": 10}, 10),  # valid number
+        (
+            {"split_pdf_concurrency_level": f"{MAX_CONCURRENCY_LEVEL+1}"},
+            MAX_CONCURRENCY_LEVEL,
+        ),  # exceeds max value
+        ({"split_pdf_concurrency_level": -3}, DEFAULT_CONCURRENCY_LEVEL),  # negative value
+    ],
+)
+def test_unit_get_split_pdf_concurrency_level_returns_valid_number(
+    self, concurrency_level, expected_result
+):
+    hook = SplitPdfHook()
+    assert hook._get_split_pdf_concurrency_level(concurrency_level) == expected_result
