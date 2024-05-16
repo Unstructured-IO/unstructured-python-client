@@ -347,7 +347,7 @@ def test_get_optimal_split_size(num_pages, concurrency_level, expected_split_siz
     ],
 )
 def test_unit_get_split_pdf_concurrency_level_returns_valid_number(
-    self, concurrency_level, expected_result
+    concurrency_level, expected_result
 ):
     hook = SplitPdfHook()
     assert hook._get_split_pdf_concurrency_level(concurrency_level) == expected_result

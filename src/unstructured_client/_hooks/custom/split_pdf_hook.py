@@ -597,9 +597,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.warning(
                 "'%s' is greater than %s. Using the maximum allowed value = %s.",
                 PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
-                MAX_THREADS,
-                MAX_THREADS,
+                MAX_CONCURRENCY_LEVEL,
+                MAX_CONCURRENCY_LEVEL,
             )
-            return MAX_THREADS
+            return MAX_CONCURRENCY_LEVEL
 
-        return num_threads
+        return concurrency_level
