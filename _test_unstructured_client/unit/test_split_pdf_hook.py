@@ -352,4 +352,4 @@ def test_unit_get_split_pdf_concurrency_level_returns_valid_number(
     concurrency_level, expected_result
 ):
     hook = SplitPdfHook()
-    assert hook._get_split_pdf_concurrency_level(concurrency_level) == expected_result
+    assert hook._get_split_pdf_concurrency_level_param(concurrency_level) == expected_result

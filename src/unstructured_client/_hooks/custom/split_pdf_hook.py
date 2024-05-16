@@ -112,7 +112,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         starting_page_number = self._get_starting_page_number(form_data)
-        concurrency_level = self._get_split_pdf_concurrency_level(form_data)
+        concurrency_level = self._get_split_pdf_concurrency_level_param(form_data)
 
         pdf = PdfReader(io.BytesIO(file.content))
         split_size = self._get_optimal_split_size(
@@ -252,7 +252,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return True
 
     def _get_optimal_split_size(self, num_pages: int, concurrency_level: int) -> int:
-        """Distributes pages to threads evenly based on the number of pages and threads."""
+        """Distributes pages to workers evenly based on the number of pages and desired concurrency level."""
         if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
             split_size = math.ceil(num_pages / concurrency_level)
         else:
@@ -558,17 +558,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         return starting_page_number
 
-    def _get_split_pdf_concurrency_level(self, form_data: FormData) -> int:
-        """Retrieves the number of threads that should be used for splitting pdf.
+    def _get_split_pdf_concurrency_level_param(self, form_data: FormData) -> int:
+        """Retrieves the value for concurreny level that should be used for splitting pdf.
 
         In case given the number is not a valid integer or less than 1, it will use the
         default value.
 
         Args:
-            form_data (FormData): The form data containing the number of threads.
+            form_data: The form data containing the desired concurrency level.
 
         Returns:
-            int: The number of threads to use.
+            int: The concurrency level after validation.
         """
         concurrency_level_str = form_data.get(PARTITION_FORM_CONCURRENCY_LEVEL_KEY)
 
