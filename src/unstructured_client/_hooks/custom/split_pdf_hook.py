@@ -6,7 +6,7 @@ import io
 import json
 import logging
 import math
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future, ProcessPoolExecutor
 from typing import Generator, Optional, Tuple, Union
 
 import requests
@@ -121,7 +121,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         pages = self._get_pdf_pages(pdf, split_size)
 
         call_api_partial = functools.partial(
-            self._call_api,
+            SplitPdfHook._call_api,
+            client=self.client,
             request=request,
             form_data=form_data,
             filename=file.file_name,
@@ -129,7 +130,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
-        with ThreadPoolExecutor(max_workers=call_threads) as executor:
+        with ProcessPoolExecutor(max_workers=call_threads) as executor:
             for page_content, page_index, all_pages_number in pages:
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
@@ -138,12 +139,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     last_page_number = page_number
                     break
                 self.partition_requests[operation_id].append(
-                    executor.submit(call_api_partial, (page_content, page_number))
+                    executor.submit(call_api_partial, page=(page_content, page_number))
                 )
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page_request = self._create_request(
+        last_page_request = SplitPdfHook._create_request(
             request, form_data, last_page_content, file.file_name, last_page_number
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
@@ -344,8 +345,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         parameters_dict = {p[0]: p[1].strip('"') for p in parameters}
         return parameters_dict
 
+    @staticmethod
     def _call_api(
-        self,
+        client: Optional[requests.Session],
         page: Tuple[io.BytesIO, int],
         request: requests.PreparedRequest,
         form_data: FormData,
@@ -366,21 +368,23 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             requests.Response: The response from the API.
 
         """
-        if self.client is None:
+        if client is None:
             raise RuntimeError("HTTP client not accessible!")
         page_content, page_number = page
 
-        new_request = self._create_request(request, form_data, page_content, filename, page_number)
-        prepared_request = self.client.prepare_request(new_request)
+        new_request = SplitPdfHook._create_request(
+            request, form_data, page_content, filename, page_number
+        )
+        prepared_request = client.prepare_request(new_request)
 
         try:
-            return self.client.send(prepared_request)
+            return client.send(prepared_request)
         except Exception:
             logger.error("Failed to send request for page %d", page_number)
             return requests.Response()
 
+    @staticmethod
     def _create_request(
-        self,
         request: requests.PreparedRequest,
         form_data: FormData,
         page_content: io.BytesIO,
@@ -401,8 +405,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             requests.Request: The request object for a splitted part of the
             original file.
         """
-        headers = self._prepare_request_headers(request.headers)
-        payload = self._prepare_request_payload(form_data)
+        headers = SplitPdfHook._prepare_request_headers(request.headers)
+        payload = SplitPdfHook._prepare_request_payload(form_data)
         body = MultipartEncoder(
             fields={
                 **payload,
@@ -421,9 +425,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             headers={**headers, "Content-Type": body.content_type},
         )
 
-    def _prepare_request_headers(
-        self, headers: CaseInsensitiveDict[str]
-    ) -> CaseInsensitiveDict[str]:
+    @staticmethod
+    def _prepare_request_headers(headers: CaseInsensitiveDict[str]) -> CaseInsensitiveDict[str]:
         """
         Prepare the request headers by removing the 'Content-Type' and
         'Content-Length' headers.
@@ -439,7 +442,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         headers.pop("Content-Length", None)
         return headers
 
-    def _prepare_request_payload(self, form_data: FormData) -> FormData:
+    @staticmethod
+    def _prepare_request_payload(form_data: FormData) -> FormData:
         """
         Prepares the request payload by removing unnecessary keys and updating the
         file.
