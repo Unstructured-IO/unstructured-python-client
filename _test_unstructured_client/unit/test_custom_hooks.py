@@ -4,12 +4,11 @@ import re
 import pytest
 import requests
 import requests_mock
+from _test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.models.errors import SDKError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
-
-from test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
