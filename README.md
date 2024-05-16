@@ -106,16 +106,16 @@ See the [general partition](/docs/models/shared/partitionparameters.md) page for
 
 #### Splitting PDF by pages
 
-In order to speed up processing of long PDF files, set `split_pdf_page=True`. It will cause the PDF
-to be split page-by-page at client side, before sending to API, and combining individual responses
+In order to speed up processing of long PDF files, `split_pdf_page=True` by default. It will cause the PDF
+to be split at client side, before sending to API, and combining individual responses
 as single result. This will work only for PDF files, so don't set it for other filetypes.
+The splitting behavior can be disabled by setting `split_pdf_page=False`.
 
 Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
 requires having context of multiple pages.
 
-The amount of workers that will be used for sending individual pdf pages, is controlled by
-`split_pdf_concurrency_level`. By default it equals to 5.
-It can't be more than 15, to avoid too high resource usage and costs.
+The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check.
+The size of each batch of pages (ranging from 2 to 20), is internally determined based on the concurrency level and the total number of pages in the document.
 
 <!-- No SDK Example Usage -->
 <!-- No SDK Available Operations -->
