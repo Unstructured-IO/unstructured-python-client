@@ -7,8 +7,8 @@ from unittest import TestCase
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
 from unstructured_client._hooks.custom.split_pdf_hook import (
-    DEFAULT_NUM_THREADS,
-    MAX_THREADS,
+    DEFAULT_CONCURRENCY_LEVEL,
+    MAX_CONCURRENCY_LEVEL,
     SplitPdfHook,
 )
 from unstructured_client.models import shared
@@ -45,13 +45,19 @@ class TestSplitPdfHook(TestCase):
         assert hook.partition_requests.get(operation_id) is None
         assert hook.partition_responses.get(operation_id) is None
 
-    def test_unit_get_split_pdf_call_threads_default(self):
+    def test_unit_get_split_pdf_concurrency_level_default(self):
         """Test get split pdf call threads method returns the right values."""
         hook = SplitPdfHook()
-        assert hook._get_split_pdf_call_threads({}) == DEFAULT_NUM_THREADS
-        assert hook._get_split_pdf_call_threads({"split_pdf_threads": 10}) == 10
-        assert hook._get_split_pdf_call_threads({"split_pdf_threads": "20"}) == MAX_THREADS
-        assert hook._get_split_pdf_call_threads({"split_pdf_threads": -3}) == DEFAULT_NUM_THREADS
+        assert hook._get_split_pdf_concurrency_level({}) == DEFAULT_CONCURRENCY_LEVEL
+        assert hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": 10}) == 10
+        assert (
+            hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": "20"})
+            == MAX_CONCURRENCY_LEVEL
+        )
+        assert (
+            hook._get_split_pdf_concurrency_level({"split_pdf_concurrency_level": -3})
+            == DEFAULT_CONCURRENCY_LEVEL
+        )
 
     def test_unit_prepare_request_payload(self):
         """Test prepare request payload method properly sets split_pdf_page to 'false'

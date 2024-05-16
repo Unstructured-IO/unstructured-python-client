@@ -10,7 +10,7 @@ from unstructured_client.models.errors import HTTPValidationError
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
-@pytest.mark.parametrize("call_threads", [1, 2, 5])
+@pytest.mark.parametrize("concurrency_level", [1, 2, 5])
 @pytest.mark.parametrize(
     ("filename", "expected_ok", "strategy"),
     [
@@ -27,13 +27,13 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ],
 )
 def test_integration_split_pdf_has_same_output_as_non_split(
-    call_threads: int, filename: str, expected_ok: bool, strategy: str, caplog
+    concurrency_level: int, filename: str, expected_ok: bool, strategy: str, caplog
 ):
     """
     Tests that output that we get from the split-by-page pdf is the same as from non-split.
 
     Requires unstructured-api running in bg. See Makefile for how to run it.
-    Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / call_threads.
+    Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / concurrency_level.
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
@@ -57,7 +57,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         strategy=strategy,
         languages=["eng"],
         split_pdf_page=True,
-        split_pdf_threads=call_threads,
+        split_pdf_concurrency_level=concurrency_level,
     )
 
     try:

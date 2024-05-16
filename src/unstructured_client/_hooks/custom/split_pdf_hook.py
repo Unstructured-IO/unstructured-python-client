@@ -33,11 +33,11 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
-PARTITION_FORM_NUM_THREADS_KEY = "split_pdf_threads"
+PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 
 DEFAULT_STARTING_PAGE_NUMBER = 1
-DEFAULT_NUM_THREADS = 5
-MAX_THREADS = 15
+DEFAULT_CONCURRENCY_LEVEL = 5
+MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_THREAD = 2
 MAX_PAGES_PER_THREAD = 20
 
@@ -112,11 +112,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         starting_page_number = self._get_starting_page_number(form_data)
-        call_threads = self._get_split_pdf_call_threads(form_data)
+        concurrency_level = self._get_split_pdf_concurrency_level(form_data)
 
         pdf = PdfReader(io.BytesIO(file.content))
         split_size = self._get_optimal_split_size(
-            num_pages=len(pdf.pages), num_threads=call_threads
+            num_pages=len(pdf.pages), concurrency_level=concurrency_level
         )
         pages = self._get_pdf_pages(pdf, split_size)
 
@@ -130,7 +130,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
-        with ProcessPoolExecutor(max_workers=call_threads) as executor:
+        with ProcessPoolExecutor(max_workers=concurrency_level) as executor:
             for page_content, page_index, all_pages_number in pages:
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
@@ -251,10 +251,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         return True
 
-    def _get_optimal_split_size(self, num_pages: int, num_threads: int) -> int:
+    def _get_optimal_split_size(self, num_pages: int, concurrency_level: int) -> int:
         """Distributes pages to threads evenly based on the number of pages and threads."""
-        if num_pages < MAX_PAGES_PER_THREAD * num_threads:
-            split_size = math.ceil(num_pages / num_threads)
+        if num_pages < MAX_PAGES_PER_THREAD * concurrency_level:
+            split_size = math.ceil(num_pages / concurrency_level)
         else:
             split_size = MAX_PAGES_PER_THREAD
 
@@ -353,16 +353,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data: FormData,
         filename: str,
     ) -> requests.Response:
-        """
-        Calls the API with the provided parameters.
+        """Calls the API with the provided parameters.
+
+        The method is static to allow for parallel execution.
 
         Args:
-            page_content (Tuple[io.BytesIO, int]): A tuple containing the page content and
-            page number.
-            func (Callable): The function to call the API.
-            request (requests.PreparedRequest): The prepared request object.
-            form_data (FormData): The form data to include in the request.
-            filename (str): The name of the original file.
+            page: A tuple containing the page content and page number.
+            request: The prepared request object.
+            form_data: The form data to include in the request.
+            filename: The name of the original file.
 
         Returns:
             requests.Response: The response from the API.
@@ -391,18 +390,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         filename: str,
         page_number: int,
     ) -> requests.Request:
-        """
-        Creates a request object for a part of a splitted PDF file.
+        """Creates a request object for a part of a splitted PDF file.
 
         Args:
-            request (requests.PreparedRequest): The original request object.
-            form_data (FormData): The form data for the request.
-            page_content (io.BytesIO): Page content in bytes.
-            filename (str): The original filename of the PDF file.
-            page_number (int): Number of the page in the original PDF file.
+            request: The original request object.
+            form_data : The form data for the request.
+            page_content: Page content in bytes.
+            filename: The original filename of the PDF file.
+            page_number: Number of the page in the original PDF file.
 
         Returns:
-            requests.Request: The request object for a splitted part of the
+            The request object for a splitted part of the
             original file.
         """
         headers = SplitPdfHook._prepare_request_headers(request.headers)
@@ -432,10 +430,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         'Content-Length' headers.
 
         Args:
-            headers (CaseInsensitiveDict[str]): The original request headers.
+            headers: The original request headers.
 
         Returns:
-            CaseInsensitiveDict[str]: The modified request headers.
+            The modified request headers.
         """
         headers = copy.deepcopy(headers)
         headers.pop("Content-Type", None)
@@ -444,15 +442,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     @staticmethod
     def _prepare_request_payload(form_data: FormData) -> FormData:
-        """
-        Prepares the request payload by removing unnecessary keys and updating the
-        file.
+        """Prepares the request payload by removing unnecessary keys and updating the file.
 
         Args:
-            form_data (FormData): The original form data.
+            form_data: The original form data.
 
         Returns:
-            FormData: The updated request payload.
+            The updated request payload.
         """
         payload = copy.deepcopy(form_data)
         payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
@@ -562,7 +558,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         return starting_page_number
 
-    def _get_split_pdf_call_threads(self, form_data: FormData) -> int:
+    def _get_split_pdf_concurrency_level(self, form_data: FormData) -> int:
         """Retrieves the number of threads that should be used for splitting pdf.
 
         In case given the number is not a valid integer or less than 1, it will use the
@@ -574,33 +570,33 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             int: The number of threads to use.
         """
-        num_threads_str = form_data.get(PARTITION_FORM_NUM_THREADS_KEY)
+        concurrency_level_str = form_data.get(PARTITION_FORM_CONCURRENCY_LEVEL_KEY)
 
-        if num_threads_str is None:
-            return DEFAULT_NUM_THREADS
+        if concurrency_level_str is None:
+            return DEFAULT_CONCURRENCY_LEVEL
 
         try:
-            num_threads = int(num_threads_str)
+            concurrency_level = int(concurrency_level_str)
         except ValueError:
             logger.warning(
                 "'%s' is not a valid integer. Using default value '%s'.",
-                PARTITION_FORM_NUM_THREADS_KEY,
-                DEFAULT_NUM_THREADS,
+                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
+                DEFAULT_CONCURRENCY_LEVEL,
             )
-            return DEFAULT_NUM_THREADS
+            return DEFAULT_CONCURRENCY_LEVEL
 
-        if num_threads < 1:
+        if concurrency_level < 1:
             logger.warning(
                 "'%s' is less than 1. Using the default value = %s.",
-                PARTITION_FORM_NUM_THREADS_KEY,
-                DEFAULT_NUM_THREADS,
+                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
+                DEFAULT_CONCURRENCY_LEVEL,
             )
-            return DEFAULT_NUM_THREADS
+            return DEFAULT_CONCURRENCY_LEVEL
 
-        if num_threads > MAX_THREADS:
+        if concurrency_level > MAX_CONCURRENCY_LEVEL:
             logger.warning(
                 "'%s' is greater than %s. Using the maximum allowed value = %s.",
-                PARTITION_FORM_NUM_THREADS_KEY,
+                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
                 MAX_THREADS,
                 MAX_THREADS,
             )
