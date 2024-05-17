@@ -1,22 +1,24 @@
 from __future__ import annotations
 
-import copy
 import functools
 import io
-import json
 import logging
 import math
 from concurrent.futures import Future, ProcessPoolExecutor
-from typing import Generator, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import requests
-from pypdf import PdfReader, PdfWriter
-from pypdf.errors import PdfReadError
-from requests.structures import CaseInsensitiveDict
+from pypdf import PdfReader
 from requests_toolbelt.multipart.decoder import MultipartDecoder
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
+from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
+from unstructured_client._hooks.custom.form_utils import (
+    PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
+    PARTITION_FORM_FILES_KEY,
+    PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+)
 from unstructured_client._hooks.types import (
     AfterErrorContext,
     AfterErrorHook,
@@ -30,10 +32,6 @@ from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
-PARTITION_FORM_FILES_KEY = "files"
-PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
-PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
-PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 
 DEFAULT_STARTING_PAGE_NUMBER = 1
 DEFAULT_CONCURRENCY_LEVEL = 5
@@ -42,7 +40,14 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 
 
-FormData = dict[str, Union[str, shared.Files]]
+def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
+    """Distributes pages to workers evenly based on the number of pages and desired concurrency level."""
+    if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
+        split_size = math.ceil(num_pages / concurrency_level)
+    else:
+        split_size = MAX_PAGES_PER_SPLIT
+
+    return max(split_size, MIN_PAGES_PER_SPLIT)
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
@@ -102,26 +107,35 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         decoded_body = MultipartDecoder(body, content_type)
-        form_data = self._parse_form_data(decoded_body)
+        form_data = form_utils.parse_form_data(decoded_body)
         split_pdf_page = form_data.get(PARTITION_FORM_SPLIT_PDF_PAGE_KEY)
         if split_pdf_page is None or split_pdf_page == "false":
             return request
 
         file = form_data.get(PARTITION_FORM_FILES_KEY)
-        if file is None or not isinstance(file, shared.Files) or not self._is_pdf(file):
+        if file is None or not isinstance(file, shared.Files) or not pdf_utils.is_pdf(file):
             return request
 
-        starting_page_number = self._get_starting_page_number(form_data)
-        concurrency_level = self._get_split_pdf_concurrency_level_param(form_data)
+        starting_page_number = form_utils.get_starting_page_number(
+            form_data,
+            key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+            fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
+        )
+        concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
+            form_data,
+            key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
+            fallback_value=DEFAULT_CONCURRENCY_LEVEL,
+            max_allowed=MAX_CONCURRENCY_LEVEL,
+        )
 
         pdf = PdfReader(io.BytesIO(file.content))
-        split_size = self._get_optimal_split_size(
+        split_size = get_optimal_split_size(
             num_pages=len(pdf.pages), concurrency_level=concurrency_level
         )
-        pages = self._get_pdf_pages(pdf, split_size)
+        pages = pdf_utils.get_pdf_pages(pdf, split_size)
 
         call_api_partial = functools.partial(
-            SplitPdfHook._call_api,
+            request_utils.call_api,
             client=self.client,
             request=request,
             form_data=form_data,
@@ -144,7 +158,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page_request = SplitPdfHook._create_request(
+        last_page_request = request_utils.create_request(
             request, form_data, last_page_content, file.file_name, last_page_number
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
@@ -175,7 +189,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if elements is None:
             return response
 
-        updated_response = self._create_response(response, elements)
+        updated_response = request_utils.create_response(response, elements)
         self._clear_operation(operation_id)
         return updated_response
 
@@ -217,267 +231,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self._clear_operation(operation_id)
             return (response, error)
 
-        updated_response = self._create_response(responses[0], elements)
+        updated_response = request_utils.create_response(responses[0], elements)
         self._clear_operation(operation_id)
         return (updated_response, None)
-
-    def _is_pdf(self, file: shared.Files) -> bool:
-        """
-        Check if the given file is a PDF. First it checks the file extension and if
-        it is equal to `.pdf` then it tries to read that file. If there is no error
-        then we assume it is a proper PDF.
-
-        Args:
-            file (File): The file to be checked.
-
-        Returns:
-            bool: True if the file is a PDF, False otherwise.
-        """
-        if not file.file_name.endswith(".pdf"):
-            logger.warning(
-                "Given file doesn't have '.pdf' extension. Continuing without splitting."
-            )
-            return False
-
-        try:
-            PdfReader(io.BytesIO(file.content), strict=True)
-        except (PdfReadError, UnicodeDecodeError) as exc:
-            logger.error(exc)
-            logger.warning(
-                "Attempted to interpret file as pdf, but error arose when splitting by pages. "
-                "Reverting to non-split pdf handling path."
-            )
-            return False
-
-        return True
-
-    def _get_optimal_split_size(self, num_pages: int, concurrency_level: int) -> int:
-        """Distributes pages to workers evenly based on the number of pages and desired concurrency level."""
-        if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
-            split_size = math.ceil(num_pages / concurrency_level)
-        else:
-            split_size = MAX_PAGES_PER_SPLIT
-
-        return max(split_size, MIN_PAGES_PER_SPLIT)
-
-    def _get_pdf_pages(
-        self,
-        pdf: PdfReader,
-        split_size: int = 1,
-    ) -> Generator[Tuple[io.BytesIO, int, int], None, None]:
-        """Reads given bytes of a pdf file and split it into n file-like objects, each
-        with `split_size` pages.
-
-        Args:
-            file_content (bytes): Content of the PDF file.
-            split_size (int, optional): Split size, e.g. if the given file has 10 pages
-            and this value is set to 2 it will yield 5 documents, each containing 2 pages
-            of the original document. By default it will split each page to a separate file.
-
-        Yields:
-            Generator[Tuple[io.BytesIO, int, int], None, None]: Yield the file contents with
-            their page number and overall pages number of the original document.
-        """
-
-        offset = 0
-        offset_end = len(pdf.pages)
-
-        while offset < offset_end:
-            new_pdf = PdfWriter()
-            pdf_buffer = io.BytesIO()
-
-            end = min(offset + split_size, offset_end)
-
-            for page in list(pdf.pages[offset:end]):
-                new_pdf.add_page(page)
-
-            new_pdf.write(pdf_buffer)
-            pdf_buffer.seek(0)
-
-            yield pdf_buffer, offset, offset_end
-            offset += split_size
-
-    def _parse_form_data(self, decoded_data: MultipartDecoder) -> FormData:
-        """
-        Parses the form data from the decoded multipart data.
-
-        Args:
-            decoded_data (MultipartDecoder): The decoded multipart data.
-
-        Returns:
-            FormData: The parsed form data.
-        """
-        form_data: FormData = {}
-
-        for part in decoded_data.parts:
-            content_disposition = part.headers.get(b"Content-Disposition")
-            if content_disposition is None:
-                raise RuntimeError("Content-Disposition header not found. Can't split pdf file.")
-            part_params = self._decode_content_disposition(content_disposition)
-            name = part_params.get("name")
-
-            if name is None:
-                continue
-
-            if name == PARTITION_FORM_FILES_KEY:
-                filename = part_params.get("filename")
-                if filename is None or not filename.strip():
-                    raise ValueError("Filename can't be an empty string.")
-                form_data[PARTITION_FORM_FILES_KEY] = shared.Files(part.content, filename)
-            else:
-                form_data[name] = part.content.decode()
-
-        return form_data
-
-    def _decode_content_disposition(self, content_disposition: bytes) -> dict[str, str]:
-        """
-        Decode the `Content-Disposition` header and return the parameters as a dictionary.
-
-        Args:
-            content_disposition (bytes): The `Content-Disposition` header as bytes.
-
-        Returns:
-            dict[str, str]: A dictionary containing the parameters extracted from the
-            `Content-Disposition` header.
-        """
-        data = content_disposition.decode().split("; ")[1:]
-        parameters = [d.split("=") for d in data]
-        parameters_dict = {p[0]: p[1].strip('"') for p in parameters}
-        return parameters_dict
-
-    @staticmethod
-    def _call_api(
-        client: Optional[requests.Session],
-        page: Tuple[io.BytesIO, int],
-        request: requests.PreparedRequest,
-        form_data: FormData,
-        filename: str,
-    ) -> requests.Response:
-        """Calls the API with the provided parameters.
-
-        The method is static to allow for parallel execution.
-
-        Args:
-            page: A tuple containing the page content and page number.
-            request: The prepared request object.
-            form_data: The form data to include in the request.
-            filename: The name of the original file.
-
-        Returns:
-            requests.Response: The response from the API.
-
-        """
-        if client is None:
-            raise RuntimeError("HTTP client not accessible!")
-        page_content, page_number = page
-
-        new_request = SplitPdfHook._create_request(
-            request, form_data, page_content, filename, page_number
-        )
-        prepared_request = client.prepare_request(new_request)
-
-        try:
-            return client.send(prepared_request)
-        except Exception:
-            logger.error("Failed to send request for page %d", page_number)
-            return requests.Response()
-
-    @staticmethod
-    def _create_request(
-        request: requests.PreparedRequest,
-        form_data: FormData,
-        page_content: io.BytesIO,
-        filename: str,
-        page_number: int,
-    ) -> requests.Request:
-        """Creates a request object for a part of a splitted PDF file.
-
-        Args:
-            request: The original request object.
-            form_data : The form data for the request.
-            page_content: Page content in bytes.
-            filename: The original filename of the PDF file.
-            page_number: Number of the page in the original PDF file.
-
-        Returns:
-            The request object for a splitted part of the
-            original file.
-        """
-        headers = SplitPdfHook._prepare_request_headers(request.headers)
-        payload = SplitPdfHook._prepare_request_payload(form_data)
-        body = MultipartEncoder(
-            fields={
-                **payload,
-                PARTITION_FORM_FILES_KEY: (
-                    filename,
-                    page_content,
-                    "application/pdf",
-                ),
-                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
-            }
-        )
-        return requests.Request(
-            method="POST",
-            url=request.url or "",
-            data=body,
-            headers={**headers, "Content-Type": body.content_type},
-        )
-
-    @staticmethod
-    def _prepare_request_headers(headers: CaseInsensitiveDict[str]) -> CaseInsensitiveDict[str]:
-        """
-        Prepare the request headers by removing the 'Content-Type' and
-        'Content-Length' headers.
-
-        Args:
-            headers: The original request headers.
-
-        Returns:
-            The modified request headers.
-        """
-        headers = copy.deepcopy(headers)
-        headers.pop("Content-Type", None)
-        headers.pop("Content-Length", None)
-        return headers
-
-    @staticmethod
-    def _prepare_request_payload(form_data: FormData) -> FormData:
-        """Prepares the request payload by removing unnecessary keys and updating the file.
-
-        Args:
-            form_data: The original form data.
-
-        Returns:
-            The updated request payload.
-        """
-        payload = copy.deepcopy(form_data)
-        payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
-        payload.pop(PARTITION_FORM_FILES_KEY, None)
-        payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
-        updated_parameters = {
-            PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
-        }
-        payload.update(updated_parameters)
-        return payload
-
-    def _create_response(self, response: requests.Response, elements: list) -> requests.Response:
-        """
-        Creates a modified response object with updated content.
-
-        Args:
-            response (requests.Response): The original response object.
-            elements (list): The list of elements to be serialized and added to
-            the response.
-
-        Returns:
-            requests.Response: The modified response object with updated content.
-        """
-        response_copy = copy.deepcopy(response)
-        content = json.dumps(elements).encode()
-        content_length = str(len(content))
-        response_copy.headers.update({"Content-Length": content_length})
-        setattr(response_copy, "_content", content)
-        return response_copy
 
     def _await_elements(self, operation_id: str, response: requests.Response) -> Optional[list]:
         """
@@ -521,85 +277,3 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.partition_responses.pop(operation_id, None)
         self.partition_requests.pop(operation_id, None)
-
-    def _get_starting_page_number(self, form_data: FormData) -> int:
-        """
-        Retrieves the starting page number from the given form data. In case given
-        starting page number is not a valid integer or less than 1, it will use the
-        default value.
-
-        Args:
-            form_data (FormData): The form data containing the starting page number.
-
-        Returns:
-            int: The starting page number.
-        """
-        starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
-        try:
-            _starting_page_number = (
-                form_data.get(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY)
-                or DEFAULT_STARTING_PAGE_NUMBER
-            )
-            starting_page_number = int(_starting_page_number)  # type: ignore
-        except ValueError:
-            logger.warning(
-                "'%s' is not a valid integer. Using default value '%d'.",
-                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
-                DEFAULT_STARTING_PAGE_NUMBER,
-            )
-
-        if starting_page_number < 1:
-            logger.warning(
-                "'%s' is less than 1. Using default value '%d'.",
-                PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
-                DEFAULT_STARTING_PAGE_NUMBER,
-            )
-            starting_page_number = DEFAULT_STARTING_PAGE_NUMBER
-
-        return starting_page_number
-
-    def _get_split_pdf_concurrency_level_param(self, form_data: FormData) -> int:
-        """Retrieves the value for concurreny level that should be used for splitting pdf.
-
-        In case given the number is not a valid integer or less than 1, it will use the
-        default value.
-
-        Args:
-            form_data: The form data containing the desired concurrency level.
-
-        Returns:
-            int: The concurrency level after validation.
-        """
-        concurrency_level_str = form_data.get(PARTITION_FORM_CONCURRENCY_LEVEL_KEY)
-
-        if concurrency_level_str is None:
-            return DEFAULT_CONCURRENCY_LEVEL
-
-        try:
-            concurrency_level = int(concurrency_level_str)
-        except ValueError:
-            logger.warning(
-                "'%s' is not a valid integer. Using default value '%s'.",
-                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
-                DEFAULT_CONCURRENCY_LEVEL,
-            )
-            return DEFAULT_CONCURRENCY_LEVEL
-
-        if concurrency_level < 1:
-            logger.warning(
-                "'%s' is less than 1. Using the default value = %s.",
-                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
-                DEFAULT_CONCURRENCY_LEVEL,
-            )
-            return DEFAULT_CONCURRENCY_LEVEL
-
-        if concurrency_level > MAX_CONCURRENCY_LEVEL:
-            logger.warning(
-                "'%s' is greater than %s. Using the maximum allowed value = %s.",
-                PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
-                MAX_CONCURRENCY_LEVEL,
-                MAX_CONCURRENCY_LEVEL,
-            )
-            return MAX_CONCURRENCY_LEVEL
-
-        return concurrency_level
