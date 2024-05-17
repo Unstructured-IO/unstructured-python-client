@@ -13,7 +13,7 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
-This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). 
+This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
 
 <div align="center">
 
@@ -33,7 +33,7 @@ pip install unstructured-client
 <!-- End SDK Installation [installation] -->
 
 ## Usage
-Only the `files` parameter is required. 
+Only the `files` parameter is required.
 
 ```python
 from unstructured_client import UnstructuredClient
@@ -64,17 +64,17 @@ try:
 except SDKError as e:
     print(e)
 ```
-    
+
 Result:
 
 ```
 {
-'type': 'UncategorizedText', 
-'element_id': 'fc550084fda1e008e07a0356894f5816', 
+'type': 'UncategorizedText',
+'element_id': 'fc550084fda1e008e07a0356894f5816',
 'metadata': {
-  'filename': 'layout-parser-paper-fast.pdf', 
-  'filetype': 'application/pdf', 
-  'languages': ['eng'], 
+  'filename': 'layout-parser-paper-fast.pdf',
+  'filetype': 'application/pdf',
+  'languages': ['eng'],
   'page_number': 1
   }
 }
@@ -176,7 +176,7 @@ While we value open-source contributions to this SDK, this library is generated 
 
 There are two important files used by `make client-generate`:
 1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json), represents the API that is supported on backend.
-2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` 
+2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json`
    which is used to generate SDK.
 
 Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR, using
