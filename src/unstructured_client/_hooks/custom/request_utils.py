@@ -8,7 +8,6 @@ from typing import Optional, Tuple
 
 import requests
 from requests.structures import CaseInsensitiveDict
-from requests_toolbelt.multipart.decoder import MultipartDecoder
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -82,7 +81,7 @@ def call_api(
         filename: The name of the original file.
 
     Returns:
-        requests.Response: The response from the API.
+        The response from the API.
 
     """
     if client is None:
@@ -101,9 +100,7 @@ def call_api(
 
 
 def prepare_request_headers(headers: CaseInsensitiveDict[str]) -> CaseInsensitiveDict[str]:
-    """
-    Prepare the request headers by removing the 'Content-Type' and
-    'Content-Length' headers.
+    """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
 
     Args:
         headers: The original request headers.
@@ -142,12 +139,12 @@ def create_response(response: requests.Response, elements: list) -> requests.Res
     Creates a modified response object with updated content.
 
     Args:
-        response (requests.Response): The original response object.
-        elements (list): The list of elements to be serialized and added to
+        response: The original response object.
+        elements: The list of elements to be serialized and added to
         the response.
 
     Returns:
-        requests.Response: The modified response object with updated content.
+        The modified response object with updated content.
     """
     response_copy = copy.deepcopy(response)
     content = json.dumps(elements).encode()

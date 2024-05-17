@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Union
 
+from requests_toolbelt.multipart.decoder import MultipartDecoder
+
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client.models import shared
 
@@ -23,6 +25,8 @@ def get_starting_page_number(form_data: FormData, key: str, fallback_value: int)
 
     Args:
         form_data: The form data containing the starting page number.
+        key: The key to look for in the form data.
+        fallback_value: The default value to use in case of an error.
 
     Returns:
         The starting page number.
@@ -59,6 +63,9 @@ def get_split_pdf_concurrency_level_param(
 
     Args:
         form_data: The form data containing the desired concurrency level.
+        key: The key to look for in the form data.
+        fallback_value: The default value to use in case of an error.
+        max_allowed: The maximum allowed value for the concurrency level.
 
     Returns:
         The concurrency level after validation.
@@ -99,14 +106,13 @@ def get_split_pdf_concurrency_level_param(
 
 
 def decode_content_disposition(content_disposition: bytes) -> dict[str, str]:
-    """
-    Decode the `Content-Disposition` header and return the parameters as a dictionary.
+    """Decode the `Content-Disposition` header and return the parameters as a dictionary.
 
     Args:
-        content_disposition (bytes): The `Content-Disposition` header as bytes.
+        content_disposition: The `Content-Disposition` header as bytes.
 
     Returns:
-        dict[str, str]: A dictionary containing the parameters extracted from the
+        A dictionary containing the parameters extracted from the
         `Content-Disposition` header.
     """
     data = content_disposition.decode().split("; ")[1:]
@@ -116,14 +122,13 @@ def decode_content_disposition(content_disposition: bytes) -> dict[str, str]:
 
 
 def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
-    """
-    Parses the form data from the decoded multipart data.
+    """Parses the form data from the decoded multipart data.
 
     Args:
-        decoded_data (MultipartDecoder): The decoded multipart data.
+        decoded_data: The decoded multipart data.
 
     Returns:
-        FormData: The parsed form data.
+        The parsed form data.
     """
     form_data: FormData = {}
 
