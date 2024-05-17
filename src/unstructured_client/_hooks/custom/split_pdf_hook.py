@@ -5,7 +5,7 @@ import io
 import logging
 import math
 import platform
-from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import Future, ProcessPoolExecutor
 from typing import Optional, Tuple, Union
 
 import requests
