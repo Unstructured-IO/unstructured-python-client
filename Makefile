@@ -34,7 +34,7 @@ test-unit:
 # Assumes you have unstructured-api running on localhost:8000
 .PHONY: test-integration
 test-integration:
-	PYTHONPATH=. pytest _test_unstructured_client -s -v -k "integration"
+	PYTHONPATH=. pytest _test_unstructured_client -v -k "integration"
 
 # Runs the unstructured-api in docker for tests
 .PHONY: test-integration-docker
