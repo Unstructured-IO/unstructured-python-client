@@ -114,7 +114,16 @@ requires having context of multiple pages.
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check.
 The size of each batch of pages (ranging from 2 to 20), is internally determined based on the concurrency level and the total number of pages in the document.
 
-<!-- No SDK Example Usage -->
+Example:
+```python
+req = shared.PartitionParameters(
+    files=files,
+    strategy="fast",
+    languages=["eng"],
+    split_pdf_page=True,
+    split_pdf_concurrency_level=8
+)
+```
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
 <!-- No Error Handling -->
