@@ -87,7 +87,6 @@ def call_api(
     if client is None:
         raise RuntimeError("HTTP client not accessible!")
     page_content, page_number = page
-    print(f"Sending request for page {page_number}")
 
     new_request = create_request(request, form_data, page_content, filename, page_number)
     prepared_request = client.prepare_request(new_request)
