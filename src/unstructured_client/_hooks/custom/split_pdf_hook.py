@@ -4,7 +4,8 @@ import functools
 import io
 import logging
 import math
-from concurrent.futures import Future, ProcessPoolExecutor
+import platform
+from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
 from typing import Optional, Tuple, Union
 
 import requests
@@ -38,6 +39,12 @@ DEFAULT_CONCURRENCY_LEVEL = 5
 MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
+
+
+if platform.system() == "Darwin":
+    import multiprocessing
+
+    multiprocessing.set_start_method("fork", force=True)
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
