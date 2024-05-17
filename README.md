@@ -106,10 +106,7 @@ See the [general partition](/docs/models/shared/partitionparameters.md) page for
 
 #### Splitting PDF by pages
 
-In order to speed up processing of long PDF files, `split_pdf_page` is set to `True` by default. It will cause the PDF
-to be split at client side, before sending to API, and combining individual responses
-as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
-The splitting behavior can be disabled by setting `split_pdf_page=False`.
+In order to speed up processing of long PDF files, `split_pdf_page` can be set to `True` (defaults to `False`). It will cause the PDF to be split at client side, before sending to API, and combining individual responses as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
 
 Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
 requires having context of multiple pages.
