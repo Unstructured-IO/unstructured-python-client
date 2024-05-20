@@ -63,7 +63,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         resp_split = client.general.partition(req)
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
-            assert "error arose when splitting by pages" in caplog.text
+            assert "The file does not appear to be a valid PDF." in caplog.text
             assert "File does not appear to be a valid PDF" in str(exc)
             return
         else:
