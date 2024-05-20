@@ -12,3 +12,5 @@ targets:
     unstructured-python:
         target: python
         source: my-source
+        codeSamples:
+            output: codeSamples.yaml
