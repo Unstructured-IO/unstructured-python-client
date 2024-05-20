@@ -66,10 +66,7 @@ def is_pdf(file: shared.Files) -> bool:
         PdfReader(io.BytesIO(file.content), strict=True)
     except (PdfReadError, UnicodeDecodeError) as exc:
         logger.error(exc)
-        logger.warning(
-            "Attempted to interpret file as pdf, but error arose when splitting by pages. "
-            "Reverting to non-split pdf handling path."
-        )
+        logger.warning("The file does not appear to be a valid PDF.")
         return False
 
     return True

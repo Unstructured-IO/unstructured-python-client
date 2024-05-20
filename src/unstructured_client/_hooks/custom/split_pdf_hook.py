@@ -121,6 +121,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         file = form_data.get(PARTITION_FORM_FILES_KEY)
         if file is None or not isinstance(file, shared.Files) or not pdf_utils.is_pdf(file):
+            logger.warning("Reverting to non-split pdf handling path.")
             return request
 
         starting_page_number = form_utils.get_starting_page_number(

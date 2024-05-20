@@ -288,7 +288,7 @@ def test_unit_is_pdf_invalid_pdf(caplog):
         result = pdf_utils.is_pdf(file)
 
     assert result is False
-    assert "Attempted to interpret file as pdf" in caplog.text
+    assert "The file does not appear to be a valid PDF." in caplog.text
 
 
 def test_unit_get_starting_page_number_missing_key():
