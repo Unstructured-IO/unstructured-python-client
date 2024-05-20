@@ -18,12 +18,10 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         ("_sample_docs/layout-parser-paper-fast.pdf", True, "fast"),  # 2 pages
         # NOTE(mike): using "fast" strategy fails on this file for unknown reasons
         ("_sample_docs/layout-parser-paper.pdf", True, "hi_res"),  # 16 pages
-        ("_sample_docs/fake.doc", True, "fast"),
-        (
-            "_sample_docs/fake.doc",
-            False,
-            "fast",
-        ),  # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
+        ("_sample_docs/fake.doc", False, "fast"),
+        ("_sample_docs/emoji.xlsx", True, "fast"),
+        ("_sample_docs/csv-with-long-lines.csv", False, "fast"),
+        ("_sample_docs/ideas-page.html", False, "fast"),
     ],
 )
 def test_integration_split_pdf_has_same_output_as_non_split(
@@ -50,6 +48,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         )
 
     if not expected_ok:
+        # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
         files.file_name += ".pdf"
 
     req = shared.PartitionParameters(
