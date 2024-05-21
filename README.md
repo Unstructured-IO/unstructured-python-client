@@ -111,8 +111,8 @@ In order to speed up processing of long PDF files, `split_pdf_page` can be set t
 Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
 requires having context of multiple pages.
 
-The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check.
-The size of each batch of pages (ranging from 2 to 20), is internally determined based on the concurrency level and the total number of pages in the document.
+The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages the `ProcessPoolExecutor` to manage concurrency effectively. 
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document.
 
 Example:
 ```python
