@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
-import requests
 
 import pytest
-
+import requests
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
@@ -16,7 +15,7 @@ def client() -> UnstructuredClient:
 
 @pytest.fixture(scope="module")
 def doc_path() -> Path:
-    return Path(__file__).resolve().parent.parent / "_sample_docs"
+    return Path(__file__).resolve().parents[2] / "_sample_docs"
 
 
 @pytest.mark.parametrize("strategy", ["fast", "ocr_only", "hi_res"])
@@ -37,4 +36,3 @@ def test_partition_strategies(strategy, client, doc_path):
     response = client.general.partition(req)
     assert response.status_code == 200
     assert len(response.elements)
-    
