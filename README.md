@@ -175,7 +175,7 @@ While we value open-source contributions to this SDK, this library is generated 
 3. Run `make client-generate`. This allows to iterate development with python client.
 
 There are two important files used by `make client-generate`:
-1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/openapi.json), represents the API that is supported on backend.
+1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://api.unstructured.io/general/openapi.json), represents the API that is supported on backend.
 2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` 
    which is used to generate SDK.
 
