@@ -4,7 +4,6 @@ import functools
 import io
 import logging
 import math
-import platform
 # NOTE: on Windows Process based multiprocessing has to be run in __main__ so to ensure the client
 # works on Windows we use Thread based multiprocessing
 from concurrent.futures import Future, ThreadPoolExecutor
