@@ -13,7 +13,7 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
-This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). 
+This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
 
 <div align="center">
 
@@ -33,7 +33,7 @@ pip install unstructured-client
 <!-- End SDK Installation [installation] -->
 
 ## Usage
-Only the `files` parameter is required. 
+Only the `files` parameter is required.
 
 ```python
 from unstructured_client import UnstructuredClient
@@ -64,17 +64,17 @@ try:
 except SDKError as e:
     print(e)
 ```
-    
+
 Result:
 
 ```
 {
-'type': 'UncategorizedText', 
-'element_id': 'fc550084fda1e008e07a0356894f5816', 
+'type': 'UncategorizedText',
+'element_id': 'fc550084fda1e008e07a0356894f5816',
 'metadata': {
-  'filename': 'layout-parser-paper-fast.pdf', 
-  'filetype': 'application/pdf', 
-  'languages': ['eng'], 
+  'filename': 'layout-parser-paper-fast.pdf',
+  'filetype': 'application/pdf',
+  'languages': ['eng'],
   'page_number': 1
   }
 }
@@ -106,18 +106,24 @@ See the [general partition](/docs/models/shared/partitionparameters.md) page for
 
 #### Splitting PDF by pages
 
-In order to speed up processing of long PDF files, set `split_pdf_page=True`. It will cause the PDF
-to be split page-by-page at client side, before sending to API, and combining individual responses
-as single result. This will work only for PDF files, so don't set it for other filetypes.
+In order to speed up processing of long PDF files, `split_pdf_page` can be set to `True` (defaults to `False`). It will cause the PDF to be split at client side, before sending to API, and combining individual responses as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
 
 Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
 requires having context of multiple pages.
 
-The amount of threads that will be used for sending individual pdf pages, is controlled by
-`UNSTRUCTURED_CLIENT_SPLIT_CALL_THREADS` env var. By default it equals to 5. 
-It can't be more than 15, to avoid too high resource usage and costs.
+The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages the `ProcessPoolExecutor` to manage concurrency effectively. 
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document.
 
-<!-- No SDK Example Usage -->
+Example:
+```python
+req = shared.PartitionParameters(
+    files=files,
+    strategy="fast",
+    languages=["eng"],
+    split_pdf_page=True,
+    split_pdf_concurrency_level=8
+)
+```
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
 <!-- No Error Handling -->
@@ -141,6 +147,36 @@ s = unstructured_client.UnstructuredClient(client=http_client)
 
 <!-- No Retries -->
 <!-- No Authentication -->
+
+<!-- Start SDK Example Usage [usage] -->
+## SDK Example Usage
+
+### Example
+
+```python
+import unstructured_client
+from unstructured_client.models import operations, shared
+
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+res = s.general.partition(request=operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=shared.Files(
+            content='0x2cC94b2FEF'.encode(),
+            file_name='um.shtml',
+        ),
+        strategy=shared.Strategy.HI_RES,
+    ),
+))
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+<!-- End SDK Example Usage [usage] -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
@@ -176,8 +212,7 @@ While we value open-source contributions to this SDK, this library is generated 
 
 There are two important files used by `make client-generate`:
 1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://api.unstructured.io/general/openapi.json), represents the API that is supported on backend.
-2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` 
-   which is used to generate SDK.
+2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` which is used to generate SDK.
 
 Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR, using
 the `openapi.json` and `overlay_client.yaml` You will have to manually bring back the human created lines in it.
