@@ -5,7 +5,7 @@ import io
 import logging
 import math
 import platform
-from concurrent.futures import Future, ProcessPoolExecutor
+import asyncio
 from typing import Optional, Tuple, Union
 
 import requests
@@ -39,12 +39,6 @@ DEFAULT_CONCURRENCY_LEVEL = 5
 MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
-
-
-if platform.system() == "Darwin":
-    import multiprocessing
-
-    multiprocessing.set_start_method("fork", force=True)
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
@@ -142,27 +136,29 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         pages = pdf_utils.get_pdf_pages(pdf, split_size)
 
-        call_api_partial = functools.partial(
-            request_utils.call_api,
-            client=self.client,
-            request=request,
-            form_data=form_data,
-            filename=file.file_name,
-        )
+        async def call_api_partial(page):
+            return request_utils.call_api(
+                client=self.client,
+                request=request,
+                form_data=form_data,
+                filename=file.file_name,
+                page=page,
+            )
+
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
-        with ProcessPoolExecutor(max_workers=concurrency_level) as executor:
-            for page_content, page_index, all_pages_number in pages:
-                page_number = page_index + starting_page_number
-                # Check if this page is the last one
-                if page_index == all_pages_number - 1:
-                    last_page_content = page_content
-                    last_page_number = page_number
-                    break
-                self.partition_requests[operation_id].append(
-                    executor.submit(call_api_partial, page=(page_content, page_number))
-                )
+
+        tasks = []
+        for page_content, page_index, all_pages_number in pages:
+            page_number = page_index + starting_page_number
+            # Check if this page is the last one
+            if page_index == all_pages_number - 1:
+                last_page_content = page_content
+                last_page_number = page_number
+                break
+            tasks.append(call_api_partial((page_content, page_number)))
+        self.partition_requests[operation_id] = tasks
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
@@ -171,35 +167,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
         return last_page_prepared_request
-
-    def after_success(
-        self, hook_ctx: AfterSuccessContext, response: requests.Response
-    ) -> Union[requests.Response, Exception]:
-        """Executes after a successful API request. Awaits all parallel requests and
-        combines the responses into a single response object.
-
-        Args:
-            hook_ctx (AfterSuccessContext): The context object containing information
-            about the hook execution.
-            response (requests.Response): The response object returned from the API
-            request.
-
-        Returns:
-            Union[requests.Response, Exception]: If requests were run in parallel, a
-            combined response object; otherwise, the original response. Can return
-            exception if it ocurred during the execution.
-        """
-        operation_id = hook_ctx.operation_id
-        # Because in `before_request` method we skipped sending last page in parallel
-        # we need to pass response, which contains last page, to `_await_elements` method
-        elements = self._await_elements(operation_id, response)
-
-        if elements is None:
-            return response
-
-        updated_response = request_utils.create_response(response, elements)
-        self._clear_operation(operation_id)
-        return updated_response
 
     def after_error(
         self,
@@ -243,6 +210,35 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self._clear_operation(operation_id)
         return (updated_response, None)
 
+    def after_success(
+        self, hook_ctx: AfterSuccessContext, response: requests.Response
+    ) -> Union[requests.Response, Exception]:
+        """Executes after a successful API request. Awaits all parallel requests and
+        combines the responses into a single response object.
+
+        Args:
+            hook_ctx (AfterSuccessContext): The context object containing information
+            about the hook execution.
+            response (requests.Response): The response object returned from the API
+            request.
+
+        Returns:
+            Union[requests.Response, Exception]: If requests were run in parallel, a
+            combined response object; otherwise, the original response. Can return
+            exception if it ocurred during the execution.
+        """
+        operation_id = hook_ctx.operation_id
+        # Because in `before_request` method we skipped sending last page in parallel
+        # we need to pass response, which contains last page, to `_await_elements` method
+        elements = self._await_elements(operation_id, response)
+
+        if elements is None:
+            return response
+
+        updated_response = request_utils.create_response(response, elements)
+        self._clear_operation(operation_id)
+        return updated_response
+
     def _await_elements(self, operation_id: str, response: requests.Response) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
@@ -261,12 +257,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if prt_requests is None:
             return None
 
-        responses = []
+        loop = asyncio.get_event_loop()
+        responses = loop.run_until_complete(asyncio.gather(*prt_requests))
         elements = []
-        for future in prt_requests:
-            res = future.result()
+        for res in responses:
             if res.status_code == 200:
-                responses.append(res)
                 elements.append(res.json())
 
         if response.status_code == 200:
