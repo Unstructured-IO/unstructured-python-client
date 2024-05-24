@@ -4,8 +4,9 @@ import functools
 import io
 import logging
 import math
-import platform
-from concurrent.futures import Future, ProcessPoolExecutor
+# NOTE: on Windows Process based multiprocessing has to be run in __main__ so to ensure the client
+# works on Windows we use Thread based multiprocessing
+from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Optional, Tuple, Union
 
 import requests
@@ -39,12 +40,6 @@ DEFAULT_CONCURRENCY_LEVEL = 5
 MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
-
-
-if platform.system() == "Darwin":
-    import multiprocessing
-
-    multiprocessing.set_start_method("fork", force=True)
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
@@ -152,7 +147,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
-        with ProcessPoolExecutor(max_workers=concurrency_level) as executor:
+        with ThreadPoolExecutor(max_workers=concurrency_level) as executor:
             for page_content, page_index, all_pages_number in pages:
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
