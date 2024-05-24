@@ -159,6 +159,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 response = requests.Response()
                 response.status_code = status_code
                 response._content = json.dumps(json_response).encode()
+                response.headers["Content-Type"] = "application/json"
                 return response
 
         self.partition_requests[operation_id] = []
