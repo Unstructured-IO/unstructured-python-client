@@ -1,8 +1,6 @@
 import io
 import logging
-import os
 from concurrent.futures import Future
-from unittest import TestCase
 
 import pytest
 import requests
