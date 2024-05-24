@@ -8,9 +8,8 @@ import platform
 import asyncio
 from typing import Optional, Tuple, Union
 
-# import requests
+import requests
 from pypdf import PdfReader
-
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
@@ -60,21 +59,20 @@ from unstructured_client._hooks.custom.form_utils import (
     FormData,
 )
 
-from httpx import Request, Headers, QueryParams
 import httpx
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
 def create_httpx_request(
-    request: httpx.Request,
+    original_request: requests.Request,
     form_data: FormData,
     page_content: io.BytesIO,
     filename: str,
     page_number: int,
 ) -> httpx.Request:
-    headers = prepare_request_headers(request.headers)
-    payload = prepare_request_payload(form_data)
+    headers = request_utils.prepare_request_headers(original_request.headers)
+    payload = request_utils.prepare_request_payload(form_data)
     body = MultipartEncoder(
         fields={
             **payload,
@@ -88,22 +86,20 @@ def create_httpx_request(
     )
     return httpx.Request(
         method="POST",
-        url=request.url or "",
+        url=original_request.url or "",
         content=body.to_string(),
         headers={**headers, "Content-Type": body.content_type},
     )
 
 
-async def call_api(
-    client: Optional[httpx.AsyncClient],
+async def call_api_async(
+    client: httpx.AsyncClient,
     page: Tuple[io.BytesIO, int],
-    request: httpx.Request,
+    original_request: requests.Request,
     form_data: FormData,
     filename: str,
 ) -> tuple[int, dict]:
     """Calls the API with the provided parameters.
-
-    This function can be executed in parallel using e.g ProcessPoolExecutor.
 
     Args:
         client: The HTTP client.
@@ -116,11 +112,10 @@ async def call_api(
         The response from the API.
 
     """
-    if client is None:
-        raise RuntimeError("HTTP client not accessible!")
-
     page_content, page_number = page
-    new_request = create_httpx_request(request, form_data, page_content, filename, page_number)
+    new_request = create_httpx_request(
+        original_request, form_data, page_content, filename, page_number
+    )
 
     try:
         response = await client.send(new_request)
@@ -130,41 +125,8 @@ async def call_api(
         return 500, {}
 
 
-def prepare_request_headers(headers: Headers) -> Headers:
-    """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
-
-    Note: httpx uses CaseInsensitiveDict for headers.
-
-    Args:
-        headers: The original request headers.
-
-    Returns:
-        The modified request headers.
-    """
-    headers = Headers(headers)
-    headers.pop("Content-Type", None)
-    headers.pop("Content-Length", None)
-    return headers
-
-
-def prepare_request_payload(form_data: FormData) -> FormData:
-    """Prepares the request payload by removing unnecessary keys and updating the file.
-
-    Args:
-        form_data: The original form data.
-
-    Returns:
-        The updated request payload.
-    """
-    payload = copy.deepcopy(form_data)
-    payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
-    payload.pop(PARTITION_FORM_FILES_KEY, None)
-    payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
-    updated_parameters = {
-        PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
-    }
-    payload.update(updated_parameters)
-    return payload
+async def run_tasks(tasks):
+    return await asyncio.gather(*tasks)
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
@@ -175,70 +137,6 @@ def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
         split_size = MAX_PAGES_PER_SPLIT
 
     return max(split_size, MIN_PAGES_PER_SPLIT)
-
-
-import requests
-
-
-def create_response(response: requests.Response, elements: list) -> requests.Response:
-    """
-    Creates a modified response object with updated content.
-
-    Args:
-        response: The original response object.
-        elements: The list of elements to be serialized and added to
-        the response.
-
-    Returns:
-        The modified response object with updated content.
-    """
-    response_copy = copy.deepcopy(response)
-    content = json.dumps(elements).encode()
-    content_length = str(len(content))
-    response_copy.headers.update({"Content-Length": content_length})
-    setattr(response_copy, "_content", content)
-    return response_copy
-
-
-def create_request(
-    request: requests.PreparedRequest,
-    form_data: FormData,
-    page_content: io.BytesIO,
-    filename: str,
-    page_number: int,
-) -> requests.Request:
-    """Creates a request object for a part of a splitted PDF file.
-
-    Args:
-        request: The original request object.
-        form_data : The form data for the request.
-        page_content: Page content in bytes.
-        filename: The original filename of the PDF file.
-        page_number: Number of the page in the original PDF file.
-
-    Returns:
-        The request object for a splitted part of the
-        original file.
-    """
-    headers = request_utils.prepare_request_headers(request.headers)
-    payload = request_utils.prepare_request_payload(form_data)
-    body = MultipartEncoder(
-        fields={
-            **payload,
-            PARTITION_FORM_FILES_KEY: (
-                filename,
-                page_content,
-                "application/pdf",
-            ),
-            PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
-        }
-    )
-    return requests.Request(
-        method="POST",
-        url=request.url or "",
-        data=body,
-        headers={**headers, "Content-Type": body.content_type},
-    )
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
@@ -253,8 +151,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def __init__(self) -> None:
         self.client: Optional[requests.Session] = None
-        self.partition_responses: dict[str, tuple] = {}
-        self.elements: dict[str, list] = {}
+        self.partition_responses: dict[str, list[requests.Response]] = {}
         self.partition_requests: dict[str, list[Future[requests.Response]]] = {}
 
     def sdk_init(self, base_url: str, client: requests.Session) -> Tuple[str, requests.Session]:
@@ -329,47 +226,78 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         async def call_api_partial(page):
             async with httpx.AsyncClient() as client:
-                return await call_api(
+                status_code, json_response = await call_api_async(
                     client=client,
-                    request=request,
+                    original_request=request,
                     form_data=form_data,
                     filename=file.file_name,
                     page=page,
                 )
+                # convert to requests.Response
+                response = requests.Response()
+                response.status_code = status_code
+                response._content = json.dumps(json_response).encode()
+                return response
 
+        self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
 
-        tasks = []
         for page_content, page_index, all_pages_number in pages:
             page_number = page_index + starting_page_number
             # Check if this page is the last one
+            print(f"Page {page_number} of {all_pages_number}")
             if page_index == all_pages_number - 1:
                 last_page_content = page_content
                 last_page_number = page_number
                 break
             coroutine = call_api_partial((page_content, page_number))
-            tasks.append(coroutine)
-
-        elements = []
-
-        async def gather_tasks():
-            return await asyncio.gather(*tasks)
-
-        responses = asyncio.run(gather_tasks())
-        for idx, (status_code, json_response) in enumerate(responses):
-            if status_code == 200:
-                elements.extend(json_response)
-        self.elements[operation_id] = elements
-        self.partition_responses[operation_id] = responses
+            self.partition_requests[operation_id].append(coroutine)
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page_request = create_request(
+        last_page_request = request_utils.create_request(
             request, form_data, last_page_content, file.file_name, last_page_number
         )
         last_page_prepared_request = self.client.prepare_request(last_page_request)
+        assert isinstance(last_page_prepared_request, requests.PreparedRequest)
         return last_page_prepared_request
+
+    def _await_elements(self, operation_id: str, response: requests.Response) -> Optional[list]:
+        """
+        Waits for the partition requests to complete and returns the flattened
+        elements.
+
+        Args:
+            operation_id (str): The ID of the operation.
+            response (requests.Response): The response object.
+
+        Returns:
+            Optional[list]: The flattened elements if the partition requests are
+            completed, otherwise None.
+        """
+        tasks = self.partition_requests.get(operation_id)
+        if tasks is None:
+            return None
+
+        task_responses = asyncio.run(run_tasks(tasks))
+
+        if task_responses is None:
+            return None
+
+        responses = []
+        elements = []
+        for res in task_responses:
+            if res.status_code == 200:
+                responses.append(res)
+                elements.append(res.json())
+
+        if response.status_code == 200:
+            elements.append(response.json())
+
+        self.partition_responses[operation_id] = responses
+        flattened_elements = [element for sublist in elements for element in sublist]
+        return flattened_elements
 
     def after_success(
         self, hook_ctx: AfterSuccessContext, response: requests.Response
@@ -380,22 +308,23 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             hook_ctx (AfterSuccessContext): The context object containing information
             about the hook execution.
-            response (httpx.Response): The response object returned from the API
+            response (requests.Response): The response object returned from the API
             request.
 
         Returns:
-            Union[httpx.Response, Exception]: If requests were run in parallel, a
+            Union[requests.Response, Exception]: If requests were run in parallel, a
             combined response object; otherwise, the original response. Can return
             exception if it ocurred during the execution.
         """
         operation_id = hook_ctx.operation_id
         # Because in `before_request` method we skipped sending last page in parallel
-        elements = self.elements[operation_id]
+        # we need to pass response, which contains last page, to `_await_elements` method
+        elements = self._await_elements(operation_id, response)
 
         if elements is None:
             return response
 
-        updated_response = create_response(response, elements)
+        updated_response = request_utils.create_response(response, elements)
         self._clear_operation(operation_id)
         return updated_response
 
@@ -425,8 +354,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         operation_id = hook_ctx.operation_id
         # We know that this request failed so we pass a failed or empty response to `_await_elements` method
         # where it checks if at least on of the other requests succeeded
+        elements = self._await_elements(operation_id, response or requests.Response())
         responses = self.partition_responses.get(operation_id)
-        elements = self.elements.get(operation_id)
 
         if elements is None or responses is None:
             return (response, error)
@@ -437,10 +366,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self._clear_operation(operation_id)
             return (response, error)
 
-        # updated_response = create_response(responses[-1], elements)
+        updated_response = request_utils.create_response(responses[0], elements)
         self._clear_operation(operation_id)
-        # return (updated_response, None)
-        return (response, None)
+        return (updated_response, None)
 
     def _clear_operation(self, operation_id: str) -> None:
         """
@@ -451,4 +379,3 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.partition_responses.pop(operation_id, None)
         self.partition_requests.pop(operation_id, None)
-        self.elements.pop(operation_id, None)
