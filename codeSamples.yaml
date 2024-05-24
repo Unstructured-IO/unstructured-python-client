@@ -16,7 +16,8 @@ actions:
                 api_key_auth="YOUR_API_KEY",
             )
 
-            res = s.partition(request=operations.PartitionRequest(
+
+            res = s.general.partition(request=operations.PartitionRequest(
                 partition_parameters=shared.PartitionParameters(
                     files=shared.Files(
                         file_name='and.wav',

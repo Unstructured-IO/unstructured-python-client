@@ -7,6 +7,7 @@ s = unstructured_client.UnstructuredClient(
     api_key_auth="YOUR_API_KEY",
 )
 
+
 res = s.general.partition(request=operations.PartitionRequest(
     partition_parameters=shared.PartitionParameters(
         files=shared.Files(
