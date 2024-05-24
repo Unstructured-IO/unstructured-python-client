@@ -5,8 +5,8 @@ import pytest
 import requests
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
-from unstructured_client.utils.retries import RetryConfig, BackoffStrategy
 from unstructured_client.models.errors.sdkerror import SDKError
+from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +44,7 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
 
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("error_code", [500, 403])
-def test_partition_handling_server_error(error_code, split_pdf,monkeypatch, doc_path):
+def test_partition_handling_server_error(error_code, split_pdf, monkeypatch, doc_path):
     filename = "layout-parser-paper-fast.pdf"
     from unstructured_client.sdkconfiguration import requests_http
 
@@ -73,4 +73,3 @@ def test_partition_handling_server_error(error_code, split_pdf,monkeypatch, doc_
 
     with pytest.raises(SDKError, match=f"API error occurred: Status {error_code}"):
         response = client.general.partition(req)
-
