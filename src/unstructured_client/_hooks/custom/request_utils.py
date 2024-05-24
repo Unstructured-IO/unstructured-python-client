@@ -6,7 +6,9 @@ import json
 import logging
 from typing import Optional, Tuple
 
+import httpx
 import requests
+from aiolimiter import AsyncLimiter
 from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
@@ -21,27 +23,9 @@ from unstructured_client._hooks.custom.form_utils import (
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
-def create_request(
-    request: requests.PreparedRequest,
-    form_data: FormData,
-    page_content: io.BytesIO,
-    filename: str,
-    page_number: int,
-) -> requests.Request:
-    """Creates a request object for a part of a splitted PDF file.
-
-    Args:
-        request: The original request object.
-        form_data : The form data for the request.
-        page_content: Page content in bytes.
-        filename: The original filename of the PDF file.
-        page_number: Number of the page in the original PDF file.
-
-    Returns:
-        The request object for a splitted part of the
-        original file.
-    """
-    headers = prepare_request_headers(request.headers)
+def create_request_body(
+    form_data: FormData, page_content: io.BytesIO, filename: str, page_number: int
+) -> MultipartEncoder:
     payload = prepare_request_payload(form_data)
     body = MultipartEncoder(
         fields={
@@ -54,12 +38,52 @@ def create_request(
             PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
         }
     )
+    return body
+
+
+def create_httpx_request(
+    original_request: requests.Request, body: MultipartEncoder
+) -> httpx.Request:
+    headers = prepare_request_headers(original_request.headers)
+    return httpx.Request(
+        method="POST",
+        url=original_request.url or "",
+        content=body.to_string(),
+        headers={**headers, "Content-Type": body.content_type},
+    )
+
+
+def create_request(
+    request: requests.PreparedRequest,
+    body: MultipartEncoder,
+) -> requests.Request:
+    headers = prepare_request_headers(request.headers)
     return requests.Request(
         method="POST",
         url=request.url or "",
         data=body,
         headers={**headers, "Content-Type": body.content_type},
     )
+
+
+async def call_api_async(
+    client: httpx.AsyncClient,
+    page: Tuple[io.BytesIO, int],
+    original_request: requests.Request,
+    form_data: FormData,
+    filename: str,
+    limiter: AsyncLimiter,
+) -> tuple[int, dict]:
+    page_content, page_number = page
+    body = create_request_body(form_data, page_content, filename, page_number)
+    new_request = create_httpx_request(original_request, body)
+    async with limiter:
+        try:
+            response = await client.send(new_request)
+            return response.status_code, response.json()
+        except Exception:
+            logger.error("Failed to send request for page %d", page_number)
+            return 500, {}
 
 
 def call_api(
@@ -69,26 +93,12 @@ def call_api(
     form_data: FormData,
     filename: str,
 ) -> requests.Response:
-    """Calls the API with the provided parameters.
-
-    This function can be executed in parallel using e.g ProcessPoolExecutor.
-
-    Args:
-        client: The HTTP client.
-        page: A tuple containing the page content and page number.
-        request: The prepared request object.
-        form_data: The form data to include in the request.
-        filename: The name of the original file.
-
-    Returns:
-        The response from the API.
-
-    """
     if client is None:
         raise RuntimeError("HTTP client not accessible!")
     page_content, page_number = page
 
-    new_request = create_request(request, form_data, page_content, filename, page_number)
+    body = create_request_body(form_data, page_content, filename, page_number)
+    new_request = create_request(request, body)
     prepared_request = client.prepare_request(new_request)
 
     try:

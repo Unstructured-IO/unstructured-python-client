@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-import functools
+import asyncio
 import io
+import json
 import logging
 import math
-import platform
-import asyncio
 from typing import Optional, Tuple, Union
 
+import httpx
 import requests
+from aiolimiter import AsyncLimiter
 from pypdf import PdfReader
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 
@@ -41,88 +42,7 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 
 
-import copy
-import io
-import json
-import logging
-from typing import Optional, Tuple
-
-# import requests
-# from requests.structures import CaseInsensitiveDict
-from requests_toolbelt.multipart.encoder import MultipartEncoder
-
-from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
-from unstructured_client._hooks.custom.form_utils import (
-    PARTITION_FORM_FILES_KEY,
-    PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
-    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
-    FormData,
-)
-
-import httpx
-
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-
-
-def create_httpx_request(
-    original_request: requests.Request,
-    form_data: FormData,
-    page_content: io.BytesIO,
-    filename: str,
-    page_number: int,
-) -> httpx.Request:
-    headers = request_utils.prepare_request_headers(original_request.headers)
-    payload = request_utils.prepare_request_payload(form_data)
-    body = MultipartEncoder(
-        fields={
-            **payload,
-            PARTITION_FORM_FILES_KEY: (
-                filename,
-                page_content,
-                "application/pdf",
-            ),
-            PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
-        }
-    )
-    return httpx.Request(
-        method="POST",
-        url=original_request.url or "",
-        content=body.to_string(),
-        headers={**headers, "Content-Type": body.content_type},
-    )
-
-
-async def call_api_async(
-    client: httpx.AsyncClient,
-    page: Tuple[io.BytesIO, int],
-    original_request: requests.Request,
-    form_data: FormData,
-    filename: str,
-) -> tuple[int, dict]:
-    """Calls the API with the provided parameters.
-
-    Args:
-        client: The HTTP client.
-        page: A tuple containing the page content and page number.
-        request: The prepared request object.
-        form_data: The form data to include in the request.
-        filename: The name of the original file.
-
-    Returns:
-        The response from the API.
-
-    """
-    page_content, page_number = page
-    new_request = create_httpx_request(
-        original_request, form_data, page_content, filename, page_number
-    )
-
-    try:
-        response = await client.send(new_request)
-        return response.status_code, response.json()
-    except Exception:
-        logger.error("Failed to send request for page %d", page_number)
-        return 500, {}
 
 
 async def run_tasks(tasks):
@@ -152,7 +72,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     def __init__(self) -> None:
         self.client: Optional[requests.Session] = None
         self.partition_responses: dict[str, list[requests.Response]] = {}
-        self.partition_requests: dict[str, list[Future[requests.Response]]] = {}
+        self.partition_requests: dict[str, list[requests.Response]] = {}
 
     def sdk_init(self, base_url: str, client: requests.Session) -> Tuple[str, requests.Session]:
         """Initializes Split PDF Hook.
@@ -217,6 +137,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
+        limiter = AsyncLimiter(max_rate=concurrency_level, time_period=1)
 
         pdf = PdfReader(io.BytesIO(file.content))
         split_size = get_optimal_split_size(
@@ -226,12 +147,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         async def call_api_partial(page):
             async with httpx.AsyncClient() as client:
-                status_code, json_response = await call_api_async(
+                status_code, json_response = await request_utils.call_api_async(
                     client=client,
                     original_request=request,
                     form_data=form_data,
                     filename=file.file_name,
                     page=page,
+                    limiter=limiter,
                 )
                 # convert to requests.Response
                 response = requests.Response()
@@ -253,14 +175,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 break
             coroutine = call_api_partial((page_content, page_number))
             self.partition_requests[operation_id].append(coroutine)
-
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
-        last_page_request = request_utils.create_request(
-            request, form_data, last_page_content, file.file_name, last_page_number
+
+        body = request_utils.create_request_body(
+            form_data, last_page_content, file.file_name, last_page_number
         )
+        last_page_request = request_utils.create_request(request, body)
         last_page_prepared_request = self.client.prepare_request(last_page_request)
-        assert isinstance(last_page_prepared_request, requests.PreparedRequest)
         return last_page_prepared_request
 
     def _await_elements(self, operation_id: str, response: requests.Response) -> Optional[list]:

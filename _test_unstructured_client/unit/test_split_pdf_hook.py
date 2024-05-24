@@ -156,7 +156,8 @@ def test_unit_create_request():
     expected_url = ""
 
     # Create request
-    request_obj = request_utils.create_request(request, form_data, page[0], filename, 7)
+    body = request_utils.create_request_body(form_data, page[0], filename, 7)
+    request_obj = request_utils.create_request(request, body)
     request_content_type: str = request_obj.headers.get("Content-Type")
     # Assert the request object
     assert request_obj.method == "POST"
