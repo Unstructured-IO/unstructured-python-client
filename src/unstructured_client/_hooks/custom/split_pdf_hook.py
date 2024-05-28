@@ -204,7 +204,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if tasks is None:
             return None
 
-        task_responses = asyncio.run(run_tasks(tasks))
+        ioloop = asyncio.get_event_loop()
+        task_responses = ioloop.run_until_complete(run_tasks(tasks))
 
         if task_responses is None:
             return None
