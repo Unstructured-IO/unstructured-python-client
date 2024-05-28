@@ -9,7 +9,6 @@ from typing import Any, Coroutine, Optional, Tuple, Union
 
 import httpx
 import requests
-from aiolimiter import AsyncLimiter
 from pypdf import PdfReader
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 
@@ -137,7 +136,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-        limiter = AsyncLimiter(max_rate=concurrency_level, time_period=1)
+        limiter = asyncio.Semaphore(concurrency_level)
 
         pdf = PdfReader(io.BytesIO(file.content))
         split_size = get_optimal_split_size(

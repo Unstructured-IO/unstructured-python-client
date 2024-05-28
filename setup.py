@@ -46,7 +46,6 @@ setuptools.setup(
         "typing_extensions>=4.7.1",
         "urllib3>=1.26.18",
         "httpx>=0.27.0",
-        "aiolimiter>=1.1.0",
     ],
     extras_require={
         "dev": [

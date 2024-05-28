@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import copy
 import io
 import json
@@ -8,7 +9,6 @@ from typing import Optional, Tuple
 
 import httpx
 import requests
-from aiolimiter import AsyncLimiter
 from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
@@ -72,7 +72,7 @@ async def call_api_async(
     original_request: requests.Request,
     form_data: FormData,
     filename: str,
-    limiter: AsyncLimiter,
+    limiter: asyncio.Semaphore,
 ) -> tuple[int, dict]:
     page_content, page_number = page
     body = create_request_body(form_data, page_content, filename, page_number)
