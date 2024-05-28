@@ -46,11 +46,13 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
 @pytest.mark.parametrize("error_code", [500, 403])
 def test_partition_handling_server_error(error_code, split_pdf, monkeypatch, doc_path):
     filename = "layout-parser-paper-fast.pdf"
+    import httpx
     from unstructured_client.sdkconfiguration import requests_http
 
     response = requests_http.Response()
     response.status_code = error_code
     monkeypatch.setattr(requests_http.Session, "send", lambda *args, **kwargs: response)
+    monkeypatch.setattr(httpx.AsyncClient, "send", lambda *args, **kwargs: response)
 
     # initialize client after patching
     client = UnstructuredClient(
