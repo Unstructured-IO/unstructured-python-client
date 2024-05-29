@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import Optional, Tuple, Union
 
 import requests

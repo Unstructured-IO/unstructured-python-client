@@ -278,10 +278,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         responses = [future.result() for future in prt_requests] + [response]
         successful_responses = []
         elements = []
-        for response_number, response in enumerate(responses):
-            if response.status_code == 200:
-                successful_responses.append(response)
-                elements.append(response.json())
+        for response_number, res in enumerate(responses):
+            if res.status_code == 200:
+                successful_responses.append(res)
+                elements.append(res.json())
                 logging.info(
                     "Successfully partitioned set #%d, elements added to the final result.",
                     response_number
