@@ -64,7 +64,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def __init__(self) -> None:
         self.client: Optional[requests.Session] = None
-        self.partition_responses: dict[str, list[requests.Response]] = {}
+        self.partition_successful_responses: dict[str, list[requests.Response]] = {}
         self.partition_requests: dict[str, list[Future[requests.Response]]] = {}
 
     def sdk_init(self, base_url: str, client: requests.Session) -> Tuple[str, requests.Session]:
@@ -243,20 +243,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # We know that this request failed so we pass a failed or empty response to `_await_elements` method
         # where it checks if at least on of the other requests succeeded
         elements = self._await_elements(operation_id, response or requests.Response())
-        responses = self.partition_responses.get(operation_id)
+        successful_responses = self.partition_successful_responses.get(operation_id)
 
-        if elements is None or responses is None:
+        if elements is None or successful_responses is None:
             logging.info("Successfully processed the request.")
             return (response, error)
 
-        if len(responses) == 0:
+        if len(successful_responses) == 0:
             logger.error("Failed to process the request.")
             if error is not None:
                 logger.error(error)
             self._clear_operation(operation_id)
             return (response, error)
 
-        updated_response = request_utils.create_response(responses[0], elements)
+        updated_response = request_utils.create_response(successful_responses[0], elements)
         self._clear_operation(operation_id)
         logging.info("Successfully processed the request.")
         return (updated_response, None)
@@ -296,7 +296,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     response_number
                 )
 
-        self.partition_responses[operation_id] = successful_responses
+        self.partition_successful_responses[operation_id] = successful_responses
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
 
@@ -307,5 +307,5 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             operation_id (str): The ID of the operation to clear.
         """
-        self.partition_responses.pop(operation_id, None)
+        self.partition_successful_responses.pop(operation_id, None)
         self.partition_requests.pop(operation_id, None)

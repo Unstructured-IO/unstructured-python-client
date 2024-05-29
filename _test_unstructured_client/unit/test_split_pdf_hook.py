@@ -41,18 +41,18 @@ def test_unit_clear_operation():
     hook = SplitPdfHook()
     operation_id = "some_id"
     hook.partition_requests[operation_id] = [Future(), Future()]
-    hook.partition_responses[operation_id] = [
+    hook.partition_successful_responses[operation_id] = [
         requests.Response(),
         requests.Response(),
     ]
 
     assert len(hook.partition_requests[operation_id]) == 2
-    assert len(hook.partition_responses[operation_id]) == 2
+    assert len(hook.partition_successful_responses[operation_id]) == 2
 
     hook._clear_operation(operation_id)
 
     assert hook.partition_requests.get(operation_id) is None
-    assert hook.partition_responses.get(operation_id) is None
+    assert hook.partition_successful_responses.get(operation_id) is None
 
 
 def test_unit_prepare_request_payload():
