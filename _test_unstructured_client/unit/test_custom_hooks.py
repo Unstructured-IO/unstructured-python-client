@@ -42,7 +42,8 @@ def test_unit_retry_with_backoff_does_retry(caplog):
         assert len(mock.request_history) > 1
 
 
-def test_unit_backoff_strategy_logs_retries(caplog):
+@pytest.mark.parametrize("status_code", [500, 503])
+def test_unit_backoff_strategy_logs_retries(status_code: int, caplog):
     caplog.set_level(logging.INFO)
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
@@ -53,8 +54,8 @@ def test_unit_backoff_strategy_logs_retries(caplog):
     )
 
     with requests_mock.Mocker() as mock:
-        # mock a 500 status code for POST requests to the api
-        mock.post("https://api.unstructured.io/general/v0/general", status_code=500)
+        # mock a 500/503 status code for POST requests to the api
+        mock.post("https://api.unstructured.io/general/v0/general", status_code=status_code)
         session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
         with open(filename, "rb") as f:
@@ -63,7 +64,8 @@ def test_unit_backoff_strategy_logs_retries(caplog):
         req = shared.PartitionParameters(files=files)
         with pytest.raises(Exception):
             session.general.partition(req, retries=retries)
-    pattern = re.compile("Response status code: 500. Sleeping before retry.")
+    pattern = re.compile(f"Failed to process a request due to API server error with status code {status_code}."
+                        "Sleeping before retry.")
     assert bool(pattern.search(caplog.text))
 
 
