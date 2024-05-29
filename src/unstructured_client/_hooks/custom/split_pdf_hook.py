@@ -112,12 +112,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data = form_utils.parse_form_data(decoded_body)
         split_pdf_page = form_data.get(PARTITION_FORM_SPLIT_PDF_PAGE_KEY)
         if split_pdf_page is None or split_pdf_page == "false":
+            logger.info("Partitioning without split.")
             return request
 
+        logger.info("Preparing to split document for partition.")
         file = form_data.get(PARTITION_FORM_FILES_KEY)
         if file is None or not isinstance(file, shared.Files) or not pdf_utils.is_pdf(file):
-            # logger.warning("File could not be split! Processing in the default mode.")
-            logger.warning("Reverting to non-split pdf handling path.")
+            logger.warning("File could not be split. Partitioning without split.")
             return request
 
         starting_page_number = form_utils.get_starting_page_number(
@@ -138,10 +139,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         split_size = get_optimal_split_size(
             num_pages=len(pdf.pages), concurrency_level=concurrency_level
         )
+        logger.info("Determined optimal split size of %d pages.", split_size)
+        
         if split_size >= len(pdf.pages):
+            logging.warning("Document has too few pages (%d) to be split efficiently. Partitioning without split.",
+                            len(pdf.pages))
             return request
+        
         pages = pdf_utils.get_pdf_pages(pdf, split_size)
-        logger.info("Document split into %d-paged sub-documents for parallel processing.", split_size)
+        logger.info("Document split into %d, %d-paged sets.", math.ceil(len(pdf.pages) / split_size), split_size)
+        logger.info("Partitioning %d, %d-paged sets.", math.ceil(len(pdf.pages) / split_size), split_size)
 
         call_api_partial = functools.partial(
             request_utils.call_api,
@@ -153,10 +160,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.partition_requests[operation_id] = []
         last_page_content = io.BytesIO()
         last_page_number = 0
+        set_index = 1
         with ThreadPoolExecutor(max_workers=concurrency_level) as executor:
-            for document_number, (page_content, page_index, all_pages_number) in enumerate(pages):
+            for page_content, page_index, all_pages_number in pages:
                 page_number = page_index + starting_page_number
-                # Check if this page is the last one
+                logger.info("Partitioning set #%d (pages %d-%d).",
+                            set_index,
+                            page_number,
+                            min(page_number + split_size, all_pages_number))
+                # Check if this set of pages is the last one
                 if page_index + split_size >= all_pages_number:
                     last_page_content = page_content
                     last_page_number = page_number
@@ -164,10 +176,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 self.partition_requests[operation_id].append(
                     executor.submit(call_api_partial, page=(page_content, page_number))
                 )
-                logging.info("sub-document #%d (pages %d-%d) sent for processing.",
-                             document_number,
-                             page_number,
-                             min(page_number + split_size, all_pages_number))
+                set_index += 1
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
@@ -274,12 +283,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 successful_responses.append(response)
                 elements.append(response.json())
                 logging.info(
-                    "Successfully processed sub-document #%d, its contents have been added to the output.",
+                    "Successfully partitioned set #%d, elements added to the final result.",
                     response_number
                 )
             else:
                 logging.warning(
-                    "Failed to process sub-document #%d, its contents will be omitted from the output.",
+                    "Failed to partition set #%d, its elements will be omitted in the final result.",
                     response_number
                 )
 
