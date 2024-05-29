@@ -20,11 +20,12 @@ class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
     def log_retries(self, response: Optional[requests.Response]):
         """Log retries to give users visibility into requests."""
 
-        if response is not None and response.status_code == 500:
-            logger.info("Response status code: 500. Sleeping before retry.")
-
-            if bool(response.text):
-                logger.info(response.text)
+        if response is not None and response.status_code // 100 == 5:
+            logger.info("Failed to process a request due to API server error with status code %d."
+                        "Sleeping before retry.",
+                        response.status_code)
+            if response.text:
+                logger.info("Server message - %s", response.text)
 
     def sdk_init(
         self, base_url: str, client: requests.Session
