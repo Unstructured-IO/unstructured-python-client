@@ -116,6 +116,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         file = form_data.get(PARTITION_FORM_FILES_KEY)
         if file is None or not isinstance(file, shared.Files) or not pdf_utils.is_pdf(file):
+            # logger.warning("File could not be split! Processing in the default mode.")
             logger.warning("Reverting to non-split pdf handling path.")
             return request
 
@@ -124,18 +125,21 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
+        logger.info("Starting page number set to %d", starting_page_number)
         concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
             key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
+        logger.info("Concurrency level set to %d", concurrency_level)
 
         pdf = PdfReader(io.BytesIO(file.content))
         split_size = get_optimal_split_size(
             num_pages=len(pdf.pages), concurrency_level=concurrency_level
         )
         pages = pdf_utils.get_pdf_pages(pdf, split_size)
+        logger.info("Document split into %d-paged sub-documents for parallel processing.", split_size)
 
         call_api_partial = functools.partial(
             request_utils.call_api,
@@ -148,7 +152,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         last_page_content = io.BytesIO()
         last_page_number = 0
         with ThreadPoolExecutor(max_workers=concurrency_level) as executor:
-            for page_content, page_index, all_pages_number in pages:
+            for document_number, (page_content, page_index, all_pages_number) in enumerate(pages):
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
                 if page_index == all_pages_number - 1:
@@ -158,6 +162,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 self.partition_requests[operation_id].append(
                     executor.submit(call_api_partial, page=(page_content, page_number))
                 )
+                logging.info("sub-document #%d (pages %d-%d) sent for processing.",
+                             document_number,
+                             page_number,
+                             min(page_number + split_size, all_pages_number))
 
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
@@ -255,19 +263,25 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         if prt_requests is None:
             return None
-
-        responses = []
+  
+        responses = [future.result() for future in prt_requests] + [response]
+        successful_responses = []
         elements = []
-        for future in prt_requests:
-            res = future.result()
-            if res.status_code == 200:
-                responses.append(res)
-                elements.append(res.json())
+        for response_number, response in enumerate(responses):
+            if response.status_code == 200:
+                successful_responses.append(response)
+                elements.append(response.json())
+                logging.info(
+                    "Successfully processed sub-document #%d, its contents have been added to the output.",
+                    response_number
+                )
+            else:
+                logging.warning(
+                    "Failed to process sub-document #%d, its contents will be omitted from the output.",
+                    response_number
+                )
 
-        if response.status_code == 200:
-            elements.append(response.json())
-
-        self.partition_responses[operation_id] = responses
+        self.partition_responses[operation_id] = successful_responses
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
 
