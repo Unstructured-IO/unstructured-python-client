@@ -64,8 +64,8 @@ def test_unit_backoff_strategy_logs_retries(status_code: int, caplog):
         req = shared.PartitionParameters(files=files)
         with pytest.raises(Exception):
             session.general.partition(req, retries=retries)
-    pattern = re.compile(f"Failed to process a request due to API server error with status code {status_code}."
-                        "Sleeping before retry.")
+    pattern = re.compile(f"Failed to process a request due to API server error with status code {status_code}. "
+                        "Attempting retry number 1 after sleep.")
     assert bool(pattern.search(caplog.text))
 
 
