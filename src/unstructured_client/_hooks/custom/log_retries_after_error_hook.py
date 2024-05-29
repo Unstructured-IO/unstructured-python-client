@@ -11,14 +11,14 @@ from unstructured_client._hooks.types import (
     SDKInitHook,
 )
 
+logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
+
 
 class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
     """Hook providing visibility to users when the client retries requests"""
 
     def log_retries(self, response: Optional[requests.Response]):
         """Log retries to give users visibility into requests."""
-        logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-        logger.setLevel(logging.INFO)
 
         if response is not None and response.status_code == 500:
             logger.info("Response status code: 500. Sleeping before retry.")
@@ -29,11 +29,6 @@ class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
     def sdk_init(
         self, base_url: str, client: requests.Session
     ) -> Tuple[str, requests.Session]:
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(levelname)s: %(message)s",
-            stream=sys.stdout,
-        )
         return base_url, client
 
     def after_error(
