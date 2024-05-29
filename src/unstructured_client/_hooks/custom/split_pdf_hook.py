@@ -138,6 +138,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         split_size = get_optimal_split_size(
             num_pages=len(pdf.pages), concurrency_level=concurrency_level
         )
+        if split_size >= len(pdf.pages):
+            return request
         pages = pdf_utils.get_pdf_pages(pdf, split_size)
         logger.info("Document split into %d-paged sub-documents for parallel processing.", split_size)
 
@@ -155,7 +157,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             for document_number, (page_content, page_index, all_pages_number) in enumerate(pages):
                 page_number = page_index + starting_page_number
                 # Check if this page is the last one
-                if page_index == all_pages_number - 1:
+                if page_index + split_size >= all_pages_number:
                     last_page_content = page_content
                     last_page_number = page_number
                     break
