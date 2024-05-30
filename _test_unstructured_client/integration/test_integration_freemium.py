@@ -1,12 +1,12 @@
+import asyncio
 import os
 from pathlib import Path
 
 import pytest
-import requests
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
-from unstructured_client.utils.retries import RetryConfig, BackoffStrategy
 from unstructured_client.models.errors.sdkerror import SDKError
+from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
 @pytest.fixture(scope="module")
@@ -42,15 +42,26 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
     assert len(response.elements)
 
 
+@pytest.fixture(scope="session")
+def event_loop():
+    """Make the loop session scope to use session async fixtures."""
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("error_code", [500, 403])
-def test_partition_handling_server_error(error_code, split_pdf,monkeypatch, doc_path):
+def test_partition_handling_server_error(error_code, split_pdf, monkeypatch, doc_path, event_loop):
     filename = "layout-parser-paper-fast.pdf"
+    import httpx
     from unstructured_client.sdkconfiguration import requests_http
 
     response = requests_http.Response()
     response.status_code = error_code
     monkeypatch.setattr(requests_http.Session, "send", lambda *args, **kwargs: response)
+    monkeypatch.setattr(httpx.AsyncClient, "send", lambda *args, **kwargs: response)
 
     # initialize client after patching
     client = UnstructuredClient(
@@ -73,4 +84,3 @@ def test_partition_handling_server_error(error_code, split_pdf,monkeypatch, doc_
 
     with pytest.raises(SDKError, match=f"API error occurred: Status {error_code}"):
         response = client.general.partition(req)
-

@@ -1,8 +1,6 @@
 import io
 import logging
-import os
 from concurrent.futures import Future
-from unittest import TestCase
 
 import pytest
 import requests
@@ -40,19 +38,23 @@ def test_unit_clear_operation():
     """Test clear operation method properly clears request/response data."""
     hook = SplitPdfHook()
     operation_id = "some_id"
-    hook.partition_requests[operation_id] = [Future(), Future()]
-    hook.partition_responses[operation_id] = [
+
+    async def example():
+        pass
+
+    hook.coroutines_to_execute[operation_id] = [example(), example()]
+    hook.api_responses[operation_id] = [
         requests.Response(),
         requests.Response(),
     ]
 
-    assert len(hook.partition_requests[operation_id]) == 2
-    assert len(hook.partition_responses[operation_id]) == 2
+    assert len(hook.coroutines_to_execute[operation_id]) == 2
+    assert len(hook.api_responses[operation_id]) == 2
 
     hook._clear_operation(operation_id)
 
-    assert hook.partition_requests.get(operation_id) is None
-    assert hook.partition_responses.get(operation_id) is None
+    assert hook.coroutines_to_execute.get(operation_id) is None
+    assert hook.api_responses.get(operation_id) is None
 
 
 def test_unit_prepare_request_payload():
@@ -156,7 +158,8 @@ def test_unit_create_request():
     expected_url = ""
 
     # Create request
-    request_obj = request_utils.create_request(request, form_data, page[0], filename, 7)
+    body = request_utils.create_request_body(form_data, page[0], filename, 7)
+    request_obj = request_utils.create_request(request, body)
     request_content_type: str = request_obj.headers.get("Content-Type")
     # Assert the request object
     assert request_obj.method == "POST"
