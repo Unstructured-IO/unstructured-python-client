@@ -112,7 +112,7 @@ Warning: this feature causes the `parent_id` metadata generation in elements to 
 requires having context of multiple pages.
 
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document.
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
 
 Example:
 ```python
