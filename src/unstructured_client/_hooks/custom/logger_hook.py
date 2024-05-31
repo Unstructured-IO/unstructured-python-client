@@ -15,8 +15,8 @@ from collections import defaultdict
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
-class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
-    """Hook providing visibility to users when the client retries requests"""
+class LoggerHook(AfterErrorHook, SDKInitHook):
+    """Hook providing custom logging"""
 
     def __init__(self) -> None:
         self.retries_counter: DefaultDict[str, int] = defaultdict(int)
@@ -25,16 +25,19 @@ class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
         """Log retries to give users visibility into requests."""
 
         if response is not None and response.status_code // 100 == 5:
-            logger.info("Failed to process a request due to API server error with status code %d. "
-                        "Attempting retry number %d after sleep.",
-                        response.status_code,
-                        self.retries_counter[operation_id])
+            logger.info(
+                "Failed to process a request due to API server error with status code %d. "
+                "Attempting retry number %d after sleep.",
+                response.status_code,
+                self.retries_counter[operation_id],
+            )
             if response.text:
                 logger.info("Server message - %s", response.text)
 
     def sdk_init(
         self, base_url: str, client: requests.Session
     ) -> Tuple[str, requests.Session]:
+        logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
         return base_url, client
 
     def after_success(
@@ -50,6 +53,6 @@ class LogRetriesAfterErrorHook(AfterErrorHook, SDKInitHook):
         error: Optional[Exception],
     ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
         """Concrete implementation for AfterErrorHook."""
-        self.retries_counter[hook_ctx.operation_id]+= 1
+        self.retries_counter[hook_ctx.operation_id] += 1
         self.log_retries(response, hook_ctx.operation_id)
         return response, error

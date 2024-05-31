@@ -2,7 +2,7 @@
 
 from .custom import (
     CleanServerUrlSDKInitHook,
-    LogRetriesAfterErrorHook,
+    LoggerHook,
     SuggestDefiningUrlIf401AfterErrorHook,
     SplitPdfHook,
 )
@@ -24,12 +24,12 @@ def init_hooks(hooks: Hooks):
     # Initialize custom hooks
     clean_server_url_hook = CleanServerUrlSDKInitHook()
     suggest_defining_url_hook = SuggestDefiningUrlIf401AfterErrorHook()
-    log_retries_after_error_hook = LogRetriesAfterErrorHook()
+    logger_hook = LoggerHook()
     split_pdf_hook = SplitPdfHook()
 
     # Register SDK Init hooks
     hooks.register_sdk_init_hook(clean_server_url_hook)
-    hooks.register_sdk_init_hook(log_retries_after_error_hook)
+    hooks.register_sdk_init_hook(logger_hook)
     hooks.register_sdk_init_hook(split_pdf_hook)
 
     # Register Before Request hooks
@@ -41,4 +41,4 @@ def init_hooks(hooks: Hooks):
     # Register After Error hooks
     hooks.register_after_error_hook(suggest_defining_url_hook)
     hooks.register_after_error_hook(split_pdf_hook)
-    hooks.register_after_error_hook(log_retries_after_error_hook)
+    hooks.register_after_error_hook(logger_hook)
