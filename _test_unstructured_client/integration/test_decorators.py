@@ -65,7 +65,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
             assert "File does not appear to be a valid PDF" in str(exc)
             return
         else:
-            pytest.exit("unexpected error", returncode=1)
+            assert exc is None
 
     req.split_pdf_page = False
     resp_single = client.general.partition(req)
