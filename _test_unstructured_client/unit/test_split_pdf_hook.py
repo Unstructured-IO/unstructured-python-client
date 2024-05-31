@@ -43,18 +43,18 @@ def test_unit_clear_operation():
         pass
 
     hook.coroutines_to_execute[operation_id] = [example(), example()]
-    hook.api_responses[operation_id] = [
+    hook.api_successful_responses[operation_id] = [
         requests.Response(),
         requests.Response(),
     ]
 
     assert len(hook.coroutines_to_execute[operation_id]) == 2
-    assert len(hook.api_responses[operation_id]) == 2
+    assert len(hook.api_successful_responses[operation_id]) == 2
 
     hook._clear_operation(operation_id)
 
     assert hook.coroutines_to_execute.get(operation_id) is None
-    assert hook.api_responses.get(operation_id) is None
+    assert hook.api_successful_responses.get(operation_id) is None
 
 
 def test_unit_prepare_request_payload():
