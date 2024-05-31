@@ -108,7 +108,9 @@ def call_api(
         return requests.Response()
 
 
-def prepare_request_headers(headers: CaseInsensitiveDict[str]) -> CaseInsensitiveDict[str]:
+def prepare_request_headers(
+    headers: CaseInsensitiveDict[str],
+) -> CaseInsensitiveDict[str]:
     """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
 
     Args:
@@ -161,3 +163,16 @@ def create_response(response: requests.Response, elements: list) -> requests.Res
     response_copy.headers.update({"Content-Length": content_length})
     setattr(response_copy, "_content", content)
     return response_copy
+
+
+def log_after_split_response(status_code: int, split_number: int):
+    if status_code == 200:
+        logger.info(
+            "Successfully partitioned set #%d, elements added to the final result.",
+            split_number,
+        )
+    else:
+        logger.warning(
+            "Failed to partition set #%d, its elements will be omitted in the final result.",
+            split_number,
+        )
