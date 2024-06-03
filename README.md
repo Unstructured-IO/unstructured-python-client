@@ -9,12 +9,6 @@
     <a href="https://speakeasyapi.dev/"><img src="https://custom-icon-badges.demolab.com/badge/-Built%20By%20Speakeasy-212015?style=for-the-badge&logoColor=FBE331&logo=speakeasy&labelColor=545454" /></a>
 </div>
 
-<h2 align="center">
-  <p>Python SDK for the Unstructured API</p>
-</h2>
-
-This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
-
 <div align="center">
 
  <a
@@ -23,6 +17,13 @@ This is a Python client for the [Unstructured API](https://unstructured-io.githu
    </a>
 
 </div>
+
+
+<h2 align="center">
+  <p>Python SDK for the Unstructured API</p>
+</h2>
+
+This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
@@ -107,9 +108,6 @@ See the [general partition](/docs/models/shared/partitionparameters.md) page for
 #### Splitting PDF by pages
 
 In order to speed up processing of long PDF files, `split_pdf_page` can be set to `True` (defaults to `False`). It will cause the PDF to be split at client side, before sending to API, and combining individual responses as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
-
-Warning: this feature causes the `parent_id` metadata generation in elements to be disabled, as that
-requires having context of multiple pages.
 
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
 The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
