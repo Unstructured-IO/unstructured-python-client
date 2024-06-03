@@ -20,10 +20,10 @@ actions:
             res = s.general.partition(request=operations.PartitionRequest(
                 partition_parameters=shared.PartitionParameters(
                     files=shared.Files(
-                        file_name='and.wav',
-                        content='0xb2FEF2EFFf'.encode(),
+                        file_name='your_file_here',
+                        content='0x2cC94b2FEF'.encode(),
                     ),
-                    strategy=shared.Strategy.HI_RES,
+                    strategy=shared.Strategy.AUTO,
                 ),
             ))
 

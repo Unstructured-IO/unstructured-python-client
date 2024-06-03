@@ -166,9 +166,9 @@ res = s.general.partition(request=operations.PartitionRequest(
     partition_parameters=shared.PartitionParameters(
         files=shared.Files(
             content='0x2cC94b2FEF'.encode(),
-            file_name='um.shtml',
+            file_name='your_file_here',
         ),
-        strategy=shared.Strategy.HI_RES,
+        strategy=shared.Strategy.AUTO,
     ),
 ))
 
