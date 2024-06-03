@@ -4,9 +4,10 @@ from __future__ import annotations
 import dataclasses
 from enum import Enum
 from typing import List, Optional
+from unstructured_client import utils
 
 
-class ChunkingStrategy(str, Enum):
+class ChunkingStrategy(str, Enum, metaclass=utils.OpenEnumMeta):
     BASIC = 'basic'
     BY_PAGE = 'by_page'
     BY_SIMILARITY = 'by_similarity'
@@ -21,13 +22,13 @@ class Files:
 
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     APPLICATION_JSON = 'application/json'
     TEXT_CSV = 'text/csv'
 
 
-class Strategy(str, Enum):
+class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
     FAST = 'fast'
     HI_RES = 'hi_res'
@@ -89,9 +90,7 @@ class PartitionParameters:
     strategy: Optional[Strategy] = dataclasses.field(default=Strategy.AUTO, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
     unique_element_ids: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'unique_element_ids' }})
-    r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness
-    (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False
-    """
+    r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False"""
     xml_keep_tags: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'xml_keep_tags' }})
     r"""If True, will retain the XML tags in the output. Otherwise it will simply extract the text from within the tags. Only applies to partition_xml."""
     
