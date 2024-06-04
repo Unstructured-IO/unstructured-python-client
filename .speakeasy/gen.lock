@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 95cf473b65c812e2a731bc586e691f89
-  docVersion: 1.0.32
-  speakeasyVersion: 1.299.4
-  generationVersion: 2.338.7
-  releaseVersion: 0.27.0
-  configChecksum: f30a94fe7726e498bf687d6aefa48ec4
+  docChecksum: 2cabb51a37782b691a9f16fbbf8df52b
+  docVersion: 1.0.33
+  speakeasyVersion: 1.299.6
+  generationVersion: 2.338.12
+  releaseVersion: 0.27.1
+  configChecksum: be7515df9b3a3a127ec54c60f405dc64
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,7 +15,7 @@ features:
   python:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.3
-    core: 4.6.8
+    core: 4.6.9
     examples: 2.81.3
     globalSecurity: 2.83.5
     globalSecurityCallbacks: 0.1.0
@@ -43,19 +43,17 @@ generatedFiles:
   - src/unstructured_client/utils/utils.py
   - src/unstructured_client/models/errors/sdkerror.py
   - src/unstructured_client/models/operations/partition.py
-  - src/unstructured_client/models/shared/element.py
+  - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/shared/validationerror.py
   - src/unstructured_client/models/shared/partition_parameters.py
   - src/unstructured_client/models/shared/security.py
-  - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/shared/__init__.py
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
-  - docs/models/shared/metadata.md
-  - docs/models/shared/element.md
+  - docs/models/errors/httpvalidationerror.md
   - docs/models/shared/loc.md
   - docs/models/shared/validationerror.md
   - docs/models/shared/chunkingstrategy.md
@@ -64,7 +62,6 @@ generatedFiles:
   - docs/models/shared/strategy.md
   - docs/models/shared/partitionparameters.md
   - docs/models/shared/security.md
-  - docs/models/errors/httpvalidationerror.md
   - USAGE.md
   - .gitattributes
   - src/unstructured_client/_hooks/sdkhooks.py
