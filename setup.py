@@ -37,6 +37,7 @@ setuptools.setup(
         "jsonpath-python>=1.0.6",
         "marshmallow>=3.19.0",
         "mypy-extensions>=1.0.0",
+        "nest-asyncio>=1.6.0",
         "packaging>=23.1",
         "pypdf>=4.0",
         "python-dateutil>=2.8.2",
