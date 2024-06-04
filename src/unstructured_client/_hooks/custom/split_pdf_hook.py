@@ -8,6 +8,7 @@ import math
 from typing import Any, Coroutine, Optional, Tuple, Union
 
 import httpx
+import nest_asyncio
 import requests
 from pypdf import PdfReader
 from requests_toolbelt.multipart.decoder import MultipartDecoder
@@ -39,6 +40,8 @@ DEFAULT_CONCURRENCY_LEVEL = 5
 MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
+
+nest_asyncio.apply()
 
 
 async def run_tasks(tasks):
