@@ -28,10 +28,10 @@ class SDKConfiguration:
     server_url: Optional[str] = ''
     server: Optional[str] = ''
     language: str = 'python'
-    openapi_doc_version: str = '1.0.32'
-    sdk_version: str = '0.27.0'
-    gen_version: str = '2.338.7'
-    user_agent: str = 'speakeasy-sdk/python 0.27.0 2.338.7 1.0.32 unstructured-client'
+    openapi_doc_version: str = '1.0.33'
+    sdk_version: str = '0.27.1'
+    gen_version: str = '2.338.12'
+    user_agent: str = 'speakeasy-sdk/python 0.27.1 2.338.12 1.0.33 unstructured-client'
     retry_config: Optional[RetryConfig] = None
 
     def __post_init__(self):

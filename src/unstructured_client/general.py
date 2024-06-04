@@ -2,10 +2,10 @@
 
 import requests as requests_http
 from .sdkconfiguration import SDKConfiguration
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from unstructured_client import utils
 from unstructured_client._hooks import AfterErrorContext, AfterSuccessContext, BeforeRequestContext, HookContext
-from unstructured_client.models import errors, operations, shared
+from unstructured_client.models import errors, operations
 
 class General:
     sdk_configuration: SDKConfiguration
@@ -83,7 +83,7 @@ class General:
         if http_res.status_code == 200:
             # pylint: disable=no-else-return
             if utils.match_content_type(http_res.headers.get('Content-Type') or '', 'application/json'):                
-                out = utils.unmarshal_json(http_res.text, Optional[List[shared.Element]])
+                out = utils.unmarshal_json(http_res.text, Optional[List[Dict[str, Any]]])
                 res.elements = out
             else:
                 content_type = http_res.headers.get('Content-Type')

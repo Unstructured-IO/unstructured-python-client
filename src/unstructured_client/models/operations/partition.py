@@ -3,9 +3,8 @@
 from __future__ import annotations
 import dataclasses
 import requests as requests_http
-from ...models.shared import element as shared_element
 from ...models.shared import partition_parameters as shared_partition_parameters
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclasses.dataclass
@@ -25,7 +24,7 @@ class PartitionResponse:
     r"""HTTP response status code for this operation"""
     raw_response: requests_http.Response = dataclasses.field()
     r"""Raw HTTP response; suitable for custom response parsing"""
-    elements: Optional[List[shared_element.Element]] = dataclasses.field(default=None)
+    elements: Optional[List[Dict[str, Any]]] = dataclasses.field(default=None)
     r"""Successful Response"""
     
 
