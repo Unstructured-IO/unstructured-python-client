@@ -41,7 +41,6 @@ MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 
-nest_asyncio.apply()
 
 
 async def run_tasks(tasks):
@@ -69,6 +68,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     """
 
     def __init__(self) -> None:
+        # This allows us to use an event loop in an env with an existing loop
+        # Temporary fix until we can improve the async splitting behavior
+        nest_asyncio.apply()
+
         self.client: Optional[requests.Session] = None
         self.coroutines_to_execute: dict[
             str, list[Coroutine[Any, Any, requests.Response]]
