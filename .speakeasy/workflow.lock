@@ -1,9 +1,9 @@
-speakeasyVersion: 1.299.6
+speakeasyVersion: 1.299.7
 sources:
     my-source:
         sourceNamespace: my-source
-        sourceRevisionDigest: sha256:90bd16aaed9a9bfefbf815e309c927f19491bd472b7c1f7f56dab7bf4a4c2dc7
-        sourceBlobDigest: sha256:6d2271499f0b5dd811144b3e1857443c6401e45229627f3078f88672f655334c
+        sourceRevisionDigest: sha256:29730cd6d9ea733e1974ee5f90b11774f0a5c308eddad34250d93787d5a9d0c3
+        sourceBlobDigest: sha256:110f9538009774e75d0a6cbc32c3d8651a0bc9223e397d34a8956b6394495ea5
         tags:
             - latest
             - main
@@ -11,8 +11,8 @@ targets:
     unstructured-python:
         source: my-source
         sourceNamespace: my-source
-        sourceRevisionDigest: sha256:90bd16aaed9a9bfefbf815e309c927f19491bd472b7c1f7f56dab7bf4a4c2dc7
-        sourceBlobDigest: sha256:6d2271499f0b5dd811144b3e1857443c6401e45229627f3078f88672f655334c
+        sourceRevisionDigest: sha256:29730cd6d9ea733e1974ee5f90b11774f0a5c308eddad34250d93787d5a9d0c3
+        sourceBlobDigest: sha256:110f9538009774e75d0a6cbc32c3d8651a0bc9223e397d34a8956b6394495ea5
         outLocation: /github/workspace/repo
 workflow:
     workflowVersion: 1.0.0
@@ -29,5 +29,8 @@ workflow:
         unstructured-python:
             target: python
             source: my-source
+            publish:
+                pypi:
+                    token: $PYPI_TOKEN
             codeSamples:
                 output: codeSamples.yaml
