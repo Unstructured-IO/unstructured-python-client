@@ -41,4 +41,6 @@ def init_hooks(hooks: Hooks):
     # Register After Error hooks
     hooks.register_after_error_hook(suggest_defining_url_hook)
     hooks.register_after_error_hook(split_pdf_hook)
-    hooks.register_after_error_hook(logger_hook)
+    # NOTE: logger_hook should stay registered last as logs the status of
+    # request and whether it will be retried which can be changed by e.g. split_pdf_hook
+    hooks.register_after_error_hook(logger_hook)  

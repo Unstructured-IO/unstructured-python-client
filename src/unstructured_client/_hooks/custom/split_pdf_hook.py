@@ -299,7 +299,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         updated_response = request_utils.create_response(response, elements)
         self._clear_operation(operation_id)
-        logger.info("Successfully processed the request.")
         return updated_response
 
     def after_error(
@@ -332,13 +331,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         successful_responses = self.api_successful_responses.get(operation_id)
 
         if elements is None or successful_responses is None:
-            logger.info("Successfully processed the request.")
             return (response, error)
 
         if len(successful_responses) == 0:
-            logger.error("Failed to process the request.")
-            if error is not None:
-                logger.error(error)
             self._clear_operation(operation_id)
             return (response, error)
 
@@ -346,7 +341,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             successful_responses[0], elements
         )
         self._clear_operation(operation_id)
-        logger.info("Successfully processed the request.")
         return (updated_response, None)
 
     def _clear_operation(self, operation_id: str) -> None:
