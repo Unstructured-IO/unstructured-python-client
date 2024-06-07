@@ -23,7 +23,7 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
-This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
+This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/overview).
 
 Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk) for a full guide to using the client.
 
