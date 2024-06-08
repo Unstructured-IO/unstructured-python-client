@@ -87,8 +87,67 @@ req = shared.PartitionParameters(
     split_pdf_concurrency_level=8
 )
 ```
-<!-- Start Retries -->
-<!-- End Retries -->
+<!-- Start Retries [retries] -->
+## Retries
+
+Some of the endpoints in this SDK support retries. If you use the SDK without any configuration, it will fall back to the default retry strategy provided by the API. However, the default retry strategy can be overridden on a per-operation basis, or across the entire SDK.
+
+To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
+```python
+import unstructured_client
+from unstructured_client.models import operations, shared
+from unstructured_client.utils import BackoffStrategy, RetryConfig
+
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+
+res = s.general.partition(request=operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=shared.Files(
+            content='0x2cC94b2FEF'.encode(),
+            file_name='your_file_here',
+        ),
+        strategy=shared.Strategy.AUTO,
+    ),
+),
+    RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False))
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+
+If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
+```python
+import unstructured_client
+from unstructured_client.models import operations, shared
+from unstructured_client.utils import BackoffStrategy, RetryConfig
+
+s = unstructured_client.UnstructuredClient(
+    retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False),
+    api_key_auth="YOUR_API_KEY",
+)
+
+
+res = s.general.partition(request=operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=shared.Files(
+            content='0x2cC94b2FEF'.encode(),
+            file_name='your_file_here',
+        ),
+        strategy=shared.Strategy.AUTO,
+    ),
+))
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+<!-- End Retries [retries] -->
 
 <!-- Start Custom HTTP Client [http-client] -->
 ## Custom HTTP Client
