@@ -80,7 +80,7 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
     )
     with requests_mock.Mocker() as mock:
-        # mock a 500/503 status code for POST requests to the api
+        # mock a connection error response to POST request
         mock.post("https://api.unstructured.io/general/v0/general", exc=requests.exceptions.ConnectionError)
         session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
