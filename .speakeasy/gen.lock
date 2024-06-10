@@ -5,8 +5,8 @@ management:
   docVersion: 1.0.33
   speakeasyVersion: 1.300.1
   generationVersion: 2.339.1
-  releaseVersion: 0.23.2
-  configChecksum: a468a45a33e1c1f49b439ef4ac9f9de9
+  releaseVersion: 0.23.3
+  configChecksum: 91a382013e2cda44b21c580620de3424
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
