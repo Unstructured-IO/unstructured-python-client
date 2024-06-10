@@ -23,7 +23,9 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
-This is a Python client for the [Unstructured API](https://unstructured-io.github.io/unstructured/api.html).
+This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/overview).
+
+Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk) for a full guide to using the client.
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
@@ -32,119 +34,6 @@ This is a Python client for the [Unstructured API](https://unstructured-io.githu
 pip install unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
-
-## Usage
-Only the `files` parameter is required.
-
-```python
-from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
-from unstructured_client.models.errors import SDKError
-
-s = UnstructuredClient(api_key_auth="YOUR_API_KEY")
-
-filename = "_sample_docs/layout-parser-paper-fast.pdf"
-
-with open(filename, "rb") as f:
-    # Note that this currently only supports a single file
-    files=shared.Files(
-        content=f.read(),
-        file_name=filename,
-	)
-
-req = shared.PartitionParameters(
-    files=files,
-    # Other partition params
-    strategy='ocr_only',
-    languages=["eng"],
-)
-
-try:
-    resp = s.general.partition(req)
-    print(resp.elements[0])
-except SDKError as e:
-    print(e)
-```
-
-Result:
-
-```
-{
-'type': 'UncategorizedText',
-'element_id': 'fc550084fda1e008e07a0356894f5816',
-'metadata': {
-  'filename': 'layout-parser-paper-fast.pdf',
-  'filetype': 'application/pdf',
-  'languages': ['eng'],
-  'page_number': 1
-  }
-}
-```
-
-### UnstructuredClient
-
-#### Change the base URL
-
-If you are self hosting the API, or developing locally, you can change the server URL when setting up the client.
-
-```python
-# Using a local server
-s = unstructured_client.UnstructuredClient(
-    server_url="http://localhost:8000",
-    api_key_auth=api_key,
-)
-
-# Using your own server
-s = unstructured_client.UnstructuredClient(
-    server_url="https://your-server",
-    api_key_auth=api_key,
-)
-```
-
-### PartitionParameters
-
-See the [general partition](/docs/models/shared/partitionparameters.md) page for all available parameters. 
-
-#### Splitting PDF by pages
-
-In order to speed up processing of long PDF files, `split_pdf_page` can be set to `True` (defaults to `False`). It will cause the PDF to be split at client side, before sending to API, and combining individual responses as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
-
-The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
-
-Example:
-```python
-req = shared.PartitionParameters(
-    files=files,
-    strategy="fast",
-    languages=["eng"],
-    split_pdf_page=True,
-    split_pdf_concurrency_level=8
-)
-```
-<!-- No SDK Available Operations -->
-<!-- No Pagination -->
-<!-- No Error Handling -->
-<!-- No Server Selection -->
-
-<!-- Start Custom HTTP Client [http-client] -->
-## Custom HTTP Client
-
-The Python SDK makes API calls using the [requests](https://pypi.org/project/requests/) HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with a custom `requests.Session` object.
-
-For example, you could specify a header for every request that this sdk makes as follows:
-```python
-import unstructured_client
-import requests
-
-http_client = requests.Session()
-http_client.headers.update({'x-custom-header': 'someValue'})
-s = unstructured_client.UnstructuredClient(client=http_client)
-```
-<!-- End Custom HTTP Client [http-client] -->
-
-<!-- No Retries -->
-<!-- No Authentication -->
 
 <!-- Start SDK Example Usage [usage] -->
 ## SDK Example Usage
@@ -176,6 +65,111 @@ if res.elements is not None:
 
 ```
 <!-- End SDK Example Usage [usage] -->
+
+Refer to the [API parameters page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all available parameters.
+
+### Configuration
+
+#### Splitting PDF by pages
+
+In order to speed up processing of long PDF files, `split_pdf_page` can be set to `True` (defaults to `False`). It will cause the PDF to be split at client side, before sending to API, and combining individual responses as single result. This parameter will affect only PDF files, no need to disable it for other filetypes.
+
+The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
+
+Example:
+```python
+req = shared.PartitionParameters(
+    files=files,
+    strategy="fast",
+    languages=["eng"],
+    split_pdf_page=True,
+    split_pdf_concurrency_level=8
+)
+```
+<!-- Start Retries [retries] -->
+## Retries
+
+Some of the endpoints in this SDK support retries. If you use the SDK without any configuration, it will fall back to the default retry strategy provided by the API. However, the default retry strategy can be overridden on a per-operation basis, or across the entire SDK.
+
+To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
+```python
+import unstructured_client
+from unstructured_client.models import operations, shared
+from unstructured_client.utils import BackoffStrategy, RetryConfig
+
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+
+res = s.general.partition(request=operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=shared.Files(
+            content='0x2cC94b2FEF'.encode(),
+            file_name='your_file_here',
+        ),
+        strategy=shared.Strategy.AUTO,
+    ),
+),
+    RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False))
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+
+If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
+```python
+import unstructured_client
+from unstructured_client.models import operations, shared
+from unstructured_client.utils import BackoffStrategy, RetryConfig
+
+s = unstructured_client.UnstructuredClient(
+    retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False),
+    api_key_auth="YOUR_API_KEY",
+)
+
+
+res = s.general.partition(request=operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=shared.Files(
+            content='0x2cC94b2FEF'.encode(),
+            file_name='your_file_here',
+        ),
+        strategy=shared.Strategy.AUTO,
+    ),
+))
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+<!-- End Retries [retries] -->
+
+<!-- Start Custom HTTP Client [http-client] -->
+## Custom HTTP Client
+
+The Python SDK makes API calls using the [requests](https://pypi.org/project/requests/) HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with a custom `requests.Session` object.
+
+For example, you could specify a header for every request that this sdk makes as follows:
+```python
+import unstructured_client
+import requests
+
+http_client = requests.Session()
+http_client.headers.update({'x-custom-header': 'someValue'})
+s = unstructured_client.UnstructuredClient(client=http_client)
+```
+<!-- End Custom HTTP Client [http-client] -->
+
+<!-- No SDK Available Operations -->
+<!-- No Pagination -->
+<!-- No Error Handling -->
+<!-- No Server Selection -->
+<!-- No Authentication -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
