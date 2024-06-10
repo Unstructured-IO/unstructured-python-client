@@ -9,13 +9,14 @@ from unstructured_client._hooks.types import (
     AfterErrorContext,
     AfterErrorHook,
     SDKInitHook,
+    AfterSuccessHook,
 )
 from collections import defaultdict
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
-class LoggerHook(AfterErrorHook, SDKInitHook):
+class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
     """Hook providing custom logging"""
 
     def __init__(self) -> None:
@@ -41,12 +42,7 @@ class LoggerHook(AfterErrorHook, SDKInitHook):
                 error,
                 self.retries_counter[operation_id],
             )
-        else:
-            logger.error("Failed to partition the document.")
-            if response is not None:
-                logging.error("Server responded with %d - %s", response.status_code, response.text)
-            if error is not None:
-                logging.error("Following error occurred - %s", error)
+
 
     def sdk_init(
         self, base_url: str, client: requests.Session
@@ -57,8 +53,9 @@ class LoggerHook(AfterErrorHook, SDKInitHook):
     def after_success(
         self, hook_ctx: AfterSuccessContext, response: requests.Response
     ) -> Union[requests.Response, Exception]:
-        del self.retries_counter[hook_ctx.operation_id]
-        logging.info("Successfully partitioned the document.")
+        self.retries_counter.pop(hook_ctx.operation_id, None)
+        # NOTE: In case of split page partition this means - at least one of the splits was partitioned successfully
+        logger.info("Successfully partitioned the document.")
         return response
 
     def after_error(
@@ -70,4 +67,17 @@ class LoggerHook(AfterErrorHook, SDKInitHook):
         """Concrete implementation for AfterErrorHook."""
         self.retries_counter[hook_ctx.operation_id] += 1
         self.log_retries(response, error, hook_ctx.operation_id)
+
+        if response and response.status_code == 200:
+            # NOTE: Even though this is an after_error method, due to split_pdf_hook logic we may get
+            # a success here when one of the split requests was partitioned successfully
+            logger.info("Successfully partitioned the document.")
+        
+        else:
+            logger.error("Failed to partition the document.")
+            if response:
+                logger.error("Server responded with %d - %s", response.status_code, response.text)
+            if error is not None:
+                logger.error("Following error occurred - %s", error)
+        
         return response, error
