@@ -1,11 +1,12 @@
 import asyncio
+import json
 import os
 from pathlib import Path
 
 import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
-from unstructured_client.models.errors.sdkerror import SDKError
+from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
@@ -52,14 +53,20 @@ def event_loop():
 
 
 @pytest.mark.parametrize("split_pdf", [True, False])
-@pytest.mark.parametrize("error_code", [500, 403])
-def test_partition_handling_server_error(error_code, split_pdf, monkeypatch, doc_path, event_loop):
+@pytest.mark.parametrize("error", [(500, ServerError), (403, SDKError), (422, HTTPValidationError)])
+def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path, event_loop):
     filename = "layout-parser-paper-fast.pdf"
     import httpx
     from unstructured_client.sdkconfiguration import requests_http
 
+    error_code, sdk_raises = error
+
     response = requests_http.Response()
     response.status_code = error_code
+    response.headers = {'Content-Type': 'application/json'}
+    json_data = {"detail": "An error occurred"}
+    response._content = bytes(json.dumps(json_data), 'utf-8')
+
     monkeypatch.setattr(requests_http.Session, "send", lambda *args, **kwargs: response)
     monkeypatch.setattr(httpx.AsyncClient, "send", lambda *args, **kwargs: response)
 
@@ -82,5 +89,5 @@ def test_partition_handling_server_error(error_code, split_pdf, monkeypatch, doc
         split_pdf_page=split_pdf,
     )
 
-    with pytest.raises(SDKError, match=f"API error occurred: Status {error_code}"):
+    with pytest.raises(sdk_raises):
         response = client.general.partition(req)
