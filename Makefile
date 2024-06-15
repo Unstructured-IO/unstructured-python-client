@@ -62,7 +62,7 @@ client-generate:
 
 .PHONY: publish
 publish:
-    ./scripts/publish.sh
+	./scripts/publish.sh
 
 ###########
 # Jupyter #
