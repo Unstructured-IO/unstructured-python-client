@@ -6,8 +6,6 @@ from dataclasses_json import Undefined, dataclass_json
 from typing import List, Union
 from unstructured_client import utils
 
-Loc = Union[str, int]
-
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclasses.dataclass
@@ -17,3 +15,5 @@ class ValidationError:
     type: str = dataclasses.field(metadata={'dataclasses_json': { 'letter_case': utils.get_field_name('type') }})
     
 
+
+Loc = Union[str, int]

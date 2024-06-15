@@ -42,25 +42,25 @@ class PartitionParameters:
     files: Files = dataclasses.field(metadata={'multipart_form': { 'file': True }})
     r"""The file to extract"""
     chunking_strategy: Optional[ChunkingStrategy] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'chunking_strategy' }})
-    r"""Use one of the supported strategies to chunk the returned elements. Currently supports: 'basic', 'by_page', 'by_similarity', or 'by_title'"""
+    r"""Use one of the supported strategies to chunk the returned elements after partitioning. When 'chunking_strategy' is not specified, no chunking is performed and any other chunking parameters provided are ignored. Supported strategies: 'basic', 'by_page', 'by_similarity', or 'by_title'"""
     combine_under_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'combine_under_n_chars' }})
     r"""If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500"""
     coordinates: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'coordinates' }})
-    r"""If true, return coordinates for each element. Default: false"""
+    r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
     r"""The encoding method used to decode the text input. Default: utf-8"""
     extract_image_block_types: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'extract_image_block_types' }})
-    r"""The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields"""
+    r"""The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields."""
     gz_uncompressed_content_type: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'gz_uncompressed_content_type' }})
-    r"""If file is gzipped, use this content type after unzipping"""
+    r"""If file is gzipped, use this content type after unzipping."""
     hi_res_model_name: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'hi_res_model_name' }})
     r"""The name of the inference model used when strategy is hi_res"""
     include_orig_elements: Optional[bool] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'include_orig_elements' }})
     r"""When a chunking strategy is specified, each returned chunk will include the elements consolidated to form that chunk as `.metadata.orig_elements`. Default: true."""
     include_page_breaks: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'include_page_breaks' }})
-    r"""If True, the output will include page breaks if the filetype supports it. Default: false"""
+    r"""If true, the output will include page breaks if the filetype supports it. Default: false"""
     languages: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
-    r"""The languages present in the document, for use in partitioning and/or OCR"""
+    r"""The languages present in the document, for use in partitioning and/or OCR. See the Tesseract documentation for a full list of languages."""
     max_characters: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'max_characters' }})
     r"""If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 500"""
     multipage_sections: Optional[bool] = dataclasses.field(default=True, metadata={'multipart_form': { 'field_name': 'multipage_sections' }})
@@ -68,7 +68,7 @@ class PartitionParameters:
     new_after_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'new_after_n_chars' }})
     r"""If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500"""
     ocr_languages: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'ocr_languages' }})
-    r"""The languages present in the document, for use in partitioning and/or OCR"""
+    r"""Deprecated! The languages present in the document, for use in partitioning and/or OCR"""
     output_format: Optional[OutputFormat] = dataclasses.field(default=OutputFormat.APPLICATION_JSON, metadata={'multipart_form': { 'field_name': 'output_format' }})
     r"""The format of the response. Supported formats are application/json and text/csv. Default: application/json."""
     overlap: Optional[int] = dataclasses.field(default=0, metadata={'multipart_form': { 'field_name': 'overlap' }})
@@ -90,8 +90,8 @@ class PartitionParameters:
     strategy: Optional[Strategy] = dataclasses.field(default=Strategy.AUTO, metadata={'multipart_form': { 'field_name': 'strategy' }})
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
     unique_element_ids: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'unique_element_ids' }})
-    r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False"""
+    r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
     xml_keep_tags: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'xml_keep_tags' }})
-    r"""If True, will retain the XML tags in the output. Otherwise it will simply extract the text from within the tags. Only applies to partition_xml."""
+    r"""If `True`, will retain the XML tags in the output. Otherwise it will simply extract the text from within the tags. Only applies to XML documents."""
     
 
