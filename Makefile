@@ -60,6 +60,10 @@ client-generate:
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
+.PHONY: publish
+publish:
+    ./scripts/publish.sh
+
 ###########
 # Jupyter #
 ###########
