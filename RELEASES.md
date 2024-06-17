@@ -528,6 +528,7 @@ Based on:
 
 ## 2024-06-15 19:11:05
 ### Changes
+
 Based on:
 - OpenAPI Doc  
 - Speakeasy CLI 1.308.1 (2.342.6) https://github.com/speakeasy-api/speakeasy
