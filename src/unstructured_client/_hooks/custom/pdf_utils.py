@@ -59,7 +59,7 @@ def is_pdf(file: shared.Files) -> bool:
         True if the file is a PDF, False otherwise.
     """
     if not file.file_name.endswith(".pdf"):
-        logger.warning("Given file doesn't have '.pdf' extension. Continuing without splitting.")
+        logger.info("Given file doesn't have '.pdf' extension, so splitting is not enabled.")
         return False
 
     try:

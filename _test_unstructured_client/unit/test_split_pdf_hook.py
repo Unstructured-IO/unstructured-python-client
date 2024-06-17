@@ -276,7 +276,7 @@ def test_unit_is_pdf_invalid_extension(caplog):
     """Test is pdf method returns False for file with invalid extension."""
     file = shared.Files(b"txt_content", "test_file.txt")
 
-    with caplog.at_level(logging.WARNING):
+    with caplog.at_level(logging.INFO):
         result = pdf_utils.is_pdf(file)
 
     assert result is False

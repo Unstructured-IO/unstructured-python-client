@@ -135,7 +135,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             or not isinstance(file, shared.Files)
             or not pdf_utils.is_pdf(file)
         ):
-            logger.warning("File could not be split. Partitioning without split.")
+            logger.info("Partitioning without split.")
             return request
 
         starting_page_number = form_utils.get_starting_page_number(
@@ -160,7 +160,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         logger.info("Determined optimal split size of %d pages.", split_size)
 
         if split_size >= len(pdf.pages):
-            logger.warning(
+            logger.info(
                 "Document has too few pages (%d) to be split efficiently. Partitioning without split.",
                 len(pdf.pages),
             )
