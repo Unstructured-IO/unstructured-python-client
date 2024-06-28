@@ -904,6 +904,9 @@ def bigintencoder(optional: bool):
 
 
 def bigintdecoder(val):
+    if val is None:
+        return None
+
     if isinstance(val, float):
         raise ValueError(f"{val} is a float")
     return int(val)
@@ -918,6 +921,9 @@ def integerstrencoder(optional: bool):
 
 
 def integerstrdecoder(val):
+    if val is None:
+        return None
+
     if isinstance(val, float):
         raise ValueError(f"{val} is a float")
     return int(val)
@@ -933,6 +939,9 @@ def numberstrencoder(optional: bool):
 
 
 def numberstrdecoder(val):
+    if val is None:
+        return None
+
     return float(val)
 
 
@@ -950,6 +959,9 @@ def decimalencoder(optional: bool, as_str: bool):
 
 
 def decimaldecoder(val):
+    if val is None:
+        return None
+
     return Decimal(str(val))
 
 

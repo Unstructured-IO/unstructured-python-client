@@ -3,15 +3,15 @@
 
 ## Supported Types
 
-### 
+### `str`
 
 ```python
-loc: str = /* values here */
+value: str = /* values here */
 ```
 
-### 
+### `int`
 
 ```python
-loc: int = /* values here */
+value: int = /* values here */
 ```
 
