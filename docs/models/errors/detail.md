@@ -3,15 +3,15 @@
 
 ## Supported Types
 
-### 
+### `List[shared.ValidationError]`
 
 ```python
-detail: List[shared.ValidationError] = /* values here */
+value: List[shared.ValidationError] = /* values here */
 ```
 
-### 
+### `str`
 
 ```python
-detail: str = /* values here */
+value: str = /* values here */
 ```
 
