@@ -9,7 +9,7 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData = dict[str, Union[str, shared.Files]]
+FormData = dict[str, Union[str, shared.Files, list[str]]]
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
@@ -148,6 +148,13 @@ def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
                 raise ValueError("Filename can't be an empty string.")
             form_data[PARTITION_FORM_FILES_KEY] = shared.Files(part.content, filename)
         else:
-            form_data[name] = part.content.decode()
+            content = part.content.decode()
+            if name in form_data:
+                if isinstance(form_data[name], list):
+                    form_data[name].append(content)
+                else:
+                    form_data[name] = [form_data[name], content]
+            else:
+                form_data[name] = content
 
     return form_data
