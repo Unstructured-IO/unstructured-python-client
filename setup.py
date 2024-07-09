@@ -19,7 +19,7 @@ except FileNotFoundError:
 
 setuptools.setup(
     name='unstructured-client',
-    version='0.23.9',
+    version='0.24.0',
     author='Unstructured',
     description='Python Client SDK for Unstructured API',
     license = 'MIT',
