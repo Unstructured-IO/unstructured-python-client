@@ -166,7 +166,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         page_count = min(len(pdf.pages), page_range_end - page_range_start + 1)
-        logger.info(f"Splitting pages {page_range_start} to {page_range_end} ({page_count} total)")
+        logger.info(
+            "Splitting pages %d to %d (%d total)",
+            page_range_start,
+            page_range_end,
+            page_count,
+        )
 
         split_size = get_optimal_split_size(
             num_pages=page_count, concurrency_level=concurrency_level

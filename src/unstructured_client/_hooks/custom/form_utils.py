@@ -39,14 +39,14 @@ def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, 
         else:
             page_range = (1, max_pages)
 
-    except (ValueError, IndexError):
+    except (ValueError, IndexError) as exc:
         msg = f"{_page_range} is not a valid page range."
         logger.error(msg)
-        raise ValueError(msg)
+        raise ValueError(msg) from exc
 
     start, end = page_range
 
-    if not (0 < start <= max_pages) or not (0 < end <= max_pages) or not (start <= end):
+    if not 0 < start <= max_pages or not 0 < end <= max_pages or not start <= end:
         msg = f"Page range {page_range} is out of bounds. Valid range is (1 - {max_pages})."
         logger.error(msg)
         raise ValueError(msg)
