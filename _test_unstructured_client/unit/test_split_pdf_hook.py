@@ -418,7 +418,7 @@ def test_unit_get_starting_page_number(starting_page_number, expected_result):
 )
 def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
     """Test get_page_range method with different inputs.
-    Ranges that are out of bounds for a 20 page doc will be adjusted."""
+    Ranges that are out of bounds for a 20 page doc will throw a ValueError."""
     form_data = {"split_pdf_page_range[]": page_range}
     try:
         result = form_utils.get_page_range(
