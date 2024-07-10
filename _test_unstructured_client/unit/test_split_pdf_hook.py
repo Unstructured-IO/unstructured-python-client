@@ -404,20 +404,33 @@ def test_unit_get_starting_page_number(starting_page_number, expected_result):
 @pytest.mark.parametrize(
     "page_range, expected_result",
     [
-        (["2", "5"], (2, 5)),  # Valid range
-        (["2", "100"], (2, 20)), # End too high
-        (["-50", "5"], (1, 5)), # Start too low
-        (None, (1, 20)), # Range not specified
-        (["foo", "foo"], (1, 20)), # Parse error
+        (["1", "14"], (1, 14)), # Valid range, start on boundary
+        (["4", "16"], (4, 16)), # Valid range, end on boundary
+        (None, (1, 20)), # Range not specified, defaults to full range
+        (["2", "5"], (2, 5)),  # Valid range within boundary
+        (["2", "100"], None), # End page too high
+        (["50", "100"], None), # Range too high
+        (["-50", "5"], None), # Start page too low
+        (["-50", "-2"], None), # Range too low
+        (["10", "2"], None), # Backwards range
+        (["foo", "foo"], None), # Parse error
     ],
 )
 def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
     """Test get_page_range method with different inputs.
     Ranges that are out of bounds for a 20 page doc will be adjusted."""
     form_data = {"split_pdf_page_range[]": page_range}
-    result = form_utils.get_page_range(
-        form_data,
-        key=PARTITION_FORM_PAGE_RANGE_KEY,
-        max_pages=20,
-    )
+    try:
+        result = form_utils.get_page_range(
+            form_data,
+            key=PARTITION_FORM_PAGE_RANGE_KEY,
+            max_pages=20,
+        )
+    except ValueError as exc:
+        if not expected_result:
+            assert "is out of bounds." in str(exc) or "is not a valid page range." in str(exc)
+            return
+        else:
+            assert exc is None
+
     assert result == expected_result

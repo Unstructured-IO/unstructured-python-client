@@ -85,6 +85,8 @@ class PartitionParameters:
     r"""When `split_pdf_page` is set to `True`, this parameter specifies the number of workers used for sending requests when the PDF is split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page: Optional[bool] = dataclasses.field(default=True, metadata={'multipart_form': { 'field_name': 'split_pdf_page' }})
     r"""This parameter determines if the PDF file should be split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
+    split_pdf_page_range: Optional[List[int]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'split_pdf_page_range' }})
+    r"""When `split_pdf_page is set to `True`, this parameter selects a subset of the pdf to send to the API. The parameter is a list of 2 integers within the range [1, length_of_pdf]. It's an internal parameter for the Python client and is not sent to the backend."""
     starting_page_number: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'starting_page_number' }})
     r"""When PDF is split into pages before sending it into the API, providing this information will allow the page number to be assigned correctly. Introduced in 1.0.27."""
     strategy: Optional[Strategy] = dataclasses.field(default=Strategy.AUTO, metadata={'multipart_form': { 'field_name': 'strategy' }})
