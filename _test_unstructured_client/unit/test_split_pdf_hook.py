@@ -9,6 +9,7 @@ from unstructured_client._hooks.custom import form_utils, pdf_utils, request_uti
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+    PARTITION_FORM_PAGE_RANGE_KEY,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import (
     DEFAULT_CONCURRENCY_LEVEL,
@@ -396,5 +397,27 @@ def test_unit_get_starting_page_number(starting_page_number, expected_result):
         form_data,
         key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
         fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
+    )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "page_range, expected_result",
+    [
+        (["2", "5"], (2, 5)),  # Valid range
+        (["2", "100"], (2, 20)), # End too high
+        (["-50", "5"], (1, 5)), # Start too low
+        (None, (1, 20)), # Range not specified
+        (["foo", "foo"], (1, 20)), # Parse error
+    ],
+)
+def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
+    """Test get_page_range method with different inputs.
+    Ranges that are out of bounds for a 20 page doc will be adjusted."""
+    form_data = {"split_pdf_page_range[]": page_range}
+    result = form_utils.get_page_range(
+        form_data,
+        key=PARTITION_FORM_PAGE_RANGE_KEY,
+        max_pages=20,
     )
     assert result == expected_result

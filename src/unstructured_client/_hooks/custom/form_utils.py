@@ -13,8 +13,46 @@ FormData = dict[str, Union[str, shared.Files, list[str]]]
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
+PARTITION_FORM_PAGE_RANGE_KEY = "split_pdf_page_range[]"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
+
+
+def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, int]:
+    """Retrieves the split page range from the given form data.
+
+    If the range is invalid or outside the bounds of the page count,
+    returns (1, num_pages), i.e. the full range.
+
+    Args:
+        form_data: The form data containing the page range
+        key: The key to look for in the form data.
+
+    Returns:
+        The range of pages to send in the request in the form (start, end)
+    """
+    try:
+        _page_range = form_data.get(key)
+
+        if _page_range is not None:
+            page_range = (int(_page_range[0]), int(_page_range[1]))
+        else:
+            page_range = (1, max_pages)
+
+    except (ValueError, IndexError):
+        logger.warning(
+            "'%s' is not a valid page range. Selecting default range (1 to %d).",
+            _page_range,
+            max_pages,
+        )
+        page_range = (1, max_pages)
+
+    if page_range[0] < 1 or page_range[1] > max_pages:
+        new_page_range = (max(page_range[0], 1), min(page_range[1], max_pages))
+        logger.warning(f"Page range {page_range} is out of bounds, setting to {new_page_range}.")
+        page_range = new_page_range
+
+    return page_range
 
 
 def get_starting_page_number(form_data: FormData, key: str, fallback_value: int) -> int:
