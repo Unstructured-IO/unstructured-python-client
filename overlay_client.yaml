@@ -18,7 +18,7 @@ actions:
         {
           "type": "array",
           "title": "Split Pdf Page Range",
-          "description": "When `split_pdf_page is set to `True`, this parameter selects a subset of the pdf to send to the API. The parameter is a list of 2 integers within the range [1, length_of_pdf]. It's an internal parameter for the Python client and is not sent to the backend.",
+          "description": "When `split_pdf_page is set to `True`, this parameter selects a subset of the pdf to send to the API. The parameter is a list of 2 integers within the range [1, length_of_pdf]. A ValueError is thrown if the given range is invalid. It's an internal parameter for the Python client and is not sent to the backend.",
           "items": {"type": "integer"},
           "minItems": 2,
           "maxItems": 2,
