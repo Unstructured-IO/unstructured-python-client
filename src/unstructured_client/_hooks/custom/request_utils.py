@@ -16,6 +16,7 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
 )
@@ -145,6 +146,7 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     payload = copy.deepcopy(form_data)
     payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
     payload.pop(PARTITION_FORM_FILES_KEY, None)
+    payload.pop(PARTITION_FORM_PAGE_RANGE_KEY, None)
     payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
     updated_parameters = {
         PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",

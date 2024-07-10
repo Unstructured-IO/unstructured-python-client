@@ -40,17 +40,16 @@ def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, 
             page_range = (1, max_pages)
 
     except (ValueError, IndexError):
-        logger.warning(
-            "'%s' is not a valid page range. Selecting default range (1 to %d).",
-            _page_range,
-            max_pages,
-        )
-        page_range = (1, max_pages)
+        msg = f"{_page_range} is not a valid page range."
+        logger.error(msg)
+        raise ValueError(msg)
 
-    if page_range[0] < 1 or page_range[1] > max_pages:
-        new_page_range = (max(page_range[0], 1), min(page_range[1], max_pages))
-        logger.warning(f"Page range {page_range} is out of bounds, setting to {new_page_range}.")
-        page_range = new_page_range
+    start, end = page_range
+
+    if not (0 < start <= max_pages) or not (0 < end <= max_pages) or not (start <= end):
+        msg = f"Page range {page_range} is out of bounds. Valid range is (1 - {max_pages})."
+        logger.error(msg)
+        raise ValueError(msg)
 
     return page_range
 
