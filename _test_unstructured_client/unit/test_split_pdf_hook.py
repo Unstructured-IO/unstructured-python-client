@@ -427,10 +427,8 @@ def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
             max_pages=20,
         )
     except ValueError as exc:
-        if not expected_result:
-            assert "is out of bounds." in str(exc) or "is not a valid page range." in str(exc)
-            return
-        else:
-            assert exc is None
+        assert not expected_result
+        assert "is out of bounds." in str(exc) or "is not a valid page range." in str(exc)
+        return
 
     assert result == expected_result

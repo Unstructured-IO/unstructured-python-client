@@ -168,12 +168,10 @@ def test_integration_split_pdf_with_page_range(
     try:
         resp = client.general.partition(req)
     except ValueError as exc:
-        if not expected_ok:
-            assert "is out of bounds." in caplog.text
-            assert "is out of bounds." in str(exc)
-            return
-        else:
-            assert exc is None
+        assert not expected_ok
+        assert "is out of bounds." in caplog.text
+        assert "is out of bounds." in str(exc)
+        return
 
     page_numbers = set([e["metadata"]["page_number"] for e in resp.elements])
 

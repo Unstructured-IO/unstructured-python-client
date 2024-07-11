@@ -165,7 +165,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             max_pages=len(pdf.pages),
         )
 
-        page_count = min(len(pdf.pages), page_range_end - page_range_start + 1)
+        page_count = page_range_end - page_range_start + 1
         logger.info(
             "Splitting pages %d to %d (%d total)",
             page_range_start,
@@ -189,10 +189,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         pages = pdf_utils.get_pdf_pages(pdf, split_size=split_size, page_start=page_range_start, page_end=page_range_end)
         logger.info(
-            "Partitioning %d, %d-paged sets.",
-            math.ceil(page_count / split_size),
+            "Partitioning %d files with %d page(s) each.",
+            math.floor(page_count / split_size),
             split_size,
         )
+
+        # Log the remainder pages if there are any
+        if page_count % split_size > 0:
+            logger.info(
+                "Partitioning 1 file with %d page(s).",
+                page_count % split_size,
+            )
 
         async def call_api_partial(page):
             async with httpx.AsyncClient() as client:
