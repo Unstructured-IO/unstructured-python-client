@@ -14,6 +14,10 @@ res = s.general.partition(request=operations.PartitionRequest(
             content='0x2cC94b2FEF'.encode(),
             file_name='your_file_here',
         ),
+        split_pdf_page_range=[
+            1,
+            10,
+        ],
         strategy=shared.Strategy.AUTO,
     ),
 ))

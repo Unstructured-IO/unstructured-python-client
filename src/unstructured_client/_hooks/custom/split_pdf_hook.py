@@ -18,6 +18,7 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_FILES_KEY,
+    PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
@@ -143,7 +144,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
-        logger.info("Starting page number set to %d", starting_page_number)
+
+        if starting_page_number > 1:
+            logger.info("Starting page number set to %d", starting_page_number)
+
         concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
             key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
@@ -154,29 +158,48 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         limiter = asyncio.Semaphore(concurrency_level)
 
         pdf = PdfReader(io.BytesIO(file.content))
+
+        page_range_start, page_range_end = form_utils.get_page_range(
+            form_data,
+            key=PARTITION_FORM_PAGE_RANGE_KEY,
+            max_pages=len(pdf.pages),
+        )
+
+        page_count = page_range_end - page_range_start + 1
+        logger.info(
+            "Splitting pages %d to %d (%d total)",
+            page_range_start,
+            page_range_end,
+            page_count,
+        )
+
         split_size = get_optimal_split_size(
-            num_pages=len(pdf.pages), concurrency_level=concurrency_level
+            num_pages=page_count, concurrency_level=concurrency_level
         )
         logger.info("Determined optimal split size of %d pages.", split_size)
 
-        if split_size >= len(pdf.pages):
+        # If the doc is small enough, and we aren't slicing it with a page range:
+        # do not split, just continue with the original request
+        if split_size >= page_count and page_count == len(pdf.pages):
             logger.info(
                 "Document has too few pages (%d) to be split efficiently. Partitioning without split.",
-                len(pdf.pages),
+                page_count,
             )
             return request
 
-        pages = pdf_utils.get_pdf_pages(pdf, split_size)
+        pages = pdf_utils.get_pdf_pages(pdf, split_size=split_size, page_start=page_range_start, page_end=page_range_end)
         logger.info(
-            "Document split into %d, %d-paged sets.",
-            math.ceil(len(pdf.pages) / split_size),
+            "Partitioning %d files with %d page(s) each.",
+            math.floor(page_count / split_size),
             split_size,
         )
-        logger.info(
-            "Partitioning %d, %d-paged sets.",
-            math.ceil(len(pdf.pages) / split_size),
-            split_size,
-        )
+
+        # Log the remainder pages if there are any
+        if page_count % split_size > 0:
+            logger.info(
+                "Partitioning 1 file with %d page(s).",
+                page_count % split_size,
+            )
 
         async def call_api_partial(page):
             async with httpx.AsyncClient() as client:
@@ -209,7 +232,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 "Partitioning set #%d (pages %d-%d).",
                 set_index,
                 page_number,
-                min(page_number + split_size, all_pages_number),
+                min(page_number + split_size - 1, all_pages_number),
             )
             # Check if this set of pages is the last one
             if page_index + split_size >= all_pages_number:

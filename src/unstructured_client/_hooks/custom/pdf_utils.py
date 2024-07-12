@@ -1,6 +1,6 @@
 import io
 import logging
-from typing import Generator, Tuple
+from typing import Generator, Tuple, Optional
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PdfReadError
@@ -12,7 +12,7 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
 def get_pdf_pages(
-    pdf: PdfReader, split_size: int = 1
+    pdf: PdfReader, split_size: int = 1, page_start: int = 1, page_end: Optional[int] = None
 ) -> Generator[Tuple[io.BytesIO, int, int], None, None]:
     """Reads given bytes of a pdf file and split it into n file-like objects, each
     with `split_size` pages.
@@ -22,13 +22,15 @@ def get_pdf_pages(
         split_size: Split size, e.g. if the given file has 10 pages
             and this value is set to 2 it will yield 5 documents, each containing 2 pages
             of the original document. By default it will split each page to a separate file.
+        page_start: Begin splitting at this page number
+        page_end: If provided, split up to and including this page number
 
     Yields:
         The file contents with their page number and overall pages number of the original document.
     """
 
-    offset = 0
-    offset_end = len(pdf.pages)
+    offset = page_start - 1
+    offset_end = page_end or len(pdf.pages)
 
     while offset < offset_end:
         new_pdf = PdfWriter()

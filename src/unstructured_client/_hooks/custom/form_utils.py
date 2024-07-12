@@ -9,12 +9,49 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData = dict[str, Union[str, shared.Files]]
+FormData = dict[str, Union[str, shared.Files, list[str]]]
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
+PARTITION_FORM_PAGE_RANGE_KEY = "split_pdf_page_range[]"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
+
+
+def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, int]:
+    """Retrieves the split page range from the given form data.
+
+    If the range is invalid or outside the bounds of the page count,
+    returns (1, num_pages), i.e. the full range.
+
+    Args:
+        form_data: The form data containing the page range
+        key: The key to look for in the form data.
+
+    Returns:
+        The range of pages to send in the request in the form (start, end)
+    """
+    try:
+        _page_range = form_data.get(key)
+
+        if _page_range is not None:
+            page_range = (int(_page_range[0]), int(_page_range[1]))
+        else:
+            page_range = (1, max_pages)
+
+    except (ValueError, IndexError) as exc:
+        msg = f"{_page_range} is not a valid page range."
+        logger.error(msg)
+        raise ValueError(msg) from exc
+
+    start, end = page_range
+
+    if not 0 < start <= max_pages or not 0 < end <= max_pages or not start <= end:
+        msg = f"Page range {page_range} is out of bounds. Start and end values should be between 1 and {max_pages}."
+        logger.error(msg)
+        raise ValueError(msg)
+
+    return page_range
 
 
 def get_starting_page_number(form_data: FormData, key: str, fallback_value: int) -> int:
@@ -148,6 +185,13 @@ def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
                 raise ValueError("Filename can't be an empty string.")
             form_data[PARTITION_FORM_FILES_KEY] = shared.Files(part.content, filename)
         else:
-            form_data[name] = part.content.decode()
+            content = part.content.decode()
+            if name in form_data:
+                if isinstance(form_data[name], list):
+                    form_data[name].append(content)
+                else:
+                    form_data[name] = [form_data[name], content]
+            else:
+                form_data[name] = content
 
     return form_data

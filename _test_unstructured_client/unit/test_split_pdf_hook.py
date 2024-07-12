@@ -9,6 +9,7 @@ from unstructured_client._hooks.custom import form_utils, pdf_utils, request_uti
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+    PARTITION_FORM_PAGE_RANGE_KEY,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import (
     DEFAULT_CONCURRENCY_LEVEL,
@@ -122,7 +123,8 @@ def test_unit_create_response():
 
 
 def test_unit_create_request():
-    """Test create request method properly sets file, Content-Type and Content-Length headers."""
+    """Test create request method properly sets file, Content-Type and Content-Length headers.
+    List parameters should be flattened in the body."""
 
     # Prepare test data
     request = requests.PreparedRequest()
@@ -133,27 +135,27 @@ def test_unit_create_request():
     form_data = {
         "parameter_1": "value_1",
         "parameter_2": "value_2",
+        "list_parameter": ["value_1", "value_2"],
     }
     page = (io.BytesIO(b"page_content"), 1)
     filename = "test_file.pdf"
 
     # Expected results
-    expected_payload = {
-        "parameter_1": "value_1",
-        "parameter_2": "value_2",
-        "split_pdf_page": "false",
-        "starting_page_number": "7",
-    }
     expected_page_filename = "test_file.pdf"
     expected_body = MultipartEncoder(
-        fields={
-            **expected_payload,
-            "files": (
+        fields=[
+            ("parameter_1", "value_1"),
+            ("parameter_2", "value_2"),
+            ("list_parameter", "value_1"),
+            ("list_parameter", "value_2"),
+            ("split_pdf_page", "false"),
+            ("starting_page_number", "7"),
+            ("files", (
                 expected_page_filename,
                 page[0],
                 "application/pdf",
-            ),
-        }
+            )),
+        ]
     )
     expected_url = ""
 
@@ -164,7 +166,10 @@ def test_unit_create_request():
     # Assert the request object
     assert request_obj.method == "POST"
     assert request_obj.url == expected_url
-    assert request_obj.data.fields == expected_body.fields
+
+    # Validate fields ignoring order
+    assert set(request_obj.data.fields) == set(expected_body.fields)
+
     assert request_content_type.startswith("multipart/form-data")
 
 
@@ -191,11 +196,37 @@ def test_unit_decode_content_disposition():
 
 
 def test_unit_parse_form_data():
-    """Test parse form data method properly parses the form data and returns dictionary."""
+    """Test parse form data method properly parses the form data and returns dictionary.
+    Parameters with the same key should be consolidated to a list."""
 
     # Prepare test data
+    test_form_data = (
+        b"--boundary\r\n"
+        b"Content-Disposition: form-data; name=\"files\"; filename=\"test_file.pdf\"\r\n"
+        b"\r\n"
+        b"file_content\r\n"
+        b"--boundary\r\n"
+        b"Content-Disposition: form-data; name=\"parameter_1\"\r\n"
+        b"\r\n"
+        b"value_1\r\n"
+        b"--boundary\r\n"
+        b"Content-Disposition: form-data; name=\"parameter_2\"\r\n"
+        b"\r\n"
+        b"value_2\r\n"
+        b"--boundary\r\n"
+        b"Content-Disposition: form-data; name=\"list_parameter\"\r\n"
+        b"\r\n"
+        b"value_1\r\n"
+        b"--boundary\r\n"
+        b"Content-Disposition: form-data; name=\"list_parameter\"\r\n"
+        b"\r\n"
+        b"value_2\r\n"
+        b"--boundary--\r\n"
+    )
+
+
     decoded_data = MultipartDecoder(
-        b'--boundary\r\nContent-Disposition: form-data; name="files"; filename="test_file.pdf"\r\n\r\nfile_content\r\n--boundary\r\nContent-Disposition: form-data; name="parameter_1"\r\n\r\nvalue_1\r\n--boundary\r\nContent-Disposition: form-data; name="parameter_2"\r\n\r\nvalue_2\r\n--boundary--\r\n',
+        test_form_data,
         "multipart/form-data; boundary=boundary",
     )
 
@@ -204,6 +235,7 @@ def test_unit_parse_form_data():
         "files": shared.Files(b"file_content", "test_file.pdf"),
         "parameter_1": "value_1",
         "parameter_2": "value_2",
+        "list_parameter": ["value_1", "value_2"],
     }
 
     # Parse form data
@@ -212,6 +244,7 @@ def test_unit_parse_form_data():
     # Assert the parsed form data
     assert form_data.get("parameter_1") == expected_form_data.get("parameter_1")
     assert form_data.get("parameter_2") == expected_form_data.get("parameter_2")
+    assert form_data.get("list_parameter") == expected_form_data.get("list_parameter")
     assert form_data.get("files").file_name == expected_form_data.get("files").file_name
 
     assert form_data.get("files").content == expected_form_data.get("files").content
@@ -365,4 +398,37 @@ def test_unit_get_starting_page_number(starting_page_number, expected_result):
         key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
         fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
     )
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "page_range, expected_result",
+    [
+        (["1", "14"], (1, 14)), # Valid range, start on boundary
+        (["4", "16"], (4, 16)), # Valid range, end on boundary
+        (None, (1, 20)), # Range not specified, defaults to full range
+        (["2", "5"], (2, 5)),  # Valid range within boundary
+        (["2", "100"], None), # End page too high
+        (["50", "100"], None), # Range too high
+        (["-50", "5"], None), # Start page too low
+        (["-50", "-2"], None), # Range too low
+        (["10", "2"], None), # Backwards range
+        (["foo", "foo"], None), # Parse error
+    ],
+)
+def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
+    """Test get_page_range method with different inputs.
+    Ranges that are out of bounds for a 20 page doc will throw a ValueError."""
+    form_data = {"split_pdf_page_range[]": page_range}
+    try:
+        result = form_utils.get_page_range(
+            form_data,
+            key=PARTITION_FORM_PAGE_RANGE_KEY,
+            max_pages=20,
+        )
+    except ValueError as exc:
+        assert not expected_result
+        assert "is out of bounds." in str(exc) or "is not a valid page range." in str(exc)
+        return
+
     assert result == expected_result

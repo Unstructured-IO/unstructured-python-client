@@ -5,7 +5,7 @@ import copy
 import io
 import json
 import logging
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 import httpx
 import requests
@@ -16,6 +16,7 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
 )
@@ -27,16 +28,24 @@ def create_request_body(
     form_data: FormData, page_content: io.BytesIO, filename: str, page_number: int
 ) -> MultipartEncoder:
     payload = prepare_request_payload(form_data)
+
+    payload_fields:  list[tuple[str, Any]] = []
+    for key, value in payload.items():
+        if isinstance(value, list):
+            payload_fields.extend([(key, list_value) for list_value in value])
+        else:
+            payload_fields.append((key, value))
+
+    payload_fields.append((PARTITION_FORM_FILES_KEY, (
+        filename,
+        page_content,
+        "application/pdf",
+    )))
+
+    payload_fields.append((PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, str(page_number)))
+
     body = MultipartEncoder(
-        fields={
-            **payload,
-            PARTITION_FORM_FILES_KEY: (
-                filename,
-                page_content,
-                "application/pdf",
-            ),
-            PARTITION_FORM_STARTING_PAGE_NUMBER_KEY: str(page_number),
-        }
+        fields=payload_fields
     )
     return body
 
@@ -137,6 +146,7 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     payload = copy.deepcopy(form_data)
     payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
     payload.pop(PARTITION_FORM_FILES_KEY, None)
+    payload.pop(PARTITION_FORM_PAGE_RANGE_KEY, None)
     payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
     updated_parameters = {
         PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
