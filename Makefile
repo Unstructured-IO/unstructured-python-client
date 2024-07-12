@@ -60,6 +60,13 @@ client-generate:
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
+.PHONY: client-generate-local
+client-generate-local:
+	wget -nv -q -O openapi.json http://localhost:5000/general/openapi.json
+	speakeasy overlay validate -o ./overlay_client.yaml
+	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
+	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
+
 .PHONY: publish
 publish:
 	./scripts/publish.sh
