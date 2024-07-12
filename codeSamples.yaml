@@ -24,6 +24,10 @@ actions:
                         content='0x2cC94b2FEF'.encode(),
                     ),
                     strategy=shared.Strategy.AUTO,
+                    split_pdf_page_range=[
+                        1,
+                        10,
+                    ],
                 ),
             ))
 
