@@ -35,41 +35,43 @@ pip install unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
 
-<!-- Start SDK Example Usage [usage] -->
 ## SDK Example Usage
 
 ### Example
 
 ```python
+import os
+
 import unstructured_client
 from unstructured_client.models import operations, shared
 
-s = unstructured_client.UnstructuredClient(
-    api_key_auth="YOUR_API_KEY",
+client = unstructured_client.UnstructuredClient(
+    api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"),
+    server_url=os.getenv("UNSTRUCTURED_API_URL"),
 )
 
+filename = "PATH_TO_FILE"
+with open(filename, "rb") as f:
+    data = f.read()
 
-res = s.general.partition(request=operations.PartitionRequest(
+req = operations.PartitionRequest(
     partition_parameters=shared.PartitionParameters(
         files=shared.Files(
-            content='0x2cC94b2FEF'.encode(),
-            file_name='your_file_here',
+            content=data,
+            file_name=filename,
         ),
-        split_pdf_page_range=[
-            1,
-            10,
-        ],
+        # --- Other partition parameters ---
         strategy=shared.Strategy.AUTO,
+        languages=['eng'],
     ),
-))
+)
 
-if res.elements is not None:
-    # handle response
-    pass
-
+try:
+    res = client.general.partition(request=req)
+    print(res.elements[0])
+except Exception as e:
+    print(e)
 ```
-<!-- End SDK Example Usage [usage] -->
-
 Refer to the [API parameters page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all available parameters.
 
 ### Configuration
@@ -92,6 +94,21 @@ req = shared.PartitionParameters(
     split_pdf_concurrency_level=8
 )
 ```
+
+#### Sending specific page ranges
+
+When `split_pdf_page=True` (the default), you can optionally specify a page range to send only a portion of your PDF to be extracted. The parameter takes a list of two integers to specify the range, inclusive. A ValueError is thrown if the page range is invalid.
+
+Example:
+```python
+req = shared.PartitionParameters(
+    files=files,
+    strategy="fast",
+    languages=["eng"],
+    split_pdf_page_range=[10,15],
+)
+```
+
 <!-- Start Retries [retries] -->
 ## Retries
 
@@ -178,6 +195,7 @@ s = unstructured_client.UnstructuredClient(client=http_client)
 ```
 <!-- End Custom HTTP Client [http-client] -->
 
+<!-- No SDK Example Usage [usage] -->
 <!-- No SDK Available Operations -->
 <!-- No Pagination -->
 <!-- No Error Handling -->
