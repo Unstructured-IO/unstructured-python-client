@@ -9,12 +9,14 @@ from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Tuple, Union
 from unstructured_client.models import shared
 
-
+SERVER_SAAS_API = 'saas-api'
+r"""Severless SaaS API"""
 SERVER_FREE_API = 'free-api'
 r"""Hosted API Free"""
 SERVER_DEVELOPMENT = 'development'
 r"""Development server"""
 SERVERS = {
+    SERVER_SAAS_API: 'https://api.unstructuredapp.io',
 	SERVER_FREE_API: 'https://api.unstructured.io',
 	SERVER_DEVELOPMENT: 'http://localhost:8000',
 }
@@ -41,7 +43,7 @@ class SDKConfiguration:
         if self.server_url is not None and self.server_url != '':
             return utils.remove_suffix(self.server_url, '/'), {}
         if not self.server:
-            self.server = SERVER_FREE_API
+            self.server = SERVER_SAAS_API
 
         if self.server not in SERVERS:
             raise ValueError(f"Invalid server \"{self.server}\"")
