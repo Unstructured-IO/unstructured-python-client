@@ -38,7 +38,7 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
         languages=["eng"],
         split_pdf_page=split_pdf,
     )
-    breakpoint()
+
     response = client.general.partition(req)
     assert response.status_code == 200
     assert len(response.elements)
