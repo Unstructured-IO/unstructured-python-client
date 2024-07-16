@@ -11,7 +11,7 @@ from unstructured_client.models.errors import SDKError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-
+SERVER_FREE_API = "free-api"
 
 def test_unit_retry_with_backoff_does_retry(caplog):
     caplog.set_level(logging.INFO)
@@ -26,7 +26,7 @@ def test_unit_retry_with_backoff_does_retry(caplog):
     with requests_mock.Mocker() as mock:
         # mock a 500 status code for POST requests to the api
         mock.post("https://api.unstructured.io/general/v0/general", status_code=500)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+        session = UnstructuredClient(api_key_auth=FAKE_KEY, server=SERVER_FREE_API)
 
         with open(filename, "rb") as f:
             files = shared.Files(content=f.read(), file_name=filename)
@@ -56,7 +56,7 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
     with requests_mock.Mocker() as mock:
         # mock a 500/503 status code for POST requests to the api
         mock.post("https://api.unstructured.io/general/v0/general", status_code=status_code)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+        session = UnstructuredClient(api_key_auth=FAKE_KEY, server=SERVER_FREE_API)
 
         with open(filename, "rb") as f:
             files = shared.Files(content=f.read(), file_name=filename)
@@ -82,7 +82,7 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     with requests_mock.Mocker() as mock:
         # mock a connection error response to POST request
         mock.post("https://api.unstructured.io/general/v0/general", exc=requests.exceptions.ConnectionError)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+        session = UnstructuredClient(api_key_auth=FAKE_KEY, server=SERVER_FREE_API)
 
         with open(filename, "rb") as f:
             files = shared.Files(content=f.read(), file_name=filename)
