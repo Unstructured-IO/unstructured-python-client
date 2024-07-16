@@ -9,10 +9,11 @@ from unstructured_client.models import shared
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
+SERVER_FREE_API = "free-api"
 
 @pytest.fixture(scope="module")
 def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
+    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"), server=SERVER_FREE_API)
     yield _client
 
 
@@ -37,7 +38,7 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
         languages=["eng"],
         split_pdf_page=split_pdf,
     )
-
+    breakpoint()
     response = client.general.partition(req)
     assert response.status_code == 200
     assert len(response.elements)
