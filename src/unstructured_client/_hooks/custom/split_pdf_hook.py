@@ -8,7 +8,8 @@ import math
 from typing import Any, Coroutine, Optional, Tuple, Union
 
 import httpx
-import nest_asyncio
+import aiohttp
+from concurrent.futures import ThreadPoolExecutor
 import requests
 from pypdf import PdfReader
 from requests_toolbelt.multipart.decoder import MultipartDecoder
@@ -58,6 +59,21 @@ def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
     return max(split_size, MIN_PAGES_PER_SPLIT)
 
 
+def run_async_in_thread(coro):
+    def wrapper():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.run_until_complete(loop.shutdown_asyncgens())
+            loop.close()
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(wrapper)
+        return future.result()
+    
+    
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
     """
     A hook class that splits a PDF file into multiple pages and sends each page as
@@ -69,10 +85,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     """
 
     def __init__(self) -> None:
-        # This allows us to use an event loop in an env with an existing loop
-        # Temporary fix until we can improve the async splitting behavior
-        nest_asyncio.apply()
-
+        
         self.client: Optional[requests.Session] = None
         self.coroutines_to_execute: dict[
             str, list[Coroutine[Any, Any, requests.Response]]
@@ -270,11 +283,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         tasks = self.coroutines_to_execute.get(operation_id)
         if tasks is None:
             return None
-
-        ioloop = asyncio.get_event_loop()
-        task_responses: list[requests.Response] = ioloop.run_until_complete(
-            run_tasks(tasks)
-        )
+        
+        async def run_tasks_async():
+            async with aiohttp.ClientSession() as _:
+                return await asyncio.gather(*tasks)
+            
+        task_responses: list[requests.Response] = run_async_in_thread(run_tasks_async())
 
         if task_responses is None:
             return None
