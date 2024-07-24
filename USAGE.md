@@ -18,6 +18,7 @@ res = s.general.partition(request=operations.PartitionRequest(
             1,
             10,
         ],
+        split_pdf_allow_failed=False,
         strategy=shared.Strategy.AUTO,
     ),
 ))
