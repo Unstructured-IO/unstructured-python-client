@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import math
+from collections.abc import Awaitable
 from typing import Any, Coroutine, Optional, Tuple, Union
 
 import httpx
@@ -44,11 +45,12 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 
 
-async def _order_keeper(index: int, coro: Coroutine) -> Tuple[int, requests.Response]:
+async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, requests.Response]:
     response = await coro
     return index, response
 
-async def run_tasks(coroutines, allow_failed: bool = False) -> list[tuple[int, requests.Response]]:
+
+async def run_tasks(coroutines: list[Awaitable], allow_failed: bool = False) -> list[tuple[int, requests.Response]]:
     if allow_failed:
         responses = await asyncio.gather(*coroutines, return_exceptions=False)
         return list(enumerate(responses, 1))
