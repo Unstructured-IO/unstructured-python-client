@@ -182,22 +182,25 @@ def test_integration_split_pdf_with_page_range(
     assert max(page_numbers) == max_page_number, f"Result should end at page {max_page_number}"
 
 
-@pytest.mark.parametrize("concurrency_level", [3])
+@pytest.mark.parametrize("concurrency_level", [2, 3])
+@pytest.mark.parametrize("allow_failed", [True, False])
 @pytest.mark.parametrize(
     ("filename", "expected_ok", "strategy"),
     [
-        # ("_sample_docs/list-item-example-1.pdf", True, "fast"),  # 1 page
-        # ("_sample_docs/layout-parser-paper-fast.pdf", True, "fast"),  # 2 pages
-        # NOTE(mike): using "fast" strategy fails on this file for unknown reasons
+        ("_sample_docs/list-item-example-1.pdf", True, "fast"),  # 1 page
+        ("_sample_docs/layout-parser-paper-fast.pdf", True, "fast"),  # 2 pages
         ("_sample_docs/layout-parser-paper.pdf", True, shared.Strategy.HI_RES),  # 16 pages
     ],
 )
 def test_integration_split_pdf_strict_mode(
-    concurrency_level: int, filename: str, expected_ok: bool, strategy: shared.Strategy, caplog
+    concurrency_level: int,
+    allow_failed: bool,
+    filename: str,
+    expected_ok: bool,
+    strategy: shared.Strategy,
+    caplog
 ):
-    """Test strict mode (allow failed = False)
-
-    """
+    """Test strict mode (allow failed = False) for split_pdf."""
     try:
         response = requests.get("http://localhost:8000/general/docs")
         assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
@@ -222,7 +225,7 @@ def test_integration_split_pdf_strict_mode(
         languages=["eng"],
         split_pdf_page=True,
         split_pdf_concurrency_level=concurrency_level,
-        split_pdf_allow_failed=True,
+        split_pdf_allow_failed=allow_failed,
     )
 
     try:

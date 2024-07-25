@@ -1,10 +1,14 @@
+import asyncio
 import io
 import logging
-from concurrent.futures import Future
+from asyncio import Task
+from collections import Counter
+from typing import Coroutine
 
 import pytest
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
+
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
@@ -18,7 +22,7 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     MAX_PAGES_PER_SPLIT,
     MIN_PAGES_PER_SPLIT,
     SplitPdfHook,
-    get_optimal_split_size,
+    get_optimal_split_size, run_tasks,
 )
 from unstructured_client.models import shared
 
@@ -224,7 +228,6 @@ def test_unit_parse_form_data():
         b"--boundary--\r\n"
     )
 
-
     decoded_data = MultipartDecoder(
         test_form_data,
         "multipart/form-data; boundary=boundary",
@@ -361,22 +364,22 @@ def test_get_optimal_split_size(num_pages, concurrency_level, expected_split_siz
         ({}, DEFAULT_CONCURRENCY_LEVEL),  # no value
         ({"split_pdf_concurrency_level": 10}, 10),  # valid number
         (
-            # exceeds max value
-            {"split_pdf_concurrency_level": f"{MAX_CONCURRENCY_LEVEL+1}"},
-            MAX_CONCURRENCY_LEVEL,
+                # exceeds max value
+                {"split_pdf_concurrency_level": f"{MAX_CONCURRENCY_LEVEL + 1}"},
+                MAX_CONCURRENCY_LEVEL,
         ),
         ({"split_pdf_concurrency_level": -3}, DEFAULT_CONCURRENCY_LEVEL),  # negative value
     ],
 )
 def test_unit_get_split_pdf_concurrency_level_returns_valid_number(form_data, expected_result):
     assert (
-        form_utils.get_split_pdf_concurrency_level_param(
-            form_data,
-            key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
-            fallback_value=DEFAULT_CONCURRENCY_LEVEL,
-            max_allowed=MAX_CONCURRENCY_LEVEL,
-        )
-        == expected_result
+            form_utils.get_split_pdf_concurrency_level_param(
+                form_data,
+                key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
+                fallback_value=DEFAULT_CONCURRENCY_LEVEL,
+                max_allowed=MAX_CONCURRENCY_LEVEL,
+            )
+            == expected_result
     )
 
 
@@ -404,16 +407,16 @@ def test_unit_get_starting_page_number(starting_page_number, expected_result):
 @pytest.mark.parametrize(
     "page_range, expected_result",
     [
-        (["1", "14"], (1, 14)), # Valid range, start on boundary
-        (["4", "16"], (4, 16)), # Valid range, end on boundary
-        (None, (1, 20)), # Range not specified, defaults to full range
+        (["1", "14"], (1, 14)),  # Valid range, start on boundary
+        (["4", "16"], (4, 16)),  # Valid range, end on boundary
+        (None, (1, 20)),  # Range not specified, defaults to full range
         (["2", "5"], (2, 5)),  # Valid range within boundary
-        (["2", "100"], None), # End page too high
-        (["50", "100"], None), # Range too high
-        (["-50", "5"], None), # Start page too low
-        (["-50", "-2"], None), # Range too low
-        (["10", "2"], None), # Backwards range
-        (["foo", "foo"], None), # Parse error
+        (["2", "100"], None),  # End page too high
+        (["50", "100"], None),  # Range too high
+        (["-50", "5"], None),  # Start page too low
+        (["-50", "-2"], None),  # Range too low
+        (["10", "2"], None),  # Backwards range
+        (["foo", "foo"], None),  # Parse error
     ],
 )
 def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
@@ -432,3 +435,96 @@ def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
         return
 
     assert result == expected_result
+
+
+async def _request_mock(fails: bool, content: str) -> requests.Response:
+    response = requests.Response()
+    response.status_code = 500 if fails else 200
+    response._content = content.encode()
+    return response
+
+
+@pytest.mark.parametrize(
+    ("allow_failed", "tasks", "expected_responses"), [
+        pytest.param(
+            True, [
+                _request_mock(fails=False, content="1"),
+                _request_mock(fails=False, content="2"),
+                _request_mock(fails=False, content="3"),
+                _request_mock(fails=False, content="4"),
+            ],
+            ["1", "2", "3", "4"],
+            id="no failures, fails allower"
+        ),
+        pytest.param(
+            True, [
+                _request_mock(fails=False, content="1"),
+                _request_mock(fails=True, content="2"),
+                _request_mock(fails=False, content="3"),
+                _request_mock(fails=True, content="4"),
+            ],
+            ["1", "2", "3", "4"],
+            id="failures, fails allowed"
+        ),
+        pytest.param(
+            False, [
+                _request_mock(fails=True, content="failure"),
+                _request_mock(fails=False, content="2"),
+                _request_mock(fails=True, content="failure"),
+                _request_mock(fails=False, content="4"),
+            ],
+            ["failure"],
+            id="failures, fails disallowed"
+        ),
+        pytest.param(
+            False, [
+                _request_mock(fails=False, content="1"),
+                _request_mock(fails=False, content="2"),
+                _request_mock(fails=False, content="3"),
+                _request_mock(fails=False, content="4"),
+            ],
+            ["1", "2", "3", "4"],
+            id="no failures, fails disallowed"
+        ),
+    ]
+)
+@pytest.mark.asyncio
+async def test_unit_disallow_failed_coroutines(
+        allow_failed: bool,
+        tasks: list[Task],
+        expected_responses: list[str],
+):
+    """Test disallow failed coroutines method properly sets the flag to False."""
+    responses = await run_tasks(tasks, allow_failed=allow_failed)
+    response_contents = [response[1].content.decode() for response in responses]
+    assert response_contents == expected_responses
+
+
+async def _fetch_canceller_error(fails: bool, content: str, cancelled_counter: Counter):
+    try:
+        if not fails:
+            await asyncio.sleep(0.01)
+            print("Doesn't fail")
+        else:
+            print("Fails")
+        return await _request_mock(fails=fails, content=content)
+    except asyncio.CancelledError:
+        cancelled_counter.update(["cancelled"])
+        print(cancelled_counter["cancelled"])
+        print("Cancelled")
+
+
+@pytest.mark.asyncio
+async def test_remaining_tasks_cancelled_when_fails_disallowed():
+    cancelled_counter = Counter()
+    tasks = [
+        _fetch_canceller_error(fails=True, content="1", cancelled_counter=cancelled_counter),
+        *[_fetch_canceller_error(fails=False, content=f"{i}", cancelled_counter=cancelled_counter)
+          for i in range(2, 200)],
+    ]
+
+    await run_tasks(tasks, allow_failed=False)
+    # give some time to actually cancel the tasks in background
+    await asyncio.sleep(1)
+    print("Cancelled amount: ", cancelled_counter["cancelled"])
+    assert len(tasks) > cancelled_counter["cancelled"] > 0
