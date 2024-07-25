@@ -9,7 +9,7 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 
 .PHONY: install-test
 install-test:
-	pip install pytest requests_mock pypdf deepdiff requests-toolbelt
+	pip install pytest pytest-asyncio pytest-mock requests_mock pypdf deepdiff requests-toolbelt
 
 .PHONY: install-dev
 install-dev:
