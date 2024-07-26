@@ -54,25 +54,23 @@ async def run_tasks(coroutines: list[Awaitable], allow_failed: bool = False) -> 
     if allow_failed:
         responses = await asyncio.gather(*coroutines, return_exceptions=False)
         return list(enumerate(responses, 1))
-    else:
-        # TODO: replace with asyncio.TaskGroup for python >3.11
-        tasks = [asyncio.create_task(_order_keeper(index, coro)) for index, coro in enumerate(coroutines, 1)]
-        results = []
-        remaining_tasks = {i: task for i, task in enumerate(tasks, 1)}
-        for future in asyncio.as_completed(tasks):
-            index, response = await future
-            if response.status_code != 200:
-                # cancel all remaining tasks
-                for remaining_task in remaining_tasks.values():
-                    remaining_task.cancel()
-                results.append((index, response))
-                break
-            else:
-                results.append((index, response))
-                # remove task from remaining_tasks that should be cancelled in case of failure
-                del remaining_tasks[index]
-        # return results in the original order
-        return sorted(results, key=lambda x: x[0])
+    # TODO: replace with asyncio.TaskGroup for python >3.11 # pylint: disable=fixme
+    tasks = [asyncio.create_task(_order_keeper(index, coro)) for index, coro in enumerate(coroutines, 1)]
+    results = []
+    remaining_tasks = dict(enumerate(tasks, 1))
+    for future in asyncio.as_completed(tasks):
+        index, response = await future
+        if response.status_code != 200:
+            # cancel all remaining tasks
+            for remaining_task in remaining_tasks.values():
+                remaining_task.cancel()
+            results.append((index, response))
+            break
+        results.append((index, response))
+        # remove task from remaining_tasks that should be cancelled in case of failure
+        del remaining_tasks[index]
+    # return results in the original order
+    return sorted(results, key=lambda x: x[0])
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
