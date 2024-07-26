@@ -14,7 +14,7 @@ FormData = dict[str, Union[str, shared.Files, list[str]]]
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_PAGE_RANGE_KEY = "split_pdf_page_range[]"
-PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED = "split_pdf_allow_failed"
+PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY = "split_pdf_allow_failed"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 

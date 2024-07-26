@@ -21,7 +21,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
-    PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED,
+    PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
 from unstructured_client._hooks.types import (
@@ -179,7 +179,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         self.allow_failed = form_utils.get_split_pdf_allow_failed_param(
             form_data,
-            key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED,
+            key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
             fallback_value=DEFAULT_ALLOW_FAILED,
         )
         logger.info("Allow failed set to %d", self.allow_failed)
