@@ -165,7 +165,7 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(se
     )
 
 
-def test_unit_issues_warning_on_a_401(session_: Mock, response_: requests.Session):
+def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: requests.Session):
     client = UnstructuredClient(api_key_auth=FAKE_KEY)
     session_.return_value = response_
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
@@ -175,11 +175,13 @@ def test_unit_issues_warning_on_a_401(session_: Mock, response_: requests.Sessio
     req = shared.PartitionParameters(files=files)
 
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
-        with pytest.warns(
-            UserWarning,
-            match="If intending to use the paid API, please define `server_url` in your request.",
-        ):
+        with caplog.at_level(logging.WARNING):
             client.general.partition(req)
+
+        assert any(
+            "This API key is invalid against the paid API. If intending to use the free API, please initialize UnstructuredClient with `server='free-api'`."
+            in message for message in caplog.messages
+        )
 
 
 # -- fixtures --------------------------------------------------------------------------------
