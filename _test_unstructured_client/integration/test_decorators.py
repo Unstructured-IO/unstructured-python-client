@@ -180,3 +180,76 @@ def test_integration_split_pdf_with_page_range(
 
     assert min(page_numbers) == min_page_number, f"Result should start at page {min_page_number}"
     assert max(page_numbers) == max_page_number, f"Result should end at page {max_page_number}"
+
+
+@pytest.mark.parametrize("concurrency_level", [2, 3])
+@pytest.mark.parametrize("allow_failed", [True, False])
+@pytest.mark.parametrize(
+    ("filename", "expected_ok", "strategy"),
+    [
+        ("_sample_docs/list-item-example-1.pdf", True, "fast"),  # 1 page
+        ("_sample_docs/layout-parser-paper-fast.pdf", True, "fast"),  # 2 pages
+        ("_sample_docs/layout-parser-paper.pdf", True, shared.Strategy.HI_RES),  # 16 pages
+    ],
+)
+def test_integration_split_pdf_strict_mode(
+    concurrency_level: int,
+    allow_failed: bool,
+    filename: str,
+    expected_ok: bool,
+    strategy: shared.Strategy,
+    caplog
+):
+    """Test strict mode (allow failed = False) for split_pdf."""
+    try:
+        response = requests.get("http://localhost:8000/general/docs")
+        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on localhost:8000"
+
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+
+    with open(filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    if not expected_ok:
+        # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
+        files.file_name += ".pdf"
+
+    req = shared.PartitionParameters(
+        files=files,
+        strategy=strategy,
+        languages=["eng"],
+        split_pdf_page=True,
+        split_pdf_concurrency_level=concurrency_level,
+        split_pdf_allow_failed=allow_failed,
+    )
+
+    try:
+        resp_split = client.general.partition(req)
+    except (HTTPValidationError, AttributeError) as exc:
+        if not expected_ok:
+            assert "The file does not appear to be a valid PDF." in caplog.text
+            assert "File does not appear to be a valid PDF" in str(exc)
+            return
+        else:
+            assert exc is None
+
+    req.split_pdf_page = False
+    resp_single = client.general.partition(req)
+
+    assert len(resp_split.elements) == len(resp_single.elements)
+    assert resp_split.content_type == resp_single.content_type
+    assert resp_split.status_code == resp_single.status_code
+
+    diff = DeepDiff(
+        t1=resp_split.elements,
+        t2=resp_single.elements,
+        exclude_regex_paths=[
+            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
+        ],
+    )
+    assert len(diff) == 0

@@ -14,6 +14,7 @@ FormData = dict[str, Union[str, shared.Files, list[str]]]
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_PAGE_RANGE_KEY = "split_pdf_page_range[]"
+PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY = "split_pdf_allow_failed"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 
@@ -89,6 +90,36 @@ def get_starting_page_number(form_data: FormData, key: str, fallback_value: int)
 
     return starting_page_number
 
+def get_split_pdf_allow_failed_param(
+    form_data: FormData, key: str, fallback_value: bool,
+) -> bool:
+    """Retrieves the value for allow failed that should be used for splitting pdf.
+
+    In case given the number is not a "false" or "true" literal, it will use the
+    default value.
+
+    Args:
+        form_data: The form data containing the desired concurrency level.
+        key: The key to look for in the form data.
+        fallback_value: The default value to use in case of an error.
+
+    Returns:
+        The concurrency level after validation.
+    """
+    allow_failed = form_data.get(key)
+
+    if allow_failed is None:
+        return fallback_value
+
+    if allow_failed.lower() not in ["true", "false"]:
+        logger.warning(
+            "'%s' is not a valid boolean. Using default value '%s'.",
+            key,
+            fallback_value,
+        )
+        return fallback_value
+
+    return allow_failed.lower() == "true"
 
 def get_split_pdf_concurrency_level_param(
     form_data: FormData, key: str, fallback_value: int, max_allowed: int

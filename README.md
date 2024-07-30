@@ -109,6 +109,21 @@ req = shared.PartitionParameters(
 )
 ```
 
+#### Splitting PDF by pages - strict mode
+
+When `split_pdf_allow_failed=False` (the default), any errors encountered during sending parallel request will break the process and raise an exception. 
+When `split_pdf_allow_failed=True`, the process will continue even if some requests fail, and the results will be combined at the end (the output from the errored pages will not be included).
+
+Example:
+```python
+req = shared.PartitionParameters(
+    files=files,
+    strategy="fast",
+    languages=["eng"],
+    split_pdf_allow_failed=True,
+)
+```
+
 <!-- Start Retries [retries] -->
 ## Retries
 

@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import math
+from collections.abc import Awaitable
 from typing import Any, Coroutine, Optional, Tuple, Union
 
 import httpx
@@ -20,6 +21,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
 from unstructured_client._hooks.types import (
@@ -35,17 +37,40 @@ from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
-
 DEFAULT_STARTING_PAGE_NUMBER = 1
+DEFAULT_ALLOW_FAILED = False
 DEFAULT_CONCURRENCY_LEVEL = 8
 MAX_CONCURRENCY_LEVEL = 15
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 
 
+async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, requests.Response]:
+    response = await coro
+    return index, response
 
-async def run_tasks(tasks):
-    return await asyncio.gather(*tasks)
+
+async def run_tasks(coroutines: list[Awaitable], allow_failed: bool = False) -> list[tuple[int, requests.Response]]:
+    if allow_failed:
+        responses = await asyncio.gather(*coroutines, return_exceptions=False)
+        return list(enumerate(responses, 1))
+    # TODO: replace with asyncio.TaskGroup for python >3.11 # pylint: disable=fixme
+    tasks = [asyncio.create_task(_order_keeper(index, coro)) for index, coro in enumerate(coroutines, 1)]
+    results = []
+    remaining_tasks = dict(enumerate(tasks, 1))
+    for future in asyncio.as_completed(tasks):
+        index, response = await future
+        if response.status_code != 200:
+            # cancel all remaining tasks
+            for remaining_task in remaining_tasks.values():
+                remaining_task.cancel()
+            results.append((index, response))
+            break
+        results.append((index, response))
+        # remove task from remaining_tasks that should be cancelled in case of failure
+        del remaining_tasks[index]
+    # return results in the original order
+    return sorted(results, key=lambda x: x[0])
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
@@ -78,9 +103,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             str, list[Coroutine[Any, Any, requests.Response]]
         ] = {}
         self.api_successful_responses: dict[str, list[requests.Response]] = {}
+        self.api_failed_responses: dict[str, list[requests.Response]] = {}
+        self.allow_failed: bool = DEFAULT_ALLOW_FAILED
 
     def sdk_init(
-        self, base_url: str, client: requests.Session
+            self, base_url: str, client: requests.Session
     ) -> Tuple[str, requests.Session]:
         """Initializes Split PDF Hook.
 
@@ -95,7 +122,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return base_url, client
 
     def before_request(
-        self, hook_ctx: BeforeRequestContext, request: requests.PreparedRequest
+            self, hook_ctx: BeforeRequestContext, request: requests.PreparedRequest
     ) -> Union[requests.PreparedRequest, Exception]:
         """If `splitPdfPage` is set to `true` in the request, the PDF file is split into
         separate pages. Each page is sent as a separate request in parallel. The last
@@ -132,9 +159,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         logger.info("Preparing to split document for partition.")
         file = form_data.get(PARTITION_FORM_FILES_KEY)
         if (
-            file is None
-            or not isinstance(file, shared.Files)
-            or not pdf_utils.is_pdf(file)
+                file is None
+                or not isinstance(file, shared.Files)
+                or not pdf_utils.is_pdf(file)
         ):
             logger.info("Partitioning without split.")
             return request
@@ -144,9 +171,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
-
         if starting_page_number > 1:
             logger.info("Starting page number set to %d", starting_page_number)
+        logger.info("Starting page number set to %d", starting_page_number)
+
+        self.allow_failed = form_utils.get_split_pdf_allow_failed_param(
+            form_data,
+            key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
+            fallback_value=DEFAULT_ALLOW_FAILED,
+        )
+        logger.info("Allow failed set to %d", self.allow_failed)
 
         concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
@@ -253,7 +287,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return last_page_prepared_request
 
     def _await_elements(
-        self, operation_id: str, response: requests.Response
+            self, operation_id: str, response: requests.Response
     ) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
@@ -272,34 +306,42 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return None
 
         ioloop = asyncio.get_event_loop()
-        task_responses: list[requests.Response] = ioloop.run_until_complete(
-            run_tasks(tasks)
+        task_responses: list[tuple[int, requests.Response]] = ioloop.run_until_complete(
+            run_tasks(tasks, allow_failed=self.allow_failed)
         )
 
         if task_responses is None:
             return None
 
         successful_responses = []
+        failed_responses = []
         elements = []
-        for response_number, res in enumerate(task_responses, 1):
+        for response_number, res in task_responses:
             request_utils.log_after_split_response(res.status_code, response_number)
             if res.status_code == 200:
                 successful_responses.append(res)
                 elements.append(res.json())
+            else:
+                failed_responses.append(res)
 
-        last_response_number = len(task_responses) + 1
-        request_utils.log_after_split_response(
-            response.status_code, last_response_number
-        )
-        if response.status_code == 200:
-            elements.append(response.json())
+        if self.allow_failed or not failed_responses:
+            last_response_number = len(task_responses) + 1
+            request_utils.log_after_split_response(
+                response.status_code, last_response_number
+            )
+            if response.status_code == 200:
+                elements.append(response.json())
+                successful_responses.append(response)
+            else:
+                failed_responses.append(response)
 
         self.api_successful_responses[operation_id] = successful_responses
+        self.api_failed_responses[operation_id] = failed_responses
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
 
     def after_success(
-        self, hook_ctx: AfterSuccessContext, response: requests.Response
+            self, hook_ctx: AfterSuccessContext, response: requests.Response
     ) -> Union[requests.Response, Exception]:
         """Executes after a successful API request. Awaits all parallel requests and
         combines the responses into a single response object.
@@ -320,6 +362,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # we need to pass response, which contains last page, to `_await_elements` method
         elements = self._await_elements(operation_id, response)
 
+        # if fails are disallowed, return the first failed response
+        if not self.allow_failed and self.api_failed_responses.get(operation_id):
+            return self.api_failed_responses[operation_id][0]
+
         if elements is None:
             return response
 
@@ -328,10 +374,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return updated_response
 
     def after_error(
-        self,
-        hook_ctx: AfterErrorContext,
-        response: Optional[requests.Response],
-        error: Optional[Exception],
+            self,
+            hook_ctx: AfterErrorContext,
+            response: Optional[requests.Response],
+            error: Optional[Exception],
     ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
         """Executes after an unsuccessful API request. Awaits all parallel requests,
         if at least one request was successful, combines the responses into a single
@@ -350,6 +396,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             If requests were run in parallel, and at least one was successful, a combined
             response object; otherwise, the original response and exception.
         """
+
+        # if fails are disallowed - return response and error objects immediately
+        if not self.allow_failed:
+            return (response, error)
+
         operation_id = hook_ctx.operation_id
         # We know that this request failed so we pass a failed or empty response to `_await_elements` method
         # where it checks if at least on of the other requests succeeded
