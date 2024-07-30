@@ -146,11 +146,12 @@ res = s.general.partition(request=operations.PartitionRequest(
             content='0x2cC94b2FEF'.encode(),
             file_name='your_file_here',
         ),
+        chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
         split_pdf_page_range=[
             1,
             10,
         ],
-        strategy=shared.Strategy.AUTO,
+        strategy=shared.Strategy.HI_RES,
     ),
 ),
     RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False))
@@ -179,11 +180,12 @@ res = s.general.partition(request=operations.PartitionRequest(
             content='0x2cC94b2FEF'.encode(),
             file_name='your_file_here',
         ),
+        chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
         split_pdf_page_range=[
             1,
             10,
         ],
-        strategy=shared.Strategy.AUTO,
+        strategy=shared.Strategy.HI_RES,
     ),
 ))
 

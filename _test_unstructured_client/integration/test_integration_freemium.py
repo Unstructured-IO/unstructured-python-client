@@ -12,7 +12,7 @@ from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 @pytest.fixture(scope="module")
 def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
+    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"), server='free-api')
     yield _client
 
 

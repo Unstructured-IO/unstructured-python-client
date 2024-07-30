@@ -24,6 +24,7 @@ actions:
                         content='0x2cC94b2FEF'.encode(),
                     ),
                     strategy=shared.Strategy.AUTO,
+                    chunking_strategy=shared.ChunkingStrategy.BASIC,
                     split_pdf_page_range=[
                         1,
                         10,
