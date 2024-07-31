@@ -76,7 +76,7 @@ async def run_tasks(coroutines: list[Awaitable], allow_failed: bool = False) -> 
 def context_is_uvloop():
     """Return true if uvloop is installed and we're currently in a uvloop context. Our asyncio splitting code currently doesn't work under uvloop."""
     try:
-        import uvloop
+        import uvloop  # pylint: disable=import-outside-toplevel
         loop = asyncio.get_event_loop()
         return isinstance(loop, uvloop.Loop)
     except ImportError:
@@ -126,6 +126,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.client = client
         return base_url, client
 
+
+    # pylint: disable=too-many-return-statements
     def before_request(
             self, hook_ctx: BeforeRequestContext, request: requests.PreparedRequest
     ) -> Union[requests.PreparedRequest, Exception]:
