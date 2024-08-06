@@ -45,6 +45,8 @@ class PartitionParameters:
     r"""Use one of the supported strategies to chunk the returned elements after partitioning. When 'chunking_strategy' is not specified, no chunking is performed and any other chunking parameters provided are ignored. Supported strategies: 'basic', 'by_page', 'by_similarity', or 'by_title'"""
     combine_under_n_chars: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'combine_under_n_chars' }})
     r"""If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500"""
+    content_type: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'content_type' }})
+    r"""A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype."""
     coordinates: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'coordinates' }})
     r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
     encoding: Optional[str] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'encoding' }})
