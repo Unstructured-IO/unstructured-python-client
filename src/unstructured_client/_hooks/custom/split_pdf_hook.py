@@ -79,7 +79,7 @@ def context_is_uvloop():
         import uvloop  # pylint: disable=import-outside-toplevel
         loop = asyncio.get_event_loop()
         return isinstance(loop, uvloop.Loop)
-    except ImportError:
+    except (ImportError, RuntimeError):
         return False
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
