@@ -10,6 +10,11 @@ from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
+# Loading pdfs with strict=False can dump a lot of warnings
+# We don't need to display these
+pdf_logger = logging.getLogger("pypdf")
+pdf_logger.setLevel(logging.ERROR)
+
 
 def get_pdf_pages(
     pdf: PdfReader, split_size: int = 1, page_start: int = 1, page_end: Optional[int] = None
