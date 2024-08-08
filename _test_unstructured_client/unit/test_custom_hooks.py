@@ -70,6 +70,40 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
     assert bool(pattern.search(caplog.text))
 
 
+@pytest.mark.parametrize(
+    ("status_code", "expect_retry"),
+    [
+        [500, False],
+        [502, True],
+        [503, True],
+        [504, True],
+    ]
+)
+def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
+    filename = "README.md"
+    backoff_strategy = BackoffStrategy(
+        initial_interval=1, max_interval=10, exponent=1.5, max_elapsed_time=300
+    )
+    retries = RetryConfig(
+        strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
+    )
+
+    with requests_mock.Mocker() as mock:
+        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=status_code)
+        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+
+        with open(filename, "rb") as f:
+            files = shared.Files(content=f.read(), file_name=filename)
+
+        req = shared.PartitionParameters(files=files)
+        with pytest.raises(Exception):
+            session.general.partition(req, retries=retries)
+    if expect_retry:
+        assert len(mock.request_history) > 1
+    else:
+        assert len(mock.request_history) == 1
+
+
 def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     caplog.set_level(logging.INFO)
     filename = "README.md"
