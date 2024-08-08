@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Union
+from typing import Dict, List, Union
 
 from requests_toolbelt.multipart.decoder import MultipartDecoder
 
@@ -9,7 +9,7 @@ from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_
 from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData = dict[str, Union[str, shared.Files, list[str]]]
+FormData = Dict[str, Union[str, shared.Files, List[str]]]
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
