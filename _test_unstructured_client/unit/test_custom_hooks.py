@@ -24,8 +24,8 @@ def test_unit_retry_with_backoff_does_retry(caplog):
     )
 
     with requests_mock.Mocker() as mock:
-        # mock a 500 status code for POST requests to the api
-        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=500)
+        # mock a 502 status code for POST requests to the api
+        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=502)
         session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
         with open(filename, "rb") as f:
@@ -35,7 +35,7 @@ def test_unit_retry_with_backoff_does_retry(caplog):
 
         with pytest.raises(Exception) as excinfo:
             resp = session.general.partition(req, retries=retries)
-            assert resp.status_code == 500
+            assert resp.status_code == 502
             assert "API error occurred" in str(excinfo.value)
 
         # the number of retries varies
