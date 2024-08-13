@@ -15,7 +15,7 @@ class UnstructuredClient:
     sdk_configuration: SDKConfiguration
 
     def __init__(self,
-                 api_key_auth: Union[str, Callable[[], str]],
+                 api_key_auth: Union[Optional[str], Callable[[], Optional[str]]] = None,
                  server: Optional[str] = None,
                  server_url: Optional[str] = None,
                  url_params: Optional[Dict[str, str]] = None,
@@ -25,7 +25,7 @@ class UnstructuredClient:
         """Instantiates the SDK configuring it with the provided parameters.
 
         :param api_key_auth: The api_key_auth required for authentication
-        :type api_key_auth: Union[str, Callable[[], str]]
+        :type api_key_auth: Union[Optional[str], Callable[[], Optional[str]]]
         :param server: The server by name to use for all operations
         :type server: str
         :param server_url: The server URL to use for all operations

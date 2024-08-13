@@ -74,7 +74,9 @@ class General:
             return http_res
 
         http_res = utils.retry(do_request, utils.Retries(retry_config, [
-            '5xx'
+            '502',
+            '503',
+            '504'
         ]))
         
         
