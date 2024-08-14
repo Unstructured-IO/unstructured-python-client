@@ -3,10 +3,12 @@ import re
 
 import pytest
 import requests
-import requests_mock
+import httpx
+from httpx import Response, ConnectError
+
 from _test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
@@ -23,23 +25,33 @@ def test_unit_retry_with_backoff_does_retry(caplog):
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
     )
 
-    with requests_mock.Mocker() as mock:
-        # mock a 502 status code for POST requests to the api
-        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=502)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+    # List to track the number of requests
+    # (Use a list so we can pass a reference into mock_post)
+    request_count = [0]
 
-        with open(filename, "rb") as f:
-            files = shared.Files(content=f.read(), file_name=filename)
+    def mock_post(request):
+        request_count[0] += 1
+        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+            return Response(502, request=request)
 
-        req = shared.PartitionParameters(files=files)
+    transport = httpx.MockTransport(mock_post)
+    client = httpx.Client(transport=transport)
+    session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
 
-        with pytest.raises(Exception) as excinfo:
-            resp = session.general.partition(req, retries=retries)
-            assert resp.status_code == 502
-            assert "API error occurred" in str(excinfo.value)
+    with open(filename, "rb") as f:
+        files = shared.Files(content=f.read(), file_name=filename)
 
-        # the number of retries varies
-        assert len(mock.request_history) > 1
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(files=files)
+    )
+
+    with pytest.raises(Exception) as excinfo:
+        resp = session.general.partition(request=req, retries=retries)
+        assert resp.status_code == 502
+        assert "API error occurred" in str(excinfo.value)
+
+    # the number of retries varies
+    assert request_count[0] > 1
 
 
 @pytest.mark.parametrize("status_code", [500, 503])
@@ -53,17 +65,23 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
     )
 
-    with requests_mock.Mocker() as mock:
-        # mock a 500/503 status code for POST requests to the api
-        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=status_code)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+    def mock_post(request):
+        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+            return Response(status_code, request=request)
 
-        with open(filename, "rb") as f:
-            files = shared.Files(content=f.read(), file_name=filename)
+    transport = httpx.MockTransport(mock_post)
+    client = httpx.Client(transport=transport)
+    session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
 
-        req = shared.PartitionParameters(files=files)
-        with pytest.raises(Exception):
-            session.general.partition(req, retries=retries)
+    with open(filename, "rb") as f:
+        files = shared.Files(content=f.read(), file_name=filename)
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(files=files)
+    )
+
+    with pytest.raises(Exception):
+        session.general.partition(request=req, retries=retries)
 
     pattern = re.compile(f"Failed to process a request due to API server error with status code {status_code}. "
                         "Attempting retry number 1 after sleep.")
@@ -79,22 +97,28 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     retries = RetryConfig(
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
     )
-    with requests_mock.Mocker() as mock:
-        # mock a connection error response to POST request
-        mock.post("https://api.unstructuredapp.io/general/v0/general", exc=requests.exceptions.ConnectionError)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
 
-        with open(filename, "rb") as f:
-            files = shared.Files(content=f.read(), file_name=filename)
+    def mock_post(request):
+        raise ConnectError("Mocked connection error", request=request)
 
-        req = shared.PartitionParameters(files=files)
-        with pytest.raises(Exception):
-            session.general.partition(req, retries=retries)
+    transport = httpx.MockTransport(mock_post)
+    client = httpx.Client(transport=transport)
+    session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
+
+    with open(filename, "rb") as f:
+        files = shared.Files(content=f.read(), file_name=filename)
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(files=files)
+    )
+
+    with pytest.raises(Exception):
+        session.general.partition(request=req, retries=retries)
 
     pattern = re.compile(f"Failed to process a request due to connection error .*? "
                          "Attempting retry number 1 after sleep.")
     assert bool(pattern.search(caplog.text))
-    
+
 
 @pytest.mark.parametrize(
     "server_url",
@@ -166,17 +190,24 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(se
 
 
 def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: requests.Session):
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
-    session_.return_value = response_
+    def mock_post(request):
+        return Response(401, request=request)
+
+    transport = httpx.MockTransport(mock_post)
+    client = httpx.Client(transport=transport)
+    session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
+
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
     with open(filename, "rb") as f:
         files = shared.Files(content=f.read(), file_name=filename)
 
-    req = shared.PartitionParameters(files=files)
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(files=files)
+    )
 
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
         with caplog.at_level(logging.WARNING):
-            client.general.partition(req)
+            session.general.partition(request=req)
 
         assert any(
             "This API key is invalid against the paid API. If intending to use the free API, please initialize UnstructuredClient with `server='free-api'`."
