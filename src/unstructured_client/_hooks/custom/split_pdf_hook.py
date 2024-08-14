@@ -126,11 +126,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.client = client
         return base_url, client
 
-
     # pylint: disable=too-many-return-statements
     def before_request(
-            self, hook_ctx: BeforeRequestContext, request: requests.PreparedRequest
-    ) -> Union[requests.PreparedRequest, Exception]:
+            self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
         """If `splitPdfPage` is set to `true` in the request, the PDF file is split into
         separate pages. Each page is sent as a separate request in parallel. The last
         page request is returned by this method. It will return the original request
@@ -159,7 +158,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         nest_asyncio.apply()
         operation_id = hook_ctx.operation_id
         content_type = request.headers.get("Content-Type")
-        body = request.body
+
+        request_content = request.read()
+        body = request_content
         if not isinstance(body, bytes) or content_type is None:
             return request
 
@@ -296,9 +297,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         body = request_utils.create_request_body(
             form_data, last_page_content, file.file_name, last_page_number
         )
-        last_page_request = request_utils.create_request(request, body)
-        last_page_prepared_request = self.client.prepare_request(last_page_request)
-        return last_page_prepared_request
+        last_page_request = request_utils.create_httpx_request(request, body)
+        return last_page_request
 
     def _await_elements(
             self, operation_id: str, response: requests.Response
@@ -355,8 +355,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return flattened_elements
 
     def after_success(
-            self, hook_ctx: AfterSuccessContext, response: requests.Response
-    ) -> Union[requests.Response, Exception]:
+            self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> Union[httpx.Response, Exception]:
         """Executes after a successful API request. Awaits all parallel requests and
         combines the responses into a single response object.
 
@@ -390,9 +390,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     def after_error(
             self,
             hook_ctx: AfterErrorContext,
-            response: Optional[requests.Response],
+            response: Optional[httpx.Response],
             error: Optional[Exception],
-    ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
+    ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
         """Executes after an unsuccessful API request. Awaits all parallel requests,
         if at least one request was successful, combines the responses into a single
         response object and doesn't throw an error. It will return an error only if
