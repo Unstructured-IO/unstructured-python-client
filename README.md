@@ -25,7 +25,7 @@
 
 This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/overview).
 
-Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk) for a full guide to using the client.
+Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk-python) for a full guide to using the client.
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
