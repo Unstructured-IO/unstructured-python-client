@@ -1,9 +1,8 @@
 from typing import Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
-import requests
-
 from unstructured_client._hooks.types import SDKInitHook
+from unstructured_client.httpclient import HttpClient
 
 
 class CleanServerUrlSDKInitHook(SDKInitHook):
@@ -26,8 +25,8 @@ class CleanServerUrlSDKInitHook(SDKInitHook):
         return urlunparse(parsed_url._replace(path=""))
 
     def sdk_init(
-        self, base_url: str, client: requests.Session
-    ) -> Tuple[str, requests.Session]:
+        self, base_url: str, client: HttpClient
+    ) -> Tuple[str, HttpClient]:
         """Concrete implementation for SDKInitHook."""
         cleaned_url = self.clean_server_url(base_url)
 

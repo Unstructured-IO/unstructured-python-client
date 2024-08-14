@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Tuple, Union, DefaultDict
 
-import requests
+import httpx
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.types import (
@@ -11,6 +11,7 @@ from unstructured_client._hooks.types import (
     SDKInitHook,
     AfterSuccessHook,
 )
+from unstructured_client.httpclient import HttpClient
 from collections import defaultdict
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
@@ -22,7 +23,7 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
     def __init__(self) -> None:
         self.retries_counter: DefaultDict[str, int] = defaultdict(int)
 
-    def log_retries(self, response: Optional[requests.Response],  error: Optional[Exception], operation_id: str,):
+    def log_retries(self, response: Optional[httpx.Response],  error: Optional[Exception], operation_id: str,):
         """Log retries to give users visibility into requests."""
 
         if response is not None and response.status_code // 100 == 5:
@@ -35,7 +36,7 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
             if response.text:
                 logger.info("Server message - %s", response.text)
         
-        elif error is not None and isinstance(error, requests.exceptions.ConnectionError):
+        elif error is not None and isinstance(error, httpx.ConnectError):
             logger.info(
                 "Failed to process a request due to connection error - %s. "
                 "Attempting retry number %d after sleep.",
@@ -45,14 +46,14 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
 
 
     def sdk_init(
-        self, base_url: str, client: requests.Session
-    ) -> Tuple[str, requests.Session]:
+        self, base_url: str, client: HttpClient
+    ) -> Tuple[str, HttpClient]:
         logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
         return base_url, client
 
     def after_success(
-        self, hook_ctx: AfterSuccessContext, response: requests.Response
-    ) -> Union[requests.Response, Exception]:
+        self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> Union[httpx.Response, Exception]:
         self.retries_counter.pop(hook_ctx.operation_id, None)
         # NOTE: In case of split page partition this means - at least one of the splits was partitioned successfully
         logger.info("Successfully partitioned the document.")
@@ -61,9 +62,9 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
     def after_error(
         self,
         hook_ctx: AfterErrorContext,
-        response: Optional[requests.Response],
+        response: Optional[httpx.Response],
         error: Optional[Exception],
-    ) -> Union[Tuple[Optional[requests.Response], Optional[Exception]], Exception]:
+    ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
         """Concrete implementation for AfterErrorHook."""
         self.retries_counter[hook_ctx.operation_id] += 1
         self.log_retries(response, error, hook_ctx.operation_id)
