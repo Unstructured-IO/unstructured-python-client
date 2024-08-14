@@ -67,7 +67,7 @@ def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
             files = shared.Files(content=f.read(), file_name=filename)
 
         req = shared.PartitionParameters(files=files)
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match=f"unknown content-type received: None: Status {status_code}"):
             session.general.partition(req, retries=retries)
     if expect_retry:
         assert len(mock.request_history) > 1
