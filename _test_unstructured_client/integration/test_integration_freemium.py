@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
@@ -31,14 +31,16 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
             file_name=filename,
         )
 
-    req = shared.PartitionParameters(
-        files=files,
-        strategy=strategy,
-        languages=["eng"],
-        split_pdf_page=split_pdf,
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy=strategy,
+            languages=["eng"],
+            split_pdf_page=split_pdf,
+        )
     )
 
-    response = client.general.partition(req)
+    response = client.general.partition(request=req)
     assert response.status_code == 200
     assert len(response.elements)
 
@@ -55,20 +57,24 @@ def event_loop():
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("error", [(500, ServerError), (403, SDKError), (422, HTTPValidationError)])
 def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path, event_loop):
+    """
+    Mock different error responses, assert that the client throws the correct error
+    """
     filename = "layout-parser-paper-fast.pdf"
     import httpx
-    from unstructured_client.sdkconfiguration import requests_http
 
     error_code, sdk_raises = error
 
-    response = requests_http.Response()
-    response.status_code = error_code
-    response.headers = {'Content-Type': 'application/json'}
+    # Create the mock response
     json_data = {"detail": "An error occurred"}
-    response._content = bytes(json.dumps(json_data), 'utf-8')
+    response = httpx.Response(
+        status_code=error_code,
+        headers={'Content-Type': 'application/json'},
+        content=json.dumps(json_data)
+    )
 
-    monkeypatch.setattr(requests_http.Session, "send", lambda *args, **kwargs: response)
     monkeypatch.setattr(httpx.AsyncClient, "send", lambda *args, **kwargs: response)
+    monkeypatch.setattr(httpx.Client, "send", lambda *args, **kwargs: response)
 
     # initialize client after patching
     client = UnstructuredClient(
@@ -82,15 +88,17 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
             file_name=filename,
         )
 
-    req = shared.PartitionParameters(
-        files=files,
-        strategy="fast",
-        languages=["eng"],
-        split_pdf_page=split_pdf,
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            languages=["eng"],
+            split_pdf_page=split_pdf,
+        )
     )
 
     with pytest.raises(sdk_raises):
-        response = client.general.partition(req)
+        response = client.general.partition(request=req)
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
@@ -102,14 +110,16 @@ def test_uvloop_partitions_without_errors(client, doc_path):
                 file_name=filename,
             )
 
-        req = shared.PartitionParameters(
-            files=files,
-            strategy="fast",
-            languages=["eng"],
-            split_pdf_page=True,
+        req = operations.PartitionRequest(
+            partition_parameters=shared.PartitionParameters(
+                files=files,
+                strategy="fast",
+                languages=["eng"],
+                split_pdf_page=True,
+            )
         )
 
-        resp = client.general.partition(req)
+        resp = client.general.partition(request=req)
 
         if resp is not None:
             return resp.elements
