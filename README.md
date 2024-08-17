@@ -30,8 +30,14 @@ Please refer to the [Unstructured docs](https://docs.unstructured.io/api-referen
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
+PIP
 ```bash
 pip install unstructured-client
+```
+
+Poetry
+```bash
+poetry add unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
 
@@ -131,28 +137,30 @@ Some of the endpoints in this SDK support retries. If you use the SDK without an
 
 To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
 ```python
-import unstructured_client
-from unstructured_client.models import operations, shared
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = unstructured_client.UnstructuredClient()
+s = UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
 
 
-res = s.general.partition(request=operations.PartitionRequest(
-    partition_parameters=shared.PartitionParameters(
-        files=shared.Files(
-            content='0x2cC94b2FEF'.encode(),
-            file_name='your_file_here',
-        ),
-        chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
-        split_pdf_page_range=[
+res = s.general.partition(request={
+    "partition_parameters": {
+        "files": {
+            "content": open("<file_path>", "rb"),
+            "file_name": "your_file_here",
+        },
+        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+        "split_pdf_page_range": [
             1,
             10,
         ],
-        strategy=shared.Strategy.HI_RES,
-    ),
-),
-    RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False))
+        "strategy": shared.Strategy.HI_RES,
+    },
+},
+    RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
 if res.elements is not None:
     # handle response
@@ -162,29 +170,30 @@ if res.elements is not None:
 
 If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
 ```python
-import unstructured_client
-from unstructured_client.models import operations, shared
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = unstructured_client.UnstructuredClient(
-    retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False),
+s = UnstructuredClient(
+    retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
+    api_key_auth="YOUR_API_KEY",
 )
 
 
-res = s.general.partition(request=operations.PartitionRequest(
-    partition_parameters=shared.PartitionParameters(
-        files=shared.Files(
-            content='0x2cC94b2FEF'.encode(),
-            file_name='your_file_here',
-        ),
-        chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
-        split_pdf_page_range=[
+res = s.general.partition(request={
+    "partition_parameters": {
+        "files": {
+            "content": open("<file_path>", "rb"),
+            "file_name": "your_file_here",
+        },
+        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+        "split_pdf_page_range": [
             1,
             10,
         ],
-        strategy=shared.Strategy.HI_RES,
-    ),
-))
+        "strategy": shared.Strategy.HI_RES,
+    },
+})
 
 if res.elements is not None:
     # handle response
@@ -196,16 +205,81 @@ if res.elements is not None:
 <!-- Start Custom HTTP Client [http-client] -->
 ## Custom HTTP Client
 
-The Python SDK makes API calls using the [requests](https://pypi.org/project/requests/) HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with a custom `requests.Session` object.
+The Python SDK makes API calls using the [httpx](https://www.python-httpx.org/) HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with your own HTTP client instance.
+Depending on whether you are using the sync or async version of the SDK, you can pass an instance of `HttpClient` or `AsyncHttpClient` respectively, which are Protocol's ensuring that the client has the necessary methods to make API calls.
+This allows you to wrap the client with your own custom logic, such as adding custom headers, logging, or error handling, or you can just pass an instance of `httpx.Client` or `httpx.AsyncClient` directly.
 
 For example, you could specify a header for every request that this sdk makes as follows:
 ```python
-import unstructured_client
-import requests
+from unstructured_client import UnstructuredClient
+import httpx
 
-http_client = requests.Session()
-http_client.headers.update({'x-custom-header': 'someValue'})
-s = unstructured_client.UnstructuredClient(client=http_client)
+http_client = httpx.Client(headers={"x-custom-header": "someValue"})
+s = UnstructuredClient(client=http_client)
+```
+
+or you could wrap the client with your own custom logic:
+```python
+from unstructured_client import UnstructuredClient
+from unstructured_client.httpclient import AsyncHttpClient
+import httpx
+
+class CustomClient(AsyncHttpClient):
+    client: AsyncHttpClient
+
+    def __init__(self, client: AsyncHttpClient):
+        self.client = client
+
+    async def send(
+        self,
+        request: httpx.Request,
+        *,
+        stream: bool = False,
+        auth: Union[
+            httpx._types.AuthTypes, httpx._client.UseClientDefault, None
+        ] = httpx.USE_CLIENT_DEFAULT,
+        follow_redirects: Union[
+            bool, httpx._client.UseClientDefault
+        ] = httpx.USE_CLIENT_DEFAULT,
+    ) -> httpx.Response:
+        request.headers["Client-Level-Header"] = "added by client"
+
+        return await self.client.send(
+            request, stream=stream, auth=auth, follow_redirects=follow_redirects
+        )
+
+    def build_request(
+        self,
+        method: str,
+        url: httpx._types.URLTypes,
+        *,
+        content: Optional[httpx._types.RequestContent] = None,
+        data: Optional[httpx._types.RequestData] = None,
+        files: Optional[httpx._types.RequestFiles] = None,
+        json: Optional[Any] = None,
+        params: Optional[httpx._types.QueryParamTypes] = None,
+        headers: Optional[httpx._types.HeaderTypes] = None,
+        cookies: Optional[httpx._types.CookieTypes] = None,
+        timeout: Union[
+            httpx._types.TimeoutTypes, httpx._client.UseClientDefault
+        ] = httpx.USE_CLIENT_DEFAULT,
+        extensions: Optional[httpx._types.RequestExtensions] = None,
+    ) -> httpx.Request:
+        return self.client.build_request(
+            method,
+            url,
+            content=content,
+            data=data,
+            files=files,
+            json=json,
+            params=params,
+            headers=headers,
+            cookies=cookies,
+            timeout=timeout,
+            extensions=extensions,
+        )
+
+s = UnstructuredClient(async_client=CustomClient(httpx.AsyncClient()))
 ```
 <!-- End Custom HTTP Client [http-client] -->
 
@@ -215,6 +289,47 @@ s = unstructured_client.UnstructuredClient(client=http_client)
 <!-- No Error Handling -->
 <!-- No Server Selection -->
 <!-- No Authentication -->
+
+<!-- Start File uploads [file-upload] -->
+## File uploads
+
+Certain SDK methods accept file objects as part of a request body or multi-part request. It is possible and typically recommended to upload files as a stream rather than reading the entire contents into memory. This avoids excessive memory consumption and potentially crashing with out-of-memory errors when working with very large files. The following example demonstrates how to attach a file stream to a request.
+
+> [!TIP]
+>
+> For endpoints that handle file uploads bytes arrays can also be used. However, using streams is recommended for large files.
+>
+
+```python
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
+
+s = UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
+
+
+res = s.general.partition(request={
+    "partition_parameters": {
+        "files": {
+            "content": open("<file_path>", "rb"),
+            "file_name": "your_file_here",
+        },
+        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+        "split_pdf_page_range": [
+            1,
+            10,
+        ],
+        "strategy": shared.Strategy.HI_RES,
+    },
+})
+
+if res.elements is not None:
+    # handle response
+    pass
+
+```
+<!-- End File uploads [file-upload] -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 

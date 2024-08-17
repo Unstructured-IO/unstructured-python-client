@@ -10,7 +10,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.25.5
+  version: 0.26.0
   additionalDependencies:
     dev: {}
     main:
@@ -23,7 +23,9 @@ python:
     - Unstructured
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API
+  enumFormat: enum
   flattenGlobalSecurity: true
+  flattenRequests: false
   imports:
     option: openapi
     paths:

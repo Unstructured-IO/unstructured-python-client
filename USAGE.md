@@ -1,29 +1,65 @@
 <!-- Start SDK Example Usage [usage] -->
 ```python
-import unstructured_client
-from unstructured_client.models import operations, shared
+# Synchronous Example
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
-s = unstructured_client.UnstructuredClient()
+s = UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
 
 
-res = s.general.partition(request=operations.PartitionRequest(
-    partition_parameters=shared.PartitionParameters(
-        files=shared.Files(
-            content='0x2cC94b2FEF'.encode(),
-            file_name='your_file_here',
-        ),
-        chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
-        split_pdf_page_range=[
+res = s.general.partition(request={
+    "partition_parameters": {
+        "files": {
+            "content": open("<file_path>", "rb"),
+            "file_name": "your_file_here",
+        },
+        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+        "split_pdf_page_range": [
             1,
             10,
         ],
-        strategy=shared.Strategy.HI_RES,
-    ),
-))
+        "strategy": shared.Strategy.HI_RES,
+    },
+})
 
 if res.elements is not None:
     # handle response
     pass
+```
 
+</br>
+
+The same SDK client can also be used to make asychronous requests by importing asyncio.
+```python
+# Asynchronous Example
+import asyncio
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
+
+async def main():
+    s = UnstructuredClient(
+        api_key_auth="YOUR_API_KEY",
+    )
+    res = await s.general.partition_async(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("<file_path>", "rb"),
+                "file_name": "your_file_here",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BASIC,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.AUTO,
+        },
+    })
+    if res.elements is not None:
+        # handle response
+        pass
+
+asyncio.run(main())
 ```
 <!-- End SDK Example Usage [usage] -->

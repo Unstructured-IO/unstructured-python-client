@@ -1,57 +1,76 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 17bd23e4247d7b65a92813afd1252693
+  docChecksum: a6ff17ff485bb4b5884d75af244e18a1
   docVersion: 1.0.44
-  speakeasyVersion: 1.361.1
-  generationVersion: 2.393.4
-  releaseVersion: 0.25.5
-  configChecksum: 6b4c1555edde75f4f1e422e49a07c208
+  speakeasyVersion: 1.346.0
+  generationVersion: 2.379.3
+  releaseVersion: 0.26.0
+  configChecksum: b455a107798458739736480ac5f51e86
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   published: true
 features:
   python:
-    additionalDependencies: 0.1.0
-    constsAndDefaults: 0.1.4
-    core: 4.8.4
-    examples: 2.81.3
-    globalSecurity: 2.83.7
-    globalSecurityCallbacks: 0.1.0
-    globalSecurityFlattening: 0.1.0
-    globalServerURLs: 2.82.2
-    nameOverrides: 2.81.2
-    nullables: 0.1.0
-    openEnums: 0.1.0
-    responseFormat: 0.1.0
-    retries: 2.82.2
-    sdkHooks: 0.1.0
-    serverIDs: 2.81.1
-    unions: 2.82.9
+    additionalDependencies: 1.0.0
+    constsAndDefaults: 1.0.0
+    core: 5.2.4
+    defaultEnabledRetries: 0.2.0
+    envVarSecurityUsage: 0.2.0
+    examples: 3.0.0
+    globalSecurity: 3.0.0
+    globalSecurityCallbacks: 1.0.0
+    globalSecurityFlattening: 1.0.0
+    globalServerURLs: 3.0.0
+    multipartFileContentType: 1.0.0
+    nameOverrides: 3.0.0
+    nullables: 1.0.0
+    openEnums: 1.0.0
+    responseFormat: 1.0.0
+    retries: 3.0.0
+    sdkHooks: 1.0.0
+    serverIDs: 3.0.0
+    unions: 3.0.1
+    uploadStreams: 1.0.0
 generatedFiles:
   - src/unstructured_client/sdkconfiguration.py
   - src/unstructured_client/general.py
   - src/unstructured_client/sdk.py
+  - .vscode/settings.json
   - py.typed
   - pylintrc
+  - pyproject.toml
   - scripts/publish.sh
-  - setup.py
   - src/unstructured_client/__init__.py
+  - src/unstructured_client/basesdk.py
+  - src/unstructured_client/httpclient.py
+  - src/unstructured_client/py.typed
+  - src/unstructured_client/types/__init__.py
+  - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
+  - src/unstructured_client/utils/annotations.py
   - src/unstructured_client/utils/enums.py
+  - src/unstructured_client/utils/eventstreaming.py
+  - src/unstructured_client/utils/forms.py
+  - src/unstructured_client/utils/headers.py
+  - src/unstructured_client/utils/metadata.py
+  - src/unstructured_client/utils/queryparams.py
+  - src/unstructured_client/utils/requestbodies.py
   - src/unstructured_client/utils/retries.py
-  - src/unstructured_client/utils/utils.py
+  - src/unstructured_client/utils/security.py
+  - src/unstructured_client/utils/serializers.py
+  - src/unstructured_client/utils/url.py
+  - src/unstructured_client/utils/values.py
   - src/unstructured_client/models/errors/sdkerror.py
   - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/errors/servererror.py
+  - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/shared/validationerror.py
   - src/unstructured_client/models/shared/partition_parameters.py
   - src/unstructured_client/models/shared/security.py
-  - src/unstructured_client/models/__init__.py
-  - src/unstructured_client/models/errors/__init__.py
-  - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/shared/__init__.py
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
