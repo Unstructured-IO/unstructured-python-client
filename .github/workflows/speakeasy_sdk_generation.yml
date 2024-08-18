@@ -24,11 +24,10 @@ jobs:
             github_access_token: ${{ secrets.GITHUB_TOKEN }}
             pypi_token: ${{ secrets.PYPI_TOKEN }}
             speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
-  # We don't need this unless we're modifying the generated code
-  patch-custom-code:
-    runs-on: ubuntu-latest
-    needs: [generate]
-    steps:
-    - name: Patch in custom code after regenerating
-      run: make patch-custom-code
+    patch-custom-code:
+      runs-on: ubuntu-latest
+      needs: [generate]
+      steps:
+      - name: Patch in custom code after regenerating
+        run: make patch-custom-code
 

@@ -23,6 +23,8 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
+NOTE: This README is for the `0.26.0-beta` version. The current published SDK, `0.25.5` can be found [here](https://github.com/Unstructured-IO/unstructured-python-client/blob/v0.25.5/README.md).
+
 This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/overview).
 
 Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk-python) for a full guide to using the client.
