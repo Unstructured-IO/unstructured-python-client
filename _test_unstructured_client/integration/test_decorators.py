@@ -2,7 +2,7 @@ import pytest
 import requests
 from deepdiff import DeepDiff
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import HTTPValidationError
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -49,7 +49,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
         files.file_name += ".pdf"
 
-    req = shared.PartitionParameters(
+    parameters = shared.PartitionParameters(
         files=files,
         strategy=strategy,
         languages=["eng"],
@@ -57,8 +57,12 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         split_pdf_concurrency_level=concurrency_level,
     )
 
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
     try:
-        resp_split = client.general.partition(req)
+        resp_split = client.general.partition(request=req)
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
             assert "The file does not appear to be a valid PDF." in caplog.text
@@ -67,8 +71,13 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         else:
             assert exc is None
 
-    req.split_pdf_page = False
-    resp_single = client.general.partition(req)
+    parameters.split_pdf_page = False
+
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
+    resp_single = client.general.partition(request=req)
 
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type
@@ -102,14 +111,16 @@ def test_integration_split_pdf_for_file_with_no_name():
             file_name="    ",
         )
 
-    req = shared.PartitionParameters(
-        files=files,
-        strategy="fast",
-        languages=["eng"],
-        split_pdf_page=True,
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            languages=["eng"],
+            split_pdf_page=True,
+        )
     )
 
-    pytest.raises(ValueError, client.general.partition, req)
+    pytest.raises(ValueError, client.general.partition, request=req)
 
 
 @pytest.mark.parametrize("starting_page_number", [1, 100])
@@ -157,16 +168,18 @@ def test_integration_split_pdf_with_page_range(
             file_name=filename,
         )
 
-    req = shared.PartitionParameters(
-        files=files,
-        strategy="fast",
-        split_pdf_page=True,
-        split_pdf_page_range=page_range,
-        starting_page_number=starting_page_number,
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            split_pdf_page=True,
+            split_pdf_page_range=page_range,
+            starting_page_number=starting_page_number,
+        )
     )
 
     try:
-        resp = client.general.partition(req)
+        resp = client.general.partition(request=req)
     except ValueError as exc:
         assert not expected_ok
         assert "is out of bounds." in caplog.text
@@ -219,7 +232,7 @@ def test_integration_split_pdf_strict_mode(
         # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
         files.file_name += ".pdf"
 
-    req = shared.PartitionParameters(
+    parameters = shared.PartitionParameters(
         files=files,
         strategy=strategy,
         languages=["eng"],
@@ -228,8 +241,12 @@ def test_integration_split_pdf_strict_mode(
         split_pdf_allow_failed=allow_failed,
     )
 
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
     try:
-        resp_split = client.general.partition(req)
+        resp_split = client.general.partition(request=req)
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
             assert "The file does not appear to be a valid PDF." in caplog.text
@@ -238,8 +255,13 @@ def test_integration_split_pdf_strict_mode(
         else:
             assert exc is None
 
-    req.split_pdf_page = False
-    resp_single = client.general.partition(req)
+    parameters.split_pdf_page = False
+
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
+    resp_single = client.general.partition(request=req)
 
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type

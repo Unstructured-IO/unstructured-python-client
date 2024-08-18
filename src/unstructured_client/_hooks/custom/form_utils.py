@@ -214,7 +214,7 @@ def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
             filename = part_params.get("filename")
             if filename is None or not filename.strip():
                 raise ValueError("Filename can't be an empty string.")
-            form_data[PARTITION_FORM_FILES_KEY] = shared.Files(part.content, filename)
+            form_data[PARTITION_FORM_FILES_KEY] = shared.Files(content=part.content, file_name=filename)
         else:
             content = part.content.decode()
             if name in form_data:

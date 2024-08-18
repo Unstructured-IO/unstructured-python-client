@@ -235,7 +235,7 @@ def test_unit_parse_form_data():
 
     # Expected results
     expected_form_data = {
-        "files": shared.Files(b"file_content", "test_file.pdf"),
+        "files": shared.Files(content=b"file_content", file_name="test_file.pdf"),
         "parameter_1": "value_1",
         "parameter_2": "value_2",
         "list_parameter": ["value_1", "value_2"],
@@ -310,7 +310,7 @@ def test_unit_is_pdf_valid_pdf():
 
 def test_unit_is_pdf_invalid_extension(caplog):
     """Test is pdf method returns False for file with invalid extension."""
-    file = shared.Files(b"txt_content", "test_file.txt")
+    file = shared.Files(content=b"txt_content", file_name="test_file.txt")
 
     with caplog.at_level(logging.INFO):
         result = pdf_utils.is_pdf(file)
@@ -321,7 +321,7 @@ def test_unit_is_pdf_invalid_extension(caplog):
 
 def test_unit_is_pdf_invalid_pdf(caplog):
     """Test is pdf method returns False for file with invalid pdf content."""
-    file = shared.Files(b"invalid_pdf_content", "test_file.pdf")
+    file = shared.Files(content=b"invalid_pdf_content", file_name="test_file.pdf")
 
     with caplog.at_level(logging.WARNING):
         result = pdf_utils.is_pdf(file)
