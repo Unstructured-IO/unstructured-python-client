@@ -19,6 +19,9 @@ class PartitionRequestTypedDict(TypedDict):
 class PartitionRequest(BaseModel):
     partition_parameters: Annotated[shared_partition_parameters.PartitionParameters, FieldMetadata(request=RequestMetadata(media_type="multipart/form-data"))]
     unstructured_api_key: Annotated[OptionalNullable[str], pydantic.Field(alias="unstructured-api-key"), FieldMetadata(header=HeaderMetadata(style="simple", explode=False))] = UNSET
+
+    def __init__(self, partition_parameters, **kwargs):
+        BaseModel.__init__(self, partition_parameters=partition_parameters, **kwargs)
     
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
