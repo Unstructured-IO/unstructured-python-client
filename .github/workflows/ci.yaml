@@ -36,7 +36,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: pip install .[dev]
+      run: pip install pylint
     - name: Lint
       run: make lint
 
