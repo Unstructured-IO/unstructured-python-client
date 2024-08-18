@@ -106,20 +106,32 @@ def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
         strategy="backoff", backoff=backoff_strategy, retry_connection_errors=True
     )
 
-    with requests_mock.Mocker() as mock:
-        mock.post("https://api.unstructuredapp.io/general/v0/general", status_code=status_code)
-        session = UnstructuredClient(api_key_auth=FAKE_KEY)
+    number_of_requests = [0]
+    def mock_post(request):
+        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+            number_of_requests[0] += 1
+            return Response(status_code, request=request)
 
-        with open(filename, "rb") as f:
-            files = shared.Files(content=f.read(), file_name=filename)
 
-        req = shared.PartitionParameters(files=files)
-        with pytest.raises(Exception, match=f"unknown content-type received: None: Status {status_code}"):
-            session.general.partition(req, retries=retries)
+    transport = httpx.MockTransport(mock_post)
+    client = httpx.Client(transport=transport)
+    session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
+
+
+    with open(filename, "rb") as f:
+        files = shared.Files(content=f.read(), file_name=filename)
+
+    req = operations.PartitionRequest(
+        shared.PartitionParameters(files=files)
+    )
+
+    with pytest.raises(Exception, match=f"Status {status_code}"):
+        session.general.partition(req, retries=retries)
+
     if expect_retry:
-        assert len(mock.request_history) > 1
+        assert number_of_requests[0] > 1
     else:
-        assert len(mock.request_history) == 1
+        assert number_of_requests[0] == 1
 
 
 def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
