@@ -320,7 +320,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return None
 
         ioloop = asyncio.get_event_loop()
-        # TODO New response type
         task_responses: list[tuple[int, httpx.Response]] = ioloop.run_until_complete(
             run_tasks(tasks, allow_failed=self.allow_failed)
         )
@@ -387,7 +386,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         updated_response = request_utils.create_response(response, elements)
         self._clear_operation(operation_id)
 
-        # TODO
         return updated_response
 
     def after_error(
