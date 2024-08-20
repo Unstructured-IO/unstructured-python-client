@@ -13,7 +13,7 @@ install-test:
 
 .PHONY: install-dev
 install-dev:
-	pip install jupyter
+	pip install jupyter uvloop
 	pip install pylint mypy
 
 ## install:					installs all test, dev, and experimental requirements
