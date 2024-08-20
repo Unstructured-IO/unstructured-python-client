@@ -10,7 +10,7 @@ from typing import Optional, Tuple, Any
 import httpx
 import requests
 from requests.structures import CaseInsensitiveDict
-from requests_toolbelt.multipart.encoder import MultipartEncoder
+from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
@@ -51,18 +51,6 @@ def create_request_body(
     return body
 
 
-def create_httpx_request(
-    original_request: requests.Request, body: MultipartEncoder
-) -> httpx.Request:
-    headers = prepare_request_headers(original_request.headers)
-    return httpx.Request(
-        method="POST",
-        url=original_request.url or "",
-        content=body.to_string(),
-        headers={**headers, "Content-Type": body.content_type},
-    )
-
-
 def create_request(
     request: requests.PreparedRequest,
     body: MultipartEncoder,
@@ -79,21 +67,24 @@ def create_request(
 async def call_api_async(
     client: httpx.AsyncClient,
     page: Tuple[io.BytesIO, int],
-    original_request: requests.Request,
+    original_request: httpx.Request,
     form_data: FormData,
     filename: str,
     limiter: asyncio.Semaphore,
-) -> tuple[int, dict]:
+) -> httpx.Response:
     page_content, page_number = page
     body = create_request_body(form_data, page_content, filename, page_number)
-    new_request = create_httpx_request(original_request, body)
+
+    new_request = httpx.Request(
+        method="POST",
+        url=original_request.url or "",
+        content=body.to_string(),
+        headers={**original_request.headers, "Content-Type": body.content_type},
+    )
+
     async with limiter:
-        try:
-            response = await client.send(new_request)
-            return response.status_code, response.json()
-        except Exception:
-            logger.error("Failed to send request for page %d", page_number)
-            return 500, {}
+        response = await client.send(new_request)
+        return response
 
 
 def call_api(
@@ -157,7 +148,7 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
-def create_response(response: requests.Response, elements: list) -> requests.Response:
+def create_response(response: httpx.Response, elements: list) -> httpx.Response:
     """
     Creates a modified response object with updated content.
 

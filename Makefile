@@ -14,7 +14,7 @@ install-test:
 .PHONY: install-dev
 install-dev:
 	pip install jupyter
-	pip install pylint
+	pip install pylint mypy
 
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
@@ -48,6 +48,7 @@ test-integration-docker:
 .PHONY: lint
 lint:
 	pylint --rcfile=pylintrc src
+	mypy src
 
 #############
 # Speakeasy #
