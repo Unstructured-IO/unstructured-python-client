@@ -5,11 +5,9 @@ import copy
 import io
 import json
 import logging
-from typing import Optional, Tuple, Any
+from typing import Tuple, Any
 
 import httpx
-import requests
-from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -51,19 +49,6 @@ def create_request_body(
     return body
 
 
-def create_request(
-    request: requests.PreparedRequest,
-    body: MultipartEncoder,
-) -> requests.Request:
-    headers = prepare_request_headers(request.headers)
-    return requests.Request(
-        method="POST",
-        url=request.url or "",
-        data=body,
-        headers={**headers, "Content-Type": body.content_type},
-    )
-
-
 async def call_api_async(
     client: httpx.AsyncClient,
     page: Tuple[io.BytesIO, int],
@@ -87,31 +72,9 @@ async def call_api_async(
         return response
 
 
-def call_api(
-    client: Optional[requests.Session],
-    page: Tuple[io.BytesIO, int],
-    request: requests.PreparedRequest,
-    form_data: FormData,
-    filename: str,
-) -> requests.Response:
-    if client is None:
-        raise RuntimeError("HTTP client not accessible!")
-    page_content, page_number = page
-
-    body = create_request_body(form_data, page_content, filename, page_number)
-    new_request = create_request(request, body)
-    prepared_request = client.prepare_request(new_request)
-
-    try:
-        return client.send(prepared_request)
-    except Exception:
-        logger.error("Failed to send request for page %d", page_number)
-        return requests.Response()
-
-
 def prepare_request_headers(
-    headers: CaseInsensitiveDict[str],
-) -> CaseInsensitiveDict[str]:
+    headers: dict[str, str],
+) -> dict[str, str]:
     """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
 
     Args:
