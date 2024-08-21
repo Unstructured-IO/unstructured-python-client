@@ -59,12 +59,13 @@ async def call_api_async(
 ) -> httpx.Response:
     page_content, page_number = page
     body = create_request_body(form_data, page_content, filename, page_number)
+    original_headers = prepare_request_headers(original_request.headers)
 
     new_request = httpx.Request(
         method="POST",
         url=original_request.url or "",
         content=body.to_string(),
-        headers={**original_request.headers, "Content-Type": body.content_type},
+        headers={**original_headers, "Content-Type": body.content_type},
     )
 
     async with limiter:
@@ -73,8 +74,8 @@ async def call_api_async(
 
 
 def prepare_request_headers(
-    headers: dict[str, str],
-) -> dict[str, str]:
+    headers: httpx.Headers,
+) -> httpx.Headers:
     """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
 
     Args:
@@ -83,10 +84,10 @@ def prepare_request_headers(
     Returns:
         The modified request headers.
     """
-    headers = copy.deepcopy(headers)
-    headers.pop("Content-Type", None)
-    headers.pop("Content-Length", None)
-    return headers
+    new_headers = headers.copy()
+    new_headers.pop("Content-Type", None)
+    new_headers.pop("Content-Length", None)
+    return new_headers
 
 
 def prepare_request_payload(form_data: FormData) -> FormData:

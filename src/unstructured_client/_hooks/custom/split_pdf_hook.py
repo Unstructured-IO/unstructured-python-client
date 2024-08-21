@@ -14,6 +14,7 @@ from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
+from unstructured_client._hooks.custom.request_utils import prepare_request_headers
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_FILES_KEY,
@@ -291,11 +292,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         original_request = request
+        original_headers = prepare_request_headers(original_request.headers)
         last_page_request = httpx.Request(
             method="POST",
             url=original_request.url or "",
             content=body.to_string(),
-            headers={**original_request.headers, "Content-Type": body.content_type},
+            headers={**original_headers, "Content-Type": body.content_type},
         )
 
         return last_page_request
