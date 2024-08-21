@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Union
 
-from requests_toolbelt.multipart.decoder import MultipartDecoder
+from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client.models import shared
@@ -35,7 +35,7 @@ def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, 
     try:
         _page_range = form_data.get(key)
 
-        if _page_range is not None:
+        if isinstance(_page_range, list):
             page_range = (int(_page_range[0]), int(_page_range[1]))
         else:
             page_range = (1, max_pages)
@@ -108,7 +108,7 @@ def get_split_pdf_allow_failed_param(
     """
     allow_failed = form_data.get(key)
 
-    if allow_failed is None:
+    if not isinstance(allow_failed, str):
         return fallback_value
 
     if allow_failed.lower() not in ["true", "false"]:
@@ -120,6 +120,7 @@ def get_split_pdf_allow_failed_param(
         return fallback_value
 
     return allow_failed.lower() == "true"
+
 
 def get_split_pdf_concurrency_level_param(
     form_data: FormData, key: str, fallback_value: int, max_allowed: int
@@ -140,7 +141,7 @@ def get_split_pdf_concurrency_level_param(
     """
     concurrency_level_str = form_data.get(key)
 
-    if concurrency_level_str is None:
+    if not isinstance(concurrency_level_str, str):
         return fallback_value
 
     try:
@@ -218,10 +219,12 @@ def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
         else:
             content = part.content.decode()
             if name in form_data:
-                if isinstance(form_data[name], list):
-                    form_data[name].append(content)
+                form_data_value = form_data[name]
+                if isinstance(form_data_value, list):
+                    form_data_value.append(content)
                 else:
-                    form_data[name] = [form_data[name], content]
+                    new_list = [form_data_value, content]
+                    form_data[name] = new_list
             else:
                 form_data[name] = content
 

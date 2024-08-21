@@ -126,57 +126,6 @@ def test_unit_create_response():
     assert response.headers.get("Content-Length"), expected_content_length
 
 
-def test_unit_create_request():
-    """Test create request method properly sets file, Content-Type and Content-Length headers.
-    List parameters should be flattened in the body."""
-
-    # Prepare test data
-    request = requests.PreparedRequest()
-    request.headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer token",
-    }
-    form_data = {
-        "parameter_1": "value_1",
-        "parameter_2": "value_2",
-        "list_parameter": ["value_1", "value_2"],
-    }
-    page = (io.BytesIO(b"page_content"), 1)
-    filename = "test_file.pdf"
-
-    # Expected results
-    expected_page_filename = "test_file.pdf"
-    expected_body = MultipartEncoder(
-        fields=[
-            ("parameter_1", "value_1"),
-            ("parameter_2", "value_2"),
-            ("list_parameter", "value_1"),
-            ("list_parameter", "value_2"),
-            ("split_pdf_page", "false"),
-            ("starting_page_number", "7"),
-            ("files", (
-                expected_page_filename,
-                page[0],
-                "application/pdf",
-            )),
-        ]
-    )
-    expected_url = ""
-
-    # Create request
-    body = request_utils.create_request_body(form_data, page[0], filename, 7)
-    request_obj = request_utils.create_request(request, body)
-    request_content_type: str = request_obj.headers.get("Content-Type")
-    # Assert the request object
-    assert request_obj.method == "POST"
-    assert request_obj.url == expected_url
-
-    # Validate fields ignoring order
-    assert set(request_obj.data.fields) == set(expected_body.fields)
-
-    assert request_content_type.startswith("multipart/form-data")
-
-
 def test_unit_decode_content_disposition():
     """Test decode content disposition method properly decodes Content-Disposition header."""
 
@@ -362,13 +311,13 @@ def test_get_optimal_split_size(num_pages, concurrency_level, expected_split_siz
     ("form_data", "expected_result"),
     [
         ({}, DEFAULT_CONCURRENCY_LEVEL),  # no value
-        ({"split_pdf_concurrency_level": 10}, 10),  # valid number
+        ({"split_pdf_concurrency_level": "10"}, 10),  # valid number
         (
                 # exceeds max value
                 {"split_pdf_concurrency_level": f"{MAX_CONCURRENCY_LEVEL + 1}"},
                 MAX_CONCURRENCY_LEVEL,
         ),
-        ({"split_pdf_concurrency_level": -3}, DEFAULT_CONCURRENCY_LEVEL),  # negative value
+        ({"split_pdf_concurrency_level": "-3"}, DEFAULT_CONCURRENCY_LEVEL),  # negative value
     ],
 )
 def test_unit_get_split_pdf_concurrency_level_returns_valid_number(form_data, expected_result):

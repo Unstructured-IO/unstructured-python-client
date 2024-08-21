@@ -1,6 +1,6 @@
 import io
 import logging
-from typing import Generator, Tuple, Optional
+from typing import cast, Generator, Tuple, Optional
 
 from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PdfReadError
@@ -70,7 +70,8 @@ def is_pdf(file: shared.Files) -> bool:
         return False
 
     try:
-        PdfReader(io.BytesIO(file.content), strict=True)
+        content = cast(bytes, file.content)
+        PdfReader(io.BytesIO(content), strict=True)
     except (PdfReadError, UnicodeDecodeError) as exc:
         logger.error(exc)
         logger.warning("The file does not appear to be a valid PDF.")

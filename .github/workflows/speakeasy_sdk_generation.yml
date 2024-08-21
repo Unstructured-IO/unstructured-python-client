@@ -24,10 +24,3 @@ jobs:
             github_access_token: ${{ secrets.GITHUB_TOKEN }}
             pypi_token: ${{ secrets.PYPI_TOKEN }}
             speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
-    patch-custom-code:
-      runs-on: ubuntu-latest
-      needs: [generate]
-      steps:
-      - name: Patch in custom code after regenerating
-        run: make patch-custom-code
-

@@ -5,12 +5,10 @@ import copy
 import io
 import json
 import logging
-from typing import Optional, Tuple, Any
+from typing import Tuple, Any
 
 import httpx
-import requests
-from requests.structures import CaseInsensitiveDict
-from requests_toolbelt.multipart.encoder import MultipartEncoder
+from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
@@ -51,76 +49,33 @@ def create_request_body(
     return body
 
 
-def create_httpx_request(
-    original_request: requests.Request, body: MultipartEncoder
-) -> httpx.Request:
-    headers = prepare_request_headers(original_request.headers)
-    return httpx.Request(
-        method="POST",
-        url=original_request.url or "",
-        content=body.to_string(),
-        headers={**headers, "Content-Type": body.content_type},
-    )
-
-
-def create_request(
-    request: requests.PreparedRequest,
-    body: MultipartEncoder,
-) -> requests.Request:
-    headers = prepare_request_headers(request.headers)
-    return requests.Request(
-        method="POST",
-        url=request.url or "",
-        data=body,
-        headers={**headers, "Content-Type": body.content_type},
-    )
-
-
 async def call_api_async(
     client: httpx.AsyncClient,
     page: Tuple[io.BytesIO, int],
-    original_request: requests.Request,
+    original_request: httpx.Request,
     form_data: FormData,
     filename: str,
     limiter: asyncio.Semaphore,
-) -> tuple[int, dict]:
+) -> httpx.Response:
     page_content, page_number = page
     body = create_request_body(form_data, page_content, filename, page_number)
-    new_request = create_httpx_request(original_request, body)
+    original_headers = prepare_request_headers(original_request.headers)
+
+    new_request = httpx.Request(
+        method="POST",
+        url=original_request.url or "",
+        content=body.to_string(),
+        headers={**original_headers, "Content-Type": body.content_type},
+    )
+
     async with limiter:
-        try:
-            response = await client.send(new_request)
-            return response.status_code, response.json()
-        except Exception:
-            logger.error("Failed to send request for page %d", page_number)
-            return 500, {}
-
-
-def call_api(
-    client: Optional[requests.Session],
-    page: Tuple[io.BytesIO, int],
-    request: requests.PreparedRequest,
-    form_data: FormData,
-    filename: str,
-) -> requests.Response:
-    if client is None:
-        raise RuntimeError("HTTP client not accessible!")
-    page_content, page_number = page
-
-    body = create_request_body(form_data, page_content, filename, page_number)
-    new_request = create_request(request, body)
-    prepared_request = client.prepare_request(new_request)
-
-    try:
-        return client.send(prepared_request)
-    except Exception:
-        logger.error("Failed to send request for page %d", page_number)
-        return requests.Response()
+        response = await client.send(new_request)
+        return response
 
 
 def prepare_request_headers(
-    headers: CaseInsensitiveDict[str],
-) -> CaseInsensitiveDict[str]:
+    headers: httpx.Headers,
+) -> httpx.Headers:
     """Prepare the request headers by removing the 'Content-Type' and 'Content-Length' headers.
 
     Args:
@@ -129,10 +84,10 @@ def prepare_request_headers(
     Returns:
         The modified request headers.
     """
-    headers = copy.deepcopy(headers)
-    headers.pop("Content-Type", None)
-    headers.pop("Content-Length", None)
-    return headers
+    new_headers = headers.copy()
+    new_headers.pop("Content-Type", None)
+    new_headers.pop("Content-Length", None)
+    return new_headers
 
 
 def prepare_request_payload(form_data: FormData) -> FormData:
@@ -157,7 +112,7 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
-def create_response(response: requests.Response, elements: list) -> requests.Response:
+def create_response(response: httpx.Response, elements: list) -> httpx.Response:
     """
     Creates a modified response object with updated content.
 
