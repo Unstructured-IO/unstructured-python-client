@@ -35,7 +35,7 @@ def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, 
     try:
         _page_range = form_data.get(key)
 
-        if _page_range is not None and isinstance(_page_range, list):
+        if isinstance(_page_range, list):
             page_range = (int(_page_range[0]), int(_page_range[1]))
         else:
             page_range = (1, max_pages)
@@ -108,7 +108,7 @@ def get_split_pdf_allow_failed_param(
     """
     allow_failed = form_data.get(key)
 
-    if allow_failed is None or not isinstance(allow_failed, str):
+    if not isinstance(allow_failed, str):
         return fallback_value
 
     if allow_failed.lower() not in ["true", "false"]:
@@ -141,7 +141,7 @@ def get_split_pdf_concurrency_level_param(
     """
     concurrency_level_str = form_data.get(key)
 
-    if concurrency_level_str is None or not isinstance(concurrency_level_str, str):
+    if not isinstance(concurrency_level_str, str):
         return fallback_value
 
     try:
