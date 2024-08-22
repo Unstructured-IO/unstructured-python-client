@@ -290,8 +290,7 @@ def test_split_pdf_requests_do_retry(monkeypatch):
     """
     Test that when we split a pdf, the split requests will honor retryable errors.
     """
-    # This is in a list so we can pass a reference to the mock function
-    number_of_502s = [1]
+    number_of_502s = 1
 
     async def mock_send(_, request):
         """
@@ -306,9 +305,10 @@ def test_split_pdf_requests_do_retry(monkeypatch):
         decoded_body = MultipartDecoder(request_body, request.headers.get("Content-Type"))
         form_data = form_utils.parse_form_data(decoded_body)
 
-        if number_of_502s[0] > 0:
+        nonlocal number_of_502s
+        if number_of_502s > 0:
             if "starting_page_number" in form_data and int(form_data["starting_page_number"]) < 3:
-                number_of_502s[0] -= 1
+                number_of_502s -= 1
                 return Response(502, request=request)
 
         mock_return_data = [{
@@ -348,5 +348,5 @@ def test_split_pdf_requests_do_retry(monkeypatch):
 
     res = sdk.general.partition(req)
 
-    assert number_of_502s[0] == 0
+    assert number_of_502s == 0
     assert res.status_code == 200
