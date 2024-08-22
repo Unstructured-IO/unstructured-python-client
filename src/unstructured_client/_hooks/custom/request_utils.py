@@ -75,10 +75,18 @@ async def call_api_async(
 
 
 async def send_request_async_with_retries(client: httpx.AsyncClient, request: httpx.Request):
+    # Hardcode the retry config until we can
+    # properly reuse the SDK logic
+    # (Values are in ms)
     retry_config = utils.RetryConfig(
         "backoff",
-        utils.BackoffStrategy(2000, 60000, 1.5, 900000),
-        True
+        utils.BackoffStrategy(
+            initial_interval=2000,
+            max_interval=60000,
+            exponent=1.5,
+            max_elapsed_time=1000 * 60 * 5  # 5 minutes
+        ),
+        retry_connection_errors=True
     )
 
     retryable_codes = [
