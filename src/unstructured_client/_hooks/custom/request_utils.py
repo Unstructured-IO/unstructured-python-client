@@ -90,7 +90,6 @@ async def send_request_async_with_retries(client: httpx.AsyncClient, request: ht
     async def do_request():
         return await client.send(request)
 
-    logger.error("Ready to retry")
     response = await utils.retry_async(
         do_request,
         utils.Retries(retry_config, retryable_codes)
