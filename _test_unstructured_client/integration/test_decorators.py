@@ -1,9 +1,18 @@
+import httpx
+import json
 import pytest
 import requests
 from deepdiff import DeepDiff
+from httpx import Response
+
+from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
+
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import HTTPValidationError
+from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
+from unstructured_client._hooks.custom import form_utils
+from unstructured_client._hooks.custom import split_pdf_hook
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
@@ -275,3 +284,80 @@ def test_integration_split_pdf_strict_mode(
         ],
     )
     assert len(diff) == 0
+
+
+@pytest.mark.asyncio
+async def test_split_pdf_requests_do_retry(monkeypatch):
+    """
+    Test that when we split a pdf, the split requests will honor retryable errors.
+    """
+    number_of_split_502s = 2
+    number_of_last_page_502s = 2
+
+    async def mock_send(_, request):
+        """
+        Return a predefined number of 502s for requests with certain starting_page_number values.
+
+        This is because N-1 splits are sent off in the hook logic. These need explicit retry handling.
+        The final split is returned to the SDK and gets the built in retry code.
+
+        We want to make sure both code paths are retried.
+        """
+        request_body = request.read()
+        decoded_body = MultipartDecoder(request_body, request.headers.get("Content-Type"))
+        form_data = form_utils.parse_form_data(decoded_body)
+
+        nonlocal number_of_split_502s
+        nonlocal number_of_last_page_502s
+
+        if number_of_split_502s > 0:
+            if "starting_page_number" in form_data and int(form_data["starting_page_number"]) < 3:
+                number_of_split_502s -= 1
+                return Response(502, request=request)
+
+        if number_of_last_page_502s > 0:
+            if "starting_page_number" in form_data and int(form_data["starting_page_number"]) > 12:
+                number_of_last_page_502s -= 1
+                return Response(502, request=request)
+
+        mock_return_data = [{
+            "type": "Title",
+            "text": "Hello",
+        }]
+
+        return Response(
+            200,
+            request=request,
+            content=json.dumps(mock_return_data),
+            headers={"Content-Type": "application/json"},
+        )
+
+    monkeypatch.setattr(split_pdf_hook.httpx.AsyncClient, "send", mock_send)
+
+    sdk = UnstructuredClient(
+        api_key_auth=FAKE_KEY,
+        server_url="localhost:8000",
+        retry_config=RetryConfig("backoff", BackoffStrategy(200, 1000, 1.5, 1000), False),
+    )
+
+    filename = "_sample_docs/layout-parser-paper.pdf"
+    with open(filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        shared.PartitionParameters(
+            files=files,
+            split_pdf_page=True,
+            split_pdf_allow_failed=False,
+            strategy="fast",
+        )
+    )
+
+    res = await sdk.general.partition_async(request=req)
+
+    assert number_of_split_502s == 0
+    assert number_of_last_page_502s == 0
+    assert res.status_code == 200

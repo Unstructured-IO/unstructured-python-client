@@ -168,7 +168,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data = form_utils.parse_form_data(decoded_body)
         split_pdf_page = form_data.get(PARTITION_FORM_SPLIT_PDF_PAGE_KEY)
         if split_pdf_page is None or split_pdf_page == "false":
-            logger.info("Partitioning without split.")
             return request
 
         logger.info("Preparing to split document for partition.")
@@ -287,6 +286,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # `before_request` method needs to return a request so we skip sending the last page in parallel
         # and return that last page at the end of this method
 
+        # Need to make sure the final page does not trigger splitting again
+        form_data[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
         body = request_utils.create_request_body(
             form_data, last_page_content, file.file_name, last_page_number
         )
@@ -413,12 +414,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             If requests were run in parallel, and at least one was successful, a combined
             response object; otherwise, the original response and exception.
         """
+        operation_id = hook_ctx.operation_id
 
         # if fails are disallowed - return response and error objects immediately
         if not self.allow_failed:
+            self._clear_operation(operation_id)
             return (response, error)
 
-        operation_id = hook_ctx.operation_id
         # We know that this request failed so we pass a failed or empty response to `_await_elements` method
         # where it checks if at least on of the other requests succeeded
         elements = self._await_elements(operation_id, response or httpx.Response(status_code=200))
