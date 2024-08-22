@@ -76,7 +76,7 @@ async def run_tasks(coroutines: list[Coroutine], allow_failed: bool = False) -> 
 def context_is_uvloop():
     """Return true if uvloop is installed and we're currently in a uvloop context. Our asyncio splitting code currently doesn't work under uvloop."""
     try:
-        import uvloop  # pylint: disable=import-outside-toplevel  # type: ignore[import]
+        import uvloop  # type: ignore[import]
         loop = asyncio.get_event_loop()
         return isinstance(loop, uvloop.Loop)
     except (ImportError, RuntimeError):
