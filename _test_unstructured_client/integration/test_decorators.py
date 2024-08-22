@@ -337,7 +337,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     sdk = UnstructuredClient(
         api_key_auth=FAKE_KEY,
         server_url="localhost:8000",
-        retry_config=RetryConfig("backoff", BackoffStrategy(200, 1000, 1.5, 1000), False),
+        retry_config=RetryConfig("backoff", BackoffStrategy(200, 1000, 1.5, 10000), False),
     )
 
     filename = "_sample_docs/layout-parser-paper.pdf"
