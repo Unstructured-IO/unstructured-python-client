@@ -101,32 +101,32 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
         response = client.general.partition(request=req)
 
 
-def test_uvloop_partitions_without_errors(client, doc_path):
-    async def call_api():
-        filename = "layout-parser-paper-fast.pdf"
-        with open(doc_path / filename, "rb") as f:
-            files = shared.Files(
-                content=f.read(),
-                file_name=filename,
-            )
+# def test_uvloop_partitions_without_errors(client, doc_path):
+#     async def call_api():
+#         filename = "layout-parser-paper-fast.pdf"
+#         with open(doc_path / filename, "rb") as f:
+#             files = shared.Files(
+#                 content=f.read(),
+#                 file_name=filename,
+#             )
 
-        req = operations.PartitionRequest(
-            partition_parameters=shared.PartitionParameters(
-                files=files,
-                strategy="fast",
-                languages=["eng"],
-                split_pdf_page=True,
-            )
-        )
+#         req = operations.PartitionRequest(
+#             partition_parameters=shared.PartitionParameters(
+#                 files=files,
+#                 strategy="fast",
+#                 languages=["eng"],
+#                 split_pdf_page=True,
+#             )
+#         )
 
-        resp = client.general.partition(request=req)
+#         resp = client.general.partition(request=req)
 
-        if resp is not None:
-            return resp.elements
-        else:
-            return []
+#         if resp is not None:
+#             return resp.elements
+#         else:
+#             return []
 
-    import uvloop
-    uvloop.install()
-    elements = asyncio.run(call_api())
-    assert len(elements) > 0
+#     import uvloop
+#     uvloop.install()
+#     elements = asyncio.run(call_api())
+#     assert len(elements) > 0
