@@ -19,6 +19,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
 )
+import unstructured_client.utils as utils
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -69,8 +70,33 @@ async def call_api_async(
     )
 
     async with limiter:
-        response = await client.send(new_request)
+        response = await send_request_async_with_retries(client, new_request)
         return response
+
+
+async def send_request_async_with_retries(client: httpx.AsyncClient, request: httpx.Request):
+    retry_config = utils.RetryConfig(
+        "backoff",
+        utils.BackoffStrategy(2000, 60000, 1.5, 900000),
+        True
+    )
+
+    retryable_codes = [
+        "502",
+        "503",
+        "504"
+    ]
+
+    async def do_request():
+        return await client.send(request)
+
+    logger.error("Ready to retry")
+    response = await utils.retry_async(
+        do_request,
+        utils.Retries(retry_config, retryable_codes)
+    )
+
+    return response
 
 
 def prepare_request_headers(
