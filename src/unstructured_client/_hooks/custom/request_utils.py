@@ -81,10 +81,10 @@ async def send_request_async_with_retries(client: httpx.AsyncClient, request: ht
     retry_config = utils.RetryConfig(
         "backoff",
         utils.BackoffStrategy(
-            initial_interval=2000,
-            max_interval=60000,
-            exponent=1.5,
-            max_elapsed_time=1000 * 60 * 5  # 5 minutes
+            initial_interval=3000,  # 3 seconds
+            max_interval=1000 * 60 * 12,  # 12 minutes
+            exponent=1.88, 
+            max_elapsed_time=1000 * 60 * 30  # 30 minutes
         ),
         retry_connection_errors=True
     )
