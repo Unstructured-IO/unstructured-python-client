@@ -19,7 +19,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
 )
-import unstructured_client.utils as utils
+from unstructured_client.utils import RetryConfig, retry_async, BackoffStrategy, Retries
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -78,9 +78,9 @@ async def send_request_async_with_retries(client: httpx.AsyncClient, request: ht
     # Hardcode the retry config until we can
     # properly reuse the SDK logic
     # (Values are in ms)
-    retry_config = utils.RetryConfig(
+    retry_config = RetryConfig(
         "backoff",
-        utils.BackoffStrategy(
+        BackoffStrategy(
             initial_interval=3000,  # 3 seconds
             max_interval=1000 * 60 * 12,  # 12 minutes
             exponent=1.88, 
@@ -98,9 +98,9 @@ async def send_request_async_with_retries(client: httpx.AsyncClient, request: ht
     async def do_request():
         return await client.send(request)
 
-    response = await utils.retry_async(
+    response = await retry_async(
         do_request,
-        utils.Retries(retry_config, retryable_codes)
+        Retries(retry_config, retryable_codes)
     )
 
     return response
