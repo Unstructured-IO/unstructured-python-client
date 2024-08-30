@@ -363,7 +363,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # if fails are disallowed, return the first failed response
         if not self.allow_failed and self.api_failed_responses.get(operation_id):
-            return self.api_failed_responses[operation_id][0]
+            first_failed_response = self.api_failed_responses[operation_id][0]
+            self._clear_operation(operation_id)
+            return request_utils.create_failure_response(first_failed_response)
 
         if elements is None:
             return response
@@ -395,7 +397,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             If requests were run in parallel, and at least one was successful, a combined
             response object; otherwise, the original response and exception.
         """
-        pass
+        return (response, error)
 
     def _clear_operation(self, operation_id: str) -> None:
         """

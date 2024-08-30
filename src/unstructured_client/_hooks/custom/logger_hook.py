@@ -55,7 +55,11 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
     ) -> Union[requests.Response, Exception]:
         self.retries_counter.pop(hook_ctx.operation_id, None)
         # NOTE: In case of split page partition this means - at least one of the splits was partitioned successfully
-        logger.info("Successfully partitioned the document.")
+        # Note(austin) - pdf splitting returns a mock request
+        # so we always reach the AfterSuccessHook
+        # This doesn't mean the splits succeeded
+        # Need to revisit our logging strategy
+        # logger.info("Successfully partitioned the document.")
         return response
 
     def after_error(

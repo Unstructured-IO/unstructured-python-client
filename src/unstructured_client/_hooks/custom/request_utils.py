@@ -157,6 +157,28 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
+def create_failure_response(response: requests.Response) -> requests.Response:
+    """
+    Convert the status code on the given response to a 500
+    This is because the split logic catches and retries 502, 503, etc
+    If a failure is passed back to the SDK, we shouldn't trigger
+    another layer of retries, we just want to print the error. 500 is
+    non retryable up above.
+
+    Args:
+        response: The original response object.
+        elements: The list of elements to be serialized and added to
+        the response.
+
+    Returns:
+        The modified response object with updated content.
+    """
+    response_copy = copy.deepcopy(response)
+
+    response_copy.status_code = 500
+    return response_copy
+
+
 def create_response(elements: list) -> requests.Response:
     """
     Creates a requests.Response object with the list of elements.
