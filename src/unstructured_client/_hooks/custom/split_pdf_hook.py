@@ -126,7 +126,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.client = client
         return base_url, client
 
-
     # pylint: disable=too-many-return-statements
     def before_request(
             self, hook_ctx: BeforeRequestContext, request: requests.PreparedRequest
@@ -282,26 +281,23 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 page_number,
                 min(page_number + split_size - 1, all_pages_number),
             )
-            # Check if this set of pages is the last one
-            if page_index + split_size >= all_pages_number:
-                last_page_content = page_content
-                last_page_number = page_number
-                break
+
             coroutine = call_api_partial((page_content, page_number))
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
-        # `before_request` method needs to return a request so we skip sending the last page in parallel
-        # and return that last page at the end of this method
 
-        body = request_utils.create_request_body(
-            form_data, last_page_content, file.file_name, last_page_number
-        )
-        last_page_request = request_utils.create_request(request, body)
-        last_page_prepared_request = self.client.prepare_request(last_page_request)
-        return last_page_prepared_request
+        # Return a dummy request for the SDK to use
+        # This allows us to skip right to the AfterRequestHook and await all the calls
+        dummy_request = requests.Request()
+        dummy_request.url = "https://httpbin.org/status/200"
+        dummy_request.method = "GET"
+        dummy_request.headers = {}
+
+        return self.client.prepare_request(dummy_request)
+
 
     def _await_elements(
-            self, operation_id: str, response: requests.Response
+            self, operation_id: str
     ) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
@@ -338,17 +334,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             else:
                 failed_responses.append(res)
 
-        if self.allow_failed or not failed_responses:
-            last_response_number = len(task_responses) + 1
-            request_utils.log_after_split_response(
-                response.status_code, last_response_number
-            )
-            if response.status_code == 200:
-                elements.append(response.json())
-                successful_responses.append(response)
-            else:
-                failed_responses.append(response)
-
         self.api_successful_responses[operation_id] = successful_responses
         self.api_failed_responses[operation_id] = failed_responses
         flattened_elements = [element for sublist in elements for element in sublist]
@@ -364,7 +349,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             hook_ctx (AfterSuccessContext): The context object containing information
             about the hook execution.
             response (requests.Response): The response object returned from the API
-            request.
+            request (A dummy 200 response).
 
         Returns:
             Union[requests.Response, Exception]: If requests were run in parallel, a
@@ -374,7 +359,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         operation_id = hook_ctx.operation_id
         # Because in `before_request` method we skipped sending last page in parallel
         # we need to pass response, which contains last page, to `_await_elements` method
-        elements = self._await_elements(operation_id, response)
+        elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
         if not self.allow_failed and self.api_failed_responses.get(operation_id):
@@ -383,9 +368,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if elements is None:
             return response
 
-        updated_response = request_utils.create_response(response, elements)
+        response = request_utils.create_response(elements)
         self._clear_operation(operation_id)
-        return updated_response
+        return response
 
     def after_error(
             self,
@@ -410,29 +395,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             If requests were run in parallel, and at least one was successful, a combined
             response object; otherwise, the original response and exception.
         """
-
-        # if fails are disallowed - return response and error objects immediately
-        if not self.allow_failed:
-            return (response, error)
-
-        operation_id = hook_ctx.operation_id
-        # We know that this request failed so we pass a failed or empty response to `_await_elements` method
-        # where it checks if at least on of the other requests succeeded
-        elements = self._await_elements(operation_id, response or requests.Response())
-        successful_responses = self.api_successful_responses.get(operation_id)
-
-        if elements is None or successful_responses is None:
-            return (response, error)
-
-        if len(successful_responses) == 0:
-            self._clear_operation(operation_id)
-            return (response, error)
-
-        updated_response = request_utils.create_response(
-            successful_responses[0], elements
-        )
-        self._clear_operation(operation_id)
-        return (updated_response, None)
+        pass
 
     def _clear_operation(self, operation_id: str) -> None:
         """

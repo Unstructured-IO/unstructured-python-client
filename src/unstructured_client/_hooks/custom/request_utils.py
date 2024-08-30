@@ -157,9 +157,9 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
-def create_response(response: requests.Response, elements: list) -> requests.Response:
+def create_response(elements: list) -> requests.Response:
     """
-    Creates a modified response object with updated content.
+    Creates a requests.Response object with the list of elements.
 
     Args:
         response: The original response object.
@@ -169,12 +169,15 @@ def create_response(response: requests.Response, elements: list) -> requests.Res
     Returns:
         The modified response object with updated content.
     """
-    response_copy = copy.deepcopy(response)
+    response = requests.Response()
+
     content = json.dumps(elements).encode()
     content_length = str(len(content))
-    response_copy.headers.update({"Content-Length": content_length})
-    setattr(response_copy, "_content", content)
-    return response_copy
+
+    response.headers.update({"Content-Length": content_length, "Content-Type": "application/json"})
+    response.status_code = 200
+    setattr(response, "_content", content)
+    return response
 
 
 def log_after_split_response(status_code: int, split_number: int):
