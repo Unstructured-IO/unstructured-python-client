@@ -14,7 +14,6 @@ import requests
 from requests.structures import CaseInsensitiveDict
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, retry
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
@@ -102,15 +101,15 @@ async def retry_with_backoff_async(
 
             if response.status_code not in retry_status_codes:
                 return response
-            else:
-                logger.error(f"Request (page {page_number}) failed with status code {response.status_code}. Waiting to retry.")
+
+            logger.error("Request (page %d) failed with status code %d. Waiting to retry.", page_number, response.status_code)
 
             # Is it time to get out of the loop?
             now = round(time.time() * 1000)
             if now - start > max_elapsed_time:
                 return response
         except Exception as e:
-            logger.error(f"Request (page {page_number}) failed ({repr(e)}). Waiting to retry.")
+            logger.error("Request (page %d) failed (%s). Waiting to retry.", page_number, repr(e))
 
             # Is it time to get out of the loop?
             now = round(time.time() * 1000)
