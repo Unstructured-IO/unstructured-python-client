@@ -6,8 +6,6 @@ permissions:
   statuses: write
 "on":
   push:
-    branches:
-      - main
     paths:
       - RELEASES.md
       - '*/RELEASES.md'
