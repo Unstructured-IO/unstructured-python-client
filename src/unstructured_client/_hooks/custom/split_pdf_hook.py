@@ -254,7 +254,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
 
         async def call_api_partial(page):
-            async with httpx.AsyncClient() as client:
+            # Individual calls should return within 10 minutes
+            client_timeout = httpx.Timeout(60 * 10)
+            async with httpx.AsyncClient(timeout=client_timeout) as client:
                 try:
                     httpx_response = await request_utils.call_api_async(
                         client=client,

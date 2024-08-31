@@ -81,6 +81,7 @@ def create_request(
 
 async def retry_with_backoff_async(
     request_func,
+    page_number,
     initial_interval,
     max_interval,
     exponent,
@@ -102,15 +103,19 @@ async def retry_with_backoff_async(
             if response.status_code not in retry_status_codes:
                 return response
             else:
-                logger.error(f"Request failed with status code {response.status_code}. Waiting to retry.")
+                logger.error(f"Request (page {page_number}) failed with status code {response.status_code}. Waiting to retry.")
 
             # Is it time to get out of the loop?
             now = round(time.time() * 1000)
             if now - start > max_elapsed_time:
                 return response
         except Exception as e:
-            logger.error(f"Request failed with error: {e}. Waiting to retry.")
-            raise
+            logger.error(f"Request (page {page_number}) failed ({repr(e)}). Waiting to retry.")
+
+            # Is it time to get out of the loop?
+            now = round(time.time() * 1000)
+            if now - start > max_elapsed_time:
+                raise
 
         # Otherwise go back to sleep
         sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
@@ -150,7 +155,7 @@ async def call_api_async(
         return await client.send(new_request)
 
     async with limiter:
-        response = await retry_with_backoff_async(do_request, **retry_values)
+        response = await retry_with_backoff_async(do_request, page_number=page_number, **retry_values)
 
         return response
 
