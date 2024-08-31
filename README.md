@@ -135,7 +135,9 @@ import unstructured_client
 from unstructured_client.models import operations, shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = unstructured_client.UnstructuredClient()
+s = unstructured_client.UnstructuredClient(
+    api_key_auth="YOUR_API_KEY",
+)
 
 
 res = s.general.partition(request=operations.PartitionRequest(
@@ -168,6 +170,7 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 s = unstructured_client.UnstructuredClient(
     retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False),
+    api_key_auth="YOUR_API_KEY",
 )
 
 
