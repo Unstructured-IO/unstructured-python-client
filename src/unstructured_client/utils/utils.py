@@ -218,7 +218,7 @@ def _populate_path_params(
                 if isinstance(param, List):
                     pp_vals: List[str] = []
                     for pp_val in param:
-                        if pp_val is None:
+                        if pp_val is None or pp_val == "__SPEAKEASY_UNSET__":
                             continue
                         pp_vals.append(_val_to_string(pp_val))
                     path_param_values[param_metadata.get("field_name", field.name)] = (
@@ -227,7 +227,10 @@ def _populate_path_params(
                 elif isinstance(param, Dict):
                     pp_vals: List[str] = []
                     for pp_key in param:
-                        if param[pp_key] is None:
+                        if (
+                            param[pp_key] is None
+                            or param[pp_key] == "__SPEAKEASY_UNSET__"
+                        ):
                             continue
                         if param_metadata.get("explode"):
                             pp_vals.append(f"{pp_key}={_val_to_string(param[pp_key])}")
@@ -247,7 +250,10 @@ def _populate_path_params(
                         param_name = param_value_metadata.get("field_name", field.name)
 
                         param_field_val = getattr(param, param_field.name)
-                        if param_field_val is None:
+                        if (
+                            param_field_val is None
+                            or param_field_val == "__SPEAKEASY_UNSET__"
+                        ):
                             continue
                         if param_metadata.get("explode"):
                             pp_vals.append(
@@ -406,19 +412,23 @@ def _get_serialized_params(
 def _populate_deep_object_query_params(
     metadata: Dict, field_name: str, obj: Any, params: Dict[str, List[str]]
 ):
-    if obj is None:
+    if obj is None or obj == "__SPEAKEASY_UNSET__":
         return
 
     if is_dataclass(obj):
-        _populate_deep_object_query_params_dataclass(metadata.get("field_name", field_name), obj, params)
+        _populate_deep_object_query_params_dataclass(
+            metadata.get("field_name", field_name), obj, params
+        )
     elif isinstance(obj, Dict):
-        _populate_deep_object_query_params_dict(metadata.get("field_name", field_name), obj, params)
+        _populate_deep_object_query_params_dict(
+            metadata.get("field_name", field_name), obj, params
+        )
 
 
 def _populate_deep_object_query_params_dataclass(
     prior_params_key: str, obj: Any, params: Dict[str, List[str]]
 ):
-    if obj is None:
+    if obj is None or obj == "__SPEAKEASY_UNSET__":
         return
 
     if not is_dataclass(obj):
@@ -431,7 +441,7 @@ def _populate_deep_object_query_params_dataclass(
             continue
 
         obj_val = getattr(obj, obj_field.name)
-        if obj_val is None:
+        if obj_val is None or obj_val == "__SPEAKEASY_UNSET__":
             continue
 
         params_key = f'{prior_params_key}[{obj_param_metadata.get("field_name", obj_field.name)}]'
@@ -449,14 +459,14 @@ def _populate_deep_object_query_params_dataclass(
 def _populate_deep_object_query_params_dict(
     prior_params_key: str, value: Dict, params: Dict[str, List[str]]
 ):
-    if value is None:
+    if value is None or value == "__SPEAKEASY_UNSET__":
         return
 
     for key, val in value.items():
-        if val is None:
+        if val is None or val == "__SPEAKEASY_UNSET__":
             continue
 
-        params_key = f'{prior_params_key}[{key}]'
+        params_key = f"{prior_params_key}[{key}]"
 
         if is_dataclass(val):
             _populate_deep_object_query_params_dataclass(params_key, val, params)
@@ -471,11 +481,11 @@ def _populate_deep_object_query_params_dict(
 def _populate_deep_object_query_params_list(
     params_key: str, value: List, params: Dict[str, List[str]]
 ):
-    if value is None:
+    if value is None or value == "__SPEAKEASY_UNSET__":
         return
 
     for val in value:
-        if val is None:
+        if val is None or val == "__SPEAKEASY_UNSET__":
             continue
 
         if params.get(params_key) is None:
@@ -593,7 +603,7 @@ def serialize_multipart_form(
 
     for field in request_fields:
         val = getattr(request, field.name)
-        if val is None:
+        if val is None or val == "__SPEAKEASY_UNSET__":
             continue
 
         field_metadata = field.metadata.get("multipart_form")
@@ -631,10 +641,12 @@ def serialize_multipart_form(
             field_name = field_metadata.get("field_name", field.name)
             if isinstance(val, List):
                 for value in val:
-                    if value is None:
+                    if value is None or value == "__SPEAKEASY_UNSET__":
                         continue
                     form.append([field_name + "[]", [None, _val_to_string(value)]])
             else:
+                if val == "__SPEAKEASY_UNSET__":
+                    continue
                 form.append([field_name, [None, _val_to_string(val)]])
     return media_type, None, form
 
@@ -667,7 +679,7 @@ def serialize_form_data(field_name: str, data: Any) -> Dict[str, Any]:
     if is_dataclass(data):
         for field in fields(data):
             val = getattr(data, field.name)
-            if val is None:
+            if val is None or val == "__SPEAKEASY_UNSET__":
                 continue
 
             metadata = field.metadata.get("form")
@@ -692,6 +704,8 @@ def serialize_form_data(field_name: str, data: Any) -> Dict[str, Any]:
                     raise Exception(f"Invalid form style for field {field.name}")
     elif isinstance(data, Dict):
         for key, value in data.items():
+            if value == "__SPEAKEASY_UNSET__":
+                continue
             form[key] = [_val_to_string(value)]
     else:
         raise Exception(f"Invalid request body type for field {field_name}")
@@ -716,7 +730,7 @@ def _populate_form(
     delimiter: str,
     form: Dict[str, List[str]],
 ):
-    if obj is None:
+    if obj is None or obj == "__SPEAKEASY_UNSET__":
         return form
 
     if is_dataclass(obj):
@@ -729,7 +743,7 @@ def _populate_form(
                 continue
 
             val = getattr(obj, obj_field.name)
-            if val is None:
+            if val is None or val == "__SPEAKEASY_UNSET__":
                 continue
 
             if explode:
@@ -742,7 +756,7 @@ def _populate_form(
     elif isinstance(obj, Dict):
         items = []
         for key, value in obj.items():
-            if value is None:
+            if value is None or value == "__SPEAKEASY_UNSET__":
                 continue
 
             if explode:
@@ -756,7 +770,7 @@ def _populate_form(
         items = []
 
         for value in obj:
-            if value is None:
+            if value is None or value == "__SPEAKEASY_UNSET__":
                 continue
 
             if explode:
@@ -769,13 +783,14 @@ def _populate_form(
         if len(items) > 0:
             form[field_name] = [delimiter.join([str(item) for item in items])]
     else:
-        form[field_name] = [_val_to_string(obj)]
+        if obj != "__SPEAKEASY_UNSET__":
+            form[field_name] = [_val_to_string(obj)]
 
     return form
 
 
 def _serialize_header(explode: bool, obj: Any) -> str:
-    if obj is None:
+    if obj is None or obj == "__SPEAKEASY_UNSET__":
         return ""
 
     if is_dataclass(obj):
@@ -792,7 +807,7 @@ def _serialize_header(explode: bool, obj: Any) -> str:
                 continue
 
             val = getattr(obj, obj_field.name)
-            if val is None:
+            if val is None or val == "__SPEAKEASY_UNSET__":
                 continue
 
             if explode:
@@ -807,7 +822,7 @@ def _serialize_header(explode: bool, obj: Any) -> str:
         items = []
 
         for key, value in obj.items():
-            if value is None:
+            if value is None or value == "__SPEAKEASY_UNSET__":
                 continue
 
             if explode:
@@ -822,7 +837,7 @@ def _serialize_header(explode: bool, obj: Any) -> str:
         items = []
 
         for value in obj:
-            if value is None:
+            if value is None or value == "__SPEAKEASY_UNSET__":
                 continue
 
             items.append(_val_to_string(value))
@@ -830,6 +845,8 @@ def _serialize_header(explode: bool, obj: Any) -> str:
         if len(items) > 0:
             return ",".join(items)
     else:
+        if obj == "__SPEAKEASY_UNSET__":
+            return ""
         return f"{_val_to_string(obj)}"
 
     return ""
@@ -927,6 +944,7 @@ def bigintdecoder(val):
     if isinstance(val, float):
         raise ValueError(f"{val} is a float")
     return int(val)
+
 
 def integerstrencoder(optional: bool):
     def integerstrencode(val: int):
@@ -1114,3 +1132,15 @@ def remove_suffix(input_string, suffix):
     if suffix and input_string.endswith(suffix):
         return input_string[: -len(suffix)]
     return input_string
+
+
+def decodeunset(decoder: Optional[Callable] = None):
+    def decode(val):
+        if val == "__SPEAKEASY_UNSET__":
+            return val
+        if decoder is None:
+            return None
+
+        return decoder(val)
+
+    return decode

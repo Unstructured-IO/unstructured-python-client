@@ -27,8 +27,29 @@ This is a Python client for the [Unstructured API](https://docs.unstructured.io/
 
 Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk) for a full guide to using the client.
 
+<!-- Start Summary [summary] -->
+## Summary
+
+
+<!-- End Summary [summary] -->
+
+<!-- Start Table of Contents [toc] -->
+## Table of Contents
+
+* [SDK Installation](#sdk-installation)
+* [SDK Example Usage](#sdk-example-usage)
+* [Available Resources and Operations](#available-resources-and-operations)
+* [Retries](#retries)
+* [Error Handling](#error-handling)
+* [Server Selection](#server-selection)
+* [Custom HTTP Client](#custom-http-client)
+* [Authentication](#authentication)
+<!-- End Table of Contents [toc] -->
+
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
+
+The SDK can be installed using the *pip* package manager, with dependencies and metadata stored in the `setup.py` file.
 
 ```bash
 pip install unstructured-client
@@ -135,9 +156,7 @@ import unstructured_client
 from unstructured_client.models import operations, shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = unstructured_client.UnstructuredClient(
-    api_key_auth="YOUR_API_KEY",
-)
+s = unstructured_client.UnstructuredClient()
 
 
 res = s.general.partition(request=operations.PartitionRequest(
@@ -170,7 +189,6 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 s = unstructured_client.UnstructuredClient(
     retry_config=RetryConfig('backoff', BackoffStrategy(1, 50, 1.1, 100), False),
-    api_key_auth="YOUR_API_KEY",
 )
 
 
