@@ -10,7 +10,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.25.6
+  version: 0.25.7
   additionalDependencies:
     dependencies:
       deepdiff: '>=6.0'
