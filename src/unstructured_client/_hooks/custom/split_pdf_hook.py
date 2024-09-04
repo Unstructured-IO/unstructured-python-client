@@ -330,10 +330,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 successful_responses.append(res)
                 elements.append(res.json())
             else:
-                logger.error(
-                    "Failed to partition set #%d.",
-                    response_number,
-                )
+                error_message = f"Failed to partition set {response_number}."
+
+                if self.allow_failed:
+                    error_message += " Its elements will be omitted from the result."
+
+                logger.error(error_message)
                 failed_responses.append(res)
 
         self.api_successful_responses[operation_id] = successful_responses
