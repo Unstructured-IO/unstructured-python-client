@@ -105,21 +105,12 @@ def test_unit_prepare_request_headers():
 def test_unit_create_response():
     """Test create response method properly overrides body elements and Content-Length header."""
     test_elements = [{"key": "value"}, {"key_2": "value"}]
-    test_response = requests.Response()
-    test_response.status_code = 200
-    test_response._content = b'[{"key_2": "value"}]'
-    test_response.headers = requests.structures.CaseInsensitiveDict(
-        {
-            "Content-Type": "application/json",
-            "Content-Length": len(test_response._content),
-        }
-    )
 
     expected_status_code = 200
     expected_content = b'[{"key": "value"}, {"key_2": "value"}]'
     expected_content_length = "38"
 
-    response = request_utils.create_response(test_response, test_elements)
+    response = request_utils.create_response(test_elements)
 
     assert response.status_code, expected_status_code
     assert response._content, expected_content
