@@ -145,24 +145,23 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
-def create_response(response: httpx.Response, elements: list) -> httpx.Response:
+def create_response(elements: list) -> httpx.Response:
     """
     Creates a modified response object with updated content.
 
     Args:
-        response: The original response object.
         elements: The list of elements to be serialized and added to
         the response.
 
     Returns:
         The modified response object with updated content.
     """
-    response_copy = copy.deepcopy(response)
+    response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
     content = json.dumps(elements).encode()
     content_length = str(len(content))
-    response_copy.headers.update({"Content-Length": content_length})
-    setattr(response_copy, "_content", content)
-    return response_copy
+    response.headers.update({"Content-Length": content_length})
+    setattr(response, "_content", content)
+    return response
 
 
 def log_after_split_response(status_code: int, split_number: int):

@@ -264,8 +264,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 return response
 
         self.coroutines_to_execute[operation_id] = []
-        last_page_content = io.BytesIO()
-        last_page_number = 0
         set_index = 1
         for page_content, page_index, all_pages_number in pages:
             page_number = page_index + starting_page_number
@@ -275,44 +273,25 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 page_number,
                 min(page_number + split_size - 1, all_pages_number),
             )
-            # Check if this set of pages is the last one
-            if page_index + split_size >= all_pages_number:
-                last_page_content = page_content
-                last_page_number = page_number
-                break
+
             coroutine = call_api_partial((page_content, page_number))
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
-        # `before_request` method needs to return a request so we skip sending the last page in parallel
-        # and return that last page at the end of this method
 
-        # Need to make sure the final page does not trigger splitting again
-        form_data[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
-        body = request_utils.create_request_body(
-            form_data, last_page_content, file.file_name, last_page_number
-        )
+        # Return a dummy request for the SDK to use
+        # This allows us to skip right to the AfterRequestHook and await all the calls
+        dummy_request = httpx.Request("GET",  "https://httpbin.org/status/200", headers={})
 
-        original_request = request
-        original_headers = prepare_request_headers(original_request.headers)
-        last_page_request = httpx.Request(
-            method="POST",
-            url=original_request.url or "",
-            content=body.to_string(),
-            headers={**original_headers, "Content-Type": body.content_type},
-        )
-
-        return last_page_request
+        return dummy_request
 
     def _await_elements(
-            self, operation_id: str, response: httpx.Response
-    ) -> Optional[list]:
+            self, operation_id: str) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
         elements.
 
         Args:
             operation_id (str): The ID of the operation.
-            response (httpx.Response): The response object.
 
         Returns:
             Optional[list]: The flattened elements if the partition requests are
@@ -341,17 +320,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             else:
                 failed_responses.append(res)
 
-        if self.allow_failed or not failed_responses:
-            last_response_number = len(task_responses) + 1
-            request_utils.log_after_split_response(
-                response.status_code, last_response_number
-            )
-            if response.status_code == 200:
-                elements.append(response.json())
-                successful_responses.append(response)
-            else:
-                failed_responses.append(response)
-
         self.api_successful_responses[operation_id] = successful_responses
         self.api_failed_responses[operation_id] = failed_responses
         flattened_elements = [element for sublist in elements for element in sublist]
@@ -366,8 +334,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             hook_ctx (AfterSuccessContext): The context object containing information
             about the hook execution.
-            response (httpx.Response): The response object returned from the API
-            request.
+            response (httpx.Response): The response object from the SDK call. This was a dummy
+            request just to get us to the AfterSuccessHook.
 
         Returns:
             Union[httpx.Response, Exception]: If requests were run in parallel, a
@@ -377,19 +345,23 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         operation_id = hook_ctx.operation_id
         # Because in `before_request` method we skipped sending last page in parallel
         # we need to pass response, which contains last page, to `_await_elements` method
-        elements = self._await_elements(operation_id, response)
+        elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
+        # Note(austin): Stick a 500 status code in here so the SDK
+        # does not trigger its own retry logic
         if not self.allow_failed and self.api_failed_responses.get(operation_id):
-            return self.api_failed_responses[operation_id][0]
+            failure_response = self.api_failed_responses[operation_id][0]
+            failure_response.status_code = 500
+            return failure_response
 
         if elements is None:
             return response
 
-        updated_response = request_utils.create_response(response, elements)
+        new_response = request_utils.create_response(elements)
         self._clear_operation(operation_id)
 
-        return updated_response
+        return new_response
 
     def after_error(
             self,
@@ -397,10 +369,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             response: Optional[httpx.Response],
             error: Optional[Exception],
     ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
-        """Executes after an unsuccessful API request. Awaits all parallel requests,
-        if at least one request was successful, combines the responses into a single
-        response object and doesn't throw an error. It will return an error only if
-        all requests failed, or there was no PDF split.
+        """This hook is unused. In the before hook, we return a mock request
+        for the SDK to run. This will take us right to the after_success hook
+        to await the split results.
 
         Args:
             hook_ctx (AfterErrorContext): The AfterErrorContext object containing
@@ -411,33 +382,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         Returns:
             Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
-            If requests were run in parallel, and at least one was successful, a combined
-            response object; otherwise, the original response and exception.
         """
-        operation_id = hook_ctx.operation_id
-
-        # if fails are disallowed - return response and error objects immediately
-        if not self.allow_failed:
-            self._clear_operation(operation_id)
-            return (response, error)
-
-        # We know that this request failed so we pass a failed or empty response to `_await_elements` method
-        # where it checks if at least on of the other requests succeeded
-        elements = self._await_elements(operation_id, response or httpx.Response(status_code=200))
-        successful_responses = self.api_successful_responses.get(operation_id)
-
-        if elements is None or successful_responses is None:
-            return (response, error)
-
-        if len(successful_responses) == 0:
-            self._clear_operation(operation_id)
-            return (response, error)
-
-        updated_response = request_utils.create_response(
-            successful_responses[0], elements
-        )
-        self._clear_operation(operation_id)
-        return (updated_response, None)
+        return (response, error)
 
     def _clear_operation(self, operation_id: str) -> None:
         """
