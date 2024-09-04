@@ -289,7 +289,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # Return a dummy request for the SDK to use
         # This allows us to skip right to the AfterRequestHook and await all the calls
-        dummy_request = httpx.Request("GET",  "https://httpbin.org/status/200", headers={})
+        dummy_request = httpx.Request("GET",  "https://httpbin.org/status/200")
 
         return dummy_request
 

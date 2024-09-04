@@ -304,6 +304,15 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         We want to make sure both code paths are retried.
         """
         request_body = request.read()
+
+        # Always return a 200 if the request is not for us
+        # (This mocks the httpbin.org call that gets us into the after_success hook)
+        if "/general/v0/general" not in str(request.url):
+            return Response(
+                200,
+                request=request,
+            )
+
         decoded_body = MultipartDecoder(request_body, request.headers.get("Content-Type"))
         form_data = form_utils.parse_form_data(decoded_body)
 
