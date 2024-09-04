@@ -162,16 +162,3 @@ def create_response(elements: list) -> httpx.Response:
     response.headers.update({"Content-Length": content_length})
     setattr(response, "_content", content)
     return response
-
-
-def log_after_split_response(status_code: int, split_number: int):
-    if status_code == 200:
-        logger.info(
-            "Successfully partitioned set #%d, elements added to the final result.",
-            split_number,
-        )
-    else:
-        logger.warning(
-            "Failed to partition set #%d, its elements will be omitted in the final result.",
-            split_number,
-        )

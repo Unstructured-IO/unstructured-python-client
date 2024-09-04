@@ -313,11 +313,18 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         failed_responses = []
         elements = []
         for response_number, res in task_responses:
-            request_utils.log_after_split_response(res.status_code, response_number)
             if res.status_code == 200:
+                logger.debug(
+                    "Successfully partitioned set #%d, elements added to the final result.",
+                    response_number,
+                )
                 successful_responses.append(res)
                 elements.append(res.json())
             else:
+                logger.error(
+                    "Failed to partition set #%d.",
+                    response_number,
+                )
                 failed_responses.append(res)
 
         self.api_successful_responses[operation_id] = successful_responses
@@ -353,6 +360,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if not self.allow_failed and self.api_failed_responses.get(operation_id):
             failure_response = self.api_failed_responses[operation_id][0]
             failure_response.status_code = 500
+
+            self._clear_operation(operation_id)
             return failure_response
 
         if elements is None:
