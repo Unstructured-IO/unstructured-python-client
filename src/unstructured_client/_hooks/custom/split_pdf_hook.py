@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
+import os
 import math
 from collections.abc import Awaitable
 from typing import Any, Coroutine, Optional, Tuple, Union, cast
@@ -250,8 +251,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 page_count % split_size,
             )
 
+        # Use a variable to adjust the httpx client timeout, or default to 30 minutes
+        # When we're able to reuse the SDK to make these calls, we can remove this var
+        # The SDK timeout will be controlled by parameter
+        client_timeout_minutes = 30
+        if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
+            client_timeout_minutes = int(timeout_var)
+
         async def call_api_partial(page):
-            async with httpx.AsyncClient() as client:
+            client_timeout = httpx.Timeout(60 * client_timeout_minutes)
+
+            async with httpx.AsyncClient(timeout=client_timeout) as client:
                 response = await request_utils.call_api_async(
                     client=client,
                     original_request=request,
