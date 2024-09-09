@@ -4,7 +4,7 @@ import httpx
 from .types import SDKInitHook, BeforeRequestContext, BeforeRequestHook, AfterSuccessContext, AfterSuccessHook, AfterErrorContext, AfterErrorHook, Hooks
 from .registration import init_hooks
 from typing import List, Optional, Tuple
-from unstructured_client.httpclient import HttpClient
+from unstructured_client.httpclient import HttpClient, AsyncHttpClient
 
 class SDKHooks(Hooks):
     def __init__(self) -> None:
@@ -26,10 +26,10 @@ class SDKHooks(Hooks):
     def register_after_error_hook(self, hook: AfterErrorHook) -> None:
         self.after_error_hooks.append(hook)
 
-    def sdk_init(self, base_url: str, client: HttpClient) -> Tuple[str, HttpClient]:
+    def sdk_init(self, base_url: str, client: HttpClient, async_client: AsyncHttpClient) -> Tuple[str, HttpClient, AsyncHttpClient]:
         for hook in self.sdk_init_hooks:
-            base_url, client = hook.sdk_init(base_url, client)
-        return base_url, client
+            base_url, client, async_client = hook.sdk_init(base_url, client, async_client)
+        return base_url, client, async_client
 
     def before_request(self, hook_ctx: BeforeRequestContext, request: httpx.Request) -> httpx.Request:
         for hook in self.before_request_hooks:

@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 import httpx
 from typing import Any, Callable, List, Optional, Tuple, Union
-from unstructured_client.httpclient import HttpClient
+from unstructured_client.httpclient import HttpClient, AsyncHttpClient
 
 
 class HookContext:
@@ -36,7 +36,7 @@ class AfterErrorContext(HookContext):
 
 class SDKInitHook(ABC):
     @abstractmethod
-    def sdk_init(self, base_url: str, client: HttpClient) -> Tuple[str, HttpClient]:
+    def sdk_init(self, base_url: str, client: HttpClient, async_client: AsyncHttpClient) -> Tuple[str, HttpClient, AsyncHttpClient]:
         pass
 
 
