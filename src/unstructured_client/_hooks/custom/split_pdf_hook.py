@@ -116,15 +116,38 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     ) -> Tuple[str, HttpClient]:
         """Initializes Split PDF Hook.
 
+        Adds a mock transport layer to the httpx client. This will return an
+        empty 200 response whenever the specified "dummy host" is used. The before_request
+        hook returns this request so the SDK always succeeds and jumps straight to
+        after_success, where we can await the split results.
+
         Args:
             base_url (str): URL of the API.
             client (HttpClient): HTTP Client.
 
         Returns:
-            Tuple[str, httpx.Session]: The initialized SDK options.
+            Tuple[str, HttpClient]: The initialized SDK options.
         """
-        self.client = client
-        return base_url, client
+        class DummyTransport(httpx.BaseTransport):
+            def __init__(self, base_transport: httpx.BaseTransport):
+                self.base_transport = base_transport
+
+            def handle_request(self, request: httpx.Request) -> httpx.Response:
+                # Return an empty 200 response if we send a request to this dummy host
+                if request.method == "GET" and request.url.host == "no-op":
+                    return httpx.Response(status_code=200, content=b'')
+
+                # Otherwise, pass the request to the default transport
+                return self.base_transport.handle_request(request)
+
+        # Explicit cast to httpx.Client to avoid a typing error
+        httpx_client = cast(httpx.Client, client)
+
+        # pylint: disable=protected-access
+        httpx_client._transport = DummyTransport(httpx_client._transport)
+
+        self.client = httpx_client
+        return base_url, self.client
 
     # pylint: disable=too-many-return-statements
     def before_request(
@@ -289,7 +312,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # Return a dummy request for the SDK to use
         # This allows us to skip right to the AfterRequestHook and await all the calls
-        dummy_request = httpx.Request("GET",  "https://httpbin.org/status/200")
+        dummy_request = httpx.Request("GET",  "http://no-op")
 
         return dummy_request
 

@@ -5,6 +5,7 @@ from asyncio import Task
 from collections import Counter
 from typing import Coroutine
 
+import httpx
 import pytest
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
@@ -32,7 +33,7 @@ def test_unit_sdk_init():
     hook = SplitPdfHook()
     # This is a fake URL, test doesn't make an API call
     test_url = "http://localhost:5000"
-    test_client = requests.Session()
+    test_client = httpx.Client()
 
     hook.sdk_init(test_url, test_client)
 
