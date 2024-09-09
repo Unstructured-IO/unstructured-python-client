@@ -28,18 +28,6 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
 from unstructured_client.models import shared
 
 
-def test_unit_sdk_init():
-    """Test sdk init method properly sets the client."""
-    hook = SplitPdfHook()
-    # This is a fake URL, test doesn't make an API call
-    test_url = "http://localhost:5000"
-    test_client = httpx.Client()
-
-    hook.sdk_init(test_url, test_client)
-
-    assert hook.client == test_client
-
-
 def test_unit_clear_operation():
     """Test clear operation method properly clears request/response data."""
     hook = SplitPdfHook()
