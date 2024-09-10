@@ -29,7 +29,7 @@ class OutputFormat(str, Enum, metaclass=utils.OpenEnumMeta):
 
 
 class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
-    r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
+    r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res"""
     FAST = 'fast'
     HI_RES = 'hi_res'
     AUTO = 'auto'
@@ -61,6 +61,8 @@ class PartitionParameters:
     r"""When a chunking strategy is specified, each returned chunk will include the elements consolidated to form that chunk as `.metadata.orig_elements`. Default: true."""
     include_page_breaks: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'include_page_breaks' }})
     r"""If true, the output will include page breaks if the filetype supports it. Default: false"""
+    include_slide_notes: Optional[bool] = dataclasses.field(default=True, metadata={'multipart_form': { 'field_name': 'include_slide_notes' }})
+    r"""When `True`, slide notes from .ppt and .pptx files will be included in the response. Default: `True`"""
     languages: Optional[List[str]] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'languages' }})
     r"""The languages present in the document, for use in partitioning and/or OCR. See the Tesseract documentation for a full list of languages."""
     max_characters: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'max_characters' }})
@@ -93,8 +95,8 @@ class PartitionParameters:
     r"""When `split_pdf_page is set to `True`, this parameter selects a subset of the pdf to send to the API. The parameter is a list of 2 integers within the range [1, length_of_pdf]. A ValueError is thrown if the given range is invalid. It's an internal parameter for the Python client and is not sent to the backend."""
     starting_page_number: Optional[int] = dataclasses.field(default=None, metadata={'multipart_form': { 'field_name': 'starting_page_number' }})
     r"""When PDF is split into pages before sending it into the API, providing this information will allow the page number to be assigned correctly. Introduced in 1.0.27."""
-    strategy: Optional[Strategy] = dataclasses.field(default=Strategy.AUTO, metadata={'multipart_form': { 'field_name': 'strategy' }})
-    r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto"""
+    strategy: Optional[Strategy] = dataclasses.field(default=Strategy.HI_RES, metadata={'multipart_form': { 'field_name': 'strategy' }})
+    r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res"""
     unique_element_ids: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'unique_element_ids' }})
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
     xml_keep_tags: Optional[bool] = dataclasses.field(default=False, metadata={'multipart_form': { 'field_name': 'xml_keep_tags' }})

@@ -45,7 +45,7 @@ class General:
             if global_retry_config:
                 retry_config = global_retry_config
             else:
-                retry_config = utils.RetryConfig('backoff', utils.BackoffStrategy(500, 60000, 1.5, 900000), True)
+                retry_config = utils.RetryConfig('backoff', utils.BackoffStrategy(3000, 720000, 1.88, 1800000), True)
 
         req = None
         def do_request():

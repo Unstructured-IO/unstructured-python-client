@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 17bd23e4247d7b65a92813afd1252693
-  docVersion: 1.0.44
-  speakeasyVersion: 1.389.0
-  generationVersion: 2.409.0
-  releaseVersion: 0.25.7
-  configChecksum: ac7a91ff3ca76edd4caa491893485665
+  docChecksum: ad32e3faae264ab1eb7cf461e373dcfa
+  docVersion: 1.0.48
+  speakeasyVersion: 1.394.0
+  generationVersion: 2.413.0
+  releaseVersion: 0.25.8
+  configChecksum: a507e57b6d5946017db1c1c77d195ca1
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,7 +15,7 @@ features:
   python:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.4
-    core: 4.8.6
+    core: 4.8.7
     examples: 2.81.3
     globalSecurity: 2.83.7
     globalSecurityCallbacks: 0.1.0
@@ -30,45 +30,57 @@ features:
     serverIDs: 2.81.1
     unions: 2.82.9
 generatedFiles:
-  - src/unstructured_client/sdkconfiguration.py
-  - src/unstructured_client/general.py
-  - src/unstructured_client/sdk.py
+  - .gitattributes
+  - CONTRIBUTING.md
+  - USAGE.md
+  - docs/models/errors/detail.md
+  - docs/models/errors/httpvalidationerror.md
+  - docs/models/errors/servererror.md
+  - docs/models/operations/partitionrequest.md
+  - docs/models/operations/partitionresponse.md
+  - docs/models/shared/chunkingstrategy.md
+  - docs/models/shared/files.md
+  - docs/models/shared/loc.md
+  - docs/models/shared/outputformat.md
+  - docs/models/shared/partitionparameters.md
+  - docs/models/shared/security.md
+  - docs/models/shared/strategy.md
+  - docs/models/shared/validationerror.md
   - py.typed
   - pylintrc
   - scripts/publish.sh
   - setup.py
   - src/unstructured_client/__init__.py
+  - src/unstructured_client/_hooks/__init__.py
+  - src/unstructured_client/_hooks/sdkhooks.py
+  - src/unstructured_client/_hooks/types.py
+  - src/unstructured_client/general.py
+  - src/unstructured_client/models/__init__.py
+  - src/unstructured_client/models/errors/__init__.py
+  - src/unstructured_client/models/errors/httpvalidationerror.py
+  - src/unstructured_client/models/errors/sdkerror.py
+  - src/unstructured_client/models/errors/servererror.py
+  - src/unstructured_client/models/operations/__init__.py
+  - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/shared/__init__.py
+  - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/security.py
+  - src/unstructured_client/models/shared/validationerror.py
+  - src/unstructured_client/sdk.py
+  - src/unstructured_client/sdkconfiguration.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/enums.py
   - src/unstructured_client/utils/retries.py
   - src/unstructured_client/utils/utils.py
-  - src/unstructured_client/models/errors/sdkerror.py
-  - src/unstructured_client/models/operations/partition.py
-  - src/unstructured_client/models/errors/httpvalidationerror.py
-  - src/unstructured_client/models/errors/servererror.py
-  - src/unstructured_client/models/shared/validationerror.py
-  - src/unstructured_client/models/shared/partition_parameters.py
-  - src/unstructured_client/models/shared/security.py
-  - src/unstructured_client/models/__init__.py
-  - src/unstructured_client/models/errors/__init__.py
-  - src/unstructured_client/models/operations/__init__.py
-  - src/unstructured_client/models/shared/__init__.py
-  - docs/models/operations/partitionrequest.md
-  - docs/models/operations/partitionresponse.md
-  - docs/models/errors/detail.md
-  - docs/models/errors/httpvalidationerror.md
-  - docs/models/errors/servererror.md
-  - docs/models/shared/loc.md
-  - docs/models/shared/validationerror.md
-  - docs/models/shared/chunkingstrategy.md
-  - docs/models/shared/files.md
-  - docs/models/shared/outputformat.md
-  - docs/models/shared/strategy.md
-  - docs/models/shared/partitionparameters.md
-  - docs/models/shared/security.md
-  - USAGE.md
-  - .gitattributes
-  - src/unstructured_client/_hooks/sdkhooks.py
-  - src/unstructured_client/_hooks/types.py
-  - src/unstructured_client/_hooks/__init__.py
-  - CONTRIBUTING.md
+examples:
+  partition:
+    speakeasy-default-partition:
+      requestBody:
+        multipart/form-data: {"chunking_strategy": "by_title", "files": {"": "your_file_here"}, "split_pdf_page_range": [1, 10], "strategy": "hi_res"}
+      responses:
+        "200":
+          application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
+        "422":
+          application/json: {"detail": "<value>"}
+        5XX:
+          application/json: {"detail": "An error occurred"}
