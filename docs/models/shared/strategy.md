@@ -1,6 +1,6 @@
 # Strategy
 
-The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto
+The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res
 
 
 ## Values
