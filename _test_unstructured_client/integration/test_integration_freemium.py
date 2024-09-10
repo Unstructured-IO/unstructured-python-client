@@ -101,6 +101,29 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
         response = client.general.partition(request=req)
 
 
+@pytest.mark.asyncio
+async def test_partition_async_returns_elements(client, doc_path):
+    filename = "layout-parser-paper.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            languages=["eng"],
+            split_pdf_page=True,
+        )
+    )
+
+    response = await client.general.partition_async(request=req)
+    assert response.status_code == 200
+    assert len(response.elements)
+
+
 def test_uvloop_partitions_without_errors(client, doc_path):
     async def call_api():
         filename = "layout-parser-paper-fast.pdf"

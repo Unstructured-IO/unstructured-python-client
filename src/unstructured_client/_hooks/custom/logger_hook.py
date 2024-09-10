@@ -11,7 +11,7 @@ from unstructured_client._hooks.types import (
     SDKInitHook,
     AfterSuccessHook,
 )
-from unstructured_client.httpclient import HttpClient
+from unstructured_client.httpclient import HttpClient, AsyncHttpClient
 from collections import defaultdict
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
@@ -46,17 +46,20 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
 
 
     def sdk_init(
-        self, base_url: str, client: HttpClient
-    ) -> Tuple[str, HttpClient]:
+        self, base_url: str, client: HttpClient, async_client: AsyncHttpClient
+    ) -> Tuple[str, HttpClient, AsyncHttpClient]:
         logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-        return base_url, client
+        return base_url, client, async_client
 
     def after_success(
         self, hook_ctx: AfterSuccessContext, response: httpx.Response
     ) -> Union[httpx.Response, Exception]:
         self.retries_counter.pop(hook_ctx.operation_id, None)
-        # NOTE: In case of split page partition this means - at least one of the splits was partitioned successfully
-        logger.info("Successfully partitioned the document.")
+        # Note(austin) - pdf splitting returns a mock request
+        # so we always reach the AfterSuccessHook
+        # This doesn't mean the splits succeeded
+        # Need to revisit our logging strategy
+        # logger.info("Successfully partitioned the document.")
         return response
 
     def after_error(

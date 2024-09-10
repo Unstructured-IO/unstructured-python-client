@@ -74,7 +74,7 @@ class UnstructuredClient(BaseSDK):
         hooks = SDKHooks()
 
         current_server_url, *_ = self.sdk_configuration.get_server_details()
-        server_url, self.sdk_configuration.client = hooks.sdk_init(current_server_url, self.sdk_configuration.client)
+        server_url, self.sdk_configuration.client, self.sdk_configuration.async_client = hooks.sdk_init(current_server_url, self.sdk_configuration.client, self.sdk_configuration.async_client)
         if current_server_url != server_url:
             self.sdk_configuration.server_url = server_url
 

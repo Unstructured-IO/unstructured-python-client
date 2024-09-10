@@ -2,7 +2,7 @@ from typing import Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
 from unstructured_client._hooks.types import SDKInitHook
-from unstructured_client.httpclient import HttpClient
+from unstructured_client.httpclient import HttpClient, AsyncHttpClient
 
 
 class CleanServerUrlSDKInitHook(SDKInitHook):
@@ -25,9 +25,9 @@ class CleanServerUrlSDKInitHook(SDKInitHook):
         return urlunparse(parsed_url._replace(path=""))
 
     def sdk_init(
-        self, base_url: str, client: HttpClient
-    ) -> Tuple[str, HttpClient]:
+        self, base_url: str, client: HttpClient, async_client: AsyncHttpClient
+    ) -> Tuple[str, HttpClient, AsyncHttpClient]:
         """Concrete implementation for SDKInitHook."""
         cleaned_url = self.clean_server_url(base_url)
 
-        return cleaned_url, client
+        return cleaned_url, client, async_client

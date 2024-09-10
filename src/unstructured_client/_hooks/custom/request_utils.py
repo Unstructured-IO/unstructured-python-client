@@ -69,22 +69,16 @@ async def call_api_async(
         headers={**original_headers, "Content-Type": body.content_type},
     )
 
-    async with limiter:
-        response = await send_request_async_with_retries(client, new_request)
-        return response
+    one_second = 1000
+    one_minute = 1000 * 60
 
-
-async def send_request_async_with_retries(client: httpx.AsyncClient, request: httpx.Request):
-    # Hardcode the retry config until we can
-    # properly reuse the SDK logic
-    # (Values are in ms)
     retry_config = utils.RetryConfig(
         "backoff",
         utils.BackoffStrategy(
-            initial_interval=3000,  # 3 seconds
-            max_interval=1000 * 60 * 12,  # 12 minutes
-            exponent=1.88, 
-            max_elapsed_time=1000 * 60 * 30  # 30 minutes
+            initial_interval = one_second * 3,
+            max_interval = one_minute * 12,
+            max_elapsed_time = one_minute * 30,
+            exponent = 1.88,
         ),
         retry_connection_errors=True
     )
@@ -96,14 +90,14 @@ async def send_request_async_with_retries(client: httpx.AsyncClient, request: ht
     ]
 
     async def do_request():
-        return await client.send(request)
+        return await client.send(new_request)
 
-    response = await utils.retry_async(
-        do_request,
-        utils.Retries(retry_config, retryable_codes)
-    )
-
-    return response
+    async with limiter:
+        response = await utils.retry_async(
+            do_request,
+            utils.Retries(retry_config, retryable_codes)
+        )
+        return response
 
 
 def prepare_request_headers(
@@ -145,34 +139,20 @@ def prepare_request_payload(form_data: FormData) -> FormData:
     return payload
 
 
-def create_response(response: httpx.Response, elements: list) -> httpx.Response:
+def create_response(elements: list) -> httpx.Response:
     """
     Creates a modified response object with updated content.
 
     Args:
-        response: The original response object.
         elements: The list of elements to be serialized and added to
         the response.
 
     Returns:
         The modified response object with updated content.
     """
-    response_copy = copy.deepcopy(response)
+    response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
     content = json.dumps(elements).encode()
     content_length = str(len(content))
-    response_copy.headers.update({"Content-Length": content_length})
-    setattr(response_copy, "_content", content)
-    return response_copy
-
-
-def log_after_split_response(status_code: int, split_number: int):
-    if status_code == 200:
-        logger.info(
-            "Successfully partitioned set #%d, elements added to the final result.",
-            split_number,
-        )
-    else:
-        logger.warning(
-            "Failed to partition set #%d, its elements will be omitted in the final result.",
-            split_number,
-        )
+    response.headers.update({"Content-Length": content_length})
+    setattr(response, "_content", content)
+    return response

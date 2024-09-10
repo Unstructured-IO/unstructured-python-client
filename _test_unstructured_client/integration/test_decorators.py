@@ -291,19 +291,27 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     """
     Test that when we split a pdf, the split requests will honor retryable errors.
     """
+    mock_endpoint_called = False
     number_of_split_502s = 2
     number_of_last_page_502s = 2
 
-    async def mock_send(_, request):
+    async def mock_send(_, request: httpx.Request):
         """
         Return a predefined number of 502s for requests with certain starting_page_number values.
 
-        This is because N-1 splits are sent off in the hook logic. These need explicit retry handling.
-        The final split is returned to the SDK and gets the built in retry code.
+        This is to make sure specific portions of the doc are retried properly.
 
         We want to make sure both code paths are retried.
         """
+        # Assert that the SDK issues our no-op request
+        # returned by the BeforeRequestHook
+        nonlocal mock_endpoint_called
+        if request.url.host == "no-op":
+            mock_endpoint_called = True
+            return Response(200, request=request)
+
         request_body = request.read()
+
         decoded_body = MultipartDecoder(request_body, request.headers.get("Content-Type"))
         form_data = form_utils.parse_form_data(decoded_body)
 
@@ -360,4 +368,6 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
 
     assert number_of_split_502s == 0
     assert number_of_last_page_502s == 0
+    assert mock_endpoint_called
+
     assert res.status_code == 200

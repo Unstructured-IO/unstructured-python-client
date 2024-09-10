@@ -5,6 +5,7 @@ from asyncio import Task
 from collections import Counter
 from typing import Coroutine
 
+import httpx
 import pytest
 import requests
 from requests_toolbelt import MultipartDecoder, MultipartEncoder
@@ -25,18 +26,6 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     get_optimal_split_size, run_tasks,
 )
 from unstructured_client.models import shared
-
-
-def test_unit_sdk_init():
-    """Test sdk init method properly sets the client."""
-    hook = SplitPdfHook()
-    # This is a fake URL, test doesn't make an API call
-    test_url = "http://localhost:5000"
-    test_client = requests.Session()
-
-    hook.sdk_init(test_url, test_client)
-
-    assert hook.client == test_client
 
 
 def test_unit_clear_operation():
@@ -105,21 +94,12 @@ def test_unit_prepare_request_headers():
 def test_unit_create_response():
     """Test create response method properly overrides body elements and Content-Length header."""
     test_elements = [{"key": "value"}, {"key_2": "value"}]
-    test_response = requests.Response()
-    test_response.status_code = 200
-    test_response._content = b'[{"key_2": "value"}]'
-    test_response.headers = requests.structures.CaseInsensitiveDict(
-        {
-            "Content-Type": "application/json",
-            "Content-Length": len(test_response._content),
-        }
-    )
 
     expected_status_code = 200
     expected_content = b'[{"key": "value"}, {"key_2": "value"}]'
     expected_content_length = "38"
 
-    response = request_utils.create_response(test_response, test_elements)
+    response = request_utils.create_response(test_elements)
 
     assert response.status_code, expected_status_code
     assert response._content, expected_content

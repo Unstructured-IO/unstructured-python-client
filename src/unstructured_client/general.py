@@ -94,8 +94,9 @@ class General(BaseSDK):
     
     
     async def partition_async(
-        self, *,
+        self,
         request: Union[operations.PartitionRequest, operations.PartitionRequestTypedDict],
+        *,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
