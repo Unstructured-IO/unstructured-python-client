@@ -125,7 +125,7 @@ def get_split_pdf_allow_failed_param(
 def get_split_pdf_concurrency_level_param(
     form_data: FormData, key: str, fallback_value: int, max_allowed: int
 ) -> int:
-    """Retrieves the value for concurreny level that should be used for splitting pdf.
+    """Retrieves the value for concurrency level that should be used for splitting pdf.
 
     In case given the number is not a valid integer or less than 1, it will use the
     default value.
