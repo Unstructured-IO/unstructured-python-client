@@ -89,7 +89,7 @@ class PartitionParametersTypedDict(TypedDict):
     skip_infer_table_types: NotRequired[List[str]]
     r"""The document types that you want to skip table extraction with. Default: []"""
     split_pdf_allow_failed: NotRequired[bool]
-    r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resuling list of Elements will miss the data from errored pages."""
+    r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resulting list of Elements will miss the data from errored pages."""
     split_pdf_concurrency_level: NotRequired[int]
     r"""When `split_pdf_page` is set to `True`, this parameter specifies the number of workers used for sending requests when the PDF is split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page: NotRequired[bool]
@@ -152,7 +152,7 @@ class PartitionParameters(BaseModel):
     skip_infer_table_types: Annotated[Optional[List[str]], FieldMetadata(multipart=True)] = None
     r"""The document types that you want to skip table extraction with. Default: []"""
     split_pdf_allow_failed: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
-    r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resuling list of Elements will miss the data from errored pages."""
+    r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resulting list of Elements will miss the data from errored pages."""
     split_pdf_concurrency_level: Annotated[Optional[int], FieldMetadata(multipart=True)] = 5
     r"""When `split_pdf_page` is set to `True`, this parameter specifies the number of workers used for sending requests when the PDF is split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page: Annotated[Optional[bool], FieldMetadata(multipart=True)] = True

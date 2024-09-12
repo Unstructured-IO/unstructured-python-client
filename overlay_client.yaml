@@ -38,7 +38,7 @@ actions:
       "split_pdf_allow_failed":
         {
           "title": "Split Pdf Allow Failed",
-          "description": "When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resuling list of Elements will miss the data from errored pages.",
+          "description": "When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resulting list of Elements will miss the data from errored pages.",
           "type": "boolean",
           "default": false,
         }

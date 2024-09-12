@@ -91,7 +91,7 @@ See [page splitting](https://docs.unstructured.io/api-reference/api-services/sdk
 In order to speed up processing of large PDF files, the client splits up PDFs into smaller files, sends these to the API concurrently, and recombines the results. `split_pdf_page` can be set to `False` to disable this.
 
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encounter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
 
 Example:
 ```python
@@ -369,9 +369,9 @@ There are two important files used by `make client-generate`:
 1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://api.unstructured.io/general/openapi.json), represents the API that is supported on backend.
 2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` which is used to generate SDK.
 
-Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR, using
+Once PR with changes is merged, GitHub CI will autogenerate the Speakeasy client in a new PR, using
 the `openapi.json` and `overlay_client.yaml` You will have to manually bring back the human created lines in it.
 
-Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
+Feel free to open a PR or a GitHub issue as a proof of concept and we'll do our best to include it in a future release!
 
 ### SDK Created by [Speakeasy](https://www.speakeasyapi.dev/docs/sdk-design/python/methodology-python)

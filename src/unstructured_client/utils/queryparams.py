@@ -66,10 +66,10 @@ def _populate_query_params(
         f_name = field.alias if field.alias is not None else name
         serialization = metadata.serialization
         if serialization is not None:
-            serialized_parms = _get_serialized_params(
+            serialized_params = _get_serialized_params(
                 metadata, f_name, value, param_field_types[name]
             )
-            for key, value in serialized_parms.items():
+            for key, value in serialized_params.items():
                 if key in query_param_values:
                     query_param_values[key].extend(value)
                 else:
