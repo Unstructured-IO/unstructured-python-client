@@ -369,9 +369,9 @@ There are two important files used by `make client-generate`:
 1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://api.unstructured.io/general/openapi.json), represents the API that is supported on backend.
 2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` which is used to generate SDK.
 
-Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR, using
+Once PR with changes is merged, GitHub CI will autogenerate the Speakeasy client in a new PR, using
 the `openapi.json` and `overlay_client.yaml` You will have to manually bring back the human created lines in it.
 
-Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
+Feel free to open a PR or a GitHub issue as a proof of concept and we'll do our best to include it in a future release!
 
 ### SDK Created by [Speakeasy](https://www.speakeasyapi.dev/docs/sdk-design/python/methodology-python)
