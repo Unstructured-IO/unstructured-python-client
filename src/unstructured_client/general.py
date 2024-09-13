@@ -11,10 +11,10 @@ from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 class General(BaseSDK):
     def partition(
         self,
-        *,
         request: Union[
             operations.PartitionRequest, operations.PartitionRequestTypedDict
         ],
+        *,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -116,10 +116,10 @@ class General(BaseSDK):
 
     async def partition_async(
         self,
-        *,
         request: Union[
             operations.PartitionRequest, operations.PartitionRequestTypedDict
         ],
+        *,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
