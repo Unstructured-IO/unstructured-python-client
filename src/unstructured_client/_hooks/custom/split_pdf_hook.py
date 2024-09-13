@@ -113,8 +113,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
 
     def sdk_init(
-            self, base_url: str, client: HttpClient, async_client: AsyncHttpClient
-    ) -> Tuple[str, HttpClient, AsyncHttpClient]:
+            self, base_url: str, client: HttpClient
+    ) -> Tuple[str, HttpClient]:
         """Initializes Split PDF Hook.
 
         Adds a mock transport layer to the httpx client. This will return an
@@ -141,31 +141,32 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 # Otherwise, pass the request to the default transport
                 return self.base_transport.handle_request(request)
 
-        class AsyncDummyTransport(httpx.AsyncBaseTransport):
-            def __init__(self, base_transport: httpx.AsyncBaseTransport):
-                self.base_transport = base_transport
+        # Note(austin) - This hook doesn't have access to the async_client
+        # So, we can't do the same no-op trick for partition_async
+        # class AsyncDummyTransport(httpx.AsyncBaseTransport):
+        #     def __init__(self, base_transport: httpx.AsyncBaseTransport):
+        #         self.base_transport = base_transport
 
-            async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
-                # Return an empty 200 response if we send a request to this dummy host
-                if request.method == "GET" and request.url.host == "no-op":
-                    return httpx.Response(status_code=200, content=b'')
+        #     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        #         # Return an empty 200 response if we send a request to this dummy host
+        #         if request.method == "GET" and request.url.host == "no-op":
+        #             return httpx.Response(status_code=200, content=b'')
 
-                # Otherwise, pass the request to the default transport
-                return await self.base_transport.handle_async_request(request)
+        #         # Otherwise, pass the request to the default transport
+        #         return await self.base_transport.handle_async_request(request)
 
         # Explicit cast to httpx.Client to avoid a typing error
         httpx_client = cast(httpx.Client, client)
-        async_httpx_client = cast(httpx.AsyncClient, async_client)
+        # async_httpx_client = cast(httpx.AsyncClient, async_client)
 
         # pylint: disable=protected-access
         httpx_client._transport = DummyTransport(httpx_client._transport)
 
         # pylint: disable=protected-access
-        async_httpx_client._transport = AsyncDummyTransport(async_httpx_client._transport)
+        # async_httpx_client._transport = AsyncDummyTransport(async_httpx_client._transport)
 
         self.client = httpx_client
-        self.async_client = async_httpx_client
-        return base_url, self.client, self.async_client
+        return base_url, self.client
 
     # pylint: disable=too-many-return-statements
     def before_request(
