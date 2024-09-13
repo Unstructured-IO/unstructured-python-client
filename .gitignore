@@ -1,3 +1,5 @@
+.venv/
+README-PYPI.md
 pyrightconfig.json
 venv/
 src/*.egg-info/

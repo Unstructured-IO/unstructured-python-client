@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "unstructured-client"
-version = "0.26.0-beta"
+version = "0.26.0-beta.1"
 description = "Python Client SDK for Unstructured API"
 authors = ["Unstructured",]
-readme = "README.md"
+readme = "README-PYPI.md"
 repository = "https://github.com/Unstructured-IO/unstructured-python-client.git"
 license = "MIT"
 packages = [
@@ -14,15 +14,19 @@ include = ["py.typed", "src/unstructured_client/py.typed"]
 [tool.setuptools.package-data]
 "*" = ["py.typed", "src/unstructured_client/py.typed"]
 
+[virtualenvs]
+in-project = true
+
 [tool.poetry.dependencies]
 python = "^3.8"
 deepdiff = ">=6.0"
+eval-type-backport = "^0.2.0"
 httpx = ">=0.27.0"
 jsonpath-python = "^1.0.6"
 nest-asyncio = ">=1.6.0"
-pydantic = "~2.8.2"
+pydantic = "~2.9.0"
 pypdf = ">=4.0"
-python-dateutil = "^2.9.0.post0"
+python-dateutil = "2.8.2"
 requests-toolbelt = ">=1.0.0"
 typing-inspect = "^0.9.0"
 
@@ -48,3 +52,9 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "jsonpath"
 ignore_missing_imports = true
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+
