@@ -25,6 +25,9 @@ class PartitionRequestTypedDict(TypedDict):
 
 
 class PartitionRequest(BaseModel):
+    def __init__(self, partition_parameters, **kwargs):
+        BaseModel.__init__(self, partition_parameters=partition_parameters, **kwargs)
+
     partition_parameters: Annotated[
         shared_partition_parameters.PartitionParameters,
         FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
