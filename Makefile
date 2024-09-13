@@ -7,19 +7,12 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 # Install #
 ###########
 
-.PHONY: install-test
-install-test:
-	pip install pytest pytest-asyncio pytest-mock requests_mock pypdf deepdiff requests-toolbelt uvloop
-
-.PHONY: install-dev
-install-dev:
-	pip install poetry
-	python scripts/prepare-readme.py
-	poetry install
-
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
-install: install-test install-dev
+install:
+	pip install poetry mypy pylint uvloop jupyter
+	python scripts/prepare-readme.py
+	poetry install
 
 #################
 # Test and Lint #

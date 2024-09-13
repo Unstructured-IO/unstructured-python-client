@@ -19,7 +19,6 @@ in-project = true
 
 [tool.poetry.dependencies]
 python = "^3.8"
-deepdiff = ">=6.0"
 eval-type-backport = "^0.2.0"
 httpx = ">=0.27.0"
 jsonpath-python = "^1.0.6"
@@ -31,9 +30,15 @@ requests-toolbelt = ">=1.0.0"
 typing-inspect = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
+deepdiff = ">=6.0"
+jupyter = ">=1.1.1"
 mypy = "==1.10.1"
 pylint = "==3.2.3"
+pytest = ">=8.3.3"
+pytest-asyncio = ">=0.24.0"
+pytest-mock = ">=3.14.0"
 types-python-dateutil = "^2.9.0.20240316"
+uvloop = ">=0.20.0"
 
 [build-system]
 requires = ["poetry-core"]
