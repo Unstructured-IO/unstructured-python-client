@@ -28,7 +28,7 @@ jobs:
       run: make install-test
     - name: Run unit tests
       run: |
-        pip install  .
+        make install
         make test-unit
 
   lint:
@@ -36,7 +36,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: pip install . && make install-dev
+      run: make install-dev
     - name: Lint
       run: make lint
 
@@ -55,7 +55,7 @@ jobs:
       run: make install-test
     - name: Run all tests
       run: |
-        pip install  .
+        make install
         make test
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}

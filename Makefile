@@ -13,7 +13,9 @@ install-test:
 
 .PHONY: install-dev
 install-dev:
-	pip install jupyter uvloop pylint mypy
+	pip install poetry
+	python scripts/prepare-readme.py
+	poetry install
 
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
