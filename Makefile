@@ -10,7 +10,7 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
 install:
-	pip install poetry mypy pylint uvloop jupyter
+	pip install poetry
 	python scripts/prepare-readme.py
 	poetry install
 
