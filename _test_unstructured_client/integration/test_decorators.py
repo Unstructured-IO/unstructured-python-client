@@ -306,7 +306,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         # Assert that the SDK issues our no-op request
         # returned by the BeforeRequestHook
         nonlocal mock_endpoint_called
-        if request.url.host == "no-op":
+        if request.url.host == "no-op" or "docs" in request.url.path:
             mock_endpoint_called = True
             return Response(200, request=request)
 
