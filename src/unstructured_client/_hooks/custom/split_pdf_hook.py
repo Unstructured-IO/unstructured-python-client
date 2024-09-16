@@ -331,7 +331,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # Return a dummy request for the SDK to use
         # This allows us to skip right to the AfterRequestHook and await all the calls
-        dummy_request = httpx.Request("GET",  "http://no-op")
+        # Note: We need access to the async_client from the sdk_init hook in order to set
+        # up a mock request like this.
+        # For now, just make an extra request against our api, which should return 200.
+        # dummy_request = httpx.Request("GET",  "http://no-op")
+
+        dummy_request = httpx.Request("GET",  "https://api.unstructuredapp.io/general/docs")
 
         return dummy_request
 

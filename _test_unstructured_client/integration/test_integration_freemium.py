@@ -70,7 +70,8 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
     response = httpx.Response(
         status_code=error_code,
         headers={'Content-Type': 'application/json'},
-        content=json.dumps(json_data)
+        content=json.dumps(json_data),
+        request=httpx.Request("POST", "http://mock-request"),
     )
 
     monkeypatch.setattr(httpx.AsyncClient, "send", lambda *args, **kwargs: response)
