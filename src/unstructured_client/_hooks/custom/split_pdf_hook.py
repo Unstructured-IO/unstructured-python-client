@@ -5,6 +5,7 @@ import io
 import logging
 import os
 import math
+import uuid
 from collections.abc import Awaitable
 from typing import Any, Coroutine, Optional, Tuple, Union, cast
 
@@ -198,7 +199,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # This allows us to use an event loop in an env with an existing loop
         # Temporary fix until we can improve the async splitting behavior
         nest_asyncio.apply()
-        operation_id = hook_ctx.operation_id
+
+        # This is our key into coroutines_to_execute
+        # We need to pass it on to after_success so
+        # we know which results are ours
+        operation_id = str(uuid.uuid4())
+
         content_type = request.headers.get("Content-Type")
 
         request_content = request.read()
@@ -329,14 +335,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
 
+
         # Return a dummy request for the SDK to use
         # This allows us to skip right to the AfterRequestHook and await all the calls
+        # Also, pass the operation_id so after_success can await the right results
+
         # Note: We need access to the async_client from the sdk_init hook in order to set
         # up a mock request like this.
         # For now, just make an extra request against our api, which should return 200.
         # dummy_request = httpx.Request("GET",  "http://no-op")
-
-        dummy_request = httpx.Request("GET",  "https://api.unstructuredapp.io/general/docs")
+        dummy_request = httpx.Request(
+            "GET",
+            "https://api.unstructuredapp.io/general/docs",
+            headers={"request_id": operation_id},
+        )
 
         return dummy_request
 
@@ -407,9 +419,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             combined response object; otherwise, the original response. Can return
             exception if it ocurred during the execution.
         """
-        operation_id = hook_ctx.operation_id
-        # Because in `before_request` method we skipped sending last page in parallel
-        # we need to pass response, which contains last page, to `_await_elements` method
+        # Grab the correct id out of the dummy request
+        operation_id = response.request.headers.get("request_id")
+
         elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
