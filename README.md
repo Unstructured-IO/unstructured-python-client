@@ -29,15 +29,45 @@ This is a Python client for the [Unstructured API](https://docs.unstructured.io/
 
 Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk-python) for a full guide to using the client.
 
+<!-- Start Summary [summary] -->
+## Summary
+
+
+<!-- End Summary [summary] -->
+
+<!-- Start Table of Contents [toc] -->
+## Table of Contents
+
+* [SDK Installation](#sdk-installation)
+* [IDE Support](#ide-support)
+* [SDK Example Usage](#sdk-example-usage)
+* [Available Resources and Operations](#available-resources-and-operations)
+* [File uploads](#file-uploads)
+* [Retries](#retries)
+* [Error Handling](#error-handling)
+* [Server Selection](#server-selection)
+* [Custom HTTP Client](#custom-http-client)
+* [Authentication](#authentication)
+* [Debugging](#debugging)
+<!-- End Table of Contents [toc] -->
+
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
-PIP
+The SDK can be installed with either *pip* or *poetry* package managers.
+
+### PIP
+
+*PIP* is the default package installer for Python, enabling easy installation and management of packages from PyPI via the command line.
+
 ```bash
 pip install unstructured-client
 ```
 
-Poetry
+### Poetry
+
+*Poetry* is a modern tool that simplifies dependency management and package publishing by using a single `pyproject.toml` file to handle project metadata and dependencies.
+
 ```bash
 poetry add unstructured-client
 ```
@@ -143,16 +173,13 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = UnstructuredClient(
-    api_key_auth="YOUR_API_KEY",
-)
-
+s = UnstructuredClient()
 
 res = s.general.partition(request={
     "partition_parameters": {
         "files": {
-            "content": open("<file_path>", "rb"),
-            "file_name": "your_file_here",
+            "content": open("example.file", "rb"),
+            "file_name": "example.file",
         },
         "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
         "split_pdf_page_range": [
@@ -178,15 +205,13 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 s = UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
-    api_key_auth="YOUR_API_KEY",
 )
-
 
 res = s.general.partition(request={
     "partition_parameters": {
         "files": {
-            "content": open("<file_path>", "rb"),
-            "file_name": "your_file_here",
+            "content": open("example.file", "rb"),
+            "file_name": "example.file",
         },
         "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
         "split_pdf_page_range": [
@@ -292,6 +317,16 @@ s = UnstructuredClient(async_client=CustomClient(httpx.AsyncClient()))
 <!-- No Server Selection -->
 <!-- No Authentication -->
 
+<!-- Start IDE Support [idesupport] -->
+## IDE Support
+
+### PyCharm
+
+Generally, the SDK will work well with most IDEs out of the box. However, when using PyCharm, you can enjoy much better integration with Pydantic by installing an additional plugin.
+
+- [PyCharm Pydantic Plugin](https://docs.pydantic.dev/latest/integrations/pycharm/)
+<!-- End IDE Support [idesupport] -->
+
 <!-- Start File uploads [file-upload] -->
 ## File uploads
 
@@ -306,16 +341,13 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-s = UnstructuredClient(
-    api_key_auth="YOUR_API_KEY",
-)
-
+s = UnstructuredClient()
 
 res = s.general.partition(request={
     "partition_parameters": {
         "files": {
-            "content": open("<file_path>", "rb"),
-            "file_name": "your_file_here",
+            "content": open("example.file", "rb"),
+            "file_name": "example.file",
         },
         "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
         "split_pdf_page_range": [
@@ -332,6 +364,21 @@ if res.elements is not None:
 
 ```
 <!-- End File uploads [file-upload] -->
+
+<!-- Start Debugging [debug] -->
+## Debugging
+
+You can setup your SDK to emit debug logs for SDK requests and responses.
+
+You can pass your own logger class directly into your SDK.
+```python
+from unstructured_client import UnstructuredClient
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
+```
+<!-- End Debugging [debug] -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 

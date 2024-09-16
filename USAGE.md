@@ -4,16 +4,13 @@
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-s = UnstructuredClient(
-    api_key_auth="YOUR_API_KEY",
-)
-
+s = UnstructuredClient()
 
 res = s.general.partition(request={
     "partition_parameters": {
         "files": {
-            "content": open("<file_path>", "rb"),
-            "file_name": "your_file_here",
+            "content": open("example.file", "rb"),
+            "file_name": "example.file",
         },
         "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
         "split_pdf_page_range": [
@@ -39,21 +36,19 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
-    s = UnstructuredClient(
-        api_key_auth="YOUR_API_KEY",
-    )
+    s = UnstructuredClient()
     res = await s.general.partition_async(request={
         "partition_parameters": {
             "files": {
-                "content": open("<file_path>", "rb"),
-                "file_name": "your_file_here",
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BASIC,
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
             "split_pdf_page_range": [
                 1,
                 10,
             ],
-            "strategy": shared.Strategy.AUTO,
+            "strategy": shared.Strategy.HI_RES,
         },
     })
     if res.elements is not None:

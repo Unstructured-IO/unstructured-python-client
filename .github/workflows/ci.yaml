@@ -12,6 +12,10 @@ permissions:
   id-token: write
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test_unit:
     strategy:
@@ -25,20 +29,20 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: make install-test
+      run: make install
     - name: Run unit tests
       run: |
-        pip install  .
-        make test-unit
+        poetry run make test-unit
 
   lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: pip install . && make install-dev
+      run: make install
     - name: Lint
-      run: make lint
+      run: |
+        poetry run make lint
 
   test_integration:
     strategy:
@@ -52,11 +56,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: make install-test
+      run: make install
     - name: Run all tests
       run: |
-        pip install  .
-        make test
+        poetry run make test
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 

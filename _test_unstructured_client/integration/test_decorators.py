@@ -295,7 +295,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     number_of_split_502s = 2
     number_of_last_page_502s = 2
 
-    async def mock_send(_, request: httpx.Request):
+    async def mock_send(_, request: httpx.Request, **kwargs):
         """
         Return a predefined number of 502s for requests with certain starting_page_number values.
 
@@ -306,7 +306,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         # Assert that the SDK issues our no-op request
         # returned by the BeforeRequestHook
         nonlocal mock_endpoint_called
-        if request.url.host == "no-op":
+        if request.url.host == "no-op" or "docs" in request.url.path:
             mock_endpoint_called = True
             return Response(200, request=request)
 
