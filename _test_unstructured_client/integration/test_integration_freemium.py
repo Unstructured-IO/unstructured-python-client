@@ -187,8 +187,6 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
         ignore_order=True,
     )
 
-    print(diff)
-
     assert len(diff) == 0
 
 
