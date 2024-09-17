@@ -344,13 +344,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # up a mock request like this.
         # For now, just make an extra request against our api, which should return 200.
         # dummy_request = httpx.Request("GET",  "http://no-op")
-        dummy_request = httpx.Request(
+        return httpx.Request(
             "GET",
             "https://api.unstructuredapp.io/general/docs",
-            headers={"request_id": operation_id},
+            headers={"operation_id": operation_id},
         )
-
-        return dummy_request
 
     def _await_elements(
             self, operation_id: str) -> Optional[list]:
@@ -420,7 +418,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             exception if it ocurred during the execution.
         """
         # Grab the correct id out of the dummy request
-        operation_id = response.request.headers.get("request_id")
+        operation_id = response.request.headers.get("operation_id")
 
         elements = self._await_elements(operation_id)
 
