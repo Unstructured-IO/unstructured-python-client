@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import pytest
+from deepdiff import DeepDiff
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
@@ -123,6 +124,70 @@ async def test_partition_async_returns_elements(client, doc_path):
     response = await client.general.partition_async(request=req)
     assert response.status_code == 200
     assert len(response.elements)
+
+
+@pytest.mark.asyncio
+async def test_partition_async_processes_concurrent_files(client, doc_path):
+    """
+    Assert that partition_async can be used to send multiple files concurrently.
+    Send two separate portions of the test doc, serially and then using asyncio.gather.
+    The results for both runs should match.
+    """
+    filename = "layout-parser-paper.pdf"
+
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    # Set up two SDK requests
+    # For different page ranges
+    requests = [
+        operations.PartitionRequest(
+            partition_parameters=shared.PartitionParameters(
+                files=files,
+                strategy="fast",
+                languages=["eng"],
+                split_pdf_page=True,
+                split_pdf_page_range=[1, 3],
+            )
+        ),
+        operations.PartitionRequest(
+            partition_parameters=shared.PartitionParameters(
+                files=files,
+                strategy="fast",
+                languages=["eng"],
+                split_pdf_page=True,
+                split_pdf_page_range=[10, 12],
+            )
+        )
+    ]
+
+    serial_responses = []
+    for req in requests:
+        res = await client.general.partition_async(request=req)
+
+        assert res.status_code == 200
+        serial_responses.append(res.elements)
+
+    concurrent_responses = []
+    results = await asyncio.gather(
+        client.general.partition_async(request=requests[0]),
+        client.general.partition_async(request=requests[1])
+    )
+
+    for res in results:
+        assert res.status_code == 200
+        concurrent_responses.append(res.elements)
+
+    diff = DeepDiff(
+        t1=serial_responses,
+        t2=concurrent_responses,
+        ignore_order=True,
+    )
+
+    assert len(diff) == 0
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
