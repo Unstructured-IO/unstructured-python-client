@@ -18,7 +18,7 @@ actions:
             res = s.general.partition(request=operations.PartitionRequest(
                 partition_parameters=shared.PartitionParameters(
                     files=shared.Files(
-                        file_name='your_file_here',
+                        file_name='example.file',
                         content='0x2cC94b2FEF'.encode(),
                     ),
                     strategy=shared.Strategy.AUTO,

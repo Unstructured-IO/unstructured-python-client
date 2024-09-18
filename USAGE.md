@@ -10,7 +10,7 @@ res = s.general.partition(request=operations.PartitionRequest(
     partition_parameters=shared.PartitionParameters(
         files=shared.Files(
             content='0x2cC94b2FEF'.encode(),
-            file_name='your_file_here',
+            file_name='example.file',
         ),
         chunking_strategy=shared.ChunkingStrategy.BY_TITLE,
         split_pdf_page_range=[
