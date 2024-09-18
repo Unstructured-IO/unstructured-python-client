@@ -3,10 +3,10 @@ id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
   docChecksum: ad32e3faae264ab1eb7cf461e373dcfa
   docVersion: 1.0.48
-  speakeasyVersion: 1.394.0
-  generationVersion: 2.413.0
-  releaseVersion: 0.25.8
-  configChecksum: a507e57b6d5946017db1c1c77d195ca1
+  speakeasyVersion: 1.399.2
+  generationVersion: 2.416.6
+  releaseVersion: 0.25.9
+  configChecksum: b89659e8aec8879c7c254a35eb4c177a
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,7 +15,7 @@ features:
   python:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.1.4
-    core: 4.8.7
+    core: 4.8.9
     examples: 2.81.3
     globalSecurity: 2.83.7
     globalSecurityCallbacks: 0.1.0
@@ -76,11 +76,11 @@ examples:
   partition:
     speakeasy-default-partition:
       requestBody:
-        multipart/form-data: {"chunking_strategy": "by_title", "files": {"": "your_file_here"}, "split_pdf_page_range": [1, 10], "strategy": "hi_res"}
+        multipart/form-data: {"chunking_strategy": "by_title", "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "split_pdf_page_range": [1, 10], "strategy": "hi_res"}
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": []}
         5XX:
           application/json: {"detail": "An error occurred"}
