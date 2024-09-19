@@ -68,10 +68,6 @@ client-generate-local:
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
-.PHONY: patch-custom-code
-patch-custom-code:
-	git apply _custom_code.patch
-
 .PHONY: publish
 publish:
 	./scripts/publish.sh
