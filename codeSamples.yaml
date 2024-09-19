@@ -9,26 +9,25 @@ actions:
         - lang: python
           label: partition
           source: |-
-            import unstructured_client
-            from unstructured_client.models import operations, shared
+            from unstructured_client import UnstructuredClient
+            from unstructured_client.models import shared
 
-            s = unstructured_client.UnstructuredClient()
+            s = UnstructuredClient()
 
-
-            res = s.general.partition(request=operations.PartitionRequest(
-                partition_parameters=shared.PartitionParameters(
-                    files=shared.Files(
-                        file_name='your_file_here',
-                        content='0x2cC94b2FEF'.encode(),
-                    ),
-                    strategy=shared.Strategy.AUTO,
-                    chunking_strategy=shared.ChunkingStrategy.BASIC,
-                    split_pdf_page_range=[
+            res = s.general.partition(request={
+                "partition_parameters": {
+                    "files": {
+                        "file_name": "example.file",
+                        "content": open("example.file", "rb"),
+                    },
+                    "strategy": shared.Strategy.AUTO,
+                    "chunking_strategy": shared.ChunkingStrategy.BASIC,
+                    "split_pdf_page_range": [
                         1,
                         10,
                     ],
-                ),
-            ))
+                },
+            })
 
             if res.elements is not None:
                 # handle response
