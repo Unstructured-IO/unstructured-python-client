@@ -14,6 +14,11 @@ install:
 	python scripts/prepare-readme.py
 	poetry install
 
+## install-speakeasy-cli:			download the speakeasy cli tool
+.PHONY: install-speakeasy-cli
+install-speakeasy-cli:
+	curl -fsSL https://raw.githubusercontent.com/speakeasy-api/speakeasy/main/install.sh | sh
+
 #################
 # Test and Lint #
 #################
@@ -48,6 +53,7 @@ lint:
 # Speakeasy #
 #############
 
+## client-generate:			Pull the openapi spec from the free hosted API and generate the SDK
 .PHONY: client-generate
 client-generate:
 	wget -nv -q -O openapi.json https://api.unstructured.io/general/openapi.json
@@ -55,9 +61,9 @@ client-generate:
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
+## client-generate-local:			Generate the SDK using a local copy of openapi.json
 .PHONY: client-generate-local
 client-generate-local:
-	wget -nv -q -O openapi.json http://localhost:5000/general/openapi.json
 	speakeasy overlay validate -o ./overlay_client.yaml
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
