@@ -19,6 +19,7 @@ python:
       pytest-mock: '>=3.14.0'
       uvloop: '>=0.20.0'
     main:
+      cryptography: '>=3.1'
       httpx: '>=0.27.0'
       nest-asyncio: '>=1.6.0'
       pypdf: '>=4.0'
