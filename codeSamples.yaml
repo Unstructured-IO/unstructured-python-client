@@ -5,31 +5,7 @@ info:
 actions:
   - target: $["paths"]["/general/v0/general"]["post"]
     update:
-      x-codeSamples:
-        - lang: python
-          label: partition
-          source: |-
-            import unstructured_client
-            from unstructured_client.models import operations, shared
-
-            s = unstructured_client.UnstructuredClient()
-
-
-            res = s.general.partition(request=operations.PartitionRequest(
-                partition_parameters=shared.PartitionParameters(
-                    files=shared.Files(
-                        file_name='your_file_here',
-                        content='0x2cC94b2FEF'.encode(),
-                    ),
-                    strategy=shared.Strategy.AUTO,
-                    chunking_strategy=shared.ChunkingStrategy.BASIC,
-                    split_pdf_page_range=[
-                        1,
-                        10,
-                    ],
-                ),
-            ))
-
-            if res.elements is not None:
-                # handle response
-                pass
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "partition"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\ns = UnstructuredClient()\n\nres = s.general.partition(request={\n    \"partition_parameters\": {\n        \"files\": {\n            \"file_name\": \"example.file\",\n            \"content\": open(\"example.file\", \"rb\"),\n        },\n        \"strategy\": shared.Strategy.AUTO,\n        \"chunking_strategy\": shared.ChunkingStrategy.BASIC,\n        \"split_pdf_page_range\": [\n            1,\n            10,\n        ],\n    },\n})\n\nif res.elements is not None:\n    # handle response\n    pass"
