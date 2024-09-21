@@ -122,11 +122,11 @@ def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
         files = shared.Files(content=f.read(), file_name=filename)
 
     req = operations.PartitionRequest(
-        shared.PartitionParameters(files=files)
+        partition_parameters=shared.PartitionParameters(files=files)
     )
 
     with pytest.raises(Exception, match=f"Status {status_code}"):
-        session.general.partition(req, retries=retries)
+        session.general.partition(request=req, retries=retries)
 
     if expect_retry:
         assert number_of_requests[0] > 1

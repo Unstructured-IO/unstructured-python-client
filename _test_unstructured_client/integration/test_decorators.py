@@ -356,7 +356,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         )
 
     req = operations.PartitionRequest(
-        shared.PartitionParameters(
+        partition_parameters=shared.PartitionParameters(
             files=files,
             split_pdf_page=True,
             split_pdf_allow_failed=False,
