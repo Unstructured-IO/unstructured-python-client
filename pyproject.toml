@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unstructured-client"
-version = "0.26.0-beta.1"
+version = "0.26.0-beta.2"
 description = "Python Client SDK for Unstructured API"
 authors = ["Unstructured",]
 readme = "README-PYPI.md"
@@ -19,6 +19,7 @@ in-project = true
 
 [tool.poetry.dependencies]
 python = "^3.8"
+cryptography = ">=3.1"
 eval-type-backport = "^0.2.0"
 httpx = ">=0.27.0"
 jsonpath-python = "^1.0.6"
@@ -31,7 +32,6 @@ typing-inspect = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 deepdiff = ">=6.0"
-jupyter = ">=1.1.1"
 mypy = "==1.10.1"
 pylint = "==3.2.3"
 pytest = ">=8.3.3"
