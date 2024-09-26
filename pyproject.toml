@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unstructured-client"
-version = "0.26.0-beta.2"
+version = "0.26.0-beta.3"
 description = "Python Client SDK for Unstructured API"
 authors = ["Unstructured",]
 readme = "README-PYPI.md"

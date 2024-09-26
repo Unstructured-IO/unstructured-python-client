@@ -33,11 +33,11 @@ class SDKConfiguration:
     server_url: Optional[str] = ""
     server: Optional[str] = ""
     language: str = "python"
-    openapi_doc_version: str = "1.0.48"
-    sdk_version: str = "0.26.0-beta.2"
-    gen_version: str = "2.421.3"
+    openapi_doc_version: str = "1.0.50"
+    sdk_version: str = "0.26.0-beta.3"
+    gen_version: str = "2.422.22"
     user_agent: str = (
-        "speakeasy-sdk/python 0.26.0-beta.2 2.421.3 1.0.48 unstructured-client"
+        "speakeasy-sdk/python 0.26.0-beta.3 2.422.22 1.0.50 unstructured-client"
     )
     retry_config: OptionalNullable[RetryConfig] = Field(default_factory=lambda: UNSET)
     timeout_ms: Optional[int] = None
