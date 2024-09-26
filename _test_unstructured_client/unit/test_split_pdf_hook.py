@@ -237,7 +237,7 @@ def test_unit_is_pdf_valid_pdf():
     assert result is True
 
 
-def test_unit_is_pdf_valid_pdf_without_file_extension(caplog):
+def test_unit_is_pdf_valid_pdf_without_file_extension():
     """Test is pdf method returns True for file with valid pdf content without basing on file extension."""
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
     
@@ -252,36 +252,31 @@ def test_unit_is_pdf_valid_pdf_without_file_extension(caplog):
     assert result is True
 
 
-def test_unit_is_pdf_invalid_extension(caplog):
+def test_unit_is_pdf_invalid_extension():
     """Test is pdf method returns False for file with invalid extension."""
     file = shared.Files(content=b"txt_content", file_name="test_file.txt")
 
-    with caplog.at_level(logging.WARNING):
-        result = pdf_utils.is_pdf(file)
+    result = pdf_utils.is_pdf(file)
 
     assert result is False
-    assert "The file does not appear to be a valid PDF." in caplog.text
 
 
-def test_unit_is_pdf_invalid_pdf(caplog):
+def test_unit_is_pdf_invalid_pdf():
     """Test is pdf method returns False for file with invalid pdf content."""
     file = shared.Files(content=b"invalid_pdf_content", file_name="test_file.pdf")
 
-    with caplog.at_level(logging.WARNING):
-        result = pdf_utils.is_pdf(file)
+    result = pdf_utils.is_pdf(file)
 
     assert result is False
-    assert "The file does not appear to be a valid PDF." in caplog.text
 
-def test_unit_is_pdf_invalid_pdf_without_file_extension(caplog):
+
+def test_unit_is_pdf_invalid_pdf_without_file_extension():
     """Test is pdf method returns False for file with invalid pdf content without basing on file extension."""
     file = shared.Files(content=b"invalid_pdf_content", file_name="uuid1234")
 
-    with caplog.at_level(logging.WARNING):
-        result = pdf_utils.is_pdf(file)
+    result = pdf_utils.is_pdf(file)
 
     assert result is False
-    assert "The file does not appear to be a valid PDF." in caplog.text
     
 
 def test_unit_get_starting_page_number_missing_key():

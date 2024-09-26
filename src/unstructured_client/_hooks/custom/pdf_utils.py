@@ -68,9 +68,7 @@ def is_pdf(file: shared.Files) -> bool:
     try:
         content = cast(bytes, file.content)
         PdfReader(io.BytesIO(content), strict=True)
-    except (PdfReadError, UnicodeDecodeError) as exc:
-        logger.error(exc)
-        logger.warning("The file does not appear to be a valid PDF.")
+    except (PdfReadError, UnicodeDecodeError):
         return False
 
     return True
