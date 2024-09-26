@@ -69,6 +69,7 @@ def is_pdf(file: shared.Files) -> bool:
         content = cast(bytes, file.content)
         PdfReader(io.BytesIO(content), strict=True)
     except (PdfReadError, UnicodeDecodeError):
+        logger.info("Loading PDF failed, so splitting is not enabled.")
         return False
 
     return True
