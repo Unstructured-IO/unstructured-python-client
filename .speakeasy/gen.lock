@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 50c3c5e39eb24b50e53fbe08f8156e76
-  docVersion: 1.0.48
-  speakeasyVersion: 1.401.2
-  generationVersion: 2.421.3
-  releaseVersion: 0.26.0-beta.2
-  configChecksum: 1c64b3f4febc852a778315853edd62ff
+  docChecksum: 9539f605294aa86b949f639c62f09e45
+  docVersion: 1.0.50
+  speakeasyVersion: 1.402.14
+  generationVersion: 2.422.22
+  releaseVersion: 0.26.0-beta.3
+  configChecksum: d33f785870188c842139f190d72017a7
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,7 +15,7 @@ features:
   python:
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.3
-    core: 5.5.4
+    core: 5.5.5
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.1
