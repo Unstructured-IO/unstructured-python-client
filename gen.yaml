@@ -10,7 +10,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
 python:
-  version: 0.26.0-beta.3
+  version: 0.26.0-beta.4
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -29,6 +29,8 @@ python:
   clientServerStatusCodesAsErrors: true
   description: Python Client SDK for Unstructured API
   enumFormat: enum
+  fixFlags:
+    responseRequiredSep2024: false
   flattenGlobalSecurity: true
   flattenRequests: false
   imports:
