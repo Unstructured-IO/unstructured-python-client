@@ -56,8 +56,7 @@ def get_pdf_pages(
 def is_pdf(file: shared.Files) -> bool:
     """Checks if the given file is a PDF.
 
-    First it checks the file extension and if it is equal to `.pdf`, then
-    it tries to read that file. If there is no error then we assume it is a proper PDF.
+    Tries to read that file. If there is no error then we assume it is a proper PDF.
 
     Args:
         file: The file to be checked.
@@ -65,16 +64,11 @@ def is_pdf(file: shared.Files) -> bool:
     Returns:
         True if the file is a PDF, False otherwise.
     """
-    if not file.file_name.endswith(".pdf"):
-        logger.info("Given file doesn't have '.pdf' extension, so splitting is not enabled.")
-        return False
 
     try:
         content = cast(bytes, file.content)
         PdfReader(io.BytesIO(content), strict=True)
-    except (PdfReadError, UnicodeDecodeError) as exc:
-        logger.error(exc)
-        logger.warning("The file does not appear to be a valid PDF.")
+    except (PdfReadError, UnicodeDecodeError):
         return False
 
     return True

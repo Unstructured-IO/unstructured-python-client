@@ -32,7 +32,7 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     ],
 )
 def test_integration_split_pdf_has_same_output_as_non_split(
-    concurrency_level: int, filename: str, expected_ok: bool, strategy: str, caplog
+    concurrency_level: int, filename: str, expected_ok: bool, strategy: str
 ):
     """
     Tests that output that we get from the split-by-page pdf is the same as from non-split.
@@ -74,7 +74,6 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         resp_split = client.general.partition(request=req)
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
-            assert "The file does not appear to be a valid PDF." in caplog.text
             assert "File does not appear to be a valid PDF" in str(exc)
             return
         else:
