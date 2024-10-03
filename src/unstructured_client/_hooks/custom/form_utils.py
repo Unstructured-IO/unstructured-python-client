@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import logging
-from typing import Union
+from typing import TYPE_CHECKING
 from typing_extensions import TypeAlias
 
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client.models import shared
+
+if TYPE_CHECKING:
+    from typing import Union
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 FormData: TypeAlias = "dict[str, Union[str, shared.Files, list[str]]]"
