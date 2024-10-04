@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import logging
-from typing import Union
+from typing import TYPE_CHECKING
+from typing_extensions import TypeAlias
 
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client.models import shared
 
+if TYPE_CHECKING:
+    from typing import Union
+
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData = dict[str, Union[str, shared.Files, list[str]]]
+FormData: TypeAlias = "dict[str, Union[str, shared.Files, list[str]]]"
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
@@ -32,6 +36,7 @@ def get_page_range(form_data: FormData, key: str, max_pages: int) -> tuple[int, 
     Returns:
         The range of pages to send in the request in the form (start, end)
     """
+    _page_range = None
     try:
         _page_range = form_data.get(key)
 
@@ -202,7 +207,7 @@ def parse_form_data(decoded_data: MultipartDecoder) -> FormData:
     form_data: FormData = {}
 
     for part in decoded_data.parts:
-        content_disposition = part.headers.get(b"Content-Disposition")
+        content_disposition = part.headers.get(b"Content-Disposition") # type: ignore
         if content_disposition is None:
             raise RuntimeError("Content-Disposition header not found. Can't split pdf file.")
         part_params = decode_content_disposition(content_disposition)

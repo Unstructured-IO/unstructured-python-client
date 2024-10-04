@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
