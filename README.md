@@ -11,19 +11,11 @@
 
 <div align="center">
 
- <a
-   href="https://www.phorm.ai/query?projectId=34efc517-2201-4376-af43-40c4b9da3dc5">
-	<img src="https://img.shields.io/badge/Phorm-Ask_AI-%23F2777A.svg?&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNSIgaGVpZ2h0PSI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxwYXRoIGQ9Ik00LjQzIDEuODgyYTEuNDQgMS40NCAwIDAgMS0uMDk4LjQyNmMtLjA1LjEyMy0uMTE1LjIzLS4xOTIuMzIyLS4wNzUuMDktLjE2LjE2NS0uMjU1LjIyNmExLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxMmMtLjA5OS4wMTItLjE5Mi4wMTQtLjI3OS4wMDZsLTEuNTkzLS4xNHYtLjQwNmgxLjY1OGMuMDkuMDAxLjE3LS4xNjkuMjQ2LS4xOTFhLjYwMy42MDMgMCAwIDAgLjItLjEwNi41MjkuNTI5IDAgMCAwIC4xMzgtLjE3LjY1NC42NTQgMCAwIDAgLjA2NS0uMjRsLjAyOC0uMzJhLjkzLjkzIDAgMCAwLS4wMzYtLjI0OS41NjcuNTY3IDAgMCAwLS4xMDMtLjIuNTAyLjUwMiAwIDAgMC0uMTY4LS4xMzguNjA4LjYwOCAwIDAgMC0uMjQtLjA2N0wyLjQzNy43MjkgMS42MjUuNjcxYS4zMjIuMzIyIDAgMCAwLS4yMzIuMDU4LjM3NS4zNzUgMCAwIDAtLjExNi4yMzJsLS4xMTYgMS40NS0uMDU4LjY5Ny0uMDU4Ljc1NEwuNzA1IDRsLS4zNTctLjA3OUwuNjAyLjkwNkMuNjE3LjcyNi42NjMuNTc0LjczOS40NTRhLjk1OC45NTggMCAwIDEgLjI3NC0uMjg1Ljk3MS45NzEgMCAwIDEgLjMzNy0uMTRjLjExOS0uMDI2LjIyNy0uMDM0LjMyNS0uMDI2TDMuMjMyLjE2Yy4xNTkuMDE0LjMzNi4wMy40NTkuMDgyYTEuMTczIDEuMTczIDAgMCAxIC41NDUuNDQ3Yy4wNi4wOTQuMTA5LjE5Mi4xNDQuMjkzYTEuMzkyIDEuMzkyIDAgMCAxIC4wNzguNThsLS4wMjkuMzJaIiBmaWxsPSIjRjI3NzdBIi8+CiAgPHBhdGggZD0iTTQuMDgyIDIuMDA3YTEuNDU1IDEuNDU1IDAgMCAxLS4wOTguNDI3Yy0uMDUuMTI0LS4xMTQuMjMyLS4xOTIuMzI0YTEuMTMgMS4xMyAwIDAgMS0uMjU0LjIyNyAxLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxNGMtLjEuMDEyLS4xOTMuMDE0LS4yOC4wMDZsLTEuNTYtLjEwOC4wMzQtLjQwNi4wMy0uMzQ4IDEuNTU5LjE1NGMuMDkgMCAuMTczLS4wMS4yNDgtLjAzM2EuNjAzLjYwMyAwIDAgMCAuMi0uMTA2LjUzMi41MzIgMCAwIDAgLjEzOS0uMTcyLjY2LjY2IDAgMCAwIC4wNjQtLjI0MWwuMDI5LS4zMjFhLjk0Ljk0IDAgMCAwLS4wMzYtLjI1LjU3LjU3IDAgMCAwLS4xMDMtLjIwMi41MDIuNTAyIDAgMCAwLS4xNjgtLjEzOC42MDUuNjA1IDAgMCAwLS4yNC0uMDY3TDEuMjczLjgyN2MtLjA5NC0uMDA4LS4xNjguMDEtLjIyMS4wNTUtLjA1My4wNDUtLjA4NC4xMTQtLjA5Mi4yMDZMLjcwNSA0IDAgMy45MzhsLjI1NS0yLjkxMUExLjAxIDEuMDEgMCAwIDEgLjM5My41NzIuOTYyLjk2MiAwIDAgMSAuNjY2LjI4NmEuOTcuOTcgMCAwIDEgLjMzOC0uMTRDMS4xMjIuMTIgMS4yMy4xMSAxLjMyOC4xMTlsMS41OTMuMTRjLjE2LjAxNC4zLjA0Ny40MjMuMWExLjE3IDEuMTcgMCAwIDEgLjU0NS40NDhjLjA2MS4wOTUuMTA5LjE5My4xNDQuMjk1YTEuNDA2IDEuNDA2IDAgMCAxIC4wNzcuNTgzbC0uMDI4LjMyMloiIGZpbGw9IndoaXRlIi8+CiAgPHBhdGggZD0iTTQuMDgyIDIuMDA3YTEuNDU1IDEuNDU1IDAgMCAxLS4wOTguNDI3Yy0uMDUuMTI0LS4xMTQuMjMyLS4xOTIuMzI0YTEuMTMgMS4xMyAwIDAgMS0uMjU0LjIyNyAxLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxNGMtLjEuMDEyLS4xOTMuMDE0LS4yOC4wMDZsLTEuNTYtLjEwOC4wMzQtLjQwNi4wMy0uMzQ4IDEuNTU5LjE1NGMuMDkgMCAuMTczLS4wMS4yNDgtLjAzM2EuNjAzLjYwMyAwIDAgMCAuMi0uMTA2LjUzMi41MzIgMCAwIDAgLjEzOS0uMTcyLjY2LjY2IDAgMCAwIC4wNjQtLjI0MWwuMDI5LS4zMjFhLjk0Ljk0IDAgMCAwLS4wMzYtLjI1LjU3LjU3IDAgMCAwLS4xMDMtLjIwMi41MDIuNTAyIDAgMCAwLS4xNjgtLjEzOC42MDUuNjA1IDAgMCAwLS4yNC0uMDY3TDEuMjczLjgyN2MtLjA5NC0uMDA4LS4xNjguMDEtLjIyMS4wNTUtLjA1My4wNDUtLjA4NC4xMTQtLjA5Mi4yMDZMLjcwNSA0IDAgMy45MzhsLjI1NS0yLjkxMUExLjAxIDEuMDEgMCAwIDEgLjM5My41NzIuOTYyLjk2MiAwIDAgMSAuNjY2LjI4NmEuOTcuOTcgMCAwIDEgLjMzOC0uMTRDMS4xMjIuMTIgMS4yMy4xMSAxLjMyOC4xMTlsMS41OTMuMTRjLjE2LjAxNC4zLjA0Ny40MjMuMWExLjE3IDEuMTcgMCAwIDEgLjU0NS40NDhjLjA2MS4wOTUuMTA5LjE5My4xNDQuMjk1YTEuNDA2IDEuNDA2IDAgMCAxIC4wNzcuNTgzbC0uMDI4LjMyMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" />
-   </a>
-
 </div>
-
 
 <h2 align="center">
   <p>Python SDK for the Unstructured API</p>
 </h2>
-
-NOTE: This README is for the `0.26.0-beta` version. The current published SDK, `0.25.5` can be found [here](https://github.com/Unstructured-IO/unstructured-python-client/blob/v0.25.5/README.md).
 
 This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/saas-api-development-guide) and you can sign up for your API key on https://app.unstructured.io.
 
@@ -73,94 +65,6 @@ poetry add unstructured-client
 ```
 <!-- End SDK Installation [installation] -->
 
-## SDK Example Usage
-
-### Example
-
-```python
-import os
-
-import unstructured_client
-from unstructured_client.models import operations, shared
-
-client = unstructured_client.UnstructuredClient(
-    api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"),
-    server_url=os.getenv("UNSTRUCTURED_API_URL"),
-)
-
-filename = "PATH_TO_FILE"
-with open(filename, "rb") as f:
-    data = f.read()
-
-req = operations.PartitionRequest(
-    partition_parameters=shared.PartitionParameters(
-        files=shared.Files(
-            content=data,
-            file_name=filename,
-        ),
-        # --- Other partition parameters ---
-        strategy=shared.Strategy.AUTO,
-        languages=['eng'],
-    ),
-)
-
-try:
-    res = client.general.partition(request=req)
-    print(res.elements[0])
-except Exception as e:
-    print(e)
-```
-Refer to the [API parameters page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all available parameters.
-
-### Configuration
-
-#### Splitting PDF by pages
-
-See [page splitting](https://docs.unstructured.io/api-reference/api-services/sdk#page-splitting) for more details.
-
-In order to speed up processing of large PDF files, the client splits up PDFs into smaller files, sends these to the API concurrently, and recombines the results. `split_pdf_page` can be set to `False` to disable this.
-
-The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
-
-Example:
-```python
-req = shared.PartitionParameters(
-    files=files,
-    strategy="fast",
-    languages=["eng"],
-    split_pdf_concurrency_level=8
-)
-```
-
-#### Sending specific page ranges
-
-When `split_pdf_page=True` (the default), you can optionally specify a page range to send only a portion of your PDF to be extracted. The parameter takes a list of two integers to specify the range, inclusive. A ValueError is thrown if the page range is invalid.
-
-Example:
-```python
-req = shared.PartitionParameters(
-    files=files,
-    strategy="fast",
-    languages=["eng"],
-    split_pdf_page_range=[10,15],
-)
-```
-
-#### Splitting PDF by pages - strict mode
-
-When `split_pdf_allow_failed=False` (the default), any errors encountered during sending parallel request will break the process and raise an exception. 
-When `split_pdf_allow_failed=True`, the process will continue even if some requests fail, and the results will be combined at the end (the output from the errored pages will not be included).
-
-Example:
-```python
-req = shared.PartitionParameters(
-    files=files,
-    strategy="fast",
-    languages=["eng"],
-    split_pdf_allow_failed=True,
-)
-```
 
 <!-- Start Retries [retries] -->
 ## Retries
@@ -228,6 +132,59 @@ if res.elements is not None:
 
 ```
 <!-- End Retries [retries] -->
+
+
+<!-- Start Error Handling [errors] -->
+## Error Handling
+
+Handling errors in this SDK should largely match your expectations.  All operations return a response object or raise an error.  If Error objects are specified in your OpenAPI Spec, the SDK will raise the appropriate Error type.
+
+| Error Object               | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.ServerError         | 5XX                        | application/json           |
+| errors.SDKError            | 4xx-5xx                    | */*                        |
+
+### Example
+
+```python
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import errors, shared
+
+s = UnstructuredClient()
+
+res = None
+try:
+    res = s.general.partition(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.HI_RES,
+        },
+    })
+
+    if res.elements is not None:
+        # handle response
+        pass
+
+except errors.HTTPValidationError as e:
+    # handle e.data: errors.HTTPValidationErrorData
+    raise(e)
+except errors.ServerError as e:
+    # handle e.data: errors.ServerErrorData
+    raise(e)
+except errors.SDKError as e:
+    # handle exception
+    raise(e)
+```
+<!-- End Error Handling [errors] -->
 
 <!-- Start Custom HTTP Client [http-client] -->
 ## Custom HTTP Client
@@ -310,13 +267,6 @@ s = UnstructuredClient(async_client=CustomClient(httpx.AsyncClient()))
 ```
 <!-- End Custom HTTP Client [http-client] -->
 
-<!-- No SDK Example Usage [usage] -->
-<!-- No SDK Available Operations -->
-<!-- No Pagination -->
-<!-- No Error Handling -->
-<!-- No Server Selection -->
-<!-- No Authentication -->
-
 <!-- Start IDE Support [idesupport] -->
 ## IDE Support
 
@@ -326,6 +276,131 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 
 - [PyCharm Pydantic Plugin](https://docs.pydantic.dev/latest/integrations/pycharm/)
 <!-- End IDE Support [idesupport] -->
+
+
+<!-- Start SDK Example Usage [usage] -->
+## SDK Example Usage
+
+### Example
+
+```python
+# Synchronous Example
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
+
+s = UnstructuredClient()
+
+res = s.general.partition(request={
+    "partition_parameters": {
+        "files": {
+            "content": open("example.file", "rb"),
+            "file_name": "example.file",
+        },
+        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+        "split_pdf_page_range": [
+            1,
+            10,
+        ],
+        "strategy": shared.Strategy.HI_RES,
+    },
+})
+
+if res.elements is not None:
+    # handle response
+    pass
+```
+
+</br>
+
+The same SDK client can also be used to make asychronous requests by importing asyncio.
+```python
+# Asynchronous Example
+import asyncio
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
+
+async def main():
+    s = UnstructuredClient()
+    res = await s.general.partition_async(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.HI_RES,
+        },
+    })
+    if res.elements is not None:
+        # handle response
+        pass
+
+asyncio.run(main())
+```
+<!-- End SDK Example Usage [usage] -->
+
+Refer to the [API parameters page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all available parameters.
+
+
+## Configuration
+
+### Splitting PDF by pages
+
+See [page splitting](https://docs.unstructured.io/api-reference/api-services/sdk#page-splitting) for more details.
+
+In order to speed up processing of large PDF files, the client splits up PDFs into smaller files, sends these to the API concurrently, and recombines the results. `split_pdf_page` can be set to `False` to disable this.
+
+The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
+
+Example:
+```python
+req = operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=files,
+        strategy="fast",
+        languages=["eng"],
+        split_pdf_concurrency_level=8
+    )
+)
+```
+
+### Sending specific page ranges
+
+When `split_pdf_page=True` (the default), you can optionally specify a page range to send only a portion of your PDF to be extracted. The parameter takes a list of two integers to specify the range, inclusive. A ValueError is thrown if the page range is invalid.
+
+Example:
+```python
+req = operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=files,
+        strategy="fast",
+        languages=["eng"],
+        split_pdf_page_range=[10,15],
+    )
+)
+```
+
+### Splitting PDF by pages - strict mode
+
+When `split_pdf_allow_failed=False` (the default), any errors encountered during sending parallel request will break the process and raise an exception. 
+When `split_pdf_allow_failed=True`, the process will continue even if some requests fail, and the results will be combined at the end (the output from the errored pages will not be included).
+
+Example:
+```python
+req = operations.PartitionRequest(
+    partition_parameters=shared.PartitionParameters(
+        files=files,
+        strategy="fast",
+        languages=["eng"],
+        split_pdf_allow_failed=True,
+    )
+)
+```
 
 <!-- Start File uploads [file-upload] -->
 ## File uploads
@@ -379,6 +454,11 @@ logging.basicConfig(level=logging.DEBUG)
 s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 ```
 <!-- End Debugging [debug] -->
+
+<!-- No SDK Available Operations -->
+<!-- No Pagination -->
+<!-- No Server Selection -->
+<!-- No Authentication -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
