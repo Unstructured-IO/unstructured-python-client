@@ -685,3 +685,13 @@ Based on:
 - [python v0.26.0-beta.4] .
 ### Releases
 - [PyPI v0.26.0-beta.4] https://pypi.org/project/unstructured-client/0.26.0-beta.4 - .
+
+## 2024-10-07 00:09:40
+### Changes
+Based on:
+- OpenAPI Doc  
+- Speakeasy CLI 1.410.0 (2.434.1) https://github.com/speakeasy-api/speakeasy
+### Generated
+- [python v0.26.0] .
+### Releases
+- [PyPI v0.26.0] https://pypi.org/project/unstructured-client/0.26.0 - .

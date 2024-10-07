@@ -3,10 +3,10 @@ id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
   docChecksum: 21f469b38bb72725739ee9d9d0fc8780
   docVersion: 1.0.51
-  speakeasyVersion: 1.405.6
-  generationVersion: 2.428.1
-  releaseVersion: 0.26.0-beta.4
-  configChecksum: 0b79ec3eb6db29cf265da8359efa5611
+  speakeasyVersion: 1.410.0
+  generationVersion: 2.434.1
+  releaseVersion: 0.26.0
+  configChecksum: 0916704b547a0697b2ccf93c0d4becac
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -14,8 +14,8 @@ management:
 features:
   python:
     additionalDependencies: 1.0.0
-    constsAndDefaults: 1.0.3
-    core: 5.5.7
+    constsAndDefaults: 1.0.4
+    core: 5.5.8
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.1
@@ -36,6 +36,7 @@ features:
     uploadStreams: 1.0.0
 generatedFiles:
   - .gitattributes
+  - .python-version
   - .vscode/settings.json
   - CONTRIBUTING.md
   - USAGE.md

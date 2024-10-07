@@ -6,8 +6,8 @@ import io
 import pydantic
 from pydantic import model_serializer
 from pydantic.functional_validators import PlainValidator
-from typing import IO, List, Optional, TypedDict, Union
-from typing_extensions import Annotated, NotRequired
+from typing import IO, List, Optional, Union
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client import utils
 from unstructured_client.types import (
     BaseModel,
