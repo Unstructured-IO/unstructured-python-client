@@ -33,6 +33,7 @@ python:
     responseRequiredSep2024: false
   flattenGlobalSecurity: true
   flattenRequests: false
+  flatteningOrder: parameters-first
   imports:
     option: openapi
     paths:

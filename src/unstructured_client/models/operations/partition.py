@@ -4,8 +4,8 @@ from __future__ import annotations
 import httpx
 import pydantic
 from pydantic import model_serializer
-from typing import Any, Dict, List, Optional, TypedDict
-from typing_extensions import Annotated, NotRequired
+from typing import Any, Dict, List, Optional
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.models.shared import (
     partition_parameters as shared_partition_parameters,
 )
