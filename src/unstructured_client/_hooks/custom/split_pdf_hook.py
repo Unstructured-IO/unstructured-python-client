@@ -156,6 +156,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         #         # Otherwise, pass the request to the default transport
         #         return await self.base_transport.handle_async_request(request)
 
+        # Instead, save the base url so we can use it for our dummy request
+        self.base_url = base_url
+
         # Explicit cast to httpx.Client to avoid a typing error
         httpx_client = cast(httpx.Client, client)
         # async_httpx_client = cast(httpx.AsyncClient, async_client)
@@ -346,7 +349,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # dummy_request = httpx.Request("GET",  "http://no-op")
         return httpx.Request(
             "GET",
-            "https://api.unstructuredapp.io/general/docs",
+            f"{self.base_url}/general/docs",
             headers={"operation_id": operation_id},
         )
 
