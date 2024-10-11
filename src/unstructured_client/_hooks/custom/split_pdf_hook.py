@@ -105,6 +105,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def __init__(self) -> None:
         self.client: Optional[HttpClient] = None
+        self.base_url: Optional[str] = None
         self.async_client: Optional[AsyncHttpClient] = None
         self.coroutines_to_execute: dict[
             str, list[Coroutine[Any, Any, httpx.Response]]
