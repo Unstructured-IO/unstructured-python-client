@@ -304,12 +304,14 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
 
         We want to make sure both code paths are retried.
         """
-        # Assert that the SDK issues our no-op request
+        # Assert that the SDK issues our dummy request
         # returned by the BeforeRequestHook
         nonlocal mock_endpoint_called
-        if request.url.host == "no-op" or "docs" in request.url.path:
+        if request.url.host == "localhost" and "docs" in request.url.path:
             mock_endpoint_called = True
             return Response(200, request=request)
+        elif "docs" in request.url.path:
+            assert False, "The server URL was not set in the dummy request"
 
         request_body = request.read()
 

@@ -1,3 +1,12 @@
+## 0.26.1
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Use the configured server_url for our split page "dummy" request
+
 ## 0.26.0
 
 ### Enhancements
