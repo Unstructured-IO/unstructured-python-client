@@ -150,8 +150,12 @@ def create_response(elements: list) -> httpx.Response:
     Returns:
         The modified response object with updated content.
     """
-    response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
-    content = json.dumps(elements).encode()
+    if not isinstance(elements[0], dict):
+        response = httpx.Response(status_code=200, headers={"Content-Type": "text/csv"})
+        content = b''.join(elements)
+    else:
+        response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
+        content = json.dumps(elements).encode()
     content_length = str(len(content))
     response.headers.update({"Content-Length": content_length})
     setattr(response, "_content", content)
