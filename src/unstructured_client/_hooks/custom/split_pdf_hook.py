@@ -621,7 +621,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         # Grab the correct id out of the dummy request
         operation_id = response.request.headers.get("operation_id")
-        # breakpoint();
         elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
