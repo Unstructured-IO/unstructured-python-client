@@ -389,7 +389,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     response_number,
                 )
                 successful_responses.append(res)
-                elements.append(res.json())
+                if res.headers["Content-Type"] == "application/json":
+                    elements.append(res.json())
+                else:
+                    elements.append(res.content)
             else:
                 error_message = f"Failed to partition set {response_number}."
 
@@ -401,7 +404,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         self.api_successful_responses[operation_id] = successful_responses
         self.api_failed_responses[operation_id] = failed_responses
-        flattened_elements = [element for sublist in elements for element in sublist]
+        flattened_elements = []
+        for sublist in elements:
+            if isinstance(sublist, list):
+                flattened_elements.extend(sublist)
+            else:
+                flattened_elements.append(sublist)
         return flattened_elements
 
     def after_success(
@@ -423,7 +431,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         # Grab the correct id out of the dummy request
         operation_id = response.request.headers.get("operation_id")
-
+        # breakpoint();
         elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
