@@ -19,6 +19,11 @@ install:
 install-speakeasy-cli:
 	curl -fsSL https://raw.githubusercontent.com/speakeasy-api/speakeasy/main/install.sh | sh
 
+## install-test:				install test requirements as they cannot be put into pyproject.toml due to python version requirements mismatch
+.PHONY: install-test-contract
+install-test:
+	pip install unstructured pytest-httpx
+
 #################
 # Test and Lint #
 #################
@@ -29,6 +34,10 @@ test: test-unit test-integration-docker
 .PHONY: test-unit
 test-unit:
 	PYTHONPATH=. pytest _test_unstructured_client -v -k "unit"
+
+.PHONY: test-contract
+test-contract:
+	PYTHONPATH=. pytest _test_unstructured_client -v -k "contract"
 
 # Assumes you have unstructured-api running on localhost:8000
 .PHONY: test-integration
