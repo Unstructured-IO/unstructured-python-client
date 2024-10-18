@@ -68,6 +68,8 @@ jobs:
       matrix:
         python-version: [ "3.9","3.10","3.11", "3.12" ]
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -77,7 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           make install
-          make install-test-contract
+          source .venv/bin/activate && make install-test-contract
       - name: Run unit tests
         run: |
           poetry run make test-contract
