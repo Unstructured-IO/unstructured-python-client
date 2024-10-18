@@ -16,7 +16,9 @@ def client() -> UnstructuredClient:
 
 @pytest.fixture(scope="module")
 def doc_path() -> Path:
-    return Path(__file__).resolve().parents[2] / "_sample_docs"
+    samples_path = Path(__file__).resolve().parents[1] / "_sample_docs"
+    assert samples_path.exists()
+    return samples_path
 
 
 MOCK_TEXT = """[
