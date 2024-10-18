@@ -21,7 +21,7 @@ install-speakeasy-cli:
 
 ## install-test:				install test requirements as they cannot be put into pyproject.toml due to python version requirements mismatch
 .PHONY: install-test-contract
-install-test:
+install-test-contract:
 	pip install unstructured pytest-httpx
 
 #################
@@ -37,7 +37,7 @@ test-unit:
 
 .PHONY: test-contract
 test-contract:
-	PYTHONPATH=. pytest _test_unstructured_client -v -k "contract"
+	PYTHONPATH=. pytest _test_contract -v
 
 # Assumes you have unstructured-api running on localhost:8000
 .PHONY: test-integration
