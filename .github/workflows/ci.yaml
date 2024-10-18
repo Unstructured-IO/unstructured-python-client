@@ -63,3 +63,24 @@ jobs:
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 
+  test_contract:
+    strategy:
+      matrix:
+        python-version: [ "3.9","3.10","3.11", "3.12" ]
+    runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          make install
+          source .venv/bin/activate && make install-test-contract
+      - name: Run unit tests
+        run: |
+          poetry run make test-contract
+
