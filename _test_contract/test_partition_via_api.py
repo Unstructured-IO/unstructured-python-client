@@ -41,11 +41,12 @@ MOCK_TEXT = """[
 ]"""
 
 
-@pytest.mark.parametrize(("url", "full_url"), [
-    ("http://localhost:8000", "http://localhost:8000/general/v0/general"),
-    ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
-]
-                    )
+@pytest.mark.parametrize(
+    ("url", "full_url"), [
+        ("http://localhost:8000", "http://localhost:8000/general/v0/general"),
+        ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
+    ]
+)
 def test_partition_via_api_custom_url(httpx_mock, doc_path: Path, url: str, full_url: str):
     """
     Assert that we can specify api_url and requests are sent to the right place
@@ -61,8 +62,7 @@ def test_partition_via_api_custom_url(httpx_mock, doc_path: Path, url: str, full
         content=MOCK_TEXT.encode(),
     )
 
-    partition_via_api(filename=str(doc_path/filename), api_url=url, metadata_filename=filename)
-
+    partition_via_api(filename=str(doc_path / filename), api_url=url, metadata_filename=filename)
 
 
 def test_partition_via_api_pass_list_type_parameters(httpx_mock, doc_path: Path):
