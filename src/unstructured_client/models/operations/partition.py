@@ -74,8 +74,9 @@ class PartitionResponseTypedDict(TypedDict):
     r"""HTTP response status code for this operation"""
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
-    elements: NotRequired[List[Dict[str, Any]]]
+    two_hundred_application_json_elements: NotRequired[List[Dict[str, Any]]]
     r"""Successful Response"""
+    body: NotRequired[bytes]
 
 
 class PartitionResponse(BaseModel):
@@ -88,5 +89,7 @@ class PartitionResponse(BaseModel):
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
 
-    elements: Optional[List[Dict[str, Any]]] = None
+    two_hundred_application_json_elements: Optional[List[Dict[str, Any]]] = None
     r"""Successful Response"""
+
+    body: Optional[bytes] = None

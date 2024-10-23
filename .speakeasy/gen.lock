@@ -1,18 +1,19 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: b1c17258d127ea2ce7e4bfa09a8eb004
-  docVersion: 1.0.51
+  docChecksum: 3ffa7dee90c40fda6656210850e12475
+  docVersion: 1.0.52
   speakeasyVersion: 1.421.0
   generationVersion: 2.438.15
-  releaseVersion: 0.26.2
-  configChecksum: c46fa7f108a08d4565530aa29da677b5
+  releaseVersion: 0.27.1
+  configChecksum: f885d47394f7c0242b6fbfc5f0244886
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   published: true
 features:
   python:
+    acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.4
     core: 5.6.0
@@ -106,6 +107,7 @@ examples:
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
+          text/csv: "0x42E2Ffaf1A"
         "422":
           application/json: {"detail": []}
         5XX:
