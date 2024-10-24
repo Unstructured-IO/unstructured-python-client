@@ -77,6 +77,15 @@ client-generate-local:
 	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
 	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
 
+## client-generate-localhost:	Generate the SDK using the openapi.json from the unstructured-api running at localhost:5000
+.PHONY: client-generate-localhost
+client-generate-localhost:
+	curl -o openapi.json http://localhost:5000/general/openapi.json || { echo "Failed to download openapi.json"; exit 1; }
+	speakeasy overlay validate -o ./overlay_client.yaml
+	speakeasy overlay apply -s ./openapi.json -o ./overlay_client.yaml > ./openapi_client.json
+	python3 -c 'import sys, yaml, json; sys.stdout.write(json.dumps(yaml.safe_load(sys.stdin), indent=2))' < ./openapi_client.json > temp.json && mv temp.json ./openapi_client.json
+	speakeasy generate sdk -s ./openapi_client.json -o ./ -l python
+
 .PHONY: publish
 publish:
 	./scripts/publish.sh
