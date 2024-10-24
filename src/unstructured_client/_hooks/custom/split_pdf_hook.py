@@ -275,7 +275,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # Use a variable to adjust the httpx client timeout, or default to 30 minutes
         # When we're able to reuse the SDK to make these calls, we can remove this var
         # The SDK timeout will be controlled by parameter
-        client_timeout_minutes = 30
+        client_timeout_minutes = 60
         if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
             client_timeout_minutes = int(timeout_var)
 
