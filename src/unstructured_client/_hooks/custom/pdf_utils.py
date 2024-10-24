@@ -51,7 +51,7 @@ def get_pdf_pages(
         new_pdf.write(pdf_buffer)
         pdf_buffer.seek(0)
 
-        yield pdf_buffer, offset, offset_end
+        yield pdf_buffer, offset
         offset += split_size
 
 
