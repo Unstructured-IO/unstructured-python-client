@@ -11,3 +11,4 @@ The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. 
 | `HI_RES`   | hi_res     |
 | `AUTO`     | auto       |
 | `OCR_ONLY` | ocr_only   |
+| `OD_ONLY`  | od_only    |

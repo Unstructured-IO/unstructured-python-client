@@ -67,6 +67,7 @@ class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
     HI_RES = "hi_res"
     AUTO = "auto"
     OCR_ONLY = "ocr_only"
+    OD_ONLY = "od_only"
 
 
 class PartitionParametersTypedDict(TypedDict):
