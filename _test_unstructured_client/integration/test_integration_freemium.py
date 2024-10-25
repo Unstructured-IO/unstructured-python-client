@@ -7,9 +7,11 @@ from pathlib import Path
 
 import pytest
 from deepdiff import DeepDiff
+
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
+from unstructured_client.models.shared.partition_parameters import OutputFormat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
@@ -221,3 +223,29 @@ def test_uvloop_partitions_without_errors(client, doc_path):
     uvloop.install()
     elements = asyncio.run(call_api())
     assert len(elements) > 0
+
+
+def test_partition_csv_response(client, doc_path):
+    filename = "layout-parser-paper-fast.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            output_format=OutputFormat.TEXT_CSV,
+        )
+    )
+
+    response = client.general.partition(request=req)
+    assert response.status_code == 200
+    assert response.content_type == "text/csv; charset=utf-8"
+    assert response.elements is None
+    assert response.csv_elements is not None
+    assert response.csv_elements.startswith(
+        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
+        "\nTitle,6aa0ff22f91bbe7e26e8e25ca8052acd,Layout"
+    )
