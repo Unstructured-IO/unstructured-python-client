@@ -95,7 +95,7 @@ res = s.general.partition(request={
 },
     RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
-if res.elements is not None:
+if res.two_hundred_application_json_elements is not None:
     # handle response
     pass
 
@@ -126,7 +126,7 @@ res = s.general.partition(request={
     },
 })
 
-if res.elements is not None:
+if res.two_hundred_application_json_elements is not None:
     # handle response
     pass
 
@@ -181,7 +181,7 @@ try:
         },
     })
 
-    if res.elements is not None:
+    if res.two_hundred_application_json_elements is not None:
         # handle response
         pass
 
@@ -316,7 +316,7 @@ res = s.general.partition(request={
     },
 })
 
-if res.elements is not None:
+if res.two_hundred_application_json_elements is not None:
     # handle response
     pass
 ```
@@ -346,7 +346,7 @@ async def main():
             "strategy": shared.Strategy.HI_RES,
         },
     })
-    if res.elements is not None:
+    if res.two_hundred_application_json_elements is not None:
         # handle response
         pass
 
@@ -444,7 +444,7 @@ res = s.general.partition(request={
     },
 })
 
-if res.elements is not None:
+if res.two_hundred_application_json_elements is not None:
     # handle response
     pass
 
