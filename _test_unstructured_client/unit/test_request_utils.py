@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-# Get unit tests for request_utils.py module
 import httpx
+import json
 import pytest
 
 from unstructured_client._hooks.custom.request_utils import create_pdf_chunk_request_params, create_response, get_multipart_stream_fields
@@ -87,10 +87,12 @@ def test_create_response_for_json():
 
 
 def test_create_response_for_csv():
-    elements = 'type,element_id,text,languages,page_number,filename,filetype,parent_id' \
-        '\nTitle,f73329878fbbb0bb131a83e7b6daacbe,Module One - Introduction to Product' \
-        ' Development and Quality Assurance,[\'eng\'],1,list-item-example-1.pdf,application/pdf,'
+    elements = [
+        b'type,element_id,text,languages,page_number,filename,filetype,parent_id' \
+        b'\nTitle,f73329878fbbb0bb131a83e7b6daacbe,Module One - Introduction to Product' \
+        b' Development and Quality Assurance,[\'eng\'],1,list-item-example-1.pdf,application/pdf,'
+    ]
     response = create_response(elements)
     assert response.status_code == 200
-    assert response.json() == None
-    assert response.headers["Content-Type"] == "text/csv"
+    pytest.raises(json.decoder.JSONDecodeError, response.json)
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"

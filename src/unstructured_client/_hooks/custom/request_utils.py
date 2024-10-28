@@ -4,7 +4,7 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO
+from typing import Any, BinaryIO, Sequence, Tuple
 
 import httpx
 from httpx._multipart import DataField, FileField
