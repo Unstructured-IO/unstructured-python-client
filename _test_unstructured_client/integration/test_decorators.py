@@ -23,6 +23,33 @@ from unstructured_client._hooks.custom import split_pdf_hook
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
+@pytest.mark.parametrize("split_pdf_page", [True, False])
+def test_integration_split_csv_response(split_pdf_page, client, doc_path):
+    filename = "layout-parser-paper.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            output_format=OutputFormat.TEXT_CSV,
+            split_pdf_page=split_pdf_page,
+        )
+    )
+
+    resp = client.general.partition(request=req)
+
+    assert resp.status_code == 200
+    assert resp.content_type == "text/csv; charset=utf-8"
+    assert resp.elements is None
+    assert resp.csv_elements is not None
+    assert resp.csv_elements.startswith(
+        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
+    )
+
+
 @pytest.mark.parametrize("concurrency_level", [1, 2, 5])
 @pytest.mark.parametrize(
     ("filename", "expected_ok", "strategy"),
@@ -459,30 +486,3 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     assert mock_endpoint_called
 
     assert res.status_code == 200
-
-
-@pytest.mark.parametrize("split_pdf_page", [True, False])
-def test_integration_split_csv_response(split_pdf_page, client, doc_path):
-    filename = "layout-parser-paper.pdf"
-    with open(doc_path / filename, "rb") as f:
-        files = shared.Files(
-            content=f.read(),
-            file_name=filename,
-        )
-    req = operations.PartitionRequest(
-        partition_parameters=shared.PartitionParameters(
-            files=files,
-            output_format=OutputFormat.TEXT_CSV,
-            split_pdf_page=split_pdf_page,
-        )
-    )
-
-    resp = client.general.partition(request=req)
-
-    assert resp.status_code == 200
-    assert resp.content_type == "text/csv; charset=utf-8"
-    assert resp.elements is None
-    assert resp.csv_elements is not None
-    assert resp.csv_elements.startswith(
-        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
-    )
