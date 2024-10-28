@@ -462,14 +462,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
 
 
 @pytest.mark.parametrize("split_pdf_page", [True, False])
-def test_integration_split_csv_response(split_pdf_page, doc_path):
-    try:
-        response = requests.get("http://127.0.0.1:8000/general/docs")
-        assert response.status_code == 200
-    except requests.exceptions.ConnectionError:
-        assert False, "The unstructured-api is not running on 127.0.0.1:8000"
-        
-    client = UnstructuredClient(api_key_auth="", server_url="127.0.0.1:8000")
+def test_integration_split_csv_response(split_pdf_page, client, doc_path):
     filename = "layout-parser-paper.pdf"
     with open(doc_path / filename, "rb") as f:
         files = shared.Files(
@@ -483,7 +476,7 @@ def test_integration_split_csv_response(split_pdf_page, doc_path):
             split_pdf_page=split_pdf_page,
         )
     )
-    
+
     resp = client.general.partition(request=req)
 
     assert resp.status_code == 200
