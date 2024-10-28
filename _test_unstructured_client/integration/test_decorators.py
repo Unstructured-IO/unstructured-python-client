@@ -41,10 +41,10 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     concurrency_level: int, filename: str, expected_ok: bool, strategy: str
 ):
     """
-    Tests that output that we get from the split-by-page pdf is the same as from non-split.
+    Test that the output we get from the split-by-page pdf is the same as from non-split.
 
     Requires unstructured-api running in bg. See Makefile for how to run it.
-    Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / concurrency_level.
+    Doesn't check for raw_response as there's no clear pattern for how it changes with the number of pages / concurrency_level.
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
