@@ -15,6 +15,7 @@ from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import HTTPValidationError
+from unstructured_client.models.shared.partition_parameters import OutputFormat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
@@ -458,3 +459,37 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     assert mock_endpoint_called
 
     assert res.status_code == 200
+
+
+@pytest.mark.parametrize("split_pdf_page", [True, False])
+def test_integration_split_csv_response(split_pdf_page, doc_path):
+    try:
+        response = requests.get("http://127.0.0.1:8000/general/docs")
+        assert response.status_code == 200
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on 127.0.0.1:8000"
+        
+    client = UnstructuredClient(api_key_auth="", server_url="127.0.0.1:8000")
+    filename = "layout-parser-paper.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            output_format=OutputFormat.TEXT_CSV,
+            split_pdf_page=split_pdf_page,
+        )
+    )
+    
+    resp = client.general.partition(request=req)
+
+    assert resp.status_code == 200
+    assert resp.content_type == "text/csv; charset=utf-8"
+    assert resp.elements is None
+    assert resp.csv_elements is not None
+    assert resp.csv_elements.startswith(
+        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
+    )

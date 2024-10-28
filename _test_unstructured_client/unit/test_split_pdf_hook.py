@@ -24,9 +24,7 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     SplitPdfHook,
     get_optimal_split_size, run_tasks,
 )
-from unstructured_client.models import operations, shared
-from unstructured_client.models.shared.partition_parameters import OutputFormat
-from unstructured_client.sdk import UnstructuredClient
+from unstructured_client.models import shared
 
 
 def test_unit_clear_operation():
@@ -432,37 +430,3 @@ async def test_remaining_tasks_cancelled_when_fails_disallowed():
     await asyncio.sleep(1)
     print("Cancelled amount: ", cancelled_counter["cancelled"])
     assert len(tasks) > cancelled_counter["cancelled"] > 0
-
-
-@pytest.mark.parametrize("split_pdf_page", [True, False])
-def test_integration_get_split_csv_response(split_pdf_page, doc_path):
-    try:
-        response = requests.get("http://127.0.0.1:8000/general/docs")
-        assert response.status_code == 200
-    except requests.exceptions.ConnectionError:
-        assert False, "The unstructured-api is not running on 127.0.0.1:8000"
-        
-    client = UnstructuredClient(api_key_auth="", server_url="127.0.0.1:8000")
-    filename = "layout-parser-paper.pdf"
-    with open(doc_path / filename, "rb") as f:
-        files = shared.Files(
-            content=f.read(),
-            file_name=filename,
-        )
-    req = operations.PartitionRequest(
-        partition_parameters=shared.PartitionParameters(
-            files=files,
-            output_format=OutputFormat.TEXT_CSV,
-            split_pdf_page=split_pdf_page,
-        )
-    )
-    
-    resp = client.general.partition(request=req)
-
-    assert resp.status_code == 200
-    assert resp.content_type == "text/csv; charset=utf-8"
-    assert resp.elements is None
-    assert resp.csv_elements is not None
-    assert resp.csv_elements.startswith(
-        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
-    )
