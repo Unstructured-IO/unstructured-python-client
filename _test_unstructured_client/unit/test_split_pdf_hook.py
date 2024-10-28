@@ -440,7 +440,7 @@ def test_integration_get_split_csv_response(split_pdf_page, doc_path):
         response = requests.get("http://127.0.0.1:8000/general/docs")
         assert response.status_code == 200
     except requests.exceptions.ConnectionError:
-        assert False, "The unstructured-api is not running on localhost:8000"
+        assert False, "The unstructured-api is not running on 127.0.0.1:8000"
         
     client = UnstructuredClient(api_key_auth="", server_url="127.0.0.1:8000")
     filename = "layout-parser-paper.pdf"
