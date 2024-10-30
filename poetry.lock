@@ -964,6 +964,17 @@ files = [
 ]
 
 [[package]]
+name = "types-aiofiles"
+version = "24.1.0.20240626"
+description = "Typing stubs for aiofiles"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-aiofiles-24.1.0.20240626.tar.gz", hash = "sha256:48604663e24bc2d5038eac05ccc33e75799b0779e93e13d6a8f711ddc306ac08"},
+    {file = "types_aiofiles-24.1.0.20240626-py3-none-any.whl", hash = "sha256:7939eca4a8b4f9c6491b6e8ef160caee9a21d32e18534a57d5ed90aee47c66b4"},
+]
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.9.0.20241003"
 description = "Typing stubs for python-dateutil"
@@ -1071,4 +1082,4 @@ test = ["aiohttp (>=3.10.5)", "flake8 (>=5.0,<6.0)", "mypy (>=0.800)", "psutil",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "7a77e3ac3619d5bc8be658eaef68c45ab7d4ca0049fab2afcab2dc595d70b18b"
+content-hash = "9ba01c7cad4bf5e57aa6ce58c762815778a76ccd2778dbcf5e8e0da65816fb80"
