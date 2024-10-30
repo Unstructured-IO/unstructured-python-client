@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import asyncio
 import io
+import json
 import logging
 import os
 import math
+import tempfile
 import uuid
 from collections.abc import Awaitable
-from typing import Any, Coroutine, Optional, Tuple, Union, cast
+from pathlib import Path
+from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
+import aiofiles
 import httpx
 import nest_asyncio  # type: ignore
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
@@ -83,6 +87,7 @@ def context_is_uvloop():
     except (ImportError, RuntimeError):
         return False
 
+
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
     """Distributes pages to workers evenly based on the number of pages and desired concurrency level."""
     if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
@@ -91,6 +96,15 @@ def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
         split_size = MAX_PAGES_PER_SPLIT
 
     return max(split_size, MIN_PAGES_PER_SPLIT)
+
+
+def load_elements_from_response(response: httpx.Response) -> list[dict]:
+    """Loads elements from the response content - the response was modified
+    to keep the path for the json file that should be loaded and returned"""
+    elements = []
+    with open(response.text, mode="r", encoding="utf-8") as file:
+        elements = json.load(file)
+    return elements
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
@@ -112,6 +126,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         ] = {}
         self.api_successful_responses: dict[str, list[httpx.Response]] = {}
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
+        self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
 
     def sdk_init(
@@ -131,6 +146,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             Tuple[str, HttpClient]: The initialized SDK options.
         """
+
         class DummyTransport(httpx.BaseTransport):
             def __init__(self, base_transport: httpx.BaseTransport):
                 self.base_transport = base_transport
@@ -288,7 +304,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
             return request
 
-        pages = pdf_utils.get_pdf_pages(pdf, split_size=split_size, page_start=page_range_start, page_end=page_range_end)
+        pages = self._get_pdf_pages(
+            pdf,
+            operation_id=operation_id,
+            split_size=split_size,
+            page_start=page_range_start,
+            page_end=page_range_end
+        )
+        # force free PDF object memory
+        del pdf
         logger.info(
             "Partitioning %d files with %d page(s) each.",
             math.floor(page_count / split_size),
@@ -309,7 +333,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
             client_timeout_minutes = int(timeout_var)
 
-        async def call_api_partial(page):
+        async def call_api_partial(pdf_chunk: Tuple[BinaryIO, int]):
             client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
             async with httpx.AsyncClient(timeout=client_timeout) as client:
@@ -318,15 +342,30 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     original_request=request,
                     form_data=form_data,
                     filename=file.file_name,
-                    page=page,
+                    pdf_chunk=pdf_chunk,
                     limiter=limiter,
                 )
+
+                # Immediately delete request to save memory
+                del response._request  # pylint: disable=protected-access
+                response._request = None  # pylint: disable=protected-access
+
+                # If we get 200, dump the contents to a file and return the path
+                temp_dir = self.tempdirs[operation_id]
+                if response.status_code == 200:
+                    temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
+                    async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
+                        # Avoid reading the entire response into memory
+                        async for bytes_chunk in response.aiter_bytes():
+                            await temp_file.write(bytes_chunk)
+                    # we save the path in content attribute to be used in after_success
+                    response._content = temp_file.name.encode()  # pylint: disable=protected-access
 
                 return response
 
         self.coroutines_to_execute[operation_id] = []
         set_index = 1
-        for page_content, page_index, all_pages_number in pages:
+        for pdf_chunk_file, page_index, all_pages_number in pages:
             page_number = page_index + starting_page_number
             logger.info(
                 "Partitioning set #%d (pages %d-%d).",
@@ -335,10 +374,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 min(page_number + split_size - 1, all_pages_number),
             )
 
-            coroutine = call_api_partial((page_content, page_number))
+            coroutine = call_api_partial((pdf_chunk_file, page_number))
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
-
 
         # Return a dummy request for the SDK to use
         # This allows us to skip right to the AfterRequestHook and await all the calls
@@ -353,6 +391,64 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             f"{self.base_url}/general/docs",
             headers={"operation_id": operation_id},
         )
+
+    def _get_pdf_pages(
+        self,
+        pdf: PdfReader,
+        operation_id: str,
+        split_size: int = 1,
+        page_start: int = 1,
+        page_end: Optional[int] = None
+    ) -> Generator[Tuple[io.BytesIO, int, int], None, None]:
+        """Reads given bytes of a pdf file and split it into n file-like objects, each
+        with `split_size` pages.
+
+        Args:
+            file_content: Content of the PDF file.
+            split_size: Split size, e.g. if the given file has 10 pages
+                and this value is set to 2 it will yield 5 documents, each containing 2 pages
+                of the original document. By default it will split each page to a separate file.
+            page_start: Begin splitting at this page number
+            page_end: If provided, split up to and including this page number
+
+        Yields:
+            The file contents with their page number and overall pages number of the original document.
+        """
+
+        offset = page_start - 1
+        offset_end = page_end or len(pdf.pages)
+
+        tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
+            suffix="unstructured_client"
+        )
+        self.tempdirs[operation_id] = tempdir
+        tempdir_path = Path(tempdir.name)
+        pdf_chunks = []
+        chunk_no = 0
+        while offset < offset_end:
+            chunk_no += 1
+            new_pdf = PdfWriter()
+
+            end = min(offset + split_size, offset_end)
+
+            for page in list(pdf.pages[offset:end]):
+                new_pdf.add_page(page)
+            with open(tempdir_path / f"chunk_{chunk_no}.pdf", "wb") as pdf_chunk:
+                new_pdf.write(pdf_chunk)
+                pdf_chunks.append((pdf_chunk.name, offset, offset_end))
+            offset += split_size
+
+        for pdf_chunk_filename, offset, offset_end in pdf_chunks:
+            pdf_chunk_file = None
+            try:
+                pdf_chunk_file = open(  # pylint: disable=consider-using-with
+                    pdf_chunk_filename,
+                    mode="rb"
+                )
+            except Exception:  # pylint: disable=broad-except
+                if pdf_chunk_file and not pdf_chunk_file.closed:
+                    pdf_chunk_file.close()
+            yield pdf_chunk_file, offset, offset_end
 
     def _await_elements(
             self, operation_id: str) -> Optional[list]:
@@ -389,7 +485,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     response_number,
                 )
                 successful_responses.append(res)
-                elements.append(res.json())
+                elements.append(load_elements_from_response(res))
             else:
                 error_message = f"Failed to partition set {response_number}."
 
@@ -475,3 +571,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.coroutines_to_execute.pop(operation_id, None)
         self.api_successful_responses.pop(operation_id, None)
+        tempdir = self.tempdirs.pop(operation_id, None)
+        if tempdir:
+            tempdir.cleanup()

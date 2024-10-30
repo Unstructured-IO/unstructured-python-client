@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unstructured-client"
-version = "0.26.1"
+version = "0.26.2"
 description = "Python Client SDK for Unstructured API"
 authors = ["Unstructured",]
 readme = "README-PYPI.md"
@@ -29,6 +29,7 @@ pypdf = ">=4.0"
 python-dateutil = "2.8.2"
 requests-toolbelt = ">=1.0.0"
 typing-inspect = "^0.9.0"
+aiofiles = ">=24.1.0"
 
 [tool.poetry.group.dev.dependencies]
 deepdiff = ">=6.0"

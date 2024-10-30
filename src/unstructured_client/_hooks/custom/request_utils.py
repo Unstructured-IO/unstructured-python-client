@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import io
 import json
 import logging
-from typing import Tuple, Any
+from typing import Tuple, Any, BinaryIO
 
 import httpx
 from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
@@ -24,9 +23,21 @@ from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, ret
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
-def create_request_body(
-    form_data: FormData, page_content: io.BytesIO, filename: str, page_number: int
+def create_pdf_request_body(
+    form_data: FormData,
+    pdf_chunk: BinaryIO,
+    filename: str,
+    page_number: int
 ) -> MultipartEncoder:
+    """Creates the request body for the partition API."
+    
+    Args:
+        form_data: The form data.
+        pdf_chunk: The pdf chunk - can be both io.BytesIO or a file object (created with open())
+        filename: The filename.
+        page_number: The page number.
+    
+    """
     payload = prepare_request_payload(form_data)
 
     payload_fields:  list[tuple[str, Any]] = []
@@ -38,7 +49,7 @@ def create_request_body(
 
     payload_fields.append((PARTITION_FORM_FILES_KEY, (
         filename,
-        page_content,
+        pdf_chunk,
         "application/pdf",
     )))
 
@@ -52,14 +63,14 @@ def create_request_body(
 
 async def call_api_async(
     client: httpx.AsyncClient,
-    page: Tuple[io.BytesIO, int],
+    pdf_chunk: Tuple[BinaryIO, int],
     original_request: httpx.Request,
     form_data: FormData,
     filename: str,
     limiter: asyncio.Semaphore,
 ) -> httpx.Response:
-    page_content, page_number = page
-    body = create_request_body(form_data, page_content, filename, page_number)
+    pdf_chunk_file, page_number = pdf_chunk
+    body = create_pdf_request_body(form_data, pdf_chunk_file, filename, page_number)
     original_headers = prepare_request_headers(original_request.headers)
 
     new_request = httpx.Request(
@@ -93,11 +104,15 @@ async def call_api_async(
         return await client.send(new_request)
 
     async with limiter:
-        response = await retry_async(
-            do_request,
-            Retries(retry_config, retryable_codes)
-        )
-        return response
+        try:
+            response = await retry_async(
+                do_request,
+                Retries(retry_config, retryable_codes)
+            )
+            return response
+        finally:
+            if not pdf_chunk_file.closed:
+                pdf_chunk_file.close()
 
 
 def prepare_request_headers(
