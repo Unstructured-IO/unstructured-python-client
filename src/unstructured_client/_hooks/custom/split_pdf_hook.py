@@ -146,7 +146,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             Tuple[str, HttpClient]: The initialized SDK options.
         """
-
         class DummyTransport(httpx.BaseTransport):
             def __init__(self, base_transport: httpx.BaseTransport):
                 self.base_transport = base_transport
@@ -238,14 +237,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_pdf_page is None or split_pdf_page == "false":
             return request
 
-        logger.info("Preparing to split document for partition.")
         file = form_data.get(PARTITION_FORM_FILES_KEY)
         if (
                 file is None
                 or not isinstance(file, shared.Files)
                 or not pdf_utils.is_pdf(file)
         ):
-            logger.info("Partitioning without split.")
             return request
 
         starting_page_number = form_utils.get_starting_page_number(
@@ -253,16 +250,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
-        if starting_page_number > 1:
-            logger.info("Starting page number set to %d", starting_page_number)
-        logger.info("Starting page number set to %d", starting_page_number)
 
         self.allow_failed = form_utils.get_split_pdf_allow_failed_param(
             form_data,
             key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
             fallback_value=DEFAULT_ALLOW_FAILED,
         )
-        logger.info("Allow failed set to %d", self.allow_failed)
 
         concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
@@ -270,7 +263,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-        logger.info("Concurrency level set to %d", concurrency_level)
         limiter = asyncio.Semaphore(concurrency_level)
 
         content = cast(bytes, file.content)
@@ -283,25 +275,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         page_count = page_range_end - page_range_start + 1
-        logger.info(
-            "Splitting pages %d to %d (%d total)",
-            page_range_start,
-            page_range_end,
-            page_count,
-        )
 
         split_size = get_optimal_split_size(
             num_pages=page_count, concurrency_level=concurrency_level
         )
-        logger.info("Determined optimal split size of %d pages.", split_size)
 
         # If the doc is small enough, and we aren't slicing it with a page range:
         # do not split, just continue with the original request
         if split_size >= page_count and page_count == len(pdf.pages):
-            logger.info(
-                "Document has too few pages (%d) to be split efficiently. Partitioning without split.",
-                page_count,
-            )
             return request
 
         pages = self._get_pdf_pages(
@@ -329,7 +310,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # Use a variable to adjust the httpx client timeout, or default to 30 minutes
         # When we're able to reuse the SDK to make these calls, we can remove this var
         # The SDK timeout will be controlled by parameter
-        client_timeout_minutes = 30
+        client_timeout_minutes = 60
         if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
             client_timeout_minutes = int(timeout_var)
 
@@ -365,14 +346,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         self.coroutines_to_execute[operation_id] = []
         set_index = 1
-        for pdf_chunk_file, page_index, all_pages_number in pages:
+        for pdf_chunk_file, page_index in pages:
             page_number = page_index + starting_page_number
-            logger.info(
-                "Partitioning set #%d (pages %d-%d).",
-                set_index,
-                page_number,
-                min(page_number + split_size - 1, all_pages_number),
-            )
 
             coroutine = call_api_partial((pdf_chunk_file, page_number))
             self.coroutines_to_execute[operation_id].append(coroutine)

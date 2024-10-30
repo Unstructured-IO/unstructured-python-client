@@ -185,6 +185,18 @@ def stream_to_text(stream: httpx.Response) -> str:
     return "".join(stream.iter_text())
 
 
+async def stream_to_text_async(stream: httpx.Response) -> str:
+    return "".join([chunk async for chunk in stream.aiter_text()])
+
+
+def stream_to_bytes(stream: httpx.Response) -> bytes:
+    return stream.content
+
+
+async def stream_to_bytes_async(stream: httpx.Response) -> bytes:
+    return await stream.aread()
+
+
 def get_pydantic_model(data: Any, typ: Any) -> Any:
     if not _contains_pydantic_model(data):
         return unmarshal(data, typ)
