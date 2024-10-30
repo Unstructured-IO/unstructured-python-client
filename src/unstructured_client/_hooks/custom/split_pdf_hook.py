@@ -340,7 +340,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                         async for bytes_chunk in response.aiter_bytes():
                             await temp_file.write(bytes_chunk)
                     # we save the path in content attribute to be used in after_success
-                    response._content = temp_file.name.encode()  # pylint: disable=protected-access
+                    response._content = temp_file_name.encode()  # pylint: disable=protected-access
 
                 return response
 
