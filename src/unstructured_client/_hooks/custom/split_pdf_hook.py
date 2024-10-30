@@ -294,18 +294,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         # force free PDF object memory
         del pdf
-        logger.info(
-            "Partitioning %d files with %d page(s) each.",
-            math.floor(page_count / split_size),
-            split_size,
-        )
-
-        # Log the remainder pages if there are any
-        if page_count % split_size > 0:
-            logger.info(
-                "Partitioning 1 file with %d page(s).",
-                page_count % split_size,
-            )
 
         # Use a variable to adjust the httpx client timeout, or default to 30 minutes
         # When we're able to reuse the SDK to make these calls, we can remove this var
@@ -374,9 +362,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         split_size: int = 1,
         page_start: int = 1,
         page_end: Optional[int] = None
-    ) -> Generator[Tuple[io.BytesIO, int], None, None]:
-        """Reads given bytes of a pdf file and split it into n file-like objects, each
-        with `split_size` pages.
+    ) -> Generator[Tuple[BinaryIO, int], None, None]:
+        """Reads given bytes of a pdf file and split it into n pdf-chunks, each
+        with `split_size` pages. The chunks are written into temporary files in
+        a temporary directory corresponding to the operation_id.
 
         Args:
             file_content: Content of the PDF file.
@@ -387,7 +376,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_end: If provided, split up to and including this page number
 
         Yields:
-            The file contents with their page number and overall pages number of the original document.
+            The file object with their page number.
         """
 
         offset = page_start - 1
@@ -423,6 +412,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             except Exception:  # pylint: disable=broad-except
                 if pdf_chunk_file and not pdf_chunk_file.closed:
                     pdf_chunk_file.close()
+                raise
             yield pdf_chunk_file, offset
 
     def _await_elements(
