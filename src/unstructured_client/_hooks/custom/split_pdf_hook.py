@@ -374,7 +374,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         split_size: int = 1,
         page_start: int = 1,
         page_end: Optional[int] = None
-    ) -> Generator[Tuple[io.BytesIO, int, int], None, None]:
+    ) -> Generator[Tuple[io.BytesIO, int], None, None]:
         """Reads given bytes of a pdf file and split it into n file-like objects, each
         with `split_size` pages.
 
@@ -410,10 +410,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 new_pdf.add_page(page)
             with open(tempdir_path / f"chunk_{chunk_no}.pdf", "wb") as pdf_chunk:
                 new_pdf.write(pdf_chunk)
-                pdf_chunks.append((pdf_chunk.name, offset, offset_end))
+                pdf_chunks.append((pdf_chunk.name, offset))
             offset += split_size
 
-        for pdf_chunk_filename, offset, offset_end in pdf_chunks:
+        for pdf_chunk_filename, offset in pdf_chunks:
             pdf_chunk_file = None
             try:
                 pdf_chunk_file = open(  # pylint: disable=consider-using-with
@@ -423,7 +423,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             except Exception:  # pylint: disable=broad-except
                 if pdf_chunk_file and not pdf_chunk_file.closed:
                     pdf_chunk_file.close()
-            yield pdf_chunk_file, offset, offset_end
+            yield pdf_chunk_file, offset
 
     def _await_elements(
             self, operation_id: str) -> Optional[list]:
