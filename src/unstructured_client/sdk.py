@@ -28,7 +28,7 @@ class UnstructuredClient(BaseSDK):
         client: Optional[HttpClient] = None,
         async_client: Optional[AsyncHttpClient] = None,
         retry_config: OptionalNullable[RetryConfig] = UNSET,
-        timeout_ms: Optional[int] = None,
+        timeout_ms: int = 10 * 60 * 1000,
         debug_logger: Optional[Logger] = None,
     ) -> None:
         r"""Instantiates the SDK configuring it with the provided parameters.
