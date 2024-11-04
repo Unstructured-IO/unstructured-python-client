@@ -9,12 +9,14 @@ import math
 import tempfile
 import uuid
 from collections.abc import Awaitable
+from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
 import aiofiles
 import httpx
 import nest_asyncio  # type: ignore
+from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 
@@ -56,26 +58,38 @@ async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Respons
 
 
 async def run_tasks(coroutines: list[Coroutine], allow_failed: bool = False) -> list[tuple[int, httpx.Response]]:
-    if allow_failed:
-        responses = await asyncio.gather(*coroutines, return_exceptions=False)
-        return list(enumerate(responses, 1))
-    # TODO: replace with asyncio.TaskGroup for python >3.11 # pylint: disable=fixme
-    tasks = [asyncio.create_task(_order_keeper(index, coro)) for index, coro in enumerate(coroutines, 1)]
-    results = []
-    remaining_tasks = dict(enumerate(tasks, 1))
-    for future in asyncio.as_completed(tasks):
-        index, response = await future
-        if response.status_code != 200:
-            # cancel all remaining tasks
-            for remaining_task in remaining_tasks.values():
-                remaining_task.cancel()
+    # Use a variable to adjust the httpx client timeout, or default to 30 minutes
+    # When we're able to reuse the SDK to make these calls, we can remove this var
+    # The SDK timeout will be controlled by parameter
+    client_timeout_minutes = 60
+    if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
+        client_timeout_minutes = int(timeout_var)
+    client_timeout = httpx.Timeout(60 * client_timeout_minutes)
+
+
+    async with httpx.AsyncClient(timeout=client_timeout) as client:
+        armed_coroutines = [coro(async_client=client) for coro in coroutines]
+        if allow_failed:
+            responses = await asyncio.gather(*armed_coroutines, return_exceptions=False)
+            return list(enumerate(responses, 1))
+        # TODO: replace with asyncio.TaskGroup for python >3.11 # pylint: disable=fixme
+        tasks = [asyncio.create_task(_order_keeper(index, coro))
+                 for index, coro in enumerate(armed_coroutines, 1)]
+        results = []
+        remaining_tasks = dict(enumerate(tasks, 1))
+        for future in asyncio.as_completed(tasks):
+            index, response = await future
+            if response.status_code != 200:
+                # cancel all remaining tasks
+                for remaining_task in remaining_tasks.values():
+                    remaining_task.cancel()
+                results.append((index, response))
+                break
             results.append((index, response))
-            break
-        results.append((index, response))
-        # remove task from remaining_tasks that should be cancelled in case of failure
-        del remaining_tasks[index]
-    # return results in the original order
-    return sorted(results, key=lambda x: x[0])
+            # remove task from remaining_tasks that should be cancelled in case of failure
+            del remaining_tasks[index]
+        # return results in the original order
+        return sorted(results, key=lambda x: x[0])
 
 
 def context_is_uvloop():
@@ -241,8 +255,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if (
                 file is None
                 or not isinstance(file, shared.Files)
-                or not pdf_utils.is_pdf(file)
         ):
+            return request
+
+        pdf = pdf_utils.read_pdf(file)
+        if pdf is None:
             return request
 
         starting_page_number = form_utils.get_starting_page_number(
@@ -265,13 +282,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         limiter = asyncio.Semaphore(concurrency_level)
 
-        content = cast(bytes, file.content)
-        pdf = PdfReader(io.BytesIO(content))
 
         page_range_start, page_range_end = form_utils.get_page_range(
             form_data,
             key=PARTITION_FORM_PAGE_RANGE_KEY,
-            max_pages=len(pdf.pages),
+            max_pages=pdf.get_num_pages(),
         )
 
         page_count = page_range_end - page_range_start + 1
@@ -285,7 +300,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
 
-        pages = self._get_pdf_pages(
+        pdf_chunk_paths = self._get_pdf_chunk_paths(
             pdf,
             operation_id=operation_id,
             split_size=split_size,
@@ -294,50 +309,35 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         # force free PDF object memory
         del pdf
+        pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
 
-        # Use a variable to adjust the httpx client timeout, or default to 30 minutes
-        # When we're able to reuse the SDK to make these calls, we can remove this var
-        # The SDK timeout will be controlled by parameter
-        client_timeout_minutes = 60
-        if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
-            client_timeout_minutes = int(timeout_var)
 
-        async def call_api_partial(pdf_chunk: Tuple[BinaryIO, int]):
-            client_timeout = httpx.Timeout(60 * client_timeout_minutes)
-
-            async with httpx.AsyncClient(timeout=client_timeout) as client:
-                response = await request_utils.call_api_async(
-                    client=client,
-                    original_request=request,
-                    form_data=form_data,
-                    filename=file.file_name,
-                    pdf_chunk=pdf_chunk,
-                    limiter=limiter,
-                )
-
-                # Immediately delete request to save memory
-                del response._request  # pylint: disable=protected-access
-                response._request = None  # pylint: disable=protected-access
-
-                # If we get 200, dump the contents to a file and return the path
-                temp_dir = self.tempdirs[operation_id]
-                if response.status_code == 200:
-                    temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
-                    async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
-                        # Avoid reading the entire response into memory
-                        async for bytes_chunk in response.aiter_bytes():
-                            await temp_file.write(bytes_chunk)
-                    # we save the path in content attribute to be used in after_success
-                    response._content = temp_file_name.encode()  # pylint: disable=protected-access
-
-                return response
 
         self.coroutines_to_execute[operation_id] = []
         set_index = 1
-        for pdf_chunk_file, page_index in pages:
+        for pdf_chunk_file, page_index in pdf_chunks:
             page_number = page_index + starting_page_number
+            pdf_chunk_request = request_utils.create_pdf_chunk_request(
+                form_data=form_data,
+                pdf_chunk=(pdf_chunk_file, page_number),
+                filename=file.file_name,
+                original_request=request,
+            )
 
-            coroutine = call_api_partial((pdf_chunk_file, page_number))
+            # using partial as the shared client parameter must be passed in `run_tasks`
+            # in `after_success`.
+            coroutine = partial(
+                self.call_api_partial,
+                # pdf_chunk=(pdf_chunk_file, page_number),
+                limiter=limiter,
+                operation_id=operation_id,
+                # client_timeout_minutes=client_timeout_minutes,
+                # original_request=request,
+                # form_data=form_data,
+                # filename=file.file_name,
+                pdf_chunk_request=pdf_chunk_request,
+                pdf_chunk_file=pdf_chunk_file,
+            )
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
 
@@ -355,14 +355,55 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             headers={"operation_id": operation_id},
         )
 
-    def _get_pdf_pages(
+    async def call_api_partial(
+            self,
+            # pdf_chunk: Tuple[BinaryIO, int],
+            pdf_chunk_file: BinaryIO,
+            limiter: asyncio.Semaphore,
+            operation_id: str,
+            # client_timeout_minutes: int,
+            # original_request: httpx.Request,
+            # form_data: dict,
+            # filename: str,
+            pdf_chunk_request: httpx.Request,
+            async_client: AsyncClient,
+    ) -> httpx.Response:
+        response = await request_utils.call_api_async(
+            client=async_client,
+            # original_request=original_request,
+            # form_data=form_data,
+            # filename=filename,
+            # pdf_chunk=pdf_chunk,
+            limiter=limiter,
+            pdf_chunk_request=pdf_chunk_request,
+            pdf_chunk_file=pdf_chunk_file,
+        )
+
+        # Immediately delete request to save memory
+        del response._request  # pylint: disable=protected-access
+        response._request = None  # pylint: disable=protected-access
+
+        # If we get 200, dump the contents to a file and return the path
+        temp_dir = self.tempdirs[operation_id]
+        if response.status_code == 200:
+            temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
+            async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
+                # Avoid reading the entire response into memory
+                async for bytes_chunk in response.aiter_bytes():
+                    await temp_file.write(bytes_chunk)
+            # we save the path in content attribute to be used in after_success
+            response._content = temp_file_name.encode()  # pylint: disable=protected-access
+
+        return response
+
+    def _get_pdf_chunk_paths(
         self,
         pdf: PdfReader,
         operation_id: str,
         split_size: int = 1,
         page_start: int = 1,
         page_end: Optional[int] = None
-    ) -> Generator[Tuple[BinaryIO, int], None, None]:
+    ) -> list[Tuple[Path, int]]:
         """Reads given bytes of a pdf file and split it into n pdf-chunks, each
         with `split_size` pages. The chunks are written into temporary files in
         a temporary directory corresponding to the operation_id.
@@ -387,7 +428,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         self.tempdirs[operation_id] = tempdir
         tempdir_path = Path(tempdir.name)
-        pdf_chunks = []
+        pdf_chunk_paths = []
         chunk_no = 0
         while offset < offset_end:
             chunk_no += 1
@@ -399,9 +440,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 new_pdf.add_page(page)
             with open(tempdir_path / f"chunk_{chunk_no}.pdf", "wb") as pdf_chunk:
                 new_pdf.write(pdf_chunk)
-                pdf_chunks.append((pdf_chunk.name, offset))
+                pdf_chunk_paths.append((pdf_chunk.name, offset))
             offset += split_size
+        return pdf_chunk_paths
 
+    def _get_pdf_chunk_files(
+            self, pdf_chunks: list[Tuple[Path, int]]
+    ) -> Generator[Tuple[BinaryIO, int], None, None]:
         for pdf_chunk_filename, offset in pdf_chunks:
             pdf_chunk_file = None
             try:
