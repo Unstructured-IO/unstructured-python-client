@@ -5,6 +5,7 @@ import io
 import logging
 from asyncio import Task
 from collections import Counter
+from functools import partial
 from typing import Coroutine
 
 import httpx
@@ -201,61 +202,31 @@ def test_unit_parse_form_data_none_filename_error():
         form_utils.parse_form_data(decoded_data)
 
 
-def test_unit_is_pdf_valid_pdf():
-    """Test is pdf method returns True for valid pdf file with filename."""
+def test_unit_is_pdf_valid_pdf_when_passing_file_object():
+    """Test is pdf method returns pdf object for valid pdf file with filename."""
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
 
     with open(filename, "rb") as f:
-        file = shared.Files(
-            content=f.read(),
-            file_name=filename,
-        )
-
-    result = pdf_utils.read_pdf(file)
+        result = pdf_utils.read_pdf(f)
 
     assert result is not None
 
 
-def test_unit_is_pdf_valid_pdf_without_file_extension():
-    """Test is pdf method returns True for file with valid pdf content without basing on file extension."""
+def test_unit_is_pdf_valid_pdf_when_passing_binary_content():
+    """Test is pdf method returns pdf object for file with valid pdf content"""
     filename = "_sample_docs/layout-parser-paper-fast.pdf"
     
     with open(filename, "rb") as f:
-        file = shared.Files(
-            content=f.read(),
-            file_name="uuid1234",
-        )
-
-    result = pdf_utils.read_pdf(file)
+        result = pdf_utils.read_pdf(f.read())
 
     assert result is not None
-
-
-def test_unit_is_pdf_invalid_extension():
-    """Test is pdf method returns False for file with invalid extension."""
-    file = shared.Files(content=b"txt_content", file_name="test_file.txt")
-
-    result = pdf_utils.read_pdf(file)
-
-    assert result is None
 
 
 def test_unit_is_pdf_invalid_pdf():
-    """Test is pdf method returns False for file with invalid pdf content."""
-    file = shared.Files(content=b"invalid_pdf_content", file_name="test_file.pdf")
-
-    result = pdf_utils.read_pdf(file)
+    """Test is pdf method returns False for file with invalid extension."""
+    result = pdf_utils.read_pdf(b"txt_content")
 
     assert result is None
-
-
-def test_unit_is_pdf_invalid_pdf_without_file_extension():
-    """Test is pdf method returns False for file with invalid pdf content without basing on file extension."""
-    file = shared.Files(content=b"invalid_pdf_content", file_name="uuid1234")
-
-    result = pdf_utils.read_pdf(file)
-
-    assert result is not None
     
 
 def test_unit_get_starting_page_number_missing_key():
@@ -365,7 +336,10 @@ def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
     assert result == expected_result
 
 
-async def _request_mock(fails: bool, content: str) -> requests.Response:
+async def _request_mock(
+        async_client: httpx.AsyncClient, # not used by mock
+        fails: bool,
+        content: str) -> requests.Response:
     response = requests.Response()
     response.status_code = 500 if fails else 200
     response._content = content.encode()
@@ -376,40 +350,40 @@ async def _request_mock(fails: bool, content: str) -> requests.Response:
     ("allow_failed", "tasks", "expected_responses"), [
         pytest.param(
             True, [
-                _request_mock(fails=False, content="1"),
-                _request_mock(fails=False, content="2"),
-                _request_mock(fails=False, content="3"),
-                _request_mock(fails=False, content="4"),
+                partial(_request_mock, fails=False, content="1"),
+                partial(_request_mock,  fails=False, content="2"),
+                partial(_request_mock,  fails=False, content="3"),
+                partial(_request_mock,  fails=False, content="4"),
             ],
             ["1", "2", "3", "4"],
             id="no failures, fails allower"
         ),
         pytest.param(
             True, [
-                _request_mock(fails=False, content="1"),
-                _request_mock(fails=True, content="2"),
-                _request_mock(fails=False, content="3"),
-                _request_mock(fails=True, content="4"),
+                partial(_request_mock,  fails=False, content="1"),
+                partial(_request_mock,  fails=True, content="2"),
+                partial(_request_mock,  fails=False, content="3"),
+                partial(_request_mock,  fails=True, content="4"),
             ],
             ["1", "2", "3", "4"],
             id="failures, fails allowed"
         ),
         pytest.param(
             False, [
-                _request_mock(fails=True, content="failure"),
-                _request_mock(fails=False, content="2"),
-                _request_mock(fails=True, content="failure"),
-                _request_mock(fails=False, content="4"),
+                partial(_request_mock,  fails=True, content="failure"),
+                partial(_request_mock,  fails=False, content="2"),
+                partial(_request_mock,  fails=True, content="failure"),
+                partial(_request_mock,  fails=False, content="4"),
             ],
             ["failure"],
             id="failures, fails disallowed"
         ),
         pytest.param(
             False, [
-                _request_mock(fails=False, content="1"),
-                _request_mock(fails=False, content="2"),
-                _request_mock(fails=False, content="3"),
-                _request_mock(fails=False, content="4"),
+                partial(_request_mock,  fails=False, content="1"),
+                partial(_request_mock,  fails=False, content="2"),
+                partial(_request_mock,  fails=False, content="3"),
+                partial(_request_mock,  fails=False, content="4"),
             ],
             ["1", "2", "3", "4"],
             id="no failures, fails disallowed"
@@ -428,14 +402,18 @@ async def test_unit_disallow_failed_coroutines(
     assert response_contents == expected_responses
 
 
-async def _fetch_canceller_error(fails: bool, content: str, cancelled_counter: Counter):
+async def _fetch_canceller_error(
+        async_client: httpx.AsyncClient, # not used by mock
+        fails: bool,
+        content: str,
+        cancelled_counter: Counter):
     try:
         if not fails:
             await asyncio.sleep(0.01)
             print("Doesn't fail")
         else:
             print("Fails")
-        return await _request_mock(fails=fails, content=content)
+        return await _request_mock(async_client=async_client, fails=fails, content=content)
     except asyncio.CancelledError:
         cancelled_counter.update(["cancelled"])
         print(cancelled_counter["cancelled"])
@@ -446,8 +424,8 @@ async def _fetch_canceller_error(fails: bool, content: str, cancelled_counter: C
 async def test_remaining_tasks_cancelled_when_fails_disallowed():
     cancelled_counter = Counter()
     tasks = [
-        _fetch_canceller_error(fails=True, content="1", cancelled_counter=cancelled_counter),
-        *[_fetch_canceller_error(fails=False, content=f"{i}", cancelled_counter=cancelled_counter)
+        partial(_fetch_canceller_error, fails=True, content="1", cancelled_counter=cancelled_counter),
+        *[partial(_fetch_canceller_error, fails=False, content=f"{i}", cancelled_counter=cancelled_counter)
           for i in range(2, 200)],
     ]
 
