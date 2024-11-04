@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-import copy
+import io
 import json
 import logging
 from typing import Tuple, Any, BinaryIO
 
 import httpx
-from httpx._multipart import MultipartStream
+from httpx._multipart import DataField, FileField
 from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -24,88 +24,40 @@ from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, ret
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
-
-def create_pdf_request_body(
-    form_data: FormData,
-    pdf_chunk: BinaryIO,
-    filename: str,
-    page_number: int
-) -> MultipartEncoder:
-    """Creates the request body for the partition API."
-    
-    Args:
-        form_data: The form data.
-        pdf_chunk: The pdf chunk - can be both io.BytesIO or a file object (created with open())
-        filename: The filename.
-        page_number: The page number.
-    
-    """
-    payload = prepare_request_payload(form_data)
-
-    payload_fields:  list[tuple[str, Any]] = []
-    for key, value in payload.items():
-        if isinstance(value, list):
-            payload_fields.extend([(key, list_value) for list_value in value])
-        else:
-            payload_fields.append((key, value))
-
-    payload_fields.append((PARTITION_FORM_FILES_KEY, (
-        filename,
-        pdf_chunk,
-        "application/pdf",
-    )))
-
-    return MultipartEncoder(fields=payload_fields)
-
-
-def create_pdf_request_data(
-        form_data: FormData,
-        pdf_chunk: BinaryIO,
-        filename: str,
-        page_number: int
-) -> dict[str, Any]:
-    """Creates the request body for the partition API."
+def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
+    """Extracts the multipart fields from the request.
 
     Args:
-        form_data: The form data.
-        pdf_chunk: The pdf chunk - can be both io.BytesIO or a file object (created with open())
-        filename: The filename.
-        page_number: The page number.
-
-    """
-    payload = prepare_request_payload(form_data)
-    payload[PARTITION_FORM_STARTING_PAGE_NUMBER_KEY] = str(page_number)
-
-    # payload[PARTITION_FORM_FILES_KEY] = (
-    #     filename,
-    #     pdf_chunk,
-    #     "application/pdf",
-    # )
-    #
-    # return MultipartEncoder(fields=payload_fields)
-    return payload
-
-def prepare_pdf_chunk_request_payload(form_data: FormData) -> FormData:
-    """Prepares the request payload by removing unnecessary keys and updating the file.
-
-    Args:
-        form_data: The original form data.
+        request: The request object.
 
     Returns:
-        The updated request payload.
+        The multipart fields.
     """
-    fields_to_drop = [
-        PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
-        PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
-        PARTITION_FORM_FILES_KEY,
-        PARTITION_FORM_PAGE_RANGE_KEY,
-        PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
-    ]
-    chunk_payload = {key: form_data[key] for key in form_data if key not in fields_to_drop}
-    chunk_payload[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
-    return chunk_payload
+    content_type = request.headers.get("Content-Type", "")
+    if "multipart" not in content_type:
+        return {}
+    if request.stream is None or not hasattr(request.stream, "fields"):
+        return {}
+    fields = request.stream.fields
 
-def create_pdf_chunk_request_data(
+    mapped_fields = {}
+    for field in fields:
+        if isinstance(field, DataField):
+            if "[]" in field.name:
+                name = field.name.replace("[]", "")
+                if name not in mapped_fields:
+                    mapped_fields[name] = []
+                mapped_fields[name].append(field.value)
+            mapped_fields[field.name] = field.value
+        elif isinstance(field, FileField):
+            mapped_fields[field.name] = {
+                "filename": field.filename,
+                "content_type": field.headers.get("Content-Type", ""),
+                "file": field.file,
+            }
+    return mapped_fields
+
+def create_pdf_chunk_request_params(
         form_data: FormData,
         page_number: int
 ) -> dict[str, Any]:
@@ -113,10 +65,10 @@ def create_pdf_chunk_request_data(
 
     Args:
         form_data: The form data.
-        pdf_chunk: The pdf chunk - can be both io.BytesIO or a file object (created with open())
-        filename: The filename.
         page_number: The page number.
 
+    Returns:
+        The updated request payload for the chunk.
     """
     fields_to_drop = [
         PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
@@ -140,7 +92,8 @@ def create_pdf_chunk_request(
 
     Args:
         form_data: The form data.
-        pdf_chunk: The pdf chunk - can be both io.BytesIO or a file object (created with open())
+        pdf_chunk: Tuple of pdf chunk contents (can be both io.BytesIO or
+            a file object created with e.g. open()) and the page number.
         original_request: The original request.
         filename: The filename.
 
@@ -148,7 +101,7 @@ def create_pdf_chunk_request(
         The updated request object.
     """
     pdf_chunk_file, page_number = pdf_chunk
-    data = create_pdf_chunk_request_data(form_data, page_number)
+    data = create_pdf_chunk_request_params(form_data, page_number)
     original_headers = prepare_request_headers(original_request.headers)
 
     pdf_chunk_partition_params = shared.PartitionParameters(
@@ -166,23 +119,14 @@ def create_pdf_chunk_request(
         "multipart",
         shared.PartitionParameters,
     )
-    # chunk_request = client.build_request(
-    #     method="POST",
-    #     url=original_request.url or "",
-    #     headers={**original_headers, "Content-Type": "application/pdf"},
-    #     files={PARTITION_FORM_FILES_KEY: (filename, pdf_chunk_file, "application/pdf")},
-    #     data=data,
-    # )
-    pdf_chunk_request = httpx.Request(
+    return httpx.Request(
         method="POST",
         url=original_request.url or "",
-        # headers={**original_headers, "Content-Type": serialized_body.media_type},
         headers={**original_headers},
         content=serialized_body.content,
         data=serialized_body.data,
         files=serialized_body.files,
     )
-    return pdf_chunk_request
 
 
 
@@ -192,17 +136,6 @@ async def call_api_async(
     pdf_chunk_file: BinaryIO,
     limiter: asyncio.Semaphore,
 ) -> httpx.Response:
-    # pdf_chunk_file, page_number = pdf_chunk
-    # body = create_pdf_request_body(form_data, pdf_chunk_file, filename, page_number)
-    # original_headers = prepare_request_headers(original_request.headers)
-
-    # new_request = httpx.Request(
-    #     method="POST",
-    #     url=original_request.url or "",
-    #     content=body.to_string(),
-    #     headers={**original_headers, "Content-Type": body.content_type},
-    # )
-
     one_second = 1000
     one_minute = 1000 * 60
 
@@ -237,7 +170,7 @@ async def call_api_async(
             print(e)
             raise e
         finally:
-            if not pdf_chunk_file.closed:
+            if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
                 pdf_chunk_file.close()
 
 
@@ -256,29 +189,6 @@ def prepare_request_headers(
     new_headers.pop("Content-Type", None)
     new_headers.pop("Content-Length", None)
     return new_headers
-
-
-def prepare_request_payload(form_data: FormData) -> FormData:
-    """Prepares the request payload by removing unnecessary keys and updating the file.
-
-    Args:
-        form_data: The original form data.
-
-    Returns:
-        The updated request payload.
-    """
-    payload = copy.deepcopy(form_data)
-    payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
-    payload.pop(PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY, None)
-    payload.pop(PARTITION_FORM_FILES_KEY, None)
-    payload.pop(PARTITION_FORM_PAGE_RANGE_KEY, None)
-    payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
-    updated_parameters = {
-        PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
-    }
-    payload.update(updated_parameters)
-    return payload
-
 
 def create_response(elements: list) -> httpx.Response:
     """

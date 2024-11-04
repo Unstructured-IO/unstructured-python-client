@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-import io
 import json
 import logging
-import os
 import math
+import os
 import tempfile
 import uuid
 from collections.abc import Awaitable
 from functools import partial
 from pathlib import Path
-from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
+from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO, Callable
 
 import aiofiles
 import httpx
@@ -40,7 +39,6 @@ from unstructured_client._hooks.types import (
     SDKInitHook,
 )
 from unstructured_client.httpclient import HttpClient, AsyncHttpClient
-from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -57,7 +55,21 @@ async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Respons
     return index, response
 
 
-async def run_tasks(coroutines: list[Coroutine], allow_failed: bool = False) -> list[tuple[int, httpx.Response]]:
+async def run_tasks(
+    coroutines: list[Callable[[AsyncClient], Coroutine]],
+    allow_failed: bool = False
+) -> list[tuple[int, httpx.Response]]:
+    """Run a list of coroutines in parallel and return the results in order.
+
+    Args:
+        coroutines (list[Callable[[Coroutine], Awaitable]): A list of fuctions
+            parametrized with async_client that return Awaitable objects.
+        allow_failed (bool, optional): If True, failed responses will be included
+            in the results. Otherwise, the first failed request breaks the
+            process. Defaults to False.
+    """
+
+
     # Use a variable to adjust the httpx client timeout, or default to 30 minutes
     # When we're able to reuse the SDK to make these calls, we can remove this var
     # The SDK timeout will be controlled by parameter
@@ -65,7 +77,6 @@ async def run_tasks(coroutines: list[Coroutine], allow_failed: bool = False) -> 
     if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
         client_timeout_minutes = int(timeout_var)
     client_timeout = httpx.Timeout(60 * client_timeout_minutes)
-
 
     async with httpx.AsyncClient(timeout=client_timeout) as client:
         armed_coroutines = [coro(async_client=client) for coro in coroutines]
@@ -114,11 +125,17 @@ def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
 
 def load_elements_from_response(response: httpx.Response) -> list[dict]:
     """Loads elements from the response content - the response was modified
-    to keep the path for the json file that should be loaded and returned"""
-    elements = []
+    to keep the path for the json file that should be loaded and returned
+
+    Args:
+        response (httpx.Response): The response object, which contains the path
+            to the json file that should be loaded.
+
+    Returns:
+        list[dict]: The elements loaded from the response content cached in the json file.
+    """
     with open(response.text, mode="r", encoding="utf-8") as file:
-        elements = json.load(file)
-    return elements
+        return json.load(file)
 
 
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
@@ -239,26 +256,36 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         operation_id = str(uuid.uuid4())
 
         content_type = request.headers.get("Content-Type")
-
-        request_content = request.read()
-        request_body = request_content
-        if not isinstance(request_body, bytes) or content_type is None:
+        if content_type is None:
             return request
 
-        decoded_body = MultipartDecoder(request_body, content_type)
-        form_data = form_utils.parse_form_data(decoded_body)
+        form_data = request_utils.get_multipart_stream_fields(request)
+        if not form_data:
+            return request
+        # For future - avoid reading the request content as it might issue
+        # OOM errors for large files. Instead, the `stream` (MultipartStream) parameter
+        # should be used which contains the list of DataField or FileField objects
+        # request_content = request.read()
+        # request_body = request_content
+
+
+        # decoded_body = MultipartDecoder(request_body, content_type)
+        # form_data = form_utils.parse_form_data(decoded_body)
         split_pdf_page = form_data.get(PARTITION_FORM_SPLIT_PDF_PAGE_KEY)
         if split_pdf_page is None or split_pdf_page == "false":
             return request
 
-        file = form_data.get(PARTITION_FORM_FILES_KEY)
+        pdf_file_meta = form_data.get(PARTITION_FORM_FILES_KEY)
         if (
-                file is None
-                or not isinstance(file, shared.Files)
+                pdf_file_meta is None or not all(metadata in pdf_file_meta for metadata in
+                                            ["filename", "content_type", "file"])
         ):
             return request
+        pdf_file = pdf_file_meta.get("file")
+        if pdf_file is None:
+            return request
 
-        pdf = pdf_utils.read_pdf(file)
+        pdf = pdf_utils.read_pdf(pdf_file)
         if pdf is None:
             return request
 
@@ -311,8 +338,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         del pdf
         pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
 
-
-
         self.coroutines_to_execute[operation_id] = []
         set_index = 1
         for pdf_chunk_file, page_index in pdf_chunks:
@@ -320,21 +345,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             pdf_chunk_request = request_utils.create_pdf_chunk_request(
                 form_data=form_data,
                 pdf_chunk=(pdf_chunk_file, page_number),
-                filename=file.file_name,
+                filename=pdf_file_meta["filename"],
                 original_request=request,
             )
-
-            # using partial as the shared client parameter must be passed in `run_tasks`
+            # using partial as the shared client parameter must be passed in `run_tasks` function
             # in `after_success`.
             coroutine = partial(
                 self.call_api_partial,
-                # pdf_chunk=(pdf_chunk_file, page_number),
                 limiter=limiter,
                 operation_id=operation_id,
-                # client_timeout_minutes=client_timeout_minutes,
-                # original_request=request,
-                # form_data=form_data,
-                # filename=file.file_name,
                 pdf_chunk_request=pdf_chunk_request,
                 pdf_chunk_file=pdf_chunk_file,
             )
@@ -357,23 +376,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     async def call_api_partial(
             self,
-            # pdf_chunk: Tuple[BinaryIO, int],
+            pdf_chunk_request: httpx.Request,
             pdf_chunk_file: BinaryIO,
             limiter: asyncio.Semaphore,
             operation_id: str,
-            # client_timeout_minutes: int,
-            # original_request: httpx.Request,
-            # form_data: dict,
-            # filename: str,
-            pdf_chunk_request: httpx.Request,
             async_client: AsyncClient,
     ) -> httpx.Response:
         response = await request_utils.call_api_async(
             client=async_client,
-            # original_request=original_request,
-            # form_data=form_data,
-            # filename=filename,
-            # pdf_chunk=pdf_chunk,
             limiter=limiter,
             pdf_chunk_request=pdf_chunk_request,
             pdf_chunk_file=pdf_chunk_file,
@@ -416,8 +426,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_start: Begin splitting at this page number
             page_end: If provided, split up to and including this page number
 
-        Yields:
-            The file object with their page number.
+        Returns:
+            The list of temporary file paths.
         """
 
         offset = page_start - 1
@@ -447,6 +457,18 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     def _get_pdf_chunk_files(
             self, pdf_chunks: list[Tuple[Path, int]]
     ) -> Generator[Tuple[BinaryIO, int], None, None]:
+        """Yields the file objects for the given pdf chunk paths.
+
+        Args:
+            pdf_chunks (list[Tuple[Path, int]]): The list of pdf chunk paths and
+                their page offsets.
+
+        Yields:
+            Tuple[BinaryIO, int]: The file object and the page offset.
+
+        Raises:
+            Exception: If the file cannot be opened.
+        """
         for pdf_chunk_filename, offset in pdf_chunks:
             pdf_chunk_file = None
             try:
@@ -454,7 +476,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     pdf_chunk_filename,
                     mode="rb"
                 )
-            except Exception:  # pylint: disable=broad-except
+            except (FileNotFoundError, IOError):
                 if pdf_chunk_file and not pdf_chunk_file.closed:
                     pdf_chunk_file.close()
                 raise
