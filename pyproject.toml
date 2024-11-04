@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unstructured-client"
-version = "0.26.2"
+version = "0.27.0"
 description = "Python Client SDK for Unstructured API"
 authors = ["Unstructured",]
 readme = "README-PYPI.md"
@@ -24,7 +24,7 @@ eval-type-backport = "^0.2.0"
 httpx = ">=0.27.0"
 jsonpath-python = "^1.0.6"
 nest-asyncio = ">=1.6.0"
-pydantic = "~2.9.0"
+pydantic = "~2.9.2"
 pypdf = ">=4.0"
 python-dateutil = "2.8.2"
 requests-toolbelt = ">=1.0.0"
