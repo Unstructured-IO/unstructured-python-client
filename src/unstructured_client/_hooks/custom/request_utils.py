@@ -32,6 +32,9 @@ def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
 
     Returns:
         The multipart fields.
+
+    Raises:
+        Exception: If the filename is not set
     """
     content_type = request.headers.get("Content-Type", "")
     if "multipart" not in content_type:
@@ -50,6 +53,8 @@ def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
                 mapped_fields[name].append(field.value)
             mapped_fields[field.name] = field.value
         elif isinstance(field, FileField):
+            if field.filename is None or not field.filename.strip():
+                raise ValueError("Filename can't be an empty string.")
             mapped_fields[field.name] = {
                 "filename": field.filename,
                 "content_type": field.headers.get("Content-Type", ""),
@@ -75,6 +80,7 @@ def create_pdf_chunk_request_params(
         PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
         PARTITION_FORM_FILES_KEY,
         PARTITION_FORM_PAGE_RANGE_KEY,
+        PARTITION_FORM_PAGE_RANGE_KEY.replace("[]", ""),
         PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     ]
     chunk_payload = {key: form_data[key] for key in form_data if key not in fields_to_drop}

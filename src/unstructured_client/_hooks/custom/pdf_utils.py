@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 import logging
-from typing import cast, Optional, BinaryIO
+from typing import cast, Optional, BinaryIO, Union
 
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
@@ -17,7 +17,7 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 pdf_logger = logging.getLogger("pypdf")
 pdf_logger.setLevel(logging.ERROR)
 
-def read_pdf(pdf_file: BinaryIO) -> Optional[PdfReader]:
+def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     """Reads the given PDF file.
 
     Args:

@@ -312,7 +312,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         page_range_start, page_range_end = form_utils.get_page_range(
             form_data,
-            key=PARTITION_FORM_PAGE_RANGE_KEY,
+            key=PARTITION_FORM_PAGE_RANGE_KEY.replace("[]", ""),
             max_pages=pdf.get_num_pages(),
         )
 
