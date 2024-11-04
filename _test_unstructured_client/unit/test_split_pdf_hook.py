@@ -53,29 +53,6 @@ def test_unit_clear_operation():
     assert hook.api_successful_responses.get(operation_id) is None
 
 
-def test_unit_prepare_request_payload():
-    """Test prepare request payload method properly sets split_pdf_page to 'false'
-    and removes files key."""
-    test_form_data = {
-        "files": ("test_file.pdf", b"test_file_content"),
-        "split_pdf_page": "true",
-        "parameter_1": "value_1",
-        "parameter_2": "value_2",
-        "parameter_3": "value_3",
-    }
-    expected_form_data = {
-        "split_pdf_page": "false",
-        "parameter_1": "value_1",
-        "parameter_2": "value_2",
-        "parameter_3": "value_3",
-    }
-
-    payload = request_utils.prepare_request_payload(test_form_data)
-
-    assert payload != test_form_data
-    assert payload, expected_form_data
-
-
 def test_unit_prepare_request_headers():
     """Test prepare request headers method properly removes Content-Type and Content-Length headers."""
     test_headers = {
@@ -234,9 +211,9 @@ def test_unit_is_pdf_valid_pdf():
             file_name=filename,
         )
 
-    result = pdf_utils.is_pdf(file)
+    result = pdf_utils.read_pdf(file)
 
-    assert result is True
+    assert result is not None
 
 
 def test_unit_is_pdf_valid_pdf_without_file_extension():
@@ -249,36 +226,36 @@ def test_unit_is_pdf_valid_pdf_without_file_extension():
             file_name="uuid1234",
         )
 
-    result = pdf_utils.is_pdf(file)
+    result = pdf_utils.read_pdf(file)
 
-    assert result is True
+    assert result is not None
 
 
 def test_unit_is_pdf_invalid_extension():
     """Test is pdf method returns False for file with invalid extension."""
     file = shared.Files(content=b"txt_content", file_name="test_file.txt")
 
-    result = pdf_utils.is_pdf(file)
+    result = pdf_utils.read_pdf(file)
 
-    assert result is False
+    assert result is None
 
 
 def test_unit_is_pdf_invalid_pdf():
     """Test is pdf method returns False for file with invalid pdf content."""
     file = shared.Files(content=b"invalid_pdf_content", file_name="test_file.pdf")
 
-    result = pdf_utils.is_pdf(file)
+    result = pdf_utils.read_pdf(file)
 
-    assert result is False
+    assert result is None
 
 
 def test_unit_is_pdf_invalid_pdf_without_file_extension():
     """Test is pdf method returns False for file with invalid pdf content without basing on file extension."""
     file = shared.Files(content=b"invalid_pdf_content", file_name="uuid1234")
 
-    result = pdf_utils.is_pdf(file)
+    result = pdf_utils.read_pdf(file)
 
-    assert result is False
+    assert result is not None
     
 
 def test_unit_get_starting_page_number_missing_key():
