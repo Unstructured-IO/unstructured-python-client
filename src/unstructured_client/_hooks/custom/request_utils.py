@@ -4,7 +4,7 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO
+from typing import Tuple, Any, BinaryIO, cast, IO
 
 import httpx
 from httpx._multipart import DataField, FileField
@@ -15,6 +15,8 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
@@ -82,6 +84,8 @@ def create_pdf_chunk_request_params(
         PARTITION_FORM_PAGE_RANGE_KEY,
         PARTITION_FORM_PAGE_RANGE_KEY.replace("[]", ""),
         PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+        PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+        PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
     ]
     chunk_payload = {key: form_data[key] for key in form_data if key not in fields_to_drop}
     chunk_payload[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
@@ -110,9 +114,15 @@ def create_pdf_chunk_request(
     data = create_pdf_chunk_request_params(form_data, page_number)
     original_headers = prepare_request_headers(original_request.headers)
 
+    pdf_chunk_content = (
+        pdf_chunk_file.getvalue()
+        if isinstance(pdf_chunk_file, io.BytesIO)
+        else pdf_chunk_file
+    )
+
     pdf_chunk_partition_params = shared.PartitionParameters(
         files=shared.Files(
-            content=pdf_chunk_file,
+            content=pdf_chunk_content,
             file_name=filename,
             content_type="application/pdf",
         ),

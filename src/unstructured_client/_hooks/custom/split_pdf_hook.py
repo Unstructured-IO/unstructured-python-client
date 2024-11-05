@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import io
 import json
 import logging
 import math
@@ -18,6 +19,7 @@ import nest_asyncio  # type: ignore
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
+from unstructured.chunking.dispatch import chunk
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -27,7 +29,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
-    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
 )
 from unstructured_client._hooks.types import (
     AfterErrorContext,
@@ -45,6 +47,8 @@ logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 DEFAULT_STARTING_PAGE_NUMBER = 1
 DEFAULT_ALLOW_FAILED = False
 DEFAULT_CONCURRENCY_LEVEL = 10
+DEFAULT_CACHE_TMP_DATA = False
+DEFAULT_CACHE_TMP_DATA_DIR = tempfile.gettempdir()
 MAX_CONCURRENCY_LEVEL = 50
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
@@ -309,6 +313,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         limiter = asyncio.Semaphore(concurrency_level)
 
+        self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
+            form_data,
+            key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+            fallback_value=DEFAULT_CACHE_TMP_DATA,
+        )
+
+        self.cache_tmp_data_dir = form_utils.get_split_pdf_cache_tmp_data_dir(
+            form_data,
+            key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+            fallback_value=DEFAULT_CACHE_TMP_DATA_DIR,
+        )
 
         page_range_start, page_range_end = form_utils.get_page_range(
             form_data,
@@ -327,16 +342,24 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
 
-        pdf_chunk_paths = self._get_pdf_chunk_paths(
-            pdf,
-            operation_id=operation_id,
-            split_size=split_size,
-            page_start=page_range_start,
-            page_end=page_range_end
-        )
-        # force free PDF object memory
-        del pdf
-        pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
+        if self.cache_tmp_data_feature:
+            pdf_chunk_paths = self._get_pdf_chunk_paths(
+                pdf,
+                operation_id=operation_id,
+                split_size=split_size,
+                page_start=page_range_start,
+                page_end=page_range_end
+            )
+            # force free PDF object memory
+            del pdf
+            pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
+        else:
+            pdf_chunks = self._get_pdf_chunks_in_memory(
+                pdf,
+                split_size=split_size,
+                page_start=page_range_start,
+                page_end=page_range_end
+            )
 
         self.coroutines_to_execute[operation_id] = []
         set_index = 1
@@ -393,18 +416,61 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         del response._request  # pylint: disable=protected-access
         response._request = None  # pylint: disable=protected-access
 
-        # If we get 200, dump the contents to a file and return the path
-        temp_dir = self.tempdirs[operation_id]
+
         if response.status_code == 200:
-            temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
-            async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
-                # Avoid reading the entire response into memory
-                async for bytes_chunk in response.aiter_bytes():
-                    await temp_file.write(bytes_chunk)
-            # we save the path in content attribute to be used in after_success
-            response._content = temp_file_name.encode()  # pylint: disable=protected-access
+            if self.cache_tmp_data_feature:
+                # If we get 200, dump the contents to a file and return the path
+                temp_dir = self.tempdirs[operation_id]
+                temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
+                async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
+                    # Avoid reading the entire response into memory
+                    async for bytes_chunk in response.aiter_bytes():
+                        await temp_file.write(bytes_chunk)
+                # we save the path in content attribute to be used in after_success
+                response._content = temp_file_name.encode()  # pylint: disable=protected-access
 
         return response
+
+    def _get_pdf_chunks_in_memory(
+            self,
+            pdf: PdfReader,
+            split_size: int = 1,
+            page_start: int = 1,
+            page_end: Optional[int] = None
+    ) -> Generator[Tuple[BinaryIO, int], None, None]:
+        """Reads given bytes of a pdf file and split it into n pdf-chunks, each
+        with `split_size` pages. The chunks are written into temporary files in
+        a temporary directory corresponding to the operation_id.
+
+        Args:
+            file_content: Content of the PDF file.
+            split_size: Split size, e.g. if the given file has 10 pages
+                and this value is set to 2 it will yield 5 documents, each containing 2 pages
+                of the original document. By default it will split each page to a separate file.
+            page_start: Begin splitting at this page number
+            page_end: If provided, split up to and including this page number
+
+        Returns:
+            The list of temporary file paths.
+        """
+
+        offset = page_start - 1
+        offset_end = page_end or len(pdf.pages)
+
+        chunk_no = 0
+        while offset < offset_end:
+            chunk_no += 1
+            new_pdf = PdfWriter()
+            chunk_buffer = io.BytesIO()
+
+            end = min(offset + split_size, offset_end)
+
+            for page in list(pdf.pages[offset:end]):
+                new_pdf.add_page(page)
+            new_pdf.write(chunk_buffer)
+            chunk_buffer.seek(0)
+            yield chunk_buffer, offset
+            offset += split_size
 
     def _get_pdf_chunk_paths(
         self,
@@ -434,7 +500,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         offset_end = page_end or len(pdf.pages)
 
         tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
-            suffix="unstructured_client"
+            dir=self.cache_tmp_data_dir,
+            prefix="unstructured_client_"
         )
         self.tempdirs[operation_id] = tempdir
         tempdir_path = Path(tempdir.name)
@@ -517,7 +584,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     response_number,
                 )
                 successful_responses.append(res)
-                elements.append(load_elements_from_response(res))
+                if self.cache_tmp_data_feature:
+                    elements.append(load_elements_from_response(res))
+                else:
+                    elements.append(res.json())
             else:
                 error_message = f"Failed to partition set {response_number}."
 
