@@ -161,8 +161,8 @@ def get_split_pdf_cache_tmp_data(
     return cache_tmp_data.lower() == "true"
 
 def get_split_pdf_cache_tmp_data_dir(
-    form_data: FormData, key: str, fallback_value: Path | str,
-) -> Path | str:
+    form_data: FormData, key: str, fallback_value: str,
+) -> str:
     """Retrieves the value for cache tmp data dir that should be used for splitting pdf.
 
     In case given the number is not a "false" or "true" literal, it will use the
@@ -178,13 +178,11 @@ def get_split_pdf_cache_tmp_data_dir(
     """
     cache_tmp_data_dir = form_data.get(key)
 
-    if not isinstance(cache_tmp_data_dir, str) and not isinstance(cache_tmp_data_dir, Path):
+    if not isinstance(cache_tmp_data_dir, str):
         return fallback_value
+    cache_tmp_data_path = Path(cache_tmp_data_dir)
 
-    if isinstance(cache_tmp_data_dir, str):
-        cache_tmp_data_dir = Path(cache_tmp_data_dir)
-
-    if not cache_tmp_data_dir.exists():
+    if not cache_tmp_data_path.exists():
         logger.warning(
             "'%s' does not exist. Using default value '%s'.",
             key,
@@ -192,7 +190,7 @@ def get_split_pdf_cache_tmp_data_dir(
         )
         return fallback_value
 
-    return cache_tmp_data_dir.resolve()
+    return str(cache_tmp_data_path.resolve())
 
 
 def get_split_pdf_concurrency_level_param(

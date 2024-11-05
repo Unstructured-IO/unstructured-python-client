@@ -4,11 +4,10 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO, cast, IO
+from typing import Tuple, Any, BinaryIO
 
 import httpx
 from httpx._multipart import DataField, FileField
-from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
@@ -45,7 +44,7 @@ def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
         return {}
     fields = request.stream.fields
 
-    mapped_fields = {}
+    mapped_fields: dict[str, Any] = {}
     for field in fields:
         if isinstance(field, DataField):
             if "[]" in field.name:
@@ -114,7 +113,7 @@ def create_pdf_chunk_request(
     data = create_pdf_chunk_request_params(form_data, page_number)
     original_headers = prepare_request_headers(original_request.headers)
 
-    pdf_chunk_content = (
+    pdf_chunk_content: BinaryIO | bytes = (
         pdf_chunk_file.getvalue()
         if isinstance(pdf_chunk_file, io.BytesIO)
         else pdf_chunk_file
@@ -135,6 +134,8 @@ def create_pdf_chunk_request(
         "multipart",
         shared.PartitionParameters,
     )
+    if serialized_body is None:
+        raise ValueError("Failed to serialize the request body.")
     return httpx.Request(
         method="POST",
         url=original_request.url or "",

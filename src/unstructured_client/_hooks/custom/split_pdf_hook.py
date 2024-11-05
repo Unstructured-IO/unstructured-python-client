@@ -11,15 +11,13 @@ import uuid
 from collections.abc import Awaitable
 from functools import partial
 from pathlib import Path
-from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO, Callable
+from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
 import aiofiles
 import httpx
 import nest_asyncio  # type: ignore
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
-from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
-from unstructured.chunking.dispatch import chunk
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -60,7 +58,7 @@ async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Respons
 
 
 async def run_tasks(
-    coroutines: list[Callable[[AsyncClient], Coroutine]],
+    coroutines: list[partial[Coroutine[Any, Any, httpx.Response]]],
     allow_failed: bool = False
 ) -> list[tuple[int, httpx.Response]]:
     """Run a list of coroutines in parallel and return the results in order.
@@ -83,7 +81,7 @@ async def run_tasks(
     client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
     async with httpx.AsyncClient(timeout=client_timeout) as client:
-        armed_coroutines = [coro(async_client=client) for coro in coroutines]
+        armed_coroutines = [coro(async_client=client) for coro in coroutines] # type: ignore
         if allow_failed:
             responses = await asyncio.gather(*armed_coroutines, return_exceptions=False)
             return list(enumerate(responses, 1))
@@ -157,12 +155,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.base_url: Optional[str] = None
         self.async_client: Optional[AsyncHttpClient] = None
         self.coroutines_to_execute: dict[
-            str, list[Coroutine[Any, Any, httpx.Response]]
+            str, list[partial[Coroutine[Any, Any, httpx.Response]]]
         ] = {}
         self.api_successful_responses: dict[str, list[httpx.Response]] = {}
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
+        self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
+        self.cache_tmp_data_dir: str = DEFAULT_CACHE_TMP_DATA_DIR
 
     def sdk_init(
             self, base_url: str, client: HttpClient
@@ -266,15 +266,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         form_data = request_utils.get_multipart_stream_fields(request)
         if not form_data:
             return request
-        # For future - avoid reading the request content as it might issue
-        # OOM errors for large files. Instead, the `stream` (MultipartStream) parameter
-        # should be used which contains the list of DataField or FileField objects
-        # request_content = request.read()
-        # request_body = request_content
 
-
-        # decoded_body = MultipartDecoder(request_body, content_type)
-        # form_data = form_utils.parse_form_data(decoded_body)
         split_pdf_page = form_data.get(PARTITION_FORM_SPLIT_PDF_PAGE_KEY)
         if split_pdf_page is None or split_pdf_page == "false":
             return request
@@ -505,7 +497,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
         self.tempdirs[operation_id] = tempdir
         tempdir_path = Path(tempdir.name)
-        pdf_chunk_paths = []
+        pdf_chunk_paths: list[Tuple[Path, int]] = []
         chunk_no = 0
         while offset < offset_end:
             chunk_no += 1
@@ -517,7 +509,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 new_pdf.add_page(page)
             with open(tempdir_path / f"chunk_{chunk_no}.pdf", "wb") as pdf_chunk:
                 new_pdf.write(pdf_chunk)
-                pdf_chunk_paths.append((pdf_chunk.name, offset))
+                pdf_chunk_paths.append((Path(pdf_chunk.name), offset))
             offset += split_size
         return pdf_chunk_paths
 

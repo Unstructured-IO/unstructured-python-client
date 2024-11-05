@@ -8,7 +8,6 @@ from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
-from unstructured_client.models import shared
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
