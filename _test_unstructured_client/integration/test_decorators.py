@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
+
 import httpx
 import json
 import pytest
@@ -101,6 +104,87 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         ],
     )
     assert len(diff) == 0
+
+@pytest.mark.parametrize( ("filename", "expected_ok", "strategy"), [
+    ("_sample_docs/layout-parser-paper.pdf", True, "hi_res"),  # 16
+]# pages
+)
+@pytest.mark.parametrize( ("use_caching", "cache_dir"), [
+    (True, None),  # Use default cache dir
+    (True, Path(tempfile.gettempdir()) / "test_integration_unstructured_client1"),  # Use custom cache dir
+    (False, None),  # Don't use caching
+    (False, Path(tempfile.gettempdir()) / "test_integration_unstructured_client2"),  # Don't use caching, use custom cache dir
+])
+def test_integration_split_pdf_with_caching(
+    filename: str, expected_ok: bool, strategy: str, use_caching: bool,
+    cache_dir: Path | None
+):
+    try:
+        response = requests.get("http://localhost:8000/general/docs")
+        assert response.status_code == 200, "The unstructured-api is not running on localhost:8000"
+    except requests.exceptions.ConnectionError:
+        assert False, "The unstructured-api is not running on localhost:8000"
+
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+
+    with open(filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    if not expected_ok:
+        # This will append .pdf to filename to fool first line of filetype detection, to simulate decoding error
+        files.file_name += ".pdf"
+
+    parameters = shared.PartitionParameters(
+        files=files,
+        strategy=strategy,
+        languages=["eng"],
+        split_pdf_page=True,
+        split_pdf_cache_tmp_data=use_caching,
+        split_pdf_cache_dir=cache_dir,
+    )
+
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
+    try:
+        resp_split = client.general.partition(request=req)
+    except (HTTPValidationError, AttributeError) as exc:
+        if not expected_ok:
+            assert "File does not appear to be a valid PDF" in str(exc)
+            return
+        else:
+            assert exc is None
+
+    parameters.split_pdf_page = False
+
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
+    resp_single = client.general.partition(request=req)
+
+    assert len(resp_split.elements) == len(resp_single.elements)
+    assert resp_split.content_type == resp_single.content_type
+    assert resp_split.status_code == resp_single.status_code
+
+    diff = DeepDiff(
+        t1=resp_split.elements,
+        t2=resp_single.elements,
+        exclude_regex_paths=[
+            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
+            r"root\[\d+\]\['element_id'\]",
+        ],
+    )
+    assert len(diff) == 0
+
+    # make sure the cache dir was cleaned if passed explicitly
+    if cache_dir:
+        assert not Path(cache_dir).exists()
+
 
 
 def test_integration_split_pdf_for_file_with_no_name():

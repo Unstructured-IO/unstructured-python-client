@@ -1,74 +1,158 @@
 from __future__ import annotations
 
 import asyncio
-import copy
 import io
 import json
 import logging
-from typing import Tuple, Any
+from typing import Tuple, Any, BinaryIO
 
 import httpx
-from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
+from httpx._multipart import DataField, FileField
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     FormData,
 )
-from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, retry_async
+from unstructured_client.models import shared
+from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, retry_async, serialize_request_body
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
+def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
+    """Extracts the multipart fields from the request.
 
-def create_request_body(
-    form_data: FormData, page_content: io.BytesIO, filename: str, page_number: int
-) -> MultipartEncoder:
-    payload = prepare_request_payload(form_data)
+    Args:
+        request: The request object.
 
-    payload_fields:  list[tuple[str, Any]] = []
-    for key, value in payload.items():
-        if isinstance(value, list):
-            payload_fields.extend([(key, list_value) for list_value in value])
-        else:
-            payload_fields.append((key, value))
+    Returns:
+        The multipart fields.
 
-    payload_fields.append((PARTITION_FORM_FILES_KEY, (
-        filename,
-        page_content,
-        "application/pdf",
-    )))
+    Raises:
+        Exception: If the filename is not set
+    """
+    content_type = request.headers.get("Content-Type", "")
+    if "multipart" not in content_type:
+        return {}
+    if request.stream is None or not hasattr(request.stream, "fields"):
+        return {}
+    fields = request.stream.fields
 
-    payload_fields.append((PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, str(page_number)))
+    mapped_fields: dict[str, Any] = {}
+    for field in fields:
+        if isinstance(field, DataField):
+            if "[]" in field.name:
+                name = field.name.replace("[]", "")
+                if name not in mapped_fields:
+                    mapped_fields[name] = []
+                mapped_fields[name].append(field.value)
+            mapped_fields[field.name] = field.value
+        elif isinstance(field, FileField):
+            if field.filename is None or not field.filename.strip():
+                raise ValueError("Filename can't be an empty string.")
+            mapped_fields[field.name] = {
+                "filename": field.filename,
+                "content_type": field.headers.get("Content-Type", ""),
+                "file": field.file,
+            }
+    return mapped_fields
 
-    body = MultipartEncoder(
-        fields=payload_fields
+def create_pdf_chunk_request_params(
+        form_data: FormData,
+        page_number: int
+) -> dict[str, Any]:
+    """Creates the request body for the partition API."
+
+    Args:
+        form_data: The form data.
+        page_number: The page number.
+
+    Returns:
+        The updated request payload for the chunk.
+    """
+    fields_to_drop = [
+        PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+        PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
+        PARTITION_FORM_FILES_KEY,
+        PARTITION_FORM_PAGE_RANGE_KEY,
+        PARTITION_FORM_PAGE_RANGE_KEY.replace("[]", ""),
+        PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
+        PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+        PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
+    ]
+    chunk_payload = {key: form_data[key] for key in form_data if key not in fields_to_drop}
+    chunk_payload[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
+    chunk_payload[PARTITION_FORM_STARTING_PAGE_NUMBER_KEY] = str(page_number)
+    return chunk_payload
+
+def create_pdf_chunk_request(
+    form_data: FormData,
+    pdf_chunk: Tuple[BinaryIO, int],
+    original_request: httpx.Request,
+    filename: str,
+) -> httpx.Request:
+    """Creates a new request object with the updated payload for the partition API.
+
+    Args:
+        form_data: The form data.
+        pdf_chunk: Tuple of pdf chunk contents (can be both io.BytesIO or
+            a file object created with e.g. open()) and the page number.
+        original_request: The original request.
+        filename: The filename.
+
+    Returns:
+        The updated request object.
+    """
+    pdf_chunk_file, page_number = pdf_chunk
+    data = create_pdf_chunk_request_params(form_data, page_number)
+    original_headers = prepare_request_headers(original_request.headers)
+
+    pdf_chunk_content: BinaryIO | bytes = (
+        pdf_chunk_file.getvalue()
+        if isinstance(pdf_chunk_file, io.BytesIO)
+        else pdf_chunk_file
     )
-    return body
+
+    pdf_chunk_partition_params = shared.PartitionParameters(
+        files=shared.Files(
+            content=pdf_chunk_content,
+            file_name=filename,
+            content_type="application/pdf",
+        ),
+        **data,
+    )
+    serialized_body = serialize_request_body(
+        pdf_chunk_partition_params,
+        False,
+        False,
+        "multipart",
+        shared.PartitionParameters,
+    )
+    if serialized_body is None:
+        raise ValueError("Failed to serialize the request body.")
+    return httpx.Request(
+        method="POST",
+        url=original_request.url or "",
+        headers={**original_headers},
+        content=serialized_body.content,
+        data=serialized_body.data,
+        files=serialized_body.files,
+    )
+
 
 
 async def call_api_async(
     client: httpx.AsyncClient,
-    page: Tuple[io.BytesIO, int],
-    original_request: httpx.Request,
-    form_data: FormData,
-    filename: str,
+    pdf_chunk_request: httpx.Request,
+    pdf_chunk_file: BinaryIO,
     limiter: asyncio.Semaphore,
 ) -> httpx.Response:
-    page_content, page_number = page
-    body = create_request_body(form_data, page_content, filename, page_number)
-    original_headers = prepare_request_headers(original_request.headers)
-
-    new_request = httpx.Request(
-        method="POST",
-        url=original_request.url or "",
-        content=body.to_string(),
-        headers={**original_headers, "Content-Type": body.content_type},
-    )
-
     one_second = 1000
     one_minute = 1000 * 60
 
@@ -90,14 +174,21 @@ async def call_api_async(
     ]
 
     async def do_request():
-        return await client.send(new_request)
+        return await client.send(pdf_chunk_request)
 
     async with limiter:
-        response = await retry_async(
-            do_request,
-            Retries(retry_config, retryable_codes)
-        )
-        return response
+        try:
+            response = await retry_async(
+                do_request,
+                Retries(retry_config, retryable_codes)
+            )
+            return response
+        except Exception as e:
+            print(e)
+            raise e
+        finally:
+            if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
+                pdf_chunk_file.close()
 
 
 def prepare_request_headers(
@@ -115,29 +206,6 @@ def prepare_request_headers(
     new_headers.pop("Content-Type", None)
     new_headers.pop("Content-Length", None)
     return new_headers
-
-
-def prepare_request_payload(form_data: FormData) -> FormData:
-    """Prepares the request payload by removing unnecessary keys and updating the file.
-
-    Args:
-        form_data: The original form data.
-
-    Returns:
-        The updated request payload.
-    """
-    payload = copy.deepcopy(form_data)
-    payload.pop(PARTITION_FORM_SPLIT_PDF_PAGE_KEY, None)
-    payload.pop(PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY, None)
-    payload.pop(PARTITION_FORM_FILES_KEY, None)
-    payload.pop(PARTITION_FORM_PAGE_RANGE_KEY, None)
-    payload.pop(PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, None)
-    updated_parameters = {
-        PARTITION_FORM_SPLIT_PDF_PAGE_KEY: "false",
-    }
-    payload.update(updated_parameters)
-    return payload
-
 
 def create_response(elements: list) -> httpx.Response:
     """

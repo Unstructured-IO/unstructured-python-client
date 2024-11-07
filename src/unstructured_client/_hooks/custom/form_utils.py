@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing_extensions import TypeAlias
 
@@ -19,6 +20,8 @@ PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
 PARTITION_FORM_PAGE_RANGE_KEY = "split_pdf_page_range[]"
 PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY = "split_pdf_allow_failed"
+PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY = "split_pdf_cache_tmp_data"
+PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY = "split_pdf_cache_tmp_data_dir"
 PARTITION_FORM_STARTING_PAGE_NUMBER_KEY = "starting_page_number"
 PARTITION_FORM_CONCURRENCY_LEVEL_KEY = "split_pdf_concurrency_level"
 
@@ -125,6 +128,69 @@ def get_split_pdf_allow_failed_param(
         return fallback_value
 
     return allow_failed.lower() == "true"
+
+def get_split_pdf_cache_tmp_data(
+    form_data: FormData, key: str, fallback_value: bool,
+) -> bool:
+    """Retrieves the value for cache tmp data that should be used for splitting pdf.
+
+    In case given the value is not a correct (existing) dir (Path), it will use the
+    default value.
+
+    Args:
+        form_data: The form data containing the desired flag value.
+        key: The key to look for in the form data.
+        fallback_value: The default value to use in case of an error.
+
+    Returns:
+        The flag value for 'cache tmp data' feature after validation.
+    """
+    cache_tmp_data = form_data.get(key)
+
+    if not isinstance(cache_tmp_data, str):
+        return fallback_value
+
+    if cache_tmp_data.lower() not in ["true", "false"]:
+        logger.warning(
+            "'%s' is not a valid boolean. Using default value '%s'.",
+            key,
+            fallback_value,
+        )
+        return fallback_value
+
+    return cache_tmp_data.lower() == "true"
+
+def get_split_pdf_cache_tmp_data_dir(
+    form_data: FormData, key: str, fallback_value: str,
+) -> str:
+    """Retrieves the value for cache tmp data dir that should be used for splitting pdf.
+
+    In case given the number is not a "false" or "true" literal, it will use the
+    default value.
+
+    Args:
+        form_data: The form data containing the desired flag value.
+        key: The key to look for in the form data.
+        fallback_value: The default value to use in case of an error.
+
+    Returns:
+        The flag value for 'cache tmp data' feature after validation.
+    """
+    cache_tmp_data_dir = form_data.get(key)
+
+    if not isinstance(cache_tmp_data_dir, str):
+        return fallback_value
+    cache_tmp_data_path = Path(cache_tmp_data_dir)
+
+    if not cache_tmp_data_path.exists():
+        logger.warning(
+            "'%s' does not exist. Using default value '%s'.",
+            key,
+            fallback_value,
+        )
+        return fallback_value
+
+    return str(cache_tmp_data_path.resolve())
 
 
 def get_split_pdf_concurrency_level_param(
