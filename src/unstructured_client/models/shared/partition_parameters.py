@@ -124,10 +124,6 @@ class PartitionParametersTypedDict(TypedDict):
     r"""This parameter determines if the PDF file should be split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page_range: NotRequired[List[int]]
     r"""When `split_pdf_page is set to `True`, this parameter selects a subset of the pdf to send to the API. The parameter is a list of 2 integers within the range [1, length_of_pdf]. A ValueError is thrown if the given range is invalid. It's an internal parameter for the Python client and is not sent to the backend."""
-    split_pdf_cache_tmp_data: NotRequired[bool]
-    r"""When `split_pdf_page` is set to `True`, this parameter determines if the temporary data used for splitting the PDF should be cached into disc - if enabled should save significant amount of RAM memory when processing big files. It's an internal parameter for the Python client and is not sent to the backend."""
-    split_pdf_cache_tmp_data_dir: NotRequired[str]
-    r"""When `split_pdf_page` is set to `True` and `split_pdf_cache_tmp_data` feature is used, this parameter specifies the directory where the temporary data used for splitting the PDF should be cached into disc. It's an internal parameter for the Python client and is not sent to the backend."""
     starting_page_number: NotRequired[Nullable[int]]
     r"""When PDF is split into pages before sending it into the API, providing this information will allow the page number to be assigned correctly. Introduced in 1.0.27."""
     strategy: NotRequired[Strategy]
