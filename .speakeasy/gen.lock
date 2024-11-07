@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 21f469b38bb72725739ee9d9d0fc8780
+  docChecksum: b1c17258d127ea2ce7e4bfa09a8eb004
   docVersion: 1.0.51
-  speakeasyVersion: 1.424.0
-  generationVersion: 2.445.1
-  releaseVersion: 0.27.0
-  configChecksum: 6ece96f34cb076ad455a9c66b68c30b0
+  speakeasyVersion: 1.434.0
+  generationVersion: 2.452.0
+  releaseVersion: 0.27.1
+  configChecksum: 6b564224a4fb4d2e0db60d5607eeb376
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,10 +15,10 @@ features:
   python:
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.4
-    core: 5.6.1
+    core: 5.6.4
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
-    envVarSecurityUsage: 0.3.1
+    envVarSecurityUsage: 0.3.2
     examples: 3.0.0
     globalSecurity: 3.0.2
     globalSecurityCallbacks: 1.0.0
@@ -33,7 +33,7 @@ features:
     sdkHooks: 1.0.0
     serverIDs: 3.0.0
     tests: 1.6.0
-    unions: 3.0.2
+    unions: 3.0.3
     uploadStreams: 1.0.0
 generatedFiles:
   - .gitattributes
@@ -58,7 +58,6 @@ generatedFiles:
   - py.typed
   - pylintrc
   - pyproject.toml
-  - scripts/compile.sh
   - scripts/prepare-readme.py
   - scripts/publish.sh
   - src/unstructured_client/__init__.py
