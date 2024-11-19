@@ -6,6 +6,7 @@
 
 ### Fixes
 * Use the configured server_url for our split page "dummy" request
+* Handle `text/csv` output format and return accordingly when passing the argument
 
 ## 0.26.0
 

@@ -3,25 +3,14 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from pathlib import Path
 
 import pytest
 from deepdiff import DeepDiff
+
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
-
-
-@pytest.fixture(scope="module")
-def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"), server='free-api')
-    yield _client
-
-
-@pytest.fixture(scope="module")
-def doc_path() -> Path:
-    return Path(__file__).resolve().parents[2] / "_sample_docs"
 
 
 @pytest.mark.parametrize("split_pdf", [True, False])

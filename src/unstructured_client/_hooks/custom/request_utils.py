@@ -4,7 +4,7 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO
+from typing import Any, BinaryIO, Tuple
 
 import httpx
 from httpx._multipart import DataField, FileField
@@ -207,7 +207,8 @@ def prepare_request_headers(
     new_headers.pop("Content-Length", None)
     return new_headers
 
-def create_response(elements: list) -> httpx.Response:
+
+def create_response(elements: list[dict[str, Any] | bytes]) -> httpx.Response:
     """
     Creates a modified response object with updated content.
 
@@ -218,8 +219,12 @@ def create_response(elements: list) -> httpx.Response:
     Returns:
         The modified response object with updated content.
     """
-    response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
-    content = json.dumps(elements).encode()
+    if isinstance(elements, list) and all(isinstance(element, bytes) for element in elements):
+        response = httpx.Response(status_code=200, headers={"Content-Type": "text/csv; charset=utf-8"})
+        content = b''.join(elements) # type: ignore
+    else:
+        response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
+        content = json.dumps(elements).encode()
     content_length = str(len(content))
     response.headers.update({"Content-Length": content_length})
     setattr(response, "_content", content)

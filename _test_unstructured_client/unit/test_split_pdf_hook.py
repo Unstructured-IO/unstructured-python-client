@@ -1,17 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-import io
-import logging
 from asyncio import Task
 from collections import Counter
 from functools import partial
-from typing import Coroutine
 
-import httpx
 import pytest
 import requests
-from requests_toolbelt import MultipartDecoder, MultipartEncoder
+from requests_toolbelt import MultipartDecoder
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (

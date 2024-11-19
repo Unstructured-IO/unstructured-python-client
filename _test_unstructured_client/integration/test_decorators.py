@@ -15,11 +15,39 @@ from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import HTTPValidationError
+from unstructured_client.models.shared.partition_parameters import OutputFormat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+
+@pytest.mark.parametrize("split_pdf_page", [True, False])
+def test_integration_split_csv_response(split_pdf_page, client, doc_path):
+    filename = "layout-parser-paper.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            output_format=OutputFormat.TEXT_CSV,
+            split_pdf_page=split_pdf_page,
+        )
+    )
+
+    resp = client.general.partition(request=req)
+
+    assert resp.status_code == 200
+    assert resp.content_type == "text/csv; charset=utf-8"
+    assert resp.elements is None
+    assert resp.csv_elements is not None
+    assert resp.csv_elements.startswith(
+        "type,element_id,text,filetype,languages,page_number,filename,parent_id"
+    )
 
 
 @pytest.mark.parametrize("concurrency_level", [1, 2, 5])
@@ -40,10 +68,10 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     concurrency_level: int, filename: str, expected_ok: bool, strategy: str
 ):
     """
-    Tests that output that we get from the split-by-page pdf is the same as from non-split.
+    Test that the output we get from the split-by-page pdf is the same as from non-split.
 
     Requires unstructured-api running in bg. See Makefile for how to run it.
-    Doesn't check for raw_response as there's no clear patter for how it changes with the number of pages / concurrency_level.
+    Doesn't check for raw_response as there's no clear pattern for how it changes with the number of pages / concurrency_level.
     """
     try:
         response = requests.get("http://localhost:8000/general/docs")
