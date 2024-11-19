@@ -582,7 +582,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     else:
                         elements.append(res.json())
                 else:  # -- Response contains csv data
-                    elements.append(res.content)
+                    elements.append(res.content)  # type: ignore
             else:
                 error_message = f"Failed to partition set {response_number}."
 
