@@ -185,7 +185,21 @@ def test_integration_split_pdf_with_caching(
     if cache_dir:
         assert not Path(cache_dir).exists()
 
+@pytest.mark.parametrize("filename", ["_sample_docs/super_long_pages.pdf"])
+def test_long_pages_hi_res(filename):
+    req = operations.PartitionRequest(partition_parameters=shared.PartitionParameters(
+        files=shared.Files(content=open(filename, "rb"), file_name=filename, ),
+        strategy=shared.Strategy.HI_RES,
+        split_pdf_page=True,
+        split_pdf_allow_failed=True,
+        split_pdf_concurrency_level=15
+    ), )
 
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+
+    response = client.general.partition(request=req)
+    assert response.status_code == 200
+    assert len(response.elements)
 
 def test_integration_split_pdf_for_file_with_no_name():
     """
