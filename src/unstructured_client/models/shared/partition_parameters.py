@@ -67,6 +67,7 @@ class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
     HI_RES = "hi_res"
     AUTO = "auto"
     OCR_ONLY = "ocr_only"
+    OD_ONLY = "od_only"
 
 
 class PartitionParametersTypedDict(TypedDict):
@@ -118,6 +119,10 @@ class PartitionParametersTypedDict(TypedDict):
     r"""The document types that you want to skip table extraction with. Default: []"""
     split_pdf_allow_failed: NotRequired[bool]
     r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resuling list of Elements will miss the data from errored pages."""
+    split_pdf_cache_tmp_data: NotRequired[bool]
+    r"""When `split_pdf_page` is set to `True`, this parameter determines if the temporary data used for splitting the PDF should be cached into disc - if enabled should save significant amount of RAM memory when processing big files. It's an internal parameter for the Python client and is not sent to the backend."""
+    split_pdf_cache_tmp_data_dir: NotRequired[str]
+    r"""When `split_pdf_page` is set to `True` and `split_pdf_cache_tmp_data` feature is used, this parameter specifies the directory where the temporary data used for splitting the PDF should be cached into disc. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_concurrency_level: NotRequired[int]
     r"""When `split_pdf_page` is set to `True`, this parameter specifies the number of workers used for sending requests when the PDF is split on the client side. It's an internal parameter for the Python client and is not sent to the backend."""
     split_pdf_page: NotRequired[bool]
@@ -128,6 +133,8 @@ class PartitionParametersTypedDict(TypedDict):
     r"""When PDF is split into pages before sending it into the API, providing this information will allow the page number to be assigned correctly. Introduced in 1.0.27."""
     strategy: NotRequired[Strategy]
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res"""
+    table_ocr_agent: NotRequired[Nullable[str]]
+    r"""The OCR agent to use for table ocr inference."""
     unique_element_ids: NotRequired[bool]
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
     xml_keep_tags: NotRequired[bool]
@@ -244,6 +251,16 @@ class PartitionParameters(BaseModel):
     )
     r"""When `split_pdf_page` is set to `True`, this parameter defines the behavior when some of the parallel requests fail. By default `split_pdf_allow_failed` is set to `False` and any failed request send to the API will make the whole process break and raise an Exception. If `split_pdf_allow_failed` is set to `True`, the errors encountered while sending parallel requests will not break the processing - the resuling list of Elements will miss the data from errored pages."""
 
+    split_pdf_cache_tmp_data: Annotated[
+        Optional[bool], FieldMetadata(multipart=True)
+    ] = False
+    r"""When `split_pdf_page` is set to `True`, this parameter determines if the temporary data used for splitting the PDF should be cached into disc - if enabled should save significant amount of RAM memory when processing big files. It's an internal parameter for the Python client and is not sent to the backend."""
+
+    split_pdf_cache_tmp_data_dir: Annotated[
+        Optional[str], FieldMetadata(multipart=True)
+    ] = None
+    r"""When `split_pdf_page` is set to `True` and `split_pdf_cache_tmp_data` feature is used, this parameter specifies the directory where the temporary data used for splitting the PDF should be cached into disc. It's an internal parameter for the Python client and is not sent to the backend."""
+
     split_pdf_concurrency_level: Annotated[
         Optional[int], FieldMetadata(multipart=True)
     ] = 5
@@ -267,6 +284,11 @@ class PartitionParameters(BaseModel):
         FieldMetadata(multipart=True),
     ] = Strategy.HI_RES
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res"""
+
+    table_ocr_agent: Annotated[OptionalNullable[str], FieldMetadata(multipart=True)] = (
+        None
+    )
+    r"""The OCR agent to use for table ocr inference."""
 
     unique_element_ids: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
@@ -300,11 +322,14 @@ class PartitionParameters(BaseModel):
             "similarity_threshold",
             "skip_infer_table_types",
             "split_pdf_allow_failed",
+            "split_pdf_cache_tmp_data",
+            "split_pdf_cache_tmp_data_dir",
             "split_pdf_concurrency_level",
             "split_pdf_page",
             "split_pdf_page_range",
             "starting_page_number",
             "strategy",
+            "table_ocr_agent",
             "unique_element_ids",
             "xml_keep_tags",
         ]
@@ -320,6 +345,7 @@ class PartitionParameters(BaseModel):
             "new_after_n_chars",
             "similarity_threshold",
             "starting_page_number",
+            "table_ocr_agent",
         ]
         null_default_fields = [
             "chunking_strategy",
@@ -333,6 +359,7 @@ class PartitionParameters(BaseModel):
             "new_after_n_chars",
             "similarity_threshold",
             "starting_page_number",
+            "table_ocr_agent",
         ]
 
         serialized = handler(self)

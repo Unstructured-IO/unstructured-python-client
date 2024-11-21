@@ -9,8 +9,9 @@ generation:
     requestResponseComponentNamesFeb2024: false
   auth:
     oAuth2ClientCredentialsEnabled: false
+    oAuth2PasswordEnabled: false
 python:
-  version: 0.27.0
+  version: 0.28.0
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -29,6 +30,7 @@ python:
   authors:
     - Unstructured
   clientServerStatusCodesAsErrors: true
+  defaultErrorName: SDKError
   description: Python Client SDK for Unstructured API
   enumFormat: enum
   fixFlags:
