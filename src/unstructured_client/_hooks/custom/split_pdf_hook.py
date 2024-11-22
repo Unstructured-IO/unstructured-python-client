@@ -50,6 +50,8 @@ DEFAULT_CACHE_TMP_DATA_DIR = tempfile.gettempdir()
 MAX_CONCURRENCY_LEVEL = 50
 MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
+HI_RES_STRATEGY = 'hi_res'
+MAX_PAGE_LENGTH = 4000
 
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
@@ -334,6 +336,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
 
+        pdf = self._trim_large_pages(pdf, form_data)
+
         if self.cache_tmp_data_feature:
             pdf_chunk_paths = self._get_pdf_chunk_paths(
                 pdf,
@@ -422,6 +426,34 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 response._content = temp_file_name.encode()  # pylint: disable=protected-access
 
         return response
+
+    def _trim_large_pages(self, pdf: PdfReader, form_data: dict[str, Any]) -> PdfReader:
+        if form_data['strategy'] != HI_RES_STRATEGY:
+            return pdf
+
+        max_page_length = MAX_PAGE_LENGTH
+        any_page_over_maximum_length = False
+        for page in pdf.pages:
+            if page.mediabox.height >= max_page_length:
+                any_page_over_maximum_length = True
+
+        # early exit if all pages are safely under the max page length
+        if not any_page_over_maximum_length:
+            return pdf
+
+        w = PdfWriter()
+
+        # trims large pages that exceed the maximum supported height for processing
+        for page in pdf.pages:
+            if page.mediabox.height >= max_page_length:
+                page.mediabox.top = page.mediabox.height
+                page.mediabox.bottom = page.mediabox.top - max_page_length
+            w.add_page(page)
+
+        chunk_buffer = io.BytesIO()
+        w.write(chunk_buffer)
+        chunk_buffer.seek(0)
+        return PdfReader(chunk_buffer)
 
     def _get_pdf_chunks_in_memory(
             self,
