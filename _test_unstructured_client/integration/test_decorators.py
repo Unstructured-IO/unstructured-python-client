@@ -478,7 +478,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
 @pytest.mark.parametrize(
     ("filename", "chunking_strategy", "expected_elements_num"),
     [
-        ## -- Paid strategy --
+        # -- Paid strategy --
         ("_sample_docs/layout-parser-paper.pdf", "by_page", 16),  # 16 pages, 133 elements w/o chunking
         ("_sample_docs/layout-parser-paper.pdf", shared.ChunkingStrategy.BY_PAGE, 16),
         # -- Open source strategy --
@@ -503,6 +503,7 @@ def test_chunking(
     parameters = shared.PartitionParameters(
         files=files,
         chunking_strategy=chunking_strategy,  # type: ignore
+        split_pdf_page=False,  # -- Testing splitting as potential issue
     )
 
     req = operations.PartitionRequest(
@@ -511,5 +512,5 @@ def test_chunking(
 
     resp = client.general.partition(request=req)
     assert len(resp.elements) == expected_elements_num
-    assert all(element.type == "CompositeElement" for element in resp.elements)
+    assert all(element.get("type") == "CompositeElement" for element in resp.elements)
 
