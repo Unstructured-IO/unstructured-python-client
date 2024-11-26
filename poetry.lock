@@ -1082,4 +1082,4 @@ test = ["aiohttp (>=3.10.5)", "flake8 (>=5.0,<6.0)", "mypy (>=0.800)", "psutil",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4f2851d643a840f1feab0c0afefe5301fdbe75e0ce3c2b6dfa4f66fef731cc23"
+content-hash = "45697f5f03748e4d57959ea42a20eea3824fe8f42211febff923818d59ae85e5"
