@@ -5,6 +5,7 @@ from pathlib import Path
 
 import httpx
 import json
+import os
 import pytest
 import requests
 from deepdiff import DeepDiff
@@ -19,7 +20,7 @@ from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
 
-FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+FAKE_KEY = os.getenv("UNSTRUCTURED_API_KEY") or "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
 @pytest.mark.parametrize("concurrency_level", [1, 2, 5])
@@ -472,3 +473,43 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     assert mock_endpoint_called
 
     assert res.status_code == 200
+
+
+@pytest.mark.parametrize(
+    ("filename", "chunking_strategy", "expected_elements_num"),
+    [
+        ## -- Paid strategy --
+        ("_sample_docs/layout-parser-paper.pdf", "by_page", 16),  # 16 pages, 133 elements w/o chunking
+        ("_sample_docs/layout-parser-paper.pdf", shared.ChunkingStrategy.BY_PAGE, 16),
+        # -- Open source strategy --
+        ("_sample_docs/layout-parser-paper.pdf", "by_title", -1),  # unsure what the correct number is atm
+        ("_sample_docs/layout-parser-paper.pdf", shared.ChunkingStrategy.BY_TITLE, -1),
+    ],
+)
+def test_chunking(
+    filename: str,
+    chunking_strategy: str| shared.ChunkingStrategy,
+    expected_elements_num: int,
+):
+
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+
+    with open(filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    parameters = shared.PartitionParameters(
+        files=files,
+        chunking_strategy=chunking_strategy,  # type: ignore
+    )
+
+    req = operations.PartitionRequest(
+        partition_parameters=parameters
+    )
+
+    resp = client.general.partition(request=req)
+    assert len(resp.elements) == expected_elements_num
+    assert all(element.type == "CompositeElement" for element in resp.elements)
+
