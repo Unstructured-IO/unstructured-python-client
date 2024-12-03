@@ -12,3 +12,4 @@ __pycache__/
 .idea/
 openapi.json
 openapi_client.json
+.env
