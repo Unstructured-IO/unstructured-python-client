@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import Literal
 
 import httpx
 import json
@@ -15,6 +16,7 @@ from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import HTTPValidationError
+from unstructured_client.models.shared.partition_parameters import Strategy
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
@@ -106,8 +108,8 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     assert len(diff) == 0
 
 @pytest.mark.parametrize( ("filename", "expected_ok", "strategy"), [
-    ("_sample_docs/layout-parser-paper.pdf", True, "hi_res"),  # 16
-]# pages
+    ("_sample_docs/layout-parser-paper.pdf", True, shared.Strategy.HI_RES),  # 16 pages
+]
 )
 @pytest.mark.parametrize( ("use_caching", "cache_dir"), [
     (True, None),  # Use default cache dir
@@ -116,8 +118,11 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     (False, Path(tempfile.gettempdir()) / "test_integration_unstructured_client2"),  # Don't use caching, use custom cache dir
 ])
 def test_integration_split_pdf_with_caching(
-    filename: str, expected_ok: bool, strategy: str, use_caching: bool,
-    cache_dir: Path | None
+    filename: str,
+    expected_ok: bool,
+    strategy: Literal[Strategy.HI_RES],
+    use_caching: bool,
+    cache_dir: Path | None,
 ):
     try:
         response = requests.get("http://localhost:8000/general/docs")
@@ -143,7 +148,7 @@ def test_integration_split_pdf_with_caching(
         languages=["eng"],
         split_pdf_page=True,
         split_pdf_cache_tmp_data=use_caching,
-        split_pdf_cache_dir=cache_dir,
+        split_pdf_cache_tmp_data_dir=str(cache_dir),
     )
 
     req = operations.PartitionRequest(
