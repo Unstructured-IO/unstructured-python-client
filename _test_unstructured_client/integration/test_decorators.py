@@ -107,11 +107,11 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     )
     assert len(diff) == 0
 
-@pytest.mark.parametrize( ("filename", "expected_ok", "strategy"), [
+
+@pytest.mark.parametrize(("filename", "expected_ok", "strategy"), [
     ("_sample_docs/layout-parser-paper.pdf", True, shared.Strategy.HI_RES),  # 16 pages
-]
-)
-@pytest.mark.parametrize( ("use_caching", "cache_dir"), [
+])
+@pytest.mark.parametrize(("use_caching", "cache_dir"), [
     (True, None),  # Use default cache dir
     (True, Path(tempfile.gettempdir()) / "test_integration_unstructured_client1"),  # Use custom cache dir
     (False, None),  # Don't use caching
@@ -145,7 +145,6 @@ def test_integration_split_pdf_with_caching(
     parameters = shared.PartitionParameters(
         files=files,
         strategy=strategy,
-        languages=["eng"],
         split_pdf_page=True,
         split_pdf_cache_tmp_data=use_caching,
         split_pdf_cache_tmp_data_dir=str(cache_dir),
@@ -189,6 +188,7 @@ def test_integration_split_pdf_with_caching(
     # make sure the cache dir was cleaned if passed explicitly
     if cache_dir:
         assert not Path(cache_dir).exists()
+
 
 @pytest.mark.parametrize("filename", ["_sample_docs/super_long_pages.pdf"])
 def test_long_pages_hi_res(filename):
