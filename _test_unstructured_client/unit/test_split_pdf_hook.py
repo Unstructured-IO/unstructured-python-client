@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-import io
-import logging
 from asyncio import Task
 from collections import Counter
 from functools import partial
-from typing import Coroutine
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
 import requests
-from requests_toolbelt import MultipartDecoder, MultipartEncoder
+from requests_toolbelt import MultipartDecoder
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
@@ -20,6 +19,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_PAGE_RANGE_KEY,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import (
+    DEFAULT_CACHE_TMP_DATA_DIR,
     DEFAULT_CONCURRENCY_LEVEL,
     DEFAULT_STARTING_PAGE_NUMBER,
     MAX_CONCURRENCY_LEVEL,
@@ -434,3 +434,30 @@ async def test_remaining_tasks_cancelled_when_fails_disallowed():
     await asyncio.sleep(1)
     print("Cancelled amount: ", cancelled_counter["cancelled"])
     assert len(tasks) > cancelled_counter["cancelled"] > 0
+
+
+@patch("unstructured_client._hooks.custom.form_utils.Path")
+def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path: MagicMock):
+    """Test get_split_pdf_cache_tmp_data_dir uses the directory from the form data."""
+    # -- Create the form_data
+    dir_key = form_utils.PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY # -- "split_pdf_cache_tmp_data_dir"
+    mock_dir = "/mock/dir"
+    form_data = {dir_key: mock_dir}  
+
+    # -- Mock the Path object in form_utils
+    mock_path_instance = MagicMock()
+    mock_path.return_value = mock_path_instance
+    mock_path_instance.exists.return_value = True
+    mock_path_instance.resolve.return_value = Path(mock_dir)
+
+    result = form_utils.get_split_pdf_cache_tmp_data_dir(
+        form_data = form_data,
+        key=dir_key,
+        fallback_value=DEFAULT_CACHE_TMP_DATA_DIR  # -- tempfile.gettempdir()
+    )
+    
+    assert dir_key == "split_pdf_cache_tmp_data_dir"
+    assert form_data.get(dir_key) == "/mock/existing/dir"
+    mock_path.assert_called_once_with(mock_dir)
+    mock_path_instance.exists.assert_called_once()
+    assert result == str(Path(mock_dir).resolve())
