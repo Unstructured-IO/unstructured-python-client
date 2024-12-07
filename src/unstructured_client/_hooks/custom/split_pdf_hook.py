@@ -548,7 +548,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return pdf_chunk_paths
 
     def _get_pdf_chunk_files(
-            self, pdf_chunks: list[Tuple[Path, int]]
+        self, pdf_chunks: list[Tuple[Path, int]]
     ) -> Generator[Tuple[BinaryIO, int], None, None]:
         """Yields the file objects for the given pdf chunk paths.
 
@@ -575,8 +575,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 raise
             yield pdf_chunk_file, offset
 
-    def _await_elements(
-            self, operation_id: str) -> Optional[list]:
+    def _await_elements(self, operation_id: str) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
         elements.
