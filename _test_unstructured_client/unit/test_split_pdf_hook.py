@@ -14,6 +14,7 @@ from requests_toolbelt import MultipartDecoder
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
+    FormData,
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
@@ -442,7 +443,7 @@ def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path
     # -- Create the form_data
     dir_key = form_utils.PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY # -- "split_pdf_cache_tmp_data_dir"
     mock_dir = "/mock/dir"
-    form_data = {dir_key: mock_dir}  
+    form_data: FormData = {dir_key: mock_dir}  
 
     # -- Mock the Path object in form_utils
     mock_path_instance = MagicMock()
@@ -457,7 +458,7 @@ def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path
     )
     
     assert dir_key == "split_pdf_cache_tmp_data_dir"
-    assert form_data.get(dir_key) == "/mock/existing/dir"
+    assert form_data.get(dir_key) == "/mock/dir"
     mock_path.assert_called_once_with(mock_dir)
     mock_path_instance.exists.assert_called_once()
     assert result == str(Path(mock_dir).resolve())

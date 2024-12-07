@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Mapping
+from typing import TYPE_CHECKING
 from typing_extensions import TypeAlias
 
 from requests_toolbelt.multipart.decoder import MultipartDecoder  # type: ignore
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from typing import Union
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData: TypeAlias = "Mapping[str, Union[str, shared.Files, list[str]]]"
+FormData: TypeAlias = "dict[str, Union[str, shared.Files, list[str]]]"
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
