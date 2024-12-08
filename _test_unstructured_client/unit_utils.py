@@ -34,7 +34,7 @@ __all__ = (
 
 def sample_docs_path(file_name: str) -> str:
     """Resolve the absolute-path to `file_name` in the sample-docs directory."""
-    sample_docs_dir = pathlib.Path(__file__).parent / "_sample_docs"
+    sample_docs_dir = pathlib.Path(__file__).parent.parent / "_sample_docs"
     file_path = sample_docs_dir / file_name
     return str(file_path.resolve())
 
