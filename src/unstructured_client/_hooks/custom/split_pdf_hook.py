@@ -25,9 +25,11 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
     PARTITION_FORM_FILES_KEY,
     PARTITION_FORM_PAGE_RANGE_KEY,
-    PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
+    PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
     PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
-    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY, PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+    PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
+    PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
 from unstructured_client._hooks.types import (
     AfterErrorContext,
@@ -315,7 +317,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         self.cache_tmp_data_dir = form_utils.get_split_pdf_cache_tmp_data_dir(
             form_data,
-            key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
+            key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
             fallback_value=DEFAULT_CACHE_TMP_DATA_DIR,
         )
 
@@ -546,7 +548,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return pdf_chunk_paths
 
     def _get_pdf_chunk_files(
-            self, pdf_chunks: list[Tuple[Path, int]]
+        self, pdf_chunks: list[Tuple[Path, int]]
     ) -> Generator[Tuple[BinaryIO, int], None, None]:
         """Yields the file objects for the given pdf chunk paths.
 
@@ -573,8 +575,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 raise
             yield pdf_chunk_file, offset
 
-    def _await_elements(
-            self, operation_id: str) -> Optional[list]:
+    def _await_elements(self, operation_id: str) -> Optional[list]:
         """
         Waits for the partition requests to complete and returns the flattened
         elements.
