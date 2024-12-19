@@ -3,7 +3,7 @@
 import importlib.metadata
 
 __title__: str = "unstructured-client"
-__version__: str = "0.28.1"
+__version__: str = "0.29.0"
 
 try:
     if __package__ is not None:
