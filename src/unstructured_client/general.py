@@ -2,7 +2,7 @@
 
 from .basesdk import BaseSDK
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
@@ -25,6 +25,7 @@ class General(BaseSDK):
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         accept_header_override: Optional[PartitionAcceptEnum] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.PartitionResponse:
         r"""Summary
 
@@ -35,6 +36,7 @@ class General(BaseSDK):
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param accept_header_override: Override the default accept header for this method
+        :param http_headers: Additional headers to set or replace on requests.
         """
         base_url = None
         url_variables = None
@@ -48,7 +50,7 @@ class General(BaseSDK):
             request = utils.unmarshal(request, operations.PartitionRequest)
         request = cast(operations.PartitionRequest, request)
 
-        req = self.build_request(
+        req = self._build_request(
             method="POST",
             path="/general/v0/general",
             base_url=base_url,
@@ -61,6 +63,7 @@ class General(BaseSDK):
             accept_header_value=accept_header_override.value
             if accept_header_override is not None
             else "application/json;q=1, text/csv;q=0",
+            http_headers=http_headers,
             security=self.sdk_configuration.security,
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.partition_parameters,
@@ -143,6 +146,7 @@ class General(BaseSDK):
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         accept_header_override: Optional[PartitionAcceptEnum] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.PartitionResponse:
         r"""Summary
 
@@ -153,6 +157,7 @@ class General(BaseSDK):
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param accept_header_override: Override the default accept header for this method
+        :param http_headers: Additional headers to set or replace on requests.
         """
         base_url = None
         url_variables = None
@@ -166,7 +171,7 @@ class General(BaseSDK):
             request = utils.unmarshal(request, operations.PartitionRequest)
         request = cast(operations.PartitionRequest, request)
 
-        req = self.build_request_async(
+        req = self._build_request_async(
             method="POST",
             path="/general/v0/general",
             base_url=base_url,
@@ -179,6 +184,7 @@ class General(BaseSDK):
             accept_header_value=accept_header_override.value
             if accept_header_override is not None
             else "application/json;q=1, text/csv;q=0",
+            http_headers=http_headers,
             security=self.sdk_configuration.security,
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.partition_parameters,
