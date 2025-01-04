@@ -1,3 +1,4 @@
+.speakeasy/reports
 .venv/
 README-PYPI.md
 pyrightconfig.json
@@ -12,7 +13,6 @@ __pycache__/
 .idea/
 openapi.json
 openapi_client.json
-
 # Environments
 .env
 .envrc
