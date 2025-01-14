@@ -89,3 +89,25 @@ publish:
 .PHONY: run-jupyter
 run-jupyter:
 	PYTHONPATH=$(realpath .) JUPYTER_PATH=$(realpath .) jupyter-notebook --NotebookApp.token='' --NotebookApp.password=''
+
+## download-openapi-specs:			         Download the openapi specs from the Serverless and Platform APIs
+.PHONY: download-openapi-specs
+download-openapi-specs:
+	wget -nv -q -O openapi_serverless.json https://api.unstructured.io/general/openapi.json
+	wget -nv -q -O openapi_platform_api.json https://platform.unstructuredapp.io/openapi.json
+
+## client-merge-serverless-platform:		Merge the Serverless and Platform APIs into a single schema
+.PHONY: client-merge-serverless-platform
+client-merge-serverless-platform:
+	speakeasy merge -s ./openapi_serverless.json -s ./openapi_platform_api.json -o ./openapi_merged.yaml
+
+## client-generate-unified-sdk-local:			Generate the SDK using merged schemas
+.PHONY: client-generate-unified-sdk-local
+client-generate-platform-local:
+	speakeasy overlay validate -o ./overlay_client.yaml
+	speakeasy overlay apply -s ./openapi_merged.yaml -o ./overlay_client.yaml > ./openapi_platform_serverless_client.yaml
+	speakeasy generate sdk -s ./openapi_platform_serverless_client.yaml -o ./ -l python
+
+## client-generate-sdk:			             Do all the steps to generate the SDK
+.PHONY: client-generate-sdk
+client-generate-sdk: download-openapi-specs client-merge-serverless-platform client-generate-unified-sdk-local
