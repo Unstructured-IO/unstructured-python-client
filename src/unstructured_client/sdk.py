@@ -61,7 +61,8 @@ class UnstructuredClient(BaseSDK):
 
         security: Any = None
         if callable(api_key_auth):
-            security = lambda: shared.Security(api_key_auth=api_key_auth())  # pylint: disable=unnecessary-lambda-assignment
+            # pylint: disable=unnecessary-lambda-assignment
+            security = lambda: shared.Security(api_key_auth=api_key_auth())
         else:
             security = shared.Security(api_key_auth=api_key_auth)
 
@@ -99,3 +100,17 @@ class UnstructuredClient(BaseSDK):
 
     def _init_sdks(self):
         self.general = General(self.sdk_configuration)
+
+    def __enter__(self):
+        return self
+
+    async def __aenter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.sdk_configuration.client is not None:
+            self.sdk_configuration.client.close()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self.sdk_configuration.async_client is not None:
+            await self.sdk_configuration.async_client.aclose()

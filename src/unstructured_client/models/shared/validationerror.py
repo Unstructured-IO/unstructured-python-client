@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 from typing import List, Union
-from typing_extensions import TypedDict
+from typing_extensions import TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
 
 
-LocTypedDict = Union[str, int]
+LocTypedDict = TypeAliasType("LocTypedDict", Union[str, int])
 
 
-Loc = Union[str, int]
+Loc = TypeAliasType("Loc", Union[str, int])
 
 
 class ValidationErrorTypedDict(TypedDict):

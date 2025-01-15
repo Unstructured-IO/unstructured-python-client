@@ -7,6 +7,7 @@ from .partition import (
     PartitionResponseTypedDict,
 )
 
+
 __all__ = [
     "PartitionRequest",
     "PartitionRequestTypedDict",

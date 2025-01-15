@@ -43,7 +43,7 @@ class Files(BaseModel):
     ]
 
     file_name: Annotated[
-        str, pydantic.Field(alias="files"), FieldMetadata(multipart=True)
+        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
     ]
 
     content_type: Annotated[
@@ -142,11 +142,7 @@ class PartitionParametersTypedDict(TypedDict):
 
 
 class PartitionParameters(BaseModel):
-    files: Annotated[
-        Files,
-        pydantic.Field(alias=""),
-        FieldMetadata(multipart=MultipartFormMetadata(file=True)),
-    ]
+    files: Annotated[Files, FieldMetadata(multipart=MultipartFormMetadata(file=True))]
     r"""The file to extract"""
 
     chunking_strategy: Annotated[
