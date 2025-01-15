@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 98911c628e565edfa455e36caff7f1c6
-  docVersion: 1.0.53
-  speakeasyVersion: 1.445.2
-  generationVersion: 2.461.4
-  releaseVersion: 0.28.1
-  configChecksum: 3df668d026dd2957c13f7d95dbd86e99
+  docChecksum: e45ec2f5b33490809e430b8fc81b996a
+  docVersion: 1.0.58
+  speakeasyVersion: 1.468.6
+  generationVersion: 2.493.13
+  releaseVersion: 0.29.0
+  configChecksum: 03be097b58114b1d008fa76201dc06a9
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,31 +16,29 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.6.6
+    core: 5.10.1
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
-    examples: 3.0.0
+    examples: 3.0.1
     globalSecurity: 3.0.2
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
-    globalServerURLs: 3.0.0
+    globalServerURLs: 3.1.0
     multipartFileContentType: 1.0.0
-    nameOverrides: 3.0.0
+    nameOverrides: 3.0.1
     nullables: 1.0.0
     openEnums: 1.0.0
     responseFormat: 1.0.1
     retries: 3.0.2
     sdkHooks: 1.0.0
     serverIDs: 3.0.0
-    tests: 1.6.0
-    unions: 3.0.3
+    unions: 3.0.4
     uploadStreams: 1.0.0
 generatedFiles:
   - .gitattributes
   - .python-version
   - .vscode/settings.json
-  - CONTRIBUTING.md
   - USAGE.md
   - docs/models/errors/detail.md
   - docs/models/errors/httpvalidationerror.md
@@ -55,6 +53,9 @@ generatedFiles:
   - docs/models/shared/security.md
   - docs/models/shared/strategy.md
   - docs/models/shared/validationerror.md
+  - docs/models/utils/retryconfig.md
+  - docs/sdks/general/README.md
+  - docs/sdks/unstructuredclient/README.md
   - poetry.toml
   - py.typed
   - pylintrc
@@ -112,3 +113,4 @@ examples:
           application/json: {"detail": []}
         5XX:
           application/json: {"detail": "An error occurred"}
+generatedTests: {}
