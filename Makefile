@@ -103,7 +103,7 @@ client-merge-serverless-platform:
 
 ## client-generate-unified-sdk-local:			Generate the SDK using merged schemas
 .PHONY: client-generate-unified-sdk-local
-client-generate-platform-local:
+client-generate-unified-sdk-local:
 	speakeasy overlay validate -o ./overlay_client.yaml
 	speakeasy overlay apply -s ./openapi_merged.yaml -o ./overlay_client.yaml > ./openapi_platform_serverless_client.yaml
 	speakeasy generate sdk -s ./openapi_platform_serverless_client.yaml -o ./ -l python
