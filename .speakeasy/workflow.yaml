@@ -4,6 +4,7 @@ sources:
     my-source:
         inputs:
             - location: https://api.unstructured.io/general/openapi.json
+            - location: https://platform.unstructuredapp.io/openapi.json
         overlays:
             - location: ./overlay_client.yaml
         registry:
