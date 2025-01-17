@@ -112,7 +112,7 @@ def test_list_sources_5xx_code(
 
 
 def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/1"
+    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="GET",
@@ -149,7 +149,7 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
 def test_get_source_not_found(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/sources/1"
+    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="GET",
@@ -209,7 +209,7 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
 
 
 def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/1"
+    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="PUT",
@@ -253,7 +253,7 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
 
 
 def test_delete_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/1"
+    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="DELETE",

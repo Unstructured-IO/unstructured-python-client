@@ -112,7 +112,7 @@ def test_list_destinations_5xx_code(
 
 
 def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/destinations/1"
+    url = f"{platform_api_url}/api/v1/destinations/0c363dec-3c70-45ee-8041-481044a6e1cc"
 
     httpx_mock.add_response(
         method="GET",
@@ -151,7 +151,7 @@ def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_ur
 def test_get_destination_not_found(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/1"
+    url = f"{platform_api_url}/api/v1/destinations/0c363dec-3c70-45ee-8041-481044a6e1cc"
 
     httpx_mock.add_response(
         method="GET",
@@ -219,7 +219,7 @@ def test_create_destination(
 def test_update_destination(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/1"
+    url = f"{platform_api_url}/api/v1/destinations/b25d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="PUT",
@@ -264,7 +264,7 @@ def test_update_destination(
 def test_delete_destination(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/1"
+    url = f"{platform_api_url}/api/v1/destinations/b25d4161-77a0-4e08-b65e-86f398ce15ad"
 
     httpx_mock.add_response(
         method="DELETE",

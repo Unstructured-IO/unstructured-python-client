@@ -18,16 +18,12 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
                 "created_at": "2025-06-22T11:37:21.648Z",
                 "destinations": [
                     "aeebecc7-9d8e-4625-bf1d-815c2f084869",
-                    "01866db9-54f2-4be7-93c3-062b8107d001",
-                    "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
                 ],
                 "id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
                 "name": "test_workflow",
                 "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]},
                 "sources": [
                     "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
-                    "c2e3e2c7-4c6f-4c7d-8e8a-6d2e3c8d2e3c",
-                    "e3e2c7d3-4c6f-4c7d-8e8a-6d2e3c8d2e3c",
                 ],
                 "status": "active",
                 "workflow_type": "advanced",
@@ -62,14 +58,10 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
 
     assert workflow.sources == [
         "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
-        "c2e3e2c7-4c6f-4c7d-8e8a-6d2e3c8d2e3c",
-        "e3e2c7d3-4c6f-4c7d-8e8a-6d2e3c8d2e3c",
     ]
 
     assert workflow.destinations == [
         "aeebecc7-9d8e-4625-bf1d-815c2f084869",
-        "01866db9-54f2-4be7-93c3-062b8107d001",
-        "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
     ]
 
 
