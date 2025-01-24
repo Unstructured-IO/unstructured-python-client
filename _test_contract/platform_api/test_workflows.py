@@ -21,7 +21,7 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
                 ],
                 "id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
                 "name": "test_workflow",
-                "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]},
+                "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * 0"}]},
                 "sources": [
                     "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
                 ],
@@ -53,7 +53,7 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
         "2025-06-22T11:37:21.648+00:00"
     )
     assert workflow.schedule == shared.WorkflowSchedule(
-        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * *")]
+        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * 0")]
     )
 
     assert workflow.sources == [
@@ -127,7 +127,7 @@ def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             ],
             "id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
             "name": "test_workflow",
-            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]},
+            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * 0"}]},
             "sources": [
                 "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
             ],
@@ -141,7 +141,7 @@ def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             create_workflow=shared.CreateWorkflow(
                 name="test_workflow",
                 workflow_type="advanced",
-                schedule="0 0 * * *",
+                schedule="weekly",
                 source_id="f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
                 destination_id="aeebecc7-9d8e-4625-bf1d-815c2f084869",
             )
@@ -171,7 +171,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             ],
             "id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
             "name": "test_workflow",
-            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]},
+            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * 0"}]},
             "sources": [
                 "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
             ],
@@ -186,7 +186,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             update_workflow=shared.UpdateWorkflow(
                 name="test_workflow",
                 workflow_type="advanced",
-                schedule="0 0 * * *",
+                schedule="weekly",
                 source_id="f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
                 destination_id="aeebecc7-9d8e-4625-bf1d-815c2f084869",
             ),
@@ -210,7 +210,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
         "2025-06-22T11:37:21.648+00:00"
     )
     assert updated_workflow.schedule == shared.WorkflowSchedule(
-        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * *")]
+        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * 0")]
     )
     assert updated_workflow.sources == ["f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c"]
     assert updated_workflow.destinations == ["aeebecc7-9d8e-4625-bf1d-815c2f084869"]
@@ -229,12 +229,12 @@ def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: 
             "created_at": "2024-08-04T10:06:22.481Z",
             "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445",
             "name": "test_workflow",
-            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]},
+            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * 0"}]},
             "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"],
             "destinations": [
                 "aeebecc7-9d8e-4625-bf1d-815c2f084869",
             ],
-            "status": "inactive",
+            "status": "active",
             "workflow_type": "platinum",
         },
     )
@@ -257,12 +257,12 @@ def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: 
     assert workflow_run.id == "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445"
     assert workflow_run.name == "test_workflow"
     assert workflow_run.workflow_type == "platinum"
-    assert workflow_run.status == "inactive"
+    assert workflow_run.status == "active"
     assert workflow_run.created_at == datetime.fromisoformat(
         "2024-08-04T10:06:22.481+00:00"
     )
     assert workflow_run.schedule == shared.WorkflowSchedule(
-        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * *")]
+        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * 0")]
     )
     assert workflow_run.sources == ["a9593964-92eb-496f-84ac-c8f067ba24c3"]
     assert workflow_run.destinations == ["aeebecc7-9d8e-4625-bf1d-815c2f084869"]

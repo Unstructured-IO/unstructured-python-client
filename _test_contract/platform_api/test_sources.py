@@ -6,12 +6,7 @@ import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
-from unstructured_client.models.shared import (
-    SourceConnectorInformationConfig,
-    SourceConnectorType,
-    CreateSourceConnectorConfig,
-    UpdateSourceConnectorConfig,
-)
+from unstructured_client.models.shared import SourceConnectorType
 
 
 class AsyncMock(mock.MagicMock):
@@ -53,7 +48,7 @@ def test_list_sources(httpx_mock, client: UnstructuredClient, platform_api_url: 
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == SourceConnectorInformationConfig()
+    assert source.config == {}
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -142,7 +137,7 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == SourceConnectorInformationConfig()
+    assert source.config == {}
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -188,7 +183,7 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
             create_source_connector=shared.CreateSourceConnector(
                 name="test_source_name",
                 type=SourceConnectorType.ONEDRIVE,
-                config=CreateSourceConnectorConfig(),
+                config={},
             )
         )
     )
@@ -204,7 +199,7 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == SourceConnectorInformationConfig()
+    assert source.config == {}
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -229,7 +224,7 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
         request=operations.UpdateSourceRequest(
             source_id="1",
             update_source_connector=shared.UpdateSourceConnector(
-                config=UpdateSourceConnectorConfig()
+                config={}
             ),
         )
     )
@@ -246,7 +241,7 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
     assert updated_source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert updated_source.name == "test_source_name"
     assert updated_source.type == "onedrive"
-    assert updated_source.config == SourceConnectorInformationConfig()
+    assert updated_source.config == {}
     assert updated_source.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )

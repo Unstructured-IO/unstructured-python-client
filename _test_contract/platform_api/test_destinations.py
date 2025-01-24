@@ -5,12 +5,8 @@ import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
-from unstructured_client.models.shared import (
-    DestinationConnectorInformationConfig,
-    DestinationConnectorType,
-    Config,
-    UpdateDestinationConnectorConfig,
-)
+from unstructured_client.models.shared import DestinationConnectorType
+
 
 
 def test_list_destinations(
@@ -49,7 +45,7 @@ def test_list_destinations(
     assert destination.id == "0c363dec-3c70-45ee-8041-481044a6e1cc"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert destination.config == DestinationConnectorInformationConfig()
+    assert destination.config == {}
     assert destination.created_at == datetime.fromisoformat(
         "2025-08-22T08:47:29.802+00:00"
     )
@@ -142,7 +138,7 @@ def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_ur
     assert destination.id == "0c363dec-3c70-45ee-8041-481044a6e1cc"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert destination.config == DestinationConnectorInformationConfig()
+    assert destination.config == {}
     assert destination.created_at == datetime.fromisoformat(
         "2025-08-22T08:47:29.802+00:00"
     )
@@ -194,7 +190,7 @@ def test_create_destination(
             create_destination_connector=shared.CreateDestinationConnector(
                 name="test_destination_name",
                 type=DestinationConnectorType.S3,
-                config=Config(),
+                config={},
             )
         )
     )
@@ -210,7 +206,7 @@ def test_create_destination(
     assert destination.id == "b25d4161-77a0-4e08-b65e-86f398ce15ad"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert destination.config == DestinationConnectorInformationConfig()
+    assert destination.config == {}
     assert destination.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
@@ -238,7 +234,7 @@ def test_update_destination(
         request=operations.UpdateDestinationRequest(
             destination_id="1",
             update_destination_connector=shared.UpdateDestinationConnector(
-                config=UpdateDestinationConnectorConfig()
+                config={}
             ),
         )
     )
@@ -255,7 +251,7 @@ def test_update_destination(
     assert updated_destination.id == "b25d4161-77a0-4e08-b65e-86f398ce15ad"
     assert updated_destination.name == "test_destination_name"
     assert updated_destination.type == "s3"
-    assert updated_destination.config == DestinationConnectorInformationConfig()
+    assert updated_destination.config == {}
     assert updated_destination.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
