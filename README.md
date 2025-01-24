@@ -29,18 +29,17 @@ Please refer to the [Unstructured docs](https://docs.unstructured.io/api-referen
 
 <!-- Start Table of Contents [toc] -->
 ## Table of Contents
+<!-- $toc-max-depth=2 -->
+  * [SDK Installation](#sdk-installation)
+  * [Retries](#retries)
+  * [Error Handling](#error-handling)
+  * [Custom HTTP Client](#custom-http-client)
+  * [IDE Support](#ide-support)
+  * [SDK Example Usage](#sdk-example-usage)
+  * [Configuration](#configuration)
+  * [File uploads](#file-uploads)
+  * [Debugging](#debugging)
 
-* [SDK Installation](#sdk-installation)
-* [IDE Support](#ide-support)
-* [SDK Example Usage](#sdk-example-usage)
-* [Available Resources and Operations](#available-resources-and-operations)
-* [File uploads](#file-uploads)
-* [Retries](#retries)
-* [Error Handling](#error-handling)
-* [Server Selection](#server-selection)
-* [Custom HTTP Client](#custom-http-client)
-* [Authentication](#authentication)
-* [Debugging](#debugging)
 <!-- End Table of Contents [toc] -->
 
 <!-- Start SDK Installation [installation] -->
@@ -77,27 +76,28 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = UnstructuredClient()
+with UnstructuredClient() as unstructured_client:
 
-res = s.general.partition(request={
-    "partition_parameters": {
-        "files": {
-            "content": open("example.file", "rb"),
-            "file_name": "example.file",
+    res = unstructured_client.general.partition(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.HI_RES,
         },
-        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-        "split_pdf_page_range": [
-            1,
-            10,
-        ],
-        "strategy": shared.Strategy.HI_RES,
     },
-},
-    RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
+        RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
-if res.elements is not None:
-    # handle response
-    pass
+    assert res.elements is not None
+
+    # Handle response
+    print(res.elements)
 
 ```
 
@@ -107,28 +107,29 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-s = UnstructuredClient(
+with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
-)
+) as unstructured_client:
 
-res = s.general.partition(request={
-    "partition_parameters": {
-        "files": {
-            "content": open("example.file", "rb"),
-            "file_name": "example.file",
+    res = unstructured_client.general.partition(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.HI_RES,
         },
-        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-        "split_pdf_page_range": [
-            1,
-            10,
-        ],
-        "strategy": shared.Strategy.HI_RES,
-    },
-})
+    })
 
-if res.elements is not None:
-    # handle response
-    pass
+    assert res.elements is not None
+
+    # Handle response
+    print(res.elements)
 
 ```
 <!-- End Retries [retries] -->
@@ -162,38 +163,39 @@ When custom error responses are specified for an operation, the SDK may also rai
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import errors, shared
 
-s = UnstructuredClient()
+with UnstructuredClient() as unstructured_client:
+    res = None
+    try:
 
-res = None
-try:
-    res = s.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
+        res = unstructured_client.general.partition(request={
+            "partition_parameters": {
+                "files": {
+                    "content": open("example.file", "rb"),
+                    "file_name": "example.file",
+                },
+                "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+                "split_pdf_page_range": [
+                    1,
+                    10,
+                ],
+                "strategy": shared.Strategy.HI_RES,
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "strategy": shared.Strategy.HI_RES,
-        },
-    })
+        })
 
-    if res.elements is not None:
-        # handle response
-        pass
+        assert res.elements is not None
 
-except errors.HTTPValidationError as e:
-    # handle e.data: errors.HTTPValidationErrorData
-    raise(e)
-except errors.ServerError as e:
-    # handle e.data: errors.ServerErrorData
-    raise(e)
-except errors.SDKError as e:
-    # handle exception
-    raise(e)
+        # Handle response
+        print(res.elements)
+
+    except errors.HTTPValidationError as e:
+        # handle e.data: errors.HTTPValidationErrorData
+        raise(e)
+    except errors.ServerError as e:
+        # handle e.data: errors.ServerErrorData
+        raise(e)
+    except errors.SDKError as e:
+        # handle exception
+        raise(e)
 ```
 <!-- End Error Handling [errors] -->
 
@@ -299,40 +301,9 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-s = UnstructuredClient()
+with UnstructuredClient() as unstructured_client:
 
-res = s.general.partition(request={
-    "partition_parameters": {
-        "files": {
-            "content": open("example.file", "rb"),
-            "file_name": "example.file",
-        },
-        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-        "split_pdf_page_range": [
-            1,
-            10,
-        ],
-        "strategy": shared.Strategy.HI_RES,
-    },
-})
-
-if res.elements is not None:
-    # handle response
-    pass
-```
-
-</br>
-
-The same SDK client can also be used to make asychronous requests by importing asyncio.
-```python
-# Asynchronous Example
-import asyncio
-from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
-
-async def main():
-    s = UnstructuredClient()
-    res = await s.general.partition_async(request={
+    res = unstructured_client.general.partition(request={
         "partition_parameters": {
             "files": {
                 "content": open("example.file", "rb"),
@@ -346,9 +317,44 @@ async def main():
             "strategy": shared.Strategy.HI_RES,
         },
     })
-    if res.elements is not None:
-        # handle response
-        pass
+
+    assert res.elements is not None
+
+    # Handle response
+    print(res.elements)
+```
+
+</br>
+
+The same SDK client can also be used to make asychronous requests by importing asyncio.
+```python
+# Asynchronous Example
+import asyncio
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
+
+async def main():
+    async with UnstructuredClient() as unstructured_client:
+
+        res = await unstructured_client.general.partition_async(request={
+            "partition_parameters": {
+                "files": {
+                    "content": open("example.file", "rb"),
+                    "file_name": "example.file",
+                },
+                "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+                "split_pdf_page_range": [
+                    1,
+                    10,
+                ],
+                "strategy": shared.Strategy.HI_RES,
+            },
+        })
+
+        assert res.elements is not None
+
+        # Handle response
+        print(res.elements)
 
 asyncio.run(main())
 ```
@@ -427,26 +433,27 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-s = UnstructuredClient()
+with UnstructuredClient() as unstructured_client:
 
-res = s.general.partition(request={
-    "partition_parameters": {
-        "files": {
-            "content": open("example.file", "rb"),
-            "file_name": "example.file",
+    res = unstructured_client.general.partition(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.HI_RES,
         },
-        "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-        "split_pdf_page_range": [
-            1,
-            10,
-        ],
-        "strategy": shared.Strategy.HI_RES,
-    },
-})
+    })
 
-if res.elements is not None:
-    # handle response
-    pass
+    assert res.elements is not None
+
+    # Handle response
+    print(res.elements)
 
 ```
 <!-- End File uploads [file-upload] -->

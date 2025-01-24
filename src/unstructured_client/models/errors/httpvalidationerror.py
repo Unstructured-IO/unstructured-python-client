@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 from typing import List, Optional, Union
+from typing_extensions import TypeAliasType
 from unstructured_client import utils
 from unstructured_client.models.shared import validationerror as shared_validationerror
 from unstructured_client.types import BaseModel
 
 
-DetailTypedDict = Union[List[shared_validationerror.ValidationErrorTypedDict], str]
+DetailTypedDict = TypeAliasType(
+    "DetailTypedDict", Union[List[shared_validationerror.ValidationErrorTypedDict], str]
+)
 
 
-Detail = Union[List[shared_validationerror.ValidationError], str]
+Detail = TypeAliasType(
+    "Detail", Union[List[shared_validationerror.ValidationError], str]
+)
 
 
 class HTTPValidationErrorData(BaseModel):

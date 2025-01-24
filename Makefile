@@ -10,7 +10,7 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
 install:
-	pip install poetry
+	pip install -U poetry
 	python scripts/prepare-readme.py
 	poetry install
 
