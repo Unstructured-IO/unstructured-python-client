@@ -13,6 +13,8 @@ class CleanServerUrlSDKInitHook(SDKInitHook):
     def clean_server_url(self, base_url) -> str:
         """Fix url scheme and remove the '/general/v0/general' path."""
 
+        if not base_url:
+            return None
         # -- add a url scheme if not present (urllib.parse does not work reliably without it)
         if "http" not in base_url:
             base_url = "http://" + base_url

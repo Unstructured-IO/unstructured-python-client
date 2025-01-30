@@ -107,7 +107,8 @@ def test_list_sources_5xx_code(
 
 
 def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/sources/{dest_id}"
 
     httpx_mock.add_response(
         method="GET",
@@ -123,7 +124,7 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
     )
 
     source_response = client.sources.get_source(
-        request=operations.GetSourceRequest(source_id="1")
+        request=operations.GetSourceRequest(source_id=dest_id)
     )
     assert source_response.status_code == 200
 
@@ -144,7 +145,8 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
 def test_get_source_not_found(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/sources/{dest_id}"
 
     httpx_mock.add_response(
         method="GET",
@@ -154,7 +156,7 @@ def test_get_source_not_found(
     )
 
     with pytest.raises(SDKError) as excinfo:
-        client.sources.get_source(request=operations.GetSourceRequest(source_id="1"))
+        client.sources.get_source(request=operations.GetSourceRequest(source_id=dest_id))
 
     requests = httpx_mock.get_requests()
     assert len(requests) == 1
@@ -204,7 +206,8 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
 
 
 def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/sources/{dest_id}"
 
     httpx_mock.add_response(
         method="PUT",
@@ -222,7 +225,7 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
 
     source_update_response = client.sources.update_source(
         request=operations.UpdateSourceRequest(
-            source_id="1",
+            source_id=dest_id,
             update_source_connector=shared.UpdateSourceConnector(
                 config={}
             ),
@@ -248,7 +251,8 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
 
 
 def test_delete_source(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/sources/a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "a15d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/sources/{dest_id}"
 
     httpx_mock.add_response(
         method="DELETE",
@@ -259,7 +263,7 @@ def test_delete_source(httpx_mock, client: UnstructuredClient, platform_api_url:
     )
 
     response = client.sources.delete_source(
-        request=operations.DeleteSourceRequest(source_id="1")
+        request=operations.DeleteSourceRequest(source_id=dest_id)
     )
     assert response.status_code == 200
 

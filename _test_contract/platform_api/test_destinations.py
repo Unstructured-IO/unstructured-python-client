@@ -108,7 +108,8 @@ def test_list_destinations_5xx_code(
 
 
 def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/destinations/0c363dec-3c70-45ee-8041-481044a6e1cc"
+    dest_id = "0c363dec-3c70-45ee-8041-481044a6e1cc"
+    url = f"{platform_api_url}/api/v1/destinations/{dest_id}"
 
     httpx_mock.add_response(
         method="GET",
@@ -124,7 +125,7 @@ def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_ur
     )
 
     destination_response = client.destinations.get_destination(
-        request=operations.GetDestinationRequest(destination_id="1")
+        request=operations.GetDestinationRequest(destination_id=dest_id)
     )
     assert destination_response.status_code == 200
 
@@ -147,7 +148,8 @@ def test_get_destination(httpx_mock, client: UnstructuredClient, platform_api_ur
 def test_get_destination_not_found(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/0c363dec-3c70-45ee-8041-481044a6e1cc"
+    dest_id = "0c363dec-3c70-45ee-8041-481044a6e1cc"
+    url = f"{platform_api_url}/api/v1/destinations/{dest_id}"
 
     httpx_mock.add_response(
         method="GET",
@@ -158,7 +160,7 @@ def test_get_destination_not_found(
 
     with pytest.raises(SDKError) as excinfo:
         client.destinations.get_destination(
-            request=operations.GetDestinationRequest(destination_id="1")
+            request=operations.GetDestinationRequest(destination_id=dest_id)
         )
 
     requests = httpx_mock.get_requests()
@@ -215,7 +217,8 @@ def test_create_destination(
 def test_update_destination(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/b25d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "b25d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/destinations/{dest_id}"
 
     httpx_mock.add_response(
         method="PUT",
@@ -232,7 +235,7 @@ def test_update_destination(
 
     destination_update_response = client.destinations.update_destination(
         request=operations.UpdateDestinationRequest(
-            destination_id="1",
+            destination_id=dest_id,
             update_destination_connector=shared.UpdateDestinationConnector(
                 config={}
             ),
@@ -260,7 +263,8 @@ def test_update_destination(
 def test_delete_destination(
     httpx_mock, client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/destinations/b25d4161-77a0-4e08-b65e-86f398ce15ad"
+    dest_id = "b25d4161-77a0-4e08-b65e-86f398ce15ad"
+    url = f"{platform_api_url}/api/v1/destinations/{dest_id}"
 
     httpx_mock.add_response(
         method="DELETE",
@@ -271,7 +275,7 @@ def test_delete_destination(
     )
 
     response = client.destinations.delete_destination(
-        request=operations.DeleteDestinationRequest(destination_id="1")
+        request=operations.DeleteDestinationRequest(destination_id=dest_id)
     )
     assert response.status_code == 200
 
