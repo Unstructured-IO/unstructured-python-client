@@ -31,6 +31,7 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
+from unstructured_client._hooks.custom.request_utils import get_base_url
 from unstructured_client._hooks.types import (
     AfterErrorContext,
     AfterErrorHook,
@@ -156,7 +157,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def __init__(self) -> None:
         self.client: Optional[HttpClient] = None
-        self.base_url: Optional[str] = None
+        self.partition_base_url: Optional[str] = None
+        self.is_partition_request: bool = False
         self.async_client: Optional[AsyncHttpClient] = None
         self.coroutines_to_execute: dict[
             str, list[partial[Coroutine[Any, Any, httpx.Response]]]
@@ -212,7 +214,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         #         return await self.base_transport.handle_async_request(request)
 
         # Instead, save the base url so we can use it for our dummy request
-        self.base_url = base_url
+        # As this can be overwritten with Platform API URL, we need to get it again in
+        # `before_request` hook from the request object as the real URL is not available here.
+        self.partition_base_url = base_url
 
         # Explicit cast to httpx.Client to avoid a typing error
         httpx_client = cast(httpx.Client, client)
@@ -246,6 +250,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             Union[httpx.PreparedRequest, Exception]: If `splitPdfPage` is set to `true`,
             the last page request; otherwise, the original request.
         """
+
+        # Actually the general.partition operation overwrites the default client's base url (as
+        # the platform operations do). Here we need to get the base url from the request object.
+        if hook_ctx.operation_id == "partition":
+            self.partition_base_url = get_base_url(request.url)
+            self.is_partition_request = True
+        else:
+            self.is_partition_request = False
+            return request
+
         if self.client is None:
             logger.warning("HTTP client not accessible! Continuing without splitting.")
             return request
@@ -391,7 +405,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # dummy_request = httpx.Request("GET",  "http://no-op")
         return httpx.Request(
             "GET",
-            f"{self.base_url}/general/docs",
+            f"{self.partition_base_url}/general/docs",
             headers={"operation_id": operation_id},
         )
 
@@ -644,6 +658,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             combined response object; otherwise, the original response. Can return
             exception if it ocurred during the execution.
         """
+        if not self.is_partition_request:
+            return response
+
         # Grab the correct id out of the dummy request
         operation_id = response.request.headers.get("operation_id")
 

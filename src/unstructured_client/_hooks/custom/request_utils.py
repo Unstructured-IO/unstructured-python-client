@@ -5,8 +5,10 @@ import io
 import json
 import logging
 from typing import Tuple, Any, BinaryIO
+from urllib.parse import urlparse
 
 import httpx
+from httpx import URL
 from httpx._multipart import DataField, FileField
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -224,3 +226,15 @@ def create_response(elements: list) -> httpx.Response:
     response.headers.update({"Content-Length": content_length})
     setattr(response, "_content", content)
     return response
+
+def get_base_url(url: str | URL) -> str:
+    """Extracts the base URL from the given URL.
+
+    Args:
+        url: The URL.
+
+    Returns:
+        The base URL.
+    """
+    parsed_url = urlparse(str(url))
+    return f"{parsed_url.scheme}://{parsed_url.netloc}"

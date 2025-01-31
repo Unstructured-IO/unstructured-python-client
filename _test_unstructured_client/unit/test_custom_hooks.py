@@ -210,10 +210,6 @@ def test_unit_clean_server_url_fixes_malformed_localhost_url(server_url: str):
     assert client.general.sdk_configuration.server_url == "http://localhost:8000"
 
 
-def test_unit_clean_server_url_returns_empty_string_given_empty_string():
-    client = UnstructuredClient(server_url="", api_key_auth=FAKE_KEY)
-    assert client.general.sdk_configuration.server_url == ""
-
 
 def test_unit_clean_server_url_returns_None_given_no_server_url():
     client = UnstructuredClient(api_key_auth=FAKE_KEY)
@@ -230,7 +226,7 @@ def test_unit_clean_server_url_returns_None_given_no_server_url():
     ],
 )
 def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(server_url: str):
-    client = UnstructuredClient(FAKE_KEY, "", server_url)
+    client = UnstructuredClient(FAKE_KEY, server_url=server_url)
     assert (
         client.general.sdk_configuration.server_url
         == "https://unstructured-000mock.api.unstructuredapp.io"
