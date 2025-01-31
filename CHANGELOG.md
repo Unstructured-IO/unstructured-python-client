@@ -1,3 +1,28 @@
+## 0.30.0
+
+### Enhancements
+
+### Features
+* Add Unstructured Platform APIs to manage source and destination connectors, workflows, and workflow runs
+__WARNING__: This is a breaking change for the use of non-default `server_url` settings in the client usage.
+To set the custom URL for the client, use the the `server_url` parameter in a given operation:
+```python
+elements = client.general.partition(
+    request=operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=shared.Files(
+                content=doc_file,
+                file_name="your_document.pdf",
+            ),
+            strategy=shared.Strategy.FAST,
+        )
+    ),
+    server_url="your_server_url",
+)
+```
+
+### Fixes
+
 ## 0.26.1
 
 ### Enhancements
