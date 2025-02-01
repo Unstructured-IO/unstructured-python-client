@@ -45,6 +45,10 @@ class General(BaseSDK):
 
         if server_url is not None:
             base_url = server_url
+        else:
+            base_url = operations.PARTITION_SERVERS[
+                operations.PARTITION_SERVER_SAAS_API
+            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.PartitionRequest)
@@ -98,7 +102,7 @@ class General(BaseSDK):
             retry_config=retry_config,
         )
 
-        data: Any = None
+        response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return operations.PartitionResponse(
                 elements=utils.unmarshal_json(
@@ -116,16 +120,18 @@ class General(BaseSDK):
                 raw_response=http_res,
             )
         if utils.match_response(http_res, "422", "application/json"):
-            data = utils.unmarshal_json(http_res.text, errors.HTTPValidationErrorData)
-            raise errors.HTTPValidationError(data=data)
+            response_data = utils.unmarshal_json(
+                http_res.text, errors.HTTPValidationErrorData
+            )
+            raise errors.HTTPValidationError(data=response_data)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = utils.stream_to_text(http_res)
             raise errors.SDKError(
                 "API error occurred", http_res.status_code, http_res_text, http_res
             )
         if utils.match_response(http_res, "5XX", "application/json"):
-            data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
-            raise errors.ServerError(data=data)
+            response_data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
+            raise errors.ServerError(data=response_data)
 
         content_type = http_res.headers.get("Content-Type")
         http_res_text = utils.stream_to_text(http_res)
@@ -166,6 +172,10 @@ class General(BaseSDK):
 
         if server_url is not None:
             base_url = server_url
+        else:
+            base_url = operations.PARTITION_SERVERS[
+                operations.PARTITION_SERVER_SAAS_API
+            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.PartitionRequest)
@@ -219,7 +229,7 @@ class General(BaseSDK):
             retry_config=retry_config,
         )
 
-        data: Any = None
+        response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return operations.PartitionResponse(
                 elements=utils.unmarshal_json(
@@ -237,16 +247,18 @@ class General(BaseSDK):
                 raw_response=http_res,
             )
         if utils.match_response(http_res, "422", "application/json"):
-            data = utils.unmarshal_json(http_res.text, errors.HTTPValidationErrorData)
-            raise errors.HTTPValidationError(data=data)
+            response_data = utils.unmarshal_json(
+                http_res.text, errors.HTTPValidationErrorData
+            )
+            raise errors.HTTPValidationError(data=response_data)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = await utils.stream_to_text_async(http_res)
             raise errors.SDKError(
                 "API error occurred", http_res.status_code, http_res_text, http_res
             )
         if utils.match_response(http_res, "5XX", "application/json"):
-            data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
-            raise errors.ServerError(data=data)
+            response_data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
+            raise errors.ServerError(data=response_data)
 
         content_type = http_res.headers.get("Content-Type")
         http_res_text = await utils.stream_to_text_async(http_res)
