@@ -1,0 +1,9 @@
+# ListDestinationsRequest
+
+
+## Fields
+
+| Field                                                                                                | Type                                                                                                 | Required                                                                                             | Description                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `destination_type`                                                                                   | [OptionalNullable[shared.DestinationConnectorType]](../../models/shared/destinationconnectortype.md) | :heavy_minus_sign:                                                                                   | N/A                                                                                                  |
+| `unstructured_api_key`                                                                               | *OptionalNullable[str]*                                                                              | :heavy_minus_sign:                                                                                   | N/A                                                                                                  |

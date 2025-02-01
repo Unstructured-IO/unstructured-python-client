@@ -18,6 +18,21 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
 
+PARTITION_SERVER_SAAS_API = "saas-api"
+r"""Serverless SaaS API"""
+
+PARTITION_SERVER_FREE_API = "free-api"
+r"""Hosted API Free"""
+
+PARTITION_SERVER_DEVELOPMENT = "development"
+r"""Development server"""
+
+PARTITION_SERVERS = {
+    PARTITION_SERVER_SAAS_API: "https://api.unstructuredapp.io",
+    PARTITION_SERVER_FREE_API: "https://api.unstructured.io",
+    PARTITION_SERVER_DEVELOPMENT: "http://localhost:8000",
+}
+
 
 class PartitionRequestTypedDict(TypedDict):
     partition_parameters: shared_partition_parameters.PartitionParametersTypedDict

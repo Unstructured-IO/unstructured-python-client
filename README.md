@@ -38,12 +38,18 @@ Please refer to the [Unstructured docs](https://docs.unstructured.io/api-referen
   * [SDK Example Usage](#sdk-example-usage)
   * [Configuration](#configuration)
   * [File uploads](#file-uploads)
+  * [Resource Management](#resource-management)
   * [Debugging](#debugging)
 
 <!-- End Table of Contents [toc] -->
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
+
+> [!NOTE]
+> **Python version upgrade policy**
+>
+> Once a Python version reaches its [official end of life date](https://devguide.python.org/versions/), a 3-month grace period is provided for users to upgrade. Following this grace period, the minimum python version supported in the SDK will be updated.
 
 The SDK can be installed with either *pip* or *poetry* package managers.
 
@@ -62,6 +68,37 @@ pip install unstructured-client
 ```bash
 poetry add unstructured-client
 ```
+
+### Shell and script usage with `uv`
+
+You can use this SDK in a Python shell with [uv](https://docs.astral.sh/uv/) and the `uvx` command that comes with it like so:
+
+```shell
+uvx --from unstructured-client python
+```
+
+It's also possible to write a standalone Python script without needing to set up a whole project like so:
+
+```python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "unstructured-client",
+# ]
+# ///
+
+from unstructured_client import UnstructuredClient
+
+sdk = UnstructuredClient(
+  # SDK arguments
+)
+
+# Rest of script here...
+```
+
+Once that is saved to a file, you can run it with `uv run script.py` where
+`script.py` can be replaced with the actual file name.
 <!-- End SDK Installation [installation] -->
 
 
@@ -76,28 +113,27 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
 
-    res = unstructured_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
+    res = uc_client.destinations.create_destination(request={
+        "create_destination_connector": {
+            "config": {
+                "account_key": "azure_account_key",
+                "account_name": "azure_account_name",
+                "anonymous": False,
+                "recursive": True,
+                "remote_url": "az://<path></path></container-name>",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "strategy": shared.Strategy.HI_RES,
+            "name": "<value>",
+            "type": shared.DestinationConnectorType.ASTRADB,
         },
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
-    assert res.elements is not None
+    assert res.destination_connector_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.destination_connector_information)
 
 ```
 
@@ -109,27 +145,26 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
-) as unstructured_client:
+) as uc_client:
 
-    res = unstructured_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
+    res = uc_client.destinations.create_destination(request={
+        "create_destination_connector": {
+            "config": {
+                "account_key": "azure_account_key",
+                "account_name": "azure_account_name",
+                "anonymous": False,
+                "recursive": True,
+                "remote_url": "az://<path></path></container-name>",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "strategy": shared.Strategy.HI_RES,
+            "name": "<value>",
+            "type": shared.DestinationConnectorType.ASTRADB,
         },
     })
 
-    assert res.elements is not None
+    assert res.destination_connector_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.destination_connector_information)
 
 ```
 <!-- End Retries [retries] -->
@@ -149,13 +184,12 @@ By default, an API error will raise a errors.SDKError exception, which has the f
 | `.raw_response` | *httpx.Response* | The raw HTTP response |
 | `.body`         | *str*            | The response content  |
 
-When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `partition_async` method may raise the following exceptions:
+When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `create_destination_async` method may raise the following exceptions:
 
 | Error Type                 | Status Code | Content Type     |
 | -------------------------- | ----------- | ---------------- |
 | errors.HTTPValidationError | 422         | application/json |
-| errors.ServerError         | 5XX         | application/json |
-| errors.SDKError            | 4XX         | \*/\*            |
+| errors.SDKError            | 4XX, 5XX    | \*/\*            |
 
 ### Example
 
@@ -163,35 +197,31 @@ When custom error responses are specified for an operation, the SDK may also rai
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import errors, shared
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
     res = None
     try:
 
-        res = unstructured_client.general.partition(request={
-            "partition_parameters": {
-                "files": {
-                    "content": open("example.file", "rb"),
-                    "file_name": "example.file",
+        res = uc_client.destinations.create_destination(request={
+            "create_destination_connector": {
+                "config": {
+                    "account_key": "azure_account_key",
+                    "account_name": "azure_account_name",
+                    "anonymous": False,
+                    "recursive": True,
+                    "remote_url": "az://<path></path></container-name>",
                 },
-                "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-                "split_pdf_page_range": [
-                    1,
-                    10,
-                ],
-                "strategy": shared.Strategy.HI_RES,
+                "name": "<value>",
+                "type": shared.DestinationConnectorType.ASTRADB,
             },
         })
 
-        assert res.elements is not None
+        assert res.destination_connector_information is not None
 
         # Handle response
-        print(res.elements)
+        print(res.destination_connector_information)
 
     except errors.HTTPValidationError as e:
         # handle e.data: errors.HTTPValidationErrorData
-        raise(e)
-    except errors.ServerError as e:
-        # handle e.data: errors.ServerErrorData
         raise(e)
     except errors.SDKError as e:
         # handle exception
@@ -301,27 +331,26 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
 
-    res = unstructured_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
+    res = uc_client.destinations.create_destination(request={
+        "create_destination_connector": {
+            "config": {
+                "account_key": "azure_account_key",
+                "account_name": "azure_account_name",
+                "anonymous": False,
+                "recursive": True,
+                "remote_url": "az://<path></path></container-name>",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "strategy": shared.Strategy.HI_RES,
+            "name": "<value>",
+            "type": shared.DestinationConnectorType.ASTRADB,
         },
     })
 
-    assert res.elements is not None
+    assert res.destination_connector_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.destination_connector_information)
 ```
 
 </br>
@@ -334,27 +363,26 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
-    async with UnstructuredClient() as unstructured_client:
+    async with UnstructuredClient() as uc_client:
 
-        res = await unstructured_client.general.partition_async(request={
-            "partition_parameters": {
-                "files": {
-                    "content": open("example.file", "rb"),
-                    "file_name": "example.file",
+        res = await uc_client.destinations.create_destination_async(request={
+            "create_destination_connector": {
+                "config": {
+                    "account_key": "azure_account_key",
+                    "account_name": "azure_account_name",
+                    "anonymous": False,
+                    "recursive": True,
+                    "remote_url": "az://<path></path></container-name>",
                 },
-                "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-                "split_pdf_page_range": [
-                    1,
-                    10,
-                ],
-                "strategy": shared.Strategy.HI_RES,
+                "name": "<value>",
+                "type": shared.DestinationConnectorType.ASTRADB,
             },
         })
 
-        assert res.elements is not None
+        assert res.destination_connector_information is not None
 
         # Handle response
-        print(res.elements)
+        print(res.destination_connector_information)
 
 asyncio.run(main())
 ```
@@ -431,22 +459,19 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
 
-    res = unstructured_client.general.partition(request={
+    res = uc_client.general.partition(request={
         "partition_parameters": {
             "files": {
                 "content": open("example.file", "rb"),
                 "file_name": "example.file",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
             "split_pdf_page_range": [
                 1,
                 10,
             ],
-            "strategy": shared.Strategy.HI_RES,
         },
     })
 
@@ -457,6 +482,27 @@ with UnstructuredClient() as unstructured_client:
 
 ```
 <!-- End File uploads [file-upload] -->
+
+<!-- Start Resource Management [resource-management] -->
+## Resource Management
+
+The `UnstructuredClient` class implements the context manager protocol and registers a finalizer function to close the underlying sync and async HTTPX clients it uses under the hood. This will close HTTP connections, release memory and free up other resources held by the SDK. In short-lived Python programs and notebooks that make a few SDK method calls, resource management may not be a concern. However, in longer-lived programs, it is beneficial to create a single SDK instance via a [context manager][context-manager] and reuse it across the application.
+
+[context-manager]: https://docs.python.org/3/reference/datamodel.html#context-managers
+
+```python
+from unstructured_client import UnstructuredClient
+def main():
+    with UnstructuredClient() as uc_client:
+        # Rest of application here...
+
+
+# Or when using async:
+async def amain():
+    async with UnstructuredClient() as uc_client:
+        # Rest of application here...
+```
+<!-- End Resource Management [resource-management] -->
 
 <!-- Start Debugging [debug] -->
 ## Debugging
