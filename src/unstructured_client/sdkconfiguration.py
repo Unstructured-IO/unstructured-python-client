@@ -16,20 +16,6 @@ from unstructured_client.models import shared
 from unstructured_client.types import OptionalNullable, UNSET
 
 
-SERVER_SAAS_API = "saas-api"
-r"""Serverless SaaS API"""
-SERVER_FREE_API = "free-api"
-r"""Hosted API Free"""
-SERVER_DEVELOPMENT = "development"
-r"""Development server"""
-SERVERS = {
-    SERVER_SAAS_API: "https://api.unstructuredapp.io",
-    SERVER_FREE_API: "https://api.unstructured.io",
-    SERVER_DEVELOPMENT: "http://localhost:8000",
-}
-"""Contains the list of servers available to the SDK"""
-
-
 @dataclass
 class SDKConfiguration:
     client: HttpClient
@@ -37,7 +23,6 @@ class SDKConfiguration:
     debug_logger: Logger
     security: Optional[Union[shared.Security, Callable[[], shared.Security]]] = None
     server_url: Optional[str] = ""
-    server: Optional[str] = ""
     language: str = "python"
     openapi_doc_version: str = __openapi_doc_version__
     sdk_version: str = __version__
@@ -50,15 +35,10 @@ class SDKConfiguration:
         self._hooks = SDKHooks()
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:
-        if self.server_url is not None and self.server_url:
-            return remove_suffix(self.server_url, "/"), {}
-        if not self.server:
-            self.server = SERVER_SAAS_API
+        if self.server_url is None:
+            return "", {}
 
-        if self.server not in SERVERS:
-            raise ValueError(f'Invalid server "{self.server}"')
-
-        return SERVERS[self.server], {}
+        return remove_suffix(self.server_url, "/"), {}
 
     def get_hooks(self) -> SDKHooks:
         return self._hooks

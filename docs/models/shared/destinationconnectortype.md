@@ -1,0 +1,27 @@
+# DestinationConnectorType
+
+
+## Values
+
+| Name                             | Value                            |
+| -------------------------------- | -------------------------------- |
+| `ASTRADB`                        | astradb                          |
+| `AZURE_AI_SEARCH`                | azure_ai_search                  |
+| `COUCHBASE`                      | couchbase                        |
+| `DATABRICKS_VOLUMES`             | databricks_volumes               |
+| `DATABRICKS_VOLUME_DELTA_TABLES` | databricks_volume_delta_tables   |
+| `DELTA_TABLE`                    | delta_table                      |
+| `ELASTICSEARCH`                  | elasticsearch                    |
+| `GCS`                            | gcs                              |
+| `KAFKA_CLOUD`                    | kafka-cloud                      |
+| `MILVUS`                         | milvus                           |
+| `MONGODB`                        | mongodb                          |
+| `NEO4J`                          | neo4j                            |
+| `ONEDRIVE`                       | onedrive                         |
+| `PINECONE`                       | pinecone                         |
+| `POSTGRES`                       | postgres                         |
+| `REDIS`                          | redis                            |
+| `QDRANT_CLOUD`                   | qdrant-cloud                     |
+| `S3`                             | s3                               |
+| `SNOWFLAKE`                      | snowflake                        |
+| `WEAVIATE_CLOUD`                 | weaviate-cloud                   |
