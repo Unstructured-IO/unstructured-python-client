@@ -15,22 +15,19 @@ Description
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
 
-    res = unstructured_client.general.partition(request={
+    res = uc_client.general.partition(request={
         "partition_parameters": {
             "files": {
                 "content": open("example.file", "rb"),
                 "file_name": "example.file",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
             "split_pdf_page_range": [
                 1,
                 10,
             ],
-            "strategy": shared.Strategy.HI_RES,
         },
     })
 
@@ -47,6 +44,7 @@ with UnstructuredClient() as unstructured_client:
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `request`                                                                  | [operations.PartitionRequest](../../models/operations/partitionrequest.md) | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
 | `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
+| `server_url`                                                               | *Optional[str]*                                                            | :heavy_minus_sign:                                                         | An optional server URL to use.                                             |
 
 ### Response
 
