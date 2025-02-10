@@ -4,27 +4,26 @@
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-with UnstructuredClient() as unstructured_client:
+with UnstructuredClient() as uc_client:
 
-    res = unstructured_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
+    res = uc_client.destinations.create_destination(request={
+        "create_destination_connector": {
+            "config": {
+                "account_key": "azure_account_key",
+                "account_name": "azure_account_name",
+                "anonymous": False,
+                "recursive": True,
+                "remote_url": "az://<path></path></container-name>",
             },
-            "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "strategy": shared.Strategy.HI_RES,
+            "name": "<value>",
+            "type": shared.DestinationConnectorType.ASTRADB,
         },
     })
 
-    assert res.elements is not None
+    assert res.destination_connector_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.destination_connector_information)
 ```
 
 </br>
@@ -37,27 +36,26 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
-    async with UnstructuredClient() as unstructured_client:
+    async with UnstructuredClient() as uc_client:
 
-        res = await unstructured_client.general.partition_async(request={
-            "partition_parameters": {
-                "files": {
-                    "content": open("example.file", "rb"),
-                    "file_name": "example.file",
+        res = await uc_client.destinations.create_destination_async(request={
+            "create_destination_connector": {
+                "config": {
+                    "account_key": "azure_account_key",
+                    "account_name": "azure_account_name",
+                    "anonymous": False,
+                    "recursive": True,
+                    "remote_url": "az://<path></path></container-name>",
                 },
-                "chunking_strategy": shared.ChunkingStrategy.BY_TITLE,
-                "split_pdf_page_range": [
-                    1,
-                    10,
-                ],
-                "strategy": shared.Strategy.HI_RES,
+                "name": "<value>",
+                "type": shared.DestinationConnectorType.ASTRADB,
             },
         })
 
-        assert res.elements is not None
+        assert res.destination_connector_information is not None
 
         # Handle response
-        print(res.elements)
+        print(res.destination_connector_information)
 
 asyncio.run(main())
 ```

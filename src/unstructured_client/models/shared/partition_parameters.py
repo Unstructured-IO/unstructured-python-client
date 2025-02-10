@@ -22,13 +22,6 @@ from unstructured_client.utils import (
 )
 
 
-class ChunkingStrategy(str, Enum, metaclass=utils.OpenEnumMeta):
-    BASIC = "basic"
-    BY_PAGE = "by_page"
-    BY_SIMILARITY = "by_similarity"
-    BY_TITLE = "by_title"
-
-
 class FilesTypedDict(TypedDict):
     content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
@@ -73,7 +66,7 @@ class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
 class PartitionParametersTypedDict(TypedDict):
     files: FilesTypedDict
     r"""The file to extract"""
-    chunking_strategy: NotRequired[Nullable[ChunkingStrategy]]
+    chunking_strategy: NotRequired[Nullable[str]]
     r"""Use one of the supported strategies to chunk the returned elements after partitioning. When 'chunking_strategy' is not specified, no chunking is performed and any other chunking parameters provided are ignored. Supported strategies: 'basic', 'by_page', 'by_similarity', or 'by_title'"""
     combine_under_n_chars: NotRequired[Nullable[int]]
     r"""If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500"""
@@ -146,11 +139,7 @@ class PartitionParameters(BaseModel):
     r"""The file to extract"""
 
     chunking_strategy: Annotated[
-        Annotated[
-            OptionalNullable[ChunkingStrategy],
-            PlainValidator(validate_open_enum(False)),
-        ],
-        FieldMetadata(multipart=True),
+        OptionalNullable[str], FieldMetadata(multipart=True)
     ] = None
     r"""Use one of the supported strategies to chunk the returned elements after partitioning. When 'chunking_strategy' is not specified, no chunking is performed and any other chunking parameters provided are ignored. Supported strategies: 'basic', 'by_page', 'by_similarity', or 'by_title'"""
 

@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: e45ec2f5b33490809e430b8fc81b996a
-  docVersion: 1.0.58
-  speakeasyVersion: 1.468.6
-  generationVersion: 2.493.13
-  releaseVersion: 0.29.0
-  configChecksum: 03be097b58114b1d008fa76201dc06a9
+  docChecksum: d5a77eae59f4c9b5275a26947bf7b3fb
+  docVersion: 1.0.0
+  speakeasyVersion: 1.487.1
+  generationVersion: 2.506.0
+  releaseVersion: 0.30.0
+  configChecksum: 70d22efea7630be13da1b2e83e04e772
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.10.1
+    core: 5.11.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -24,7 +24,7 @@ features:
     globalSecurity: 3.0.2
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
-    globalServerURLs: 3.1.0
+    methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
     nullables: 1.0.0
@@ -40,22 +40,82 @@ generatedFiles:
   - .python-version
   - .vscode/settings.json
   - USAGE.md
-  - docs/models/errors/detail.md
   - docs/models/errors/httpvalidationerror.md
   - docs/models/errors/servererror.md
+  - docs/models/operations/canceljobrequest.md
+  - docs/models/operations/canceljobresponse.md
+  - docs/models/operations/createdestinationrequest.md
+  - docs/models/operations/createdestinationresponse.md
+  - docs/models/operations/createsourcerequest.md
+  - docs/models/operations/createsourceresponse.md
+  - docs/models/operations/createworkflowrequest.md
+  - docs/models/operations/createworkflowresponse.md
+  - docs/models/operations/deletedestinationrequest.md
+  - docs/models/operations/deletedestinationresponse.md
+  - docs/models/operations/deletesourcerequest.md
+  - docs/models/operations/deletesourceresponse.md
+  - docs/models/operations/deleteworkflowrequest.md
+  - docs/models/operations/deleteworkflowresponse.md
+  - docs/models/operations/getdestinationrequest.md
+  - docs/models/operations/getdestinationresponse.md
+  - docs/models/operations/getjobrequest.md
+  - docs/models/operations/getjobresponse.md
+  - docs/models/operations/getsourcerequest.md
+  - docs/models/operations/getsourceresponse.md
+  - docs/models/operations/getworkflowrequest.md
+  - docs/models/operations/getworkflowresponse.md
+  - docs/models/operations/listdestinationsrequest.md
+  - docs/models/operations/listdestinationsresponse.md
+  - docs/models/operations/listjobsrequest.md
+  - docs/models/operations/listjobsresponse.md
+  - docs/models/operations/listsourcesrequest.md
+  - docs/models/operations/listsourcesresponse.md
+  - docs/models/operations/listworkflowsrequest.md
+  - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
-  - docs/models/shared/chunkingstrategy.md
+  - docs/models/operations/runworkflowrequest.md
+  - docs/models/operations/runworkflowresponse.md
+  - docs/models/operations/updatedestinationrequest.md
+  - docs/models/operations/updatedestinationresponse.md
+  - docs/models/operations/updatesourcerequest.md
+  - docs/models/operations/updatesourceresponse.md
+  - docs/models/operations/updateworkflowrequest.md
+  - docs/models/operations/updateworkflowresponse.md
+  - docs/models/shared/createdestinationconnector.md
+  - docs/models/shared/createsourceconnector.md
+  - docs/models/shared/createworkflow.md
+  - docs/models/shared/createworkflowschedule.md
+  - docs/models/shared/createworkflowworkflowtype.md
+  - docs/models/shared/crontabentry.md
+  - docs/models/shared/destinationconnectorinformation.md
+  - docs/models/shared/destinationconnectortype.md
   - docs/models/shared/files.md
+  - docs/models/shared/jobinformation.md
   - docs/models/shared/loc.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/schedule.md
   - docs/models/shared/security.md
+  - docs/models/shared/sourceconnectorinformation.md
+  - docs/models/shared/sourceconnectortype.md
   - docs/models/shared/strategy.md
+  - docs/models/shared/updatedestinationconnector.md
+  - docs/models/shared/updatesourceconnector.md
+  - docs/models/shared/updateworkflow.md
   - docs/models/shared/validationerror.md
+  - docs/models/shared/workflowautostrategy.md
+  - docs/models/shared/workflowinformation.md
+  - docs/models/shared/workflowschedule.md
+  - docs/models/shared/workflowstate.md
+  - docs/models/shared/workflowtype.md
   - docs/models/utils/retryconfig.md
+  - docs/sdks/destinations/README.md
   - docs/sdks/general/README.md
+  - docs/sdks/jobs/README.md
+  - docs/sdks/sources/README.md
   - docs/sdks/unstructuredclient/README.md
+  - docs/sdks/workflows/README.md
   - poetry.toml
   - py.typed
   - pylintrc
@@ -68,21 +128,59 @@ generatedFiles:
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
+  - src/unstructured_client/destinations.py
   - src/unstructured_client/general.py
   - src/unstructured_client/httpclient.py
+  - src/unstructured_client/jobs.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/errors/sdkerror.py
   - src/unstructured_client/models/errors/servererror.py
   - src/unstructured_client/models/operations/__init__.py
+  - src/unstructured_client/models/operations/cancel_job.py
+  - src/unstructured_client/models/operations/create_destination.py
+  - src/unstructured_client/models/operations/create_source.py
+  - src/unstructured_client/models/operations/create_workflow.py
+  - src/unstructured_client/models/operations/delete_destination.py
+  - src/unstructured_client/models/operations/delete_source.py
+  - src/unstructured_client/models/operations/delete_workflow.py
+  - src/unstructured_client/models/operations/get_destination.py
+  - src/unstructured_client/models/operations/get_job.py
+  - src/unstructured_client/models/operations/get_source.py
+  - src/unstructured_client/models/operations/get_workflow.py
+  - src/unstructured_client/models/operations/list_destinations.py
+  - src/unstructured_client/models/operations/list_jobs.py
+  - src/unstructured_client/models/operations/list_sources.py
+  - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/operations/run_workflow.py
+  - src/unstructured_client/models/operations/update_destination.py
+  - src/unstructured_client/models/operations/update_source.py
+  - src/unstructured_client/models/operations/update_workflow.py
   - src/unstructured_client/models/shared/__init__.py
+  - src/unstructured_client/models/shared/createdestinationconnector.py
+  - src/unstructured_client/models/shared/createsourceconnector.py
+  - src/unstructured_client/models/shared/createworkflow.py
+  - src/unstructured_client/models/shared/crontabentry.py
+  - src/unstructured_client/models/shared/destinationconnectorinformation.py
+  - src/unstructured_client/models/shared/destinationconnectortype.py
+  - src/unstructured_client/models/shared/jobinformation.py
   - src/unstructured_client/models/shared/partition_parameters.py
   - src/unstructured_client/models/shared/security.py
+  - src/unstructured_client/models/shared/sourceconnectorinformation.py
+  - src/unstructured_client/models/shared/sourceconnectortype.py
+  - src/unstructured_client/models/shared/updatedestinationconnector.py
+  - src/unstructured_client/models/shared/updatesourceconnector.py
+  - src/unstructured_client/models/shared/updateworkflow.py
   - src/unstructured_client/models/shared/validationerror.py
+  - src/unstructured_client/models/shared/workflowautostrategy.py
+  - src/unstructured_client/models/shared/workflowinformation.py
+  - src/unstructured_client/models/shared/workflowschedule.py
+  - src/unstructured_client/models/shared/workflowstate.py
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
+  - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
@@ -100,17 +198,212 @@ generatedFiles:
   - src/unstructured_client/utils/serializers.py
   - src/unstructured_client/utils/url.py
   - src/unstructured_client/utils/values.py
+  - src/unstructured_client/workflows.py
 examples:
+  create_destination:
+    speakeasy-default-create-destination:
+      requestBody:
+        application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "name": "<value>", "type": "astradb"}
+      responses:
+        "200":
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-11-15T01:07:46.428Z", "id": "05b94b3c-bed9-4976-bf02-38635119a590", "name": "<value>", "type": "databricks_volumes"}
+        "422":
+          application/json: {}
+  delete_destination:
+    speakeasy-default-delete-destination:
+      parameters:
+        path:
+          destination_id: "10a88d76-65fb-4c88-8488-9e7d272c6373"
+        header: {}
+      responses:
+        "200":
+          application/json: "<value>"
+        "422":
+          application/json: {}
+  get_destination:
+    speakeasy-default-get-destination:
+      parameters:
+        path:
+          destination_id: "41ba03fb-faa3-4e9e-8cfb-27f133c4198a"
+        header: {}
+      responses:
+        "200":
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
+        "422":
+          application/json: {}
+  list_destinations:
+    speakeasy-default-list-destinations:
+      responses:
+        "200":
+          application/json: [{"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
+        "422":
+          application/json: {}
+  update_destination:
+    speakeasy-default-update-destination:
+      parameters:
+        path:
+          destination_id: "0a0ddfee-087e-467d-abcc-fdb6451a6e6f"
+        header: {}
+      requestBody:
+        application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
+      responses:
+        "200":
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2025-01-09T05:32:50.655Z", "id": "9d27c4e2-ecb5-4a69-971b-d7ec9d2266e1", "name": "<value>", "type": "postgres"}
+        "422":
+          application/json: {}
+  cancel_job:
+    speakeasy-default-cancel-job:
+      parameters:
+        path:
+          job_id: "ec29bf67-0f30-4793-b5ee-8fc0da196032"
+        header: {}
+      responses:
+        "200":
+          application/json: "<value>"
+        "422":
+          application/json: {}
+  get_job:
+    speakeasy-default-get-job:
+      parameters:
+        path:
+          job_id: "6bb4cb72-a072-4398-9de3-194e59352a3c"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2025-01-14T00:09:32.358Z", "id": "d18f330b-506f-455c-9cb8-0cee2386ac29", "runtime": "<value>", "status": "<value>", "workflow_id": "136fd799-4c45-4417-a632-f460d8ebb2a2", "workflow_name": "<value>"}
+        "422":
+          application/json: {}
+  list_jobs:
+    speakeasy-default-list-jobs:
+      responses:
+        "200":
+          application/json: [{"created_at": "2023-09-01T17:59:19.211Z", "id": "7098ff76-419f-4a5a-a313-d159507b629d", "runtime": "<value>", "status": "<value>", "workflow_id": "75cf761e-8c10-48e4-b3d7-6ae90ad4fd3e", "workflow_name": "<value>"}]
+        "422":
+          application/json: {}
+  create_source:
+    speakeasy-default-create-source:
+      requestBody:
+        application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "name": "<value>", "type": "salesforce"}
+      responses:
+        "200":
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-04-25T02:02:10.136Z", "id": "18d86009-3eb2-422a-a875-93c814e4cdc9", "name": "<value>", "type": "dropbox"}
+        "422":
+          application/json: {}
+  delete_source:
+    speakeasy-default-delete-source:
+      parameters:
+        path:
+          source_id: "8a24d7ae-5524-45e9-83f9-b0adba5303d4"
+        header: {}
+      responses:
+        "200":
+          application/json: "<value>"
+        "422":
+          application/json: {}
+  get_source:
+    speakeasy-default-get-source:
+      parameters:
+        path:
+          source_id: "e02d8147-b614-4e4c-9c6d-0cd9c4492ea0"
+        header: {}
+      responses:
+        "200":
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-05-26T11:39:22.869Z", "id": "24daedf6-4f76-49d1-a6af-bb58044f8cfd", "name": "<value>", "type": "sharepoint"}
+        "422":
+          application/json: {}
+  list_sources:
+    speakeasy-default-list-sources:
+      responses:
+        "200":
+          application/json: [{"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2024-12-15T10:13:09.959Z", "id": "15d41617-7a0e-4086-a5e8-6f398ce15adf", "name": "<value>", "type": "postgres"}]
+        "422":
+          application/json: {}
+  update_source:
+    speakeasy-default-update-source:
+      parameters:
+        path:
+          source_id: "196d27d0-3173-4749-b69d-2ee5d8e2396e"
+        header: {}
+      requestBody:
+        application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
+      responses:
+        "200":
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2025-05-26T03:32:19.957Z", "id": "439e8ef6-c69c-49e3-9ba7-a8418be7cbe9", "name": "<value>", "type": "snowflake"}
+        "422":
+          application/json: {}
+  create_workflow:
+    speakeasy-default-create-workflow:
+      requestBody:
+        application/json: {"destination_id": "<id>", "name": "<value>", "schedule": "every 12 hours", "source_id": "<id>", "workflow_type": "advanced"}
+      responses:
+        "200":
+          application/json: {"created_at": "2025-03-22T20:24:23.695Z", "destinations": ["ba90bc88-ea44-45fe-a894-788e3f38c0ef", "06124dfe-11e8-44dd-a7cf-a1e3fe9ec68c"], "id": "7a3141b6-19c5-4d0d-aa5f-5edb0b22f19c", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["4d2c1c2a-0f50-44c3-87fb-0f07c5417c9d", "569dec87-2ffe-4467-98bf-fe279bdaafcc", "47b1728b-a663-4345-8bae-a1ae67a567f1"], "status": "active", "workflow_type": "advanced"}
+        "422":
+          application/json: {}
+  delete_workflow:
+    speakeasy-default-delete-workflow:
+      parameters:
+        path:
+          workflow_id: "26c0bd77-269e-4239-86b8-71541359440c"
+        header: {}
+      responses:
+        "200":
+          application/json: "<value>"
+        "422":
+          application/json: {}
+  get_workflow:
+    speakeasy-default-get-workflow:
+      parameters:
+        path:
+          workflow_id: "270d9bb5-13f1-4e4d-bb84-4bcc30c93967"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2023-05-27T02:17:56.472Z", "destinations": [], "id": "5781a90a-c5ba-41a1-ac38-4b031d1d247d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["1ecf852c-a41e-4193-b8ae-7afe4e642c1d", "73825739-ddfe-44a7-b2e9-6adc9e5972ee", "32976128-e157-4711-b160-6c7e63baa0cb"], "status": "inactive", "workflow_type": "advanced"}
+        "422":
+          application/json: {}
+  list_workflows:
+    speakeasy-default-list-workflows:
+      responses:
+        "200":
+          application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_type": "advanced"}]
+        "422":
+          application/json: {}
+  run_workflow:
+    speakeasy-default-run-workflow:
+      parameters:
+        path:
+          workflow_id: "6b67be6d-98e9-440c-88fd-721e5d2d0036"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2024-08-04T10:06:22.481Z", "destinations": [], "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"], "status": "inactive", "workflow_type": "platinum"}
+        "422":
+          application/json: {}
+  update_workflow:
+    speakeasy-default-update-workflow:
+      parameters:
+        path:
+          workflow_id: "b63b90df-08ba-41e1-b15b-bc744e5781fa"
+        header: {}
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_type": "advanced"}
+        "422":
+          application/json: {}
   partition:
     speakeasy-default-partition:
       requestBody:
-        multipart/form-data: {"chunking_strategy": "by_title", "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "split_pdf_page_range": [1, 10], "strategy": "hi_res"}
+        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "hi_res", "table_ocr_agent": null, "unique_element_ids": false, "xml_keep_tags": false}
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
           text/csv: "<value>"
         "422":
-          application/json: {"detail": []}
+          application/json: {}
         5XX:
           application/json: {"detail": "An error occurred"}
+examplesVersion: 1.0.0
 generatedTests: {}
