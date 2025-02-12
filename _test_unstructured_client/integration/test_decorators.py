@@ -79,7 +79,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
 
     try:
         resp_split = client.general.partition(
-            server_url="localhost:8000",
+            server_url="http://localhost:8000",
             request=req
         )
     except (HTTPValidationError, AttributeError) as exc:
@@ -159,7 +159,7 @@ def test_integration_split_pdf_with_caching(
 
     try:
         resp_split = client.general.partition(
-            server_url="localhost:8000",
+            server_url="http://localhost:8000",
             request=req
         )
     except (HTTPValidationError, AttributeError) as exc:
@@ -176,7 +176,7 @@ def test_integration_split_pdf_with_caching(
     )
 
     resp_single = client.general.partition(
-        server_url="localhost:8000",
+        server_url="http://localhost:8000",
         request=req
     )
 
@@ -242,7 +242,7 @@ def test_integration_split_pdf_for_file_with_no_name():
         )
     )
 
-    pytest.raises(ValueError, client.general.partition, request=req, server_url="localhost:8000")
+    pytest.raises(ValueError, client.general.partition, request=req, server_url="http://localhost:8000")
 
 
 @pytest.mark.parametrize("starting_page_number", [1, 100])
@@ -302,7 +302,7 @@ def test_integration_split_pdf_with_page_range(
 
     try:
         resp = client.general.partition(
-            server_url="localhost:8000",
+            server_url="http://localhost:8000",
             request=req
         )
     except ValueError as exc:
@@ -372,7 +372,7 @@ def test_integration_split_pdf_strict_mode(
 
     try:
         resp_split = client.general.partition(
-            server_url="localhost:8000",
+            server_url="http://localhost:8000",
             request=req
         )
     except (HTTPValidationError, AttributeError) as exc:
@@ -425,7 +425,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         # Assert that the SDK issues our dummy request
         # returned by the BeforeRequestHook
         nonlocal mock_endpoint_called
-        if request.url.host == "localhost" and "docs" in request.url.path:
+        if request.url.host == "http://localhost" and "docs" in request.url.path:
             mock_endpoint_called = True
             return Response(200, request=request)
         elif "docs" in request.url.path:
@@ -485,7 +485,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
     )
 
     res = await sdk.general.partition_async(
-        server_url="localhost:8000",
+        server_url="http://localhost:8000",
         request=req
     )
 
