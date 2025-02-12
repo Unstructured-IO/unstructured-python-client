@@ -53,7 +53,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -78,7 +78,10 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     )
 
     try:
-        resp_split = client.general.partition(request=req)
+        resp_split = client.general.partition(
+            server_url="localhost:8000",
+            request=req
+        )
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
             assert "File does not appear to be a valid PDF" in str(exc)
@@ -130,7 +133,7 @@ def test_integration_split_pdf_with_caching(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -155,7 +158,10 @@ def test_integration_split_pdf_with_caching(
     )
 
     try:
-        resp_split = client.general.partition(request=req)
+        resp_split = client.general.partition(
+            server_url="localhost:8000",
+            request=req
+        )
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
             assert "File does not appear to be a valid PDF" in str(exc)
@@ -169,7 +175,10 @@ def test_integration_split_pdf_with_caching(
         partition_parameters=parameters
     )
 
-    resp_single = client.general.partition(request=req)
+    resp_single = client.general.partition(
+        server_url="localhost:8000",
+        request=req
+    )
 
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type
@@ -200,7 +209,7 @@ def test_long_pages_hi_res(filename):
         split_pdf_concurrency_level=15
     ), )
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     response = client.general.partition(request=req)
     assert response.status_code == 200
@@ -216,7 +225,7 @@ def test_integration_split_pdf_for_file_with_no_name():
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     with open("_sample_docs/layout-parser-paper-fast.pdf", "rb") as f:
         files = shared.Files(
@@ -233,7 +242,7 @@ def test_integration_split_pdf_for_file_with_no_name():
         )
     )
 
-    pytest.raises(ValueError, client.general.partition, request=req)
+    pytest.raises(ValueError, client.general.partition, request=req, server_url="localhost:8000")
 
 
 @pytest.mark.parametrize("starting_page_number", [1, 100])
@@ -272,7 +281,7 @@ def test_integration_split_pdf_with_page_range(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     filename = "_sample_docs/layout-parser-paper.pdf"
     with open(filename, "rb") as f:
@@ -292,7 +301,10 @@ def test_integration_split_pdf_with_page_range(
     )
 
     try:
-        resp = client.general.partition(request=req)
+        resp = client.general.partition(
+            server_url="localhost:8000",
+            request=req
+        )
     except ValueError as exc:
         assert not expected_ok
         assert "is out of bounds." in caplog.text
@@ -333,7 +345,7 @@ def test_integration_split_pdf_strict_mode(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY, server_url="localhost:8000")
+    client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -359,7 +371,10 @@ def test_integration_split_pdf_strict_mode(
     )
 
     try:
-        resp_split = client.general.partition(request=req)
+        resp_split = client.general.partition(
+            server_url="localhost:8000",
+            request=req
+        )
     except (HTTPValidationError, AttributeError) as exc:
         if not expected_ok:
             assert "The file does not appear to be a valid PDF." in caplog.text
@@ -450,7 +465,6 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
 
     sdk = UnstructuredClient(
         api_key_auth=FAKE_KEY,
-        server_url="localhost:8000",
         retry_config=RetryConfig("backoff", BackoffStrategy(200, 1000, 1.5, 10000), False),
     )
 
@@ -470,7 +484,10 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         )
     )
 
-    res = await sdk.general.partition_async(request=req)
+    res = await sdk.general.partition_async(
+        server_url="localhost:8000",
+        request=req
+    )
 
     assert number_of_split_502s == 0
     assert number_of_last_page_502s == 0
