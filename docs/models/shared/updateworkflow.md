@@ -1,0 +1,12 @@
+# UpdateWorkflow
+
+
+## Fields
+
+| Field                                                                        | Type                                                                         | Required                                                                     | Description                                                                  |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `destination_id`                                                             | *OptionalNullable[str]*                                                      | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `name`                                                                       | *OptionalNullable[str]*                                                      | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `schedule`                                                                   | [OptionalNullable[shared.Schedule]](../../models/shared/schedule.md)         | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `source_id`                                                                  | *OptionalNullable[str]*                                                      | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `workflow_type`                                                              | [OptionalNullable[shared.WorkflowType]](../../models/shared/workflowtype.md) | :heavy_minus_sign:                                                           | N/A                                                                          |
