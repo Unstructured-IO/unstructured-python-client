@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: b78eae8dbe173e2848e2a257a406845e
+  docChecksum: 3e6bb7582e05075b42a34cbc507599a3
   docVersion: 1.0.0
-  speakeasyVersion: 1.488.0
-  generationVersion: 2.506.0
-  releaseVersion: 0.30.0
-  configChecksum: 70d22efea7630be13da1b2e83e04e772
+  speakeasyVersion: 1.490.0
+  generationVersion: 2.512.0
+  releaseVersion: 0.30.0b
+  configChecksum: cf1f9a507e398edc1222ab95bbf9b244
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -21,7 +21,7 @@ features:
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
     examples: 3.0.1
-    globalSecurity: 3.0.2
+    globalSecurity: 3.0.3
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
     methodServerURLs: 3.1.1
@@ -209,7 +209,7 @@ examples:
         application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "name": "<value>", "type": "astradb"}
       responses:
         "200":
-          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-11-15T01:07:46.428Z", "id": "05b94b3c-bed9-4976-bf02-38635119a590", "name": "<value>", "type": "databricks_volumes"}
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-11-15T01:07:46.428Z", "id": "05b94b3c-bed9-4976-bf02-38635119a590", "name": "<value>", "type": "databricks_volumes"}
         "422":
           application/json: {}
   delete_destination:
@@ -231,14 +231,14 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
         "422":
           application/json: {}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
         "200":
-          application/json: [{"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
+          application/json: [{"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
         "422":
           application/json: {}
   update_destination:
@@ -251,7 +251,7 @@ examples:
         application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
       responses:
         "200":
-          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2025-01-09T05:32:50.655Z", "id": "9d27c4e2-ecb5-4a69-971b-d7ec9d2266e1", "name": "<value>", "type": "postgres"}
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2025-01-09T05:32:50.655Z", "id": "9d27c4e2-ecb5-4a69-971b-d7ec9d2266e1", "name": "<value>", "type": "postgres"}
         "422":
           application/json: {}
   cancel_job:
@@ -289,7 +289,7 @@ examples:
         application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "name": "<value>", "type": "salesforce"}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-04-25T02:02:10.136Z", "id": "18d86009-3eb2-422a-a875-93c814e4cdc9", "name": "<value>", "type": "dropbox"}
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-04-25T02:02:10.136Z", "id": "18d86009-3eb2-422a-a875-93c814e4cdc9", "name": "<value>", "type": "dropbox"}
         "422":
           application/json: {}
   delete_source:
@@ -311,7 +311,7 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-05-26T11:39:22.869Z", "id": "24daedf6-4f76-49d1-a6af-bb58044f8cfd", "name": "<value>", "type": "sharepoint"}
+          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-05-26T11:39:22.869Z", "id": "24daedf6-4f76-49d1-a6af-bb58044f8cfd", "name": "<value>", "type": "sharepoint"}
         "422":
           application/json: {}
   list_sources:
@@ -331,7 +331,7 @@ examples:
         application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
       responses:
         "200":
-          application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2025-05-26T03:32:19.957Z", "id": "439e8ef6-c69c-49e3-9ba7-a8418be7cbe9", "name": "<value>", "type": "snowflake"}
+          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2025-05-26T03:32:19.957Z", "id": "439e8ef6-c69c-49e3-9ba7-a8418be7cbe9", "name": "<value>", "type": "snowflake"}
         "422":
           application/json: {}
   create_workflow:

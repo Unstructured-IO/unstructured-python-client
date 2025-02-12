@@ -7,11 +7,12 @@ generation:
     nameResolutionDec2023: false
     parameterOrderingFeb2024: false
     requestResponseComponentNamesFeb2024: false
+    securityFeb2025: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.30.0
+  version: 0.30.0b
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -54,5 +55,6 @@ python:
   outputModelSuffix: output
   packageName: unstructured-client
   projectUrls: {}
+  pytestTimeout: 0
   responseFormat: envelope
   templateVersion: v2
