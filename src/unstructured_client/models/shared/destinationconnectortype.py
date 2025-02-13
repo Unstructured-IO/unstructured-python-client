@@ -16,6 +16,7 @@ class DestinationConnectorType(str, Enum):
     KAFKA_CLOUD = "kafka-cloud"
     MILVUS = "milvus"
     MONGODB = "mongodb"
+    MOTHERDUCK = "motherduck"
     NEO4J = "neo4j"
     ONEDRIVE = "onedrive"
     PINECONE = "pinecone"
