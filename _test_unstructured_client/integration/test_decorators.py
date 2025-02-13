@@ -95,7 +95,10 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         partition_parameters=parameters
     )
 
-    resp_single = client.general.partition(request=req)
+    resp_single = client.general.partition(
+        server_url="http://localhost:8000",
+        request=req,
+    )
 
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type
@@ -211,7 +214,10 @@ def test_long_pages_hi_res(filename):
 
     client = UnstructuredClient(api_key_auth=FAKE_KEY)
 
-    response = client.general.partition(request=req)
+    response = client.general.partition(
+        request=req,
+        server_url="http://localhost:8000",
+    )
     assert response.status_code == 200
     assert len(response.elements)
 
@@ -389,7 +395,10 @@ def test_integration_split_pdf_strict_mode(
         partition_parameters=parameters
     )
 
-    resp_single = client.general.partition(request=req)
+    resp_single = client.general.partition(
+        request=req,
+        server_url="http://localhost:8000",
+    )
 
     assert len(resp_split.elements) == len(resp_single.elements)
     assert resp_split.content_type == resp_single.content_type
@@ -425,7 +434,7 @@ async def test_split_pdf_requests_do_retry(monkeypatch):
         # Assert that the SDK issues our dummy request
         # returned by the BeforeRequestHook
         nonlocal mock_endpoint_called
-        if request.url.host == "http://localhost" and "docs" in request.url.path:
+        if request.url.host == "localhost" and "docs" in request.url.path:
             mock_endpoint_called = True
             return Response(200, request=request)
         elif "docs" in request.url.path:

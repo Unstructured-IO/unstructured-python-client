@@ -219,7 +219,7 @@ def test_uvloop_partitions_without_errors(client, doc_path):
             )
         )
 
-        response = client.general.partition(
+        resp = client.general.partition(
             server_url=FREEMIUM_URL,
             request=req
         )
