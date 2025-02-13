@@ -7,11 +7,12 @@ generation:
     nameResolutionDec2023: false
     parameterOrderingFeb2024: false
     requestResponseComponentNamesFeb2024: false
+    securityFeb2025: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.29.0
+  version: 0.30.0
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -32,6 +33,7 @@ python:
   clientServerStatusCodesAsErrors: true
   defaultErrorName: SDKError
   description: Python Client SDK for Unstructured API
+  enableCustomCodeRegions: false
   enumFormat: enum
   fixFlags:
     responseRequiredSep2024: false
@@ -53,5 +55,6 @@ python:
   outputModelSuffix: output
   packageName: unstructured-client
   projectUrls: {}
+  pytestTimeout: 0
   responseFormat: envelope
   templateVersion: v2
