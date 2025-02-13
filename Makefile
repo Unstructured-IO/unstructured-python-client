@@ -71,7 +71,7 @@ download-openapi-specs:
 ## client-merge-serverless-platform:		Merge the Serverless and Platform APIs specs into a single schema
 .PHONY: client-merge-serverless-platform
 client-merge-serverless-platform:
-	speakeasy merge -s ./openapi_serverless.json -s ./openapi_platform_api.json -o ./openapi_merged.yaml
+	speakeasy merge -s ./openapi_platform_api.json -s ./openapi_serverless.json -o ./openapi_merged.yaml
 
 ## client-generate-unified-sdk-local:		Generate the SDK using merged schemas
 .PHONY: client-generate-unified-sdk-local
