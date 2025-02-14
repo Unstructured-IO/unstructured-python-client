@@ -13,7 +13,8 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-FREEMIUM_URL = "https://api.unstructured.io"
+# FREEMIUM_URL = "https://api.unstructured.io"
+FREEMIUM_URL = "http://127.0.0.1:5000"
 
 
 @pytest.fixture(scope="module")
@@ -233,3 +234,35 @@ def test_uvloop_partitions_without_errors(client, doc_path):
     uvloop.install()
     elements = asyncio.run(call_api())
     assert len(elements) > 0
+
+
+# TODO (klaijan) - still cannot test against vlm if the updated client vlm is generated
+# `vlm_model cannot be empty for vlm requests.` because partition_parameters do not have the param.
+@pytest.mark.parametrize("split_pdf", [True, False])
+@pytest.mark.parametrize("vlm_model", ["gpt-4o"])
+@pytest.mark.parametrize("vlm_model_provider", ["openai"])
+def test_partition_strategy_vlm(split_pdf, vlm_model, vlm_model_provider, client, doc_path):
+    filename = "layout-parser-paper-fast.pdf"
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="vlm",
+            vlm_model=vlm_model,
+            vlm_model_provider=vlm_model_provider,
+            # languages=["eng"],
+            # split_pdf_page=split_pdf,
+        )
+    )
+
+    response = client.general.partition(
+        server_url=FREEMIUM_URL,
+        request=req
+    )
+    assert response.status_code == 200
+    assert len(response.elements)
