@@ -394,7 +394,7 @@ class Destinations(BaseSDK):
         base_url = choose_server_url(
             endpoint_url=server_url,
             client_url=client_url,
-            default_endpoint_url=DELETE_DESTINATION_SERVERS[
+            default_endpoint_url=operations.DELETE_DESTINATION_SERVERS[
                 operations.DELETE_DESTINATION_SERVER_PLATFORM_API
             ]
         )
