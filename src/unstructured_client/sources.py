@@ -4,6 +4,7 @@ from .basesdk import BaseSDK
 from typing import Any, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
+from unstructured_client._hooks.custom.clean_server_url_hook import choose_server_url
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 
@@ -33,12 +34,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.CREATE_SOURCE_SERVERS[
                 operations.CREATE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -150,12 +154,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.CREATE_SOURCE_SERVERS[
                 operations.CREATE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -267,12 +274,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.DELETE_SOURCE_SERVERS[
                 operations.DELETE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -375,12 +385,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.DELETE_SOURCE_SERVERS[
                 operations.DELETE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -483,12 +496,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.GET_SOURCE_SERVERS[
                 operations.GET_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -593,12 +609,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.GET_SOURCE_SERVERS[
                 operations.GET_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -703,12 +722,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_SOURCES_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.LIST_SOURCES_SERVERS[
                 operations.LIST_SOURCES_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -813,12 +835,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_SOURCES_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.LIST_SOURCES_SERVERS[
                 operations.LIST_SOURCES_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -923,12 +948,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.UPDATE_SOURCE_SERVERS[
                 operations.UPDATE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)
@@ -1040,12 +1068,15 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_SOURCE_SERVERS[
+        client_url, *_ = self.sdk_configuration.get_server_details()
+
+        base_url = choose_server_url(
+            endpoint_url=server_url,
+            client_url=client_url,
+            default_endpoint_url=operations.UPDATE_SOURCE_SERVERS[
                 operations.UPDATE_SOURCE_SERVER_PLATFORM_API
             ]
+        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)
