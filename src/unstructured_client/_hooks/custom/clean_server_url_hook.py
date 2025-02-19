@@ -18,13 +18,8 @@ def clean_server_url(base_url: str) -> str:
         base_url = "http://" + base_url
 
     parsed_url: ParseResult = urlparse(base_url)
-
-    unstructured_services = [
-        "api.unstructuredapp.io",
-        "api.unstructured.io",
-        "platform.unstructuredapp.io",
-    ]
-    if parsed_url.netloc in unstructured_services:
+    
+    if "api.unstructuredapp.io" in parsed_url.netloc:
         if parsed_url.scheme != "https":
             parsed_url = parsed_url._replace(scheme="https")
 
