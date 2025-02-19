@@ -32,7 +32,7 @@ def clean_server_url(base_url: str) -> str:
     return urlunparse(parsed_url._replace(path="", params="", query="", fragment=""))
 
 
-def choose_server_url(endpoint_url: str, client_url: str, default_endpoint_url: str) -> str:
+def choose_server_url(endpoint_url: str | None, client_url: str, default_endpoint_url: str) -> str:
     """
     Helper function to fix a breaking change in the SDK past 0.30.0.
     When we merged the partition and platform specs, the client server_url stopped working,
