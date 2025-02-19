@@ -92,7 +92,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_workflow"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"source_id\": \"b5baba90-bc88-4ea4-b45f-e894788e3f38\",\n            \"destination_id\": \"0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n            \"schedule\": shared.CreateWorkflowSchedule.EVERY_10_HOURS,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"source_id\": \"b5baba90-bc88-4ea4-b45f-e894788e3f38\",\n            \"destination_id\": \"0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["delete"]
     update:
       "x-codeSamples":

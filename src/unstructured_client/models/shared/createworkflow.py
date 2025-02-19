@@ -16,7 +16,7 @@ from unstructured_client.types import (
 )
 
 
-class CreateWorkflowSchedule(str, Enum):
+class Schedule(str, Enum):
     EVERY_15_MINUTES = "every 15 minutes"
     EVERY_HOUR = "every hour"
     EVERY_2_HOURS = "every 2 hours"
@@ -33,9 +33,9 @@ class CreateWorkflowSchedule(str, Enum):
 class CreateWorkflowTypedDict(TypedDict):
     destination_id: str
     name: str
-    schedule: CreateWorkflowSchedule
     source_id: str
     workflow_type: WorkflowType
+    schedule: NotRequired[Nullable[Schedule]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
 
 
@@ -44,18 +44,18 @@ class CreateWorkflow(BaseModel):
 
     name: str
 
-    schedule: CreateWorkflowSchedule
-
     source_id: str
 
     workflow_type: WorkflowType
+
+    schedule: OptionalNullable[Schedule] = UNSET
 
     workflow_nodes: OptionalNullable[List[WorkflowNode]] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["workflow_nodes"]
-        nullable_fields = ["workflow_nodes"]
+        optional_fields = ["schedule", "workflow_nodes"]
+        nullable_fields = ["schedule", "workflow_nodes"]
         null_default_fields = []
 
         serialized = handler(self)
