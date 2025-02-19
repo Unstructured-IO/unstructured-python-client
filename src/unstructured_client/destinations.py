@@ -4,7 +4,6 @@ from .basesdk import BaseSDK
 from typing import Any, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
-from unstructured_client._hooks.custom.clean_server_url_hook import choose_server_url
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 
@@ -22,7 +21,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateDestinationResponse:
-        r"""Create Destination
+        r"""Create destination connector
+
+        Create a new destination connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -35,15 +36,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_DESTINATION_SERVERS[
                 operations.CREATE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateDestinationRequest)
@@ -143,7 +141,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateDestinationResponse:
-        r"""Create Destination
+        r"""Create destination connector
+
+        Create a new destination connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -156,15 +156,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_DESTINATION_SERVERS[
                 operations.CREATE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateDestinationRequest)
@@ -264,7 +261,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteDestinationResponse:
-        r"""Delete Destination
+        r"""Delete destination connector
+
+        Delete a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -277,15 +276,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_DESTINATION_SERVERS[
                 operations.DELETE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteDestinationRequest)
@@ -376,7 +372,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteDestinationResponse:
-        r"""Delete Destination
+        r"""Delete destination connector
+
+        Delete a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -389,15 +387,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_DESTINATION_SERVERS[
                 operations.DELETE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteDestinationRequest)
@@ -487,7 +482,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetDestinationResponse:
-        r"""Get Destination
+        r"""Get destination connector
+
+        Retrieve detailed information for a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -500,15 +497,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_DESTINATION_SERVERS[
                 operations.GET_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetDestinationRequest)
@@ -600,7 +594,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetDestinationResponse:
-        r"""Get Destination
+        r"""Get destination connector
+
+        Retrieve detailed information for a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -613,15 +609,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_DESTINATION_SERVERS[
                 operations.GET_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetDestinationRequest)
@@ -714,7 +707,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListDestinationsResponse:
-        r"""List Destinations
+        r"""List destination connectors
+
+        Retrieve a list of available destination connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -727,15 +722,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_DESTINATIONS_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_DESTINATIONS_SERVERS[
                 operations.LIST_DESTINATIONS_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListDestinationsRequest)
@@ -829,7 +821,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListDestinationsResponse:
-        r"""List Destinations
+        r"""List destination connectors
+
+        Retrieve a list of available destination connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -842,15 +836,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_DESTINATIONS_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_DESTINATIONS_SERVERS[
                 operations.LIST_DESTINATIONS_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListDestinationsRequest)
@@ -944,7 +935,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateDestinationResponse:
-        r"""Update Destination
+        r"""Update destination connector
+
+        Update the configuration of an existing destination connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -957,15 +950,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_DESTINATION_SERVERS[
                 operations.UPDATE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateDestinationRequest)
@@ -1065,7 +1055,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateDestinationResponse:
-        r"""Update Destination
+        r"""Update destination connector
+
+        Update the configuration of an existing destination connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1078,15 +1070,12 @@ class Destinations(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_DESTINATION_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_DESTINATION_SERVERS[
                 operations.UPDATE_DESTINATION_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateDestinationRequest)

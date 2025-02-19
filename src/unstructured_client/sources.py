@@ -4,7 +4,6 @@ from .basesdk import BaseSDK
 from typing import Any, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
-from unstructured_client._hooks.custom.clean_server_url_hook import choose_server_url
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 
@@ -21,7 +20,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateSourceResponse:
-        r"""Create Source
+        r"""Create source connector
+
+        Create a new source connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -34,15 +35,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_SOURCE_SERVERS[
                 operations.CREATE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -141,7 +139,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateSourceResponse:
-        r"""Create Source
+        r"""Create source connector
+
+        Create a new source connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -154,15 +154,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_SOURCE_SERVERS[
                 operations.CREATE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -261,7 +258,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteSourceResponse:
-        r"""Delete Source
+        r"""Delete source connector
+
+        Delete a specific source connector identified by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -274,15 +273,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_SOURCE_SERVERS[
                 operations.DELETE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -372,7 +368,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteSourceResponse:
-        r"""Delete Source
+        r"""Delete source connector
+
+        Delete a specific source connector identified by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -385,15 +383,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_SOURCE_SERVERS[
                 operations.DELETE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -483,7 +478,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetSourceResponse:
-        r"""Get Source
+        r"""Get source connector
+
+        Retrieve detailed information for a specific source connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -496,15 +493,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_SOURCE_SERVERS[
                 operations.GET_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -596,7 +590,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetSourceResponse:
-        r"""Get Source
+        r"""Get source connector
+
+        Retrieve detailed information for a specific source connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -609,15 +605,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_SOURCE_SERVERS[
                 operations.GET_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -709,7 +702,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListSourcesResponse:
-        r"""List Sources
+        r"""List available source connectors
+
+        Retrieve a list of available source connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -722,15 +717,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_SOURCES_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_SOURCES_SERVERS[
                 operations.LIST_SOURCES_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -822,7 +814,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListSourcesResponse:
-        r"""List Sources
+        r"""List available source connectors
+
+        Retrieve a list of available source connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -835,15 +829,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_SOURCES_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_SOURCES_SERVERS[
                 operations.LIST_SOURCES_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -935,7 +926,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateSourceResponse:
-        r"""Update Source
+        r"""Update source connector
+
+        Update the configuration of an existing source connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -948,15 +941,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_SOURCE_SERVERS[
                 operations.UPDATE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)
@@ -1055,7 +1045,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateSourceResponse:
-        r"""Update Source
+        r"""Update source connector
+
+        Update the configuration of an existing source connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1068,15 +1060,12 @@ class Sources(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_SOURCE_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_SOURCE_SERVERS[
                 operations.UPDATE_SOURCE_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)

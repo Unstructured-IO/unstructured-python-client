@@ -4,7 +4,6 @@ from .basesdk import BaseSDK
 from typing import Any, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import HookContext
-from unstructured_client._hooks.custom.clean_server_url_hook import choose_server_url
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 
@@ -23,6 +22,8 @@ class Workflows(BaseSDK):
     ) -> operations.CreateWorkflowResponse:
         r"""Create Workflow
 
+        Create a new workflow, either custom or auto, and configure its settings.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -34,15 +35,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_WORKFLOW_SERVERS[
                 operations.CREATE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateWorkflowRequest)
@@ -139,6 +137,8 @@ class Workflows(BaseSDK):
     ) -> operations.CreateWorkflowResponse:
         r"""Create Workflow
 
+        Create a new workflow, either custom or auto, and configure its settings.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -150,15 +150,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.CREATE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.CREATE_WORKFLOW_SERVERS[
                 operations.CREATE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateWorkflowRequest)
@@ -255,6 +252,8 @@ class Workflows(BaseSDK):
     ) -> operations.DeleteWorkflowResponse:
         r"""Delete Workflow
 
+        Delete a workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -266,15 +265,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_WORKFLOW_SERVERS[
                 operations.DELETE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteWorkflowRequest)
@@ -366,6 +362,8 @@ class Workflows(BaseSDK):
     ) -> operations.DeleteWorkflowResponse:
         r"""Delete Workflow
 
+        Delete a workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -377,15 +375,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.DELETE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.DELETE_WORKFLOW_SERVERS[
                 operations.DELETE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteWorkflowRequest)
@@ -477,6 +472,8 @@ class Workflows(BaseSDK):
     ) -> operations.GetWorkflowResponse:
         r"""Get Workflow
 
+        Retrieve detailed information for a specific workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -488,15 +485,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_WORKFLOW_SERVERS[
                 operations.GET_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetWorkflowRequest)
@@ -590,6 +584,8 @@ class Workflows(BaseSDK):
     ) -> operations.GetWorkflowResponse:
         r"""Get Workflow
 
+        Retrieve detailed information for a specific workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -601,15 +597,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.GET_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.GET_WORKFLOW_SERVERS[
                 operations.GET_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetWorkflowRequest)
@@ -703,6 +696,8 @@ class Workflows(BaseSDK):
     ) -> operations.ListWorkflowsResponse:
         r"""List Workflows
 
+        Retrieve a list of workflows, optionally filtered by source, destination, or state.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -714,15 +709,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_WORKFLOWS_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_WORKFLOWS_SERVERS[
                 operations.LIST_WORKFLOWS_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListWorkflowsRequest)
@@ -816,6 +808,8 @@ class Workflows(BaseSDK):
     ) -> operations.ListWorkflowsResponse:
         r"""List Workflows
 
+        Retrieve a list of workflows, optionally filtered by source, destination, or state.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -827,15 +821,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.LIST_WORKFLOWS_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.LIST_WORKFLOWS_SERVERS[
                 operations.LIST_WORKFLOWS_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListWorkflowsRequest)
@@ -929,6 +920,8 @@ class Workflows(BaseSDK):
     ) -> operations.RunWorkflowResponse:
         r"""Run Workflow
 
+        Run a workflow by triggering a new job if none is currently active.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -940,15 +933,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.RUN_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.RUN_WORKFLOW_SERVERS[
                 operations.RUN_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.RunWorkflowRequest)
@@ -1042,6 +1032,8 @@ class Workflows(BaseSDK):
     ) -> operations.RunWorkflowResponse:
         r"""Run Workflow
 
+        Run a workflow by triggering a new job if none is currently active.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1053,15 +1045,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.RUN_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.RUN_WORKFLOW_SERVERS[
                 operations.RUN_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.RunWorkflowRequest)
@@ -1155,6 +1144,8 @@ class Workflows(BaseSDK):
     ) -> operations.UpdateWorkflowResponse:
         r"""Update Workflow
 
+        Update an existing workflow's name, connectors, schedule, or workflow type.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1166,15 +1157,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_WORKFLOW_SERVERS[
                 operations.UPDATE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateWorkflowRequest)
@@ -1271,6 +1259,8 @@ class Workflows(BaseSDK):
     ) -> operations.UpdateWorkflowResponse:
         r"""Update Workflow
 
+        Update an existing workflow's name, connectors, schedule, or workflow type.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1282,15 +1272,12 @@ class Workflows(BaseSDK):
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        client_url, *_ = self.sdk_configuration.get_server_details()
-
-        base_url = choose_server_url(
-            endpoint_url=server_url,
-            client_url=client_url,
-            default_endpoint_url=operations.UPDATE_WORKFLOW_SERVERS[
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = operations.UPDATE_WORKFLOW_SERVERS[
                 operations.UPDATE_WORKFLOW_SERVER_PLATFORM_API
             ]
-        )
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateWorkflowRequest)
