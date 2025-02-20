@@ -1,4 +1,4 @@
-# CreateWorkflowSchedule
+# UpdateWorkflowSchedule
 
 
 ## Values

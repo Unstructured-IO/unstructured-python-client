@@ -14,7 +14,7 @@ from unstructured_client.types import (
 )
 
 
-class Schedule(str, Enum):
+class UpdateWorkflowSchedule(str, Enum):
     EVERY_15_MINUTES = "every 15 minutes"
     EVERY_HOUR = "every hour"
     EVERY_2_HOURS = "every 2 hours"
@@ -31,7 +31,7 @@ class Schedule(str, Enum):
 class UpdateWorkflowTypedDict(TypedDict):
     destination_id: NotRequired[Nullable[str]]
     name: NotRequired[Nullable[str]]
-    schedule: NotRequired[Nullable[Schedule]]
+    schedule: NotRequired[Nullable[UpdateWorkflowSchedule]]
     source_id: NotRequired[Nullable[str]]
     workflow_type: NotRequired[Nullable[WorkflowType]]
 
@@ -41,7 +41,7 @@ class UpdateWorkflow(BaseModel):
 
     name: OptionalNullable[str] = UNSET
 
-    schedule: OptionalNullable[Schedule] = UNSET
+    schedule: OptionalNullable[UpdateWorkflowSchedule] = UNSET
 
     source_id: OptionalNullable[str] = UNSET
 
