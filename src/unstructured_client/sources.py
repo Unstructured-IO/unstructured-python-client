@@ -20,7 +20,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateSourceResponse:
-        r"""Create Source
+        r"""Create source connector
+
+        Create a new source connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -137,7 +139,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateSourceResponse:
-        r"""Create Source
+        r"""Create source connector
+
+        Create a new source connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -254,7 +258,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteSourceResponse:
-        r"""Delete Source
+        r"""Delete source connector
+
+        Delete a specific source connector identified by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -362,7 +368,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteSourceResponse:
-        r"""Delete Source
+        r"""Delete source connector
+
+        Delete a specific source connector identified by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -470,7 +478,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetSourceResponse:
-        r"""Get Source
+        r"""Get source connector
+
+        Retrieve detailed information for a specific source connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -580,7 +590,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetSourceResponse:
-        r"""Get Source
+        r"""Get source connector
+
+        Retrieve detailed information for a specific source connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -690,7 +702,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListSourcesResponse:
-        r"""List Sources
+        r"""List available source connectors
+
+        Retrieve a list of available source connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -800,7 +814,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListSourcesResponse:
-        r"""List Sources
+        r"""List available source connectors
+
+        Retrieve a list of available source connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -910,7 +926,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateSourceResponse:
-        r"""Update Source
+        r"""Update source connector
+
+        Update the configuration of an existing source connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1027,7 +1045,9 @@ class Sources(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateSourceResponse:
-        r"""Update Source
+        r"""Update source connector
+
+        Update the configuration of an existing source connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method

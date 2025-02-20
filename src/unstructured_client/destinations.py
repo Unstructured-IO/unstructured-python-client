@@ -21,7 +21,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateDestinationResponse:
-        r"""Create Destination
+        r"""Create destination connector
+
+        Create a new destination connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -139,7 +141,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateDestinationResponse:
-        r"""Create Destination
+        r"""Create destination connector
+
+        Create a new destination connector using the provided configuration and name.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -257,7 +261,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteDestinationResponse:
-        r"""Delete Destination
+        r"""Delete destination connector
+
+        Delete a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -366,7 +372,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.DeleteDestinationResponse:
-        r"""Delete Destination
+        r"""Delete destination connector
+
+        Delete a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -474,7 +482,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetDestinationResponse:
-        r"""Get Destination
+        r"""Get destination connector
+
+        Retrieve detailed information for a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -584,7 +594,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetDestinationResponse:
-        r"""Get Destination
+        r"""Get destination connector
+
+        Retrieve detailed information for a specific destination connector by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -695,7 +707,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListDestinationsResponse:
-        r"""List Destinations
+        r"""List destination connectors
+
+        Retrieve a list of available destination connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -807,7 +821,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListDestinationsResponse:
-        r"""List Destinations
+        r"""List destination connectors
+
+        Retrieve a list of available destination connectors.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -919,7 +935,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateDestinationResponse:
-        r"""Update Destination
+        r"""Update destination connector
+
+        Update the configuration of an existing destination connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1037,7 +1055,9 @@ class Destinations(BaseSDK):
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateDestinationResponse:
-        r"""Update Destination
+        r"""Update destination connector
+
+        Update the configuration of an existing destination connector.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method

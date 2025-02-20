@@ -8,3 +8,6 @@ _test_unstructured_client
 
 # ignore Makefile
 Makefile
+
+# Ignore the general.partition code until we can fix the base_url issue
+src/unstructured_client/general.py
