@@ -5,11 +5,7 @@ from .createdestinationconnector import (
     CreateDestinationConnectorTypedDict,
 )
 from .createsourceconnector import CreateSourceConnector, CreateSourceConnectorTypedDict
-from .createworkflow import (
-    CreateWorkflow,
-    CreateWorkflowSchedule,
-    CreateWorkflowTypedDict,
-)
+from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
 from .crontabentry import CronTabEntry, CronTabEntryTypedDict
 from .destinationconnectorinformation import (
     DestinationConnectorInformation,
@@ -36,7 +32,11 @@ from .updatedestinationconnector import (
     UpdateDestinationConnectorTypedDict,
 )
 from .updatesourceconnector import UpdateSourceConnector, UpdateSourceConnectorTypedDict
-from .updateworkflow import Schedule, UpdateWorkflow, UpdateWorkflowTypedDict
+from .updateworkflow import (
+    UpdateWorkflow,
+    UpdateWorkflowSchedule,
+    UpdateWorkflowTypedDict,
+)
 from .validationerror import (
     Loc,
     LocTypedDict,
@@ -62,7 +62,6 @@ __all__ = [
     "CreateSourceConnector",
     "CreateSourceConnectorTypedDict",
     "CreateWorkflow",
-    "CreateWorkflowSchedule",
     "CreateWorkflowTypedDict",
     "CronTabEntry",
     "CronTabEntryTypedDict",
@@ -92,6 +91,7 @@ __all__ = [
     "UpdateSourceConnector",
     "UpdateSourceConnectorTypedDict",
     "UpdateWorkflow",
+    "UpdateWorkflowSchedule",
     "UpdateWorkflowTypedDict",
     "ValidationError",
     "ValidationErrorTypedDict",

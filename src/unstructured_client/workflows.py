@@ -22,6 +22,8 @@ class Workflows(BaseSDK):
     ) -> operations.CreateWorkflowResponse:
         r"""Create Workflow
 
+        Create a new workflow, either custom or auto, and configure its settings.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -134,6 +136,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.CreateWorkflowResponse:
         r"""Create Workflow
+
+        Create a new workflow, either custom or auto, and configure its settings.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -248,6 +252,8 @@ class Workflows(BaseSDK):
     ) -> operations.DeleteWorkflowResponse:
         r"""Delete Workflow
 
+        Delete a workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -356,6 +362,8 @@ class Workflows(BaseSDK):
     ) -> operations.DeleteWorkflowResponse:
         r"""Delete Workflow
 
+        Delete a workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -463,6 +471,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetWorkflowResponse:
         r"""Get Workflow
+
+        Retrieve detailed information for a specific workflow by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -574,6 +584,8 @@ class Workflows(BaseSDK):
     ) -> operations.GetWorkflowResponse:
         r"""Get Workflow
 
+        Retrieve detailed information for a specific workflow by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -683,6 +695,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListWorkflowsResponse:
         r"""List Workflows
+
+        Retrieve a list of workflows, optionally filtered by source, destination, or state.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -794,6 +808,8 @@ class Workflows(BaseSDK):
     ) -> operations.ListWorkflowsResponse:
         r"""List Workflows
 
+        Retrieve a list of workflows, optionally filtered by source, destination, or state.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -903,6 +919,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.RunWorkflowResponse:
         r"""Run Workflow
+
+        Run a workflow by triggering a new job if none is currently active.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1014,6 +1032,8 @@ class Workflows(BaseSDK):
     ) -> operations.RunWorkflowResponse:
         r"""Run Workflow
 
+        Run a workflow by triggering a new job if none is currently active.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1123,6 +1143,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateWorkflowResponse:
         r"""Update Workflow
+
+        Update an existing workflow's name, connectors, schedule, or workflow type.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -1236,6 +1258,8 @@ class Workflows(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.UpdateWorkflowResponse:
         r"""Update Workflow
+
+        Update an existing workflow's name, connectors, schedule, or workflow type.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
