@@ -17,7 +17,7 @@ def platform_api_url():
 def client(platform_api_url) -> UnstructuredClient:
     _client = UnstructuredClient(
         api_key_auth=FAKE_API_KEY,
-        server_url="platform-api",
+        server_url=platform_api_url,
         retry_config=RetryConfig(
             strategy="backoff",
             retry_connection_errors=False,
