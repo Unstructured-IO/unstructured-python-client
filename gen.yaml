@@ -4,15 +4,16 @@ generation:
   usageSnippets:
     optionalPropertyRendering: withExample
   fixes:
-    nameResolutionFeb2025: false
+    nameResolutionDec2023: false
     parameterOrderingFeb2024: false
     requestResponseComponentNamesFeb2024: false
     securityFeb2025: false
+    nameResolutionFeb2025: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.30.3
+  version: 0.30.4
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'

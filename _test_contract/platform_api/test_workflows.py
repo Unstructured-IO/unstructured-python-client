@@ -25,6 +25,7 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
                 "sources": [
                     "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
                 ],
+                "workflow_nodes": [],
                 "status": "active",
                 "workflow_type": "advanced",
             }
@@ -131,6 +132,7 @@ def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             "sources": [
                 "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
             ],
+            "workflow_nodes": [],
             "status": "active",
             "workflow_type": "advanced",
         },
@@ -175,6 +177,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
             "sources": [
                 "f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c",
             ],
+            "workflow_nodes": [],
             "status": "active",
             "workflow_type": "advanced",
         },
@@ -234,6 +237,7 @@ def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: 
             "destinations": [
                 "aeebecc7-9d8e-4625-bf1d-815c2f084869",
             ],
+            "workflow_nodes": [],
             "status": "active",
             "workflow_type": "platinum",
         },

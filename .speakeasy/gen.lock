@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: ecf43991e66b0e7217a77239ed0a1da9
+  docChecksum: 622461ba121cc2a105e29eab97b6bee3
   docVersion: 1.0.68
-  speakeasyVersion: 1.498.1
-  generationVersion: 2.518.1
-  releaseVersion: 0.30.3
-  configChecksum: 8f8960cde56a4a3e94f39254a7afa405
+  speakeasyVersion: 1.490.0
+  generationVersion: 2.512.0
+  releaseVersion: 0.30.4
+  configChecksum: 87e53f0ca57296c4cae62d4792edc2cf
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -27,11 +27,11 @@ features:
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
-    nullables: 1.0.1
+    nullables: 1.0.0
     openEnums: 1.0.0
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.1
+    sdkHooks: 1.0.0
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
@@ -83,28 +83,98 @@ generatedFiles:
   - docs/models/operations/updatesourceresponse.md
   - docs/models/operations/updateworkflowrequest.md
   - docs/models/operations/updateworkflowresponse.md
+  - docs/models/shared/astradbconnectorconfig.md
+  - docs/models/shared/astradbconnectorconfiginput.md
+  - docs/models/shared/azureaisearchconnectorconfig.md
+  - docs/models/shared/azureaisearchconnectorconfiginput.md
+  - docs/models/shared/azuresourceconnectorconfig.md
+  - docs/models/shared/azuresourceconnectorconfiginput.md
+  - docs/models/shared/config.md
+  - docs/models/shared/confluencesourceconnectorconfig.md
+  - docs/models/shared/confluencesourceconnectorconfiginput.md
+  - docs/models/shared/couchbasedestinationconnectorconfig.md
+  - docs/models/shared/couchbasedestinationconnectorconfiginput.md
+  - docs/models/shared/couchbasesourceconnectorconfig.md
+  - docs/models/shared/couchbasesourceconnectorconfiginput.md
   - docs/models/shared/createdestinationconnector.md
   - docs/models/shared/createsourceconnector.md
+  - docs/models/shared/createsourceconnectorconfig.md
   - docs/models/shared/createworkflow.md
   - docs/models/shared/crontabentry.md
+  - docs/models/shared/databricksvdtdestinationconnectorconfig.md
+  - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
+  - docs/models/shared/databricksvolumesconnectorconfig.md
+  - docs/models/shared/databricksvolumesconnectorconfiginput.md
+  - docs/models/shared/deltatableconnectorconfig.md
+  - docs/models/shared/deltatableconnectorconfiginput.md
   - docs/models/shared/destinationconnectorinformation.md
+  - docs/models/shared/destinationconnectorinformationconfig.md
   - docs/models/shared/destinationconnectortype.md
+  - docs/models/shared/dropboxsourceconnectorconfig.md
+  - docs/models/shared/dropboxsourceconnectorconfiginput.md
+  - docs/models/shared/elasticsearchconnectorconfig.md
+  - docs/models/shared/elasticsearchconnectorconfiginput.md
   - docs/models/shared/files.md
+  - docs/models/shared/gcsdestinationconnectorconfig.md
+  - docs/models/shared/gcsdestinationconnectorconfiginput.md
+  - docs/models/shared/gcssourceconnectorconfig.md
+  - docs/models/shared/gcssourceconnectorconfiginput.md
+  - docs/models/shared/googledrivesourceconnectorconfig.md
+  - docs/models/shared/googledrivesourceconnectorconfiginput.md
   - docs/models/shared/jobinformation.md
+  - docs/models/shared/kafkaclouddestinationconnectorconfig.md
+  - docs/models/shared/kafkaclouddestinationconnectorconfiginput.md
+  - docs/models/shared/kafkacloudsourceconnectorconfig.md
+  - docs/models/shared/kafkacloudsourceconnectorconfiginput.md
   - docs/models/shared/loc.md
+  - docs/models/shared/milvusdestinationconnectorconfig.md
+  - docs/models/shared/milvusdestinationconnectorconfiginput.md
+  - docs/models/shared/mongodbconnectorconfig.md
+  - docs/models/shared/mongodbconnectorconfiginput.md
+  - docs/models/shared/neo4jdestinationconnectorconfig.md
+  - docs/models/shared/neo4jdestinationconnectorconfiginput.md
+  - docs/models/shared/onedrivedestinationconnectorconfig.md
+  - docs/models/shared/onedrivedestinationconnectorconfiginput.md
+  - docs/models/shared/onedrivesourceconnectorconfig.md
+  - docs/models/shared/onedrivesourceconnectorconfiginput.md
+  - docs/models/shared/outlooksourceconnectorconfig.md
+  - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/postgresdestinationconnectorconfig.md
+  - docs/models/shared/postgresdestinationconnectorconfiginput.md
+  - docs/models/shared/qdrantclouddestinationconnectorconfig.md
+  - docs/models/shared/qdrantclouddestinationconnectorconfiginput.md
+  - docs/models/shared/redisdestinationconnectorconfig.md
+  - docs/models/shared/redisdestinationconnectorconfiginput.md
+  - docs/models/shared/s3destinationconnectorconfig.md
+  - docs/models/shared/s3destinationconnectorconfiginput.md
+  - docs/models/shared/s3sourceconnectorconfig.md
+  - docs/models/shared/s3sourceconnectorconfiginput.md
+  - docs/models/shared/salesforcesourceconnectorconfig.md
+  - docs/models/shared/salesforcesourceconnectorconfiginput.md
   - docs/models/shared/schedule.md
   - docs/models/shared/security.md
   - docs/models/shared/settings.md
+  - docs/models/shared/sharepointsourceconnectorconfig.md
+  - docs/models/shared/sharepointsourceconnectorconfiginput.md
+  - docs/models/shared/snowflakedestinationconnectorconfig.md
+  - docs/models/shared/snowflakedestinationconnectorconfiginput.md
+  - docs/models/shared/snowflakesourceconnectorconfig.md
+  - docs/models/shared/snowflakesourceconnectorconfiginput.md
   - docs/models/shared/sourceconnectorinformation.md
+  - docs/models/shared/sourceconnectorinformationconfig.md
   - docs/models/shared/sourceconnectortype.md
   - docs/models/shared/strategy.md
   - docs/models/shared/updatedestinationconnector.md
+  - docs/models/shared/updatedestinationconnectorconfig.md
   - docs/models/shared/updatesourceconnector.md
+  - docs/models/shared/updatesourceconnectorconfig.md
   - docs/models/shared/updateworkflow.md
   - docs/models/shared/updateworkflowschedule.md
   - docs/models/shared/validationerror.md
+  - docs/models/shared/weaviatedestinationconnectorconfig.md
+  - docs/models/shared/weaviatedestinationconnectorconfiginput.md
   - docs/models/shared/workflowinformation.md
   - docs/models/shared/workflownode.md
   - docs/models/shared/workflownodetype.md
@@ -159,21 +229,85 @@ generatedFiles:
   - src/unstructured_client/models/operations/update_source.py
   - src/unstructured_client/models/operations/update_workflow.py
   - src/unstructured_client/models/shared/__init__.py
+  - src/unstructured_client/models/shared/astradbconnectorconfig.py
+  - src/unstructured_client/models/shared/astradbconnectorconfiginput.py
+  - src/unstructured_client/models/shared/azureaisearchconnectorconfig.py
+  - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
+  - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
+  - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/confluencesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/createdestinationconnector.py
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
   - src/unstructured_client/models/shared/crontabentry.py
+  - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py
+  - src/unstructured_client/models/shared/databricksvolumesconnectorconfiginput.py
+  - src/unstructured_client/models/shared/deltatableconnectorconfig.py
+  - src/unstructured_client/models/shared/deltatableconnectorconfiginput.py
   - src/unstructured_client/models/shared/destinationconnectorinformation.py
   - src/unstructured_client/models/shared/destinationconnectortype.py
+  - src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py
+  - src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
+  - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
+  - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/gcsdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/gcssourceconnectorconfig.py
+  - src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/jobinformation.py
+  - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py
+  - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/mongodbconnectorconfig.py
+  - src/unstructured_client/models/shared/mongodbconnectorconfiginput.py
+  - src/unstructured_client/models/shared/neo4jdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/neo4jdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/onedrivedestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/onedrivedestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/onedrivesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/onedrivesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
+  - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/postgresdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/redisdestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/redisdestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/s3destinationconnectorconfig.py
+  - src/unstructured_client/models/shared/s3destinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/s3sourceconnectorconfig.py
+  - src/unstructured_client/models/shared/s3sourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/salesforcesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/salesforcesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/security.py
+  - src/unstructured_client/models/shared/sharepointsourceconnectorconfig.py
+  - src/unstructured_client/models/shared/sharepointsourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/snowflakedestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/snowflakedestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/snowflakesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/snowflakesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/sourceconnectorinformation.py
   - src/unstructured_client/models/shared/sourceconnectortype.py
   - src/unstructured_client/models/shared/updatedestinationconnector.py
   - src/unstructured_client/models/shared/updatesourceconnector.py
   - src/unstructured_client/models/shared/updateworkflow.py
   - src/unstructured_client/models/shared/validationerror.py
+  - src/unstructured_client/models/shared/weaviatedestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/workflowinformation.py
   - src/unstructured_client/models/shared/workflownode.py
   - src/unstructured_client/models/shared/workflownodetype.py
@@ -206,12 +340,12 @@ examples:
   create_destination:
     speakeasy-default-create-destination:
       requestBody:
-        application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "name": "<value>", "type": "astradb"}
+        application/json: {"config": {"endpoint": "<value>", "index": "<value>", "key": "<key>"}, "name": "<value>", "type": "astradb"}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-11-15T01:07:46.428Z", "id": "05b94b3c-bed9-4976-bf02-38635119a590", "name": "<value>", "type": "databricks_volumes"}
+          application/json: {"config": {"api_endpoint": "<value>", "batch_size": 811497, "collection_name": "<value>", "token": "<value>"}, "created_at": "2023-11-15T01:07:46.428Z", "id": "05b94b3c-bed9-4976-bf02-38635119a590", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": []}
   delete_destination:
     speakeasy-default-delete-destination:
       parameters:
@@ -231,16 +365,16 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
+          application/json: {"config": {"catalog": "<value>", "database": "<value>", "table_name": "<value>", "volume": "<value>"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [939869, 667498, "<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
         "200":
-          application/json: [{"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
+          application/json: [{"config": {"aws_access_key_id": "<id>", "aws_region": "<value>", "aws_secret_access_key": "<value>", "table_uri": "https://authorized-saw.biz"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [800205, "<value>", 473062], "msg": "<value>", "type": "<value>"}]}
   update_destination:
     speakeasy-default-update-destination:
       parameters:
@@ -248,10 +382,10 @@ examples:
           destination_id: "0a0ddfee-087e-467d-abcc-fdb6451a6e6f"
         header: {}
       requestBody:
-        application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
+        application/json: {"config": {"batch_size": 7372, "database": "<value>", "host": "pushy-apparatus.net", "password": "sxtPKvIMqbllzrd", "port": 432315, "table_name": "<value>", "username": "Dulce38"}}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2025-01-09T05:32:50.655Z", "id": "9d27c4e2-ecb5-4a69-971b-d7ec9d2266e1", "name": "<value>", "type": "postgres"}
+          application/json: {"config": {"remote_url": "https://pointed-tennis.net", "service_account_key": "<value>"}, "created_at": "2025-01-09T05:32:50.655Z", "id": "9d27c4e2-ecb5-4a69-971b-d7ec9d2266e1", "name": "<value>", "type": "postgres"}
         "422":
           application/json: {"detail": "<value>"}
   cancel_job:
@@ -291,7 +425,7 @@ examples:
         "200":
           application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-04-25T02:02:10.136Z", "id": "18d86009-3eb2-422a-a875-93c814e4cdc9", "name": "<value>", "type": "dropbox"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": "<value>"}
   delete_source:
     speakeasy-default-delete-source:
       parameters:
@@ -313,14 +447,14 @@ examples:
         "200":
           application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}, "created_at": "2023-05-26T11:39:22.869Z", "id": "24daedf6-4f76-49d1-a6af-bb58044f8cfd", "name": "<value>", "type": "sharepoint"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": "<value>"}
   list_sources:
     speakeasy-default-list-sources:
       responses:
         "200":
-          application/json: [{"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2024-12-15T10:13:09.959Z", "id": "15d41617-7a0e-4086-a5e8-6f398ce15adf", "name": "<value>", "type": "postgres"}]
+          application/json: [{"config": {"recursive": true, "remote_url": "https://caring-forager.net", "token": "<value>"}, "created_at": "2024-12-15T10:13:09.959Z", "id": "15d41617-7a0e-4086-a5e8-6f398ce15adf", "name": "<value>", "type": "postgres"}]
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [312491], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   update_source:
     speakeasy-default-update-source:
       parameters:
@@ -331,7 +465,7 @@ examples:
         application/json: {"config": {"batch_size": 100, "bucket": "bucket-name", "collection": "collection_name", "collection_id": "type", "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com", "password": "password", "scope": "scope_name", "username": "username"}}
       responses:
         "200":
-          application/json: {"config": {"account_key": "azure_account_key", "account_name": "azure_account_name", "anonymous": false, "recursive": true, "remote_url": "az://<path></path></container-name>"}, "created_at": "2025-05-26T03:32:19.957Z", "id": "439e8ef6-c69c-49e3-9ba7-a8418be7cbe9", "name": "<value>", "type": "snowflake"}
+          application/json: {"config": {"client_cred": "<value>", "client_id": "<id>", "recursive": true, "user_email": "<value>"}, "created_at": "2025-05-26T03:32:19.957Z", "id": "439e8ef6-c69c-49e3-9ba7-a8418be7cbe9", "name": "<value>", "type": "snowflake"}
         "422":
           application/json: {"detail": "<value>"}
   create_workflow:
@@ -340,7 +474,7 @@ examples:
         application/json: {"destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38", "name": "<value>", "schedule": "every 15 minutes", "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec", "workflow_type": "platinum"}
       responses:
         "200":
-          application/json: {"created_at": "2025-06-03T14:40:43.213Z", "destinations": ["7a3141b6-19c5-4d0d-aa5f-5edb0b22f19c", "e4d2c1c2-a0f5-404c-b37f-b0f07c5417c9"], "id": "2569dec8-72ff-4e46-b78b-ffe279bdaafc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47b1728b-a663-4345-8bae-a1ae67a567f1"], "status": "active", "workflow_type": "advanced"}
+          application/json: {"created_at": "2025-06-03T14:40:43.213Z", "destinations": ["7a3141b6-19c5-4d0d-aa5f-5edb0b22f19c", "e4d2c1c2-a0f5-404c-b37f-b0f07c5417c9"], "id": "2569dec8-72ff-4e46-b78b-ffe279bdaafc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47b1728b-a663-4345-8bae-a1ae67a567f1"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "prompter"}, {"name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "advanced"}
         "422":
           application/json: {"detail": "<value>"}
   delete_workflow:
@@ -362,14 +496,14 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"created_at": "2023-05-27T02:17:56.472Z", "destinations": [], "id": "5781a90a-c5ba-41a1-ac38-4b031d1d247d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["1ecf852c-a41e-4193-b8ae-7afe4e642c1d", "73825739-ddfe-44a7-b2e9-6adc9e5972ee", "32976128-e157-4711-b160-6c7e63baa0cb"], "status": "inactive", "workflow_type": "platinum"}
+          application/json: {"created_at": "2023-05-27T02:17:56.472Z", "destinations": [], "id": "5781a90a-c5ba-41a1-ac38-4b031d1d247d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["1ecf852c-a41e-4193-b8ae-7afe4e642c1d", "73825739-ddfe-44a7-b2e9-6adc9e5972ee", "32976128-e157-4711-b160-6c7e63baa0cb"], "status": "inactive", "workflow_nodes": [], "workflow_type": "platinum"}
         "422":
           application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
   list_workflows:
     speakeasy-default-list-workflows:
       responses:
         "200":
-          application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_type": "advanced"}]
+          application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "embed"}], "workflow_type": "advanced"}]
         "422":
           application/json: {"detail": [{"loc": [931730, 730320, 769892], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 862351, 882715], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
@@ -380,7 +514,7 @@ examples:
         header: {}
       responses:
         "202":
-          application/json: {"created_at": "2024-08-04T10:06:22.481Z", "destinations": [], "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"], "status": "inactive", "workflow_type": "custom"}
+          application/json: {"created_at": "2024-08-04T10:06:22.481Z", "destinations": [], "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "custom"}
         "422":
           application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [397022, 604524], "msg": "<value>", "type": "<value>"}]}
   update_workflow:
@@ -393,7 +527,7 @@ examples:
         application/json: {}
       responses:
         "200":
-          application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_type": "platinum"}
+          application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "prompter"}, {"name": "<value>", "subtype": "<value>", "type": "partition"}], "workflow_type": "platinum"}
         "422":
           application/json: {"detail": "<value>"}
   partition:

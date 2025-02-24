@@ -26,11 +26,9 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "account_key": "azure_account_key",
-                "account_name": "azure_account_name",
-                "anonymous": False,
-                "recursive": True,
-                "remote_url": "az://<path></path></container-name>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
             "type": shared.DestinationConnectorType.ASTRADB,
@@ -198,14 +196,13 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.update_destination(request={
         "update_destination_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection": "collection_name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "scope": "scope_name",
-                "username": "username",
+                "batch_size": 7372,
+                "database": "<value>",
+                "host": "pushy-apparatus.net",
+                "password": "sxtPKvIMqbllzrd",
+                "port": 432315,
+                "table_name": "<value>",
+                "username": "Dulce38",
             },
         },
         "destination_id": "0a0ddfee-087e-467d-abcc-fdb6451a6e6f",
