@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: eb050201e8bfff645042e3b2847104cc
+  docChecksum: 622461ba121cc2a105e29eab97b6bee3
   docVersion: 1.0.68
-  speakeasyVersion: 1.501.0
-  generationVersion: 2.522.1
-  releaseVersion: 0.31.0
-  configChecksum: faf5191e78f1597b78cd7600af4f1d96
+  speakeasyVersion: 1.490.0
+  generationVersion: 2.512.0
+  releaseVersion: 0.30.4
+  configChecksum: 87e53f0ca57296c4cae62d4792edc2cf
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.12.1
+    core: 5.11.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -27,11 +27,11 @@ features:
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
-    nullables: 1.0.1
+    nullables: 1.0.0
     openEnums: 1.0.0
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.1
+    sdkHooks: 1.0.0
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
@@ -367,14 +367,14 @@ examples:
         "200":
           application/json: {"config": {"catalog": "<value>", "database": "<value>", "table_name": "<value>", "volume": "<value>"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [939869, 667498, "<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
         "200":
           application/json: [{"config": {"aws_access_key_id": "<id>", "aws_region": "<value>", "aws_secret_access_key": "<value>", "table_uri": "https://authorized-saw.biz"}, "created_at": "2023-02-24T01:08:17.980Z", "id": "c363dec3-c705-4ee0-a414-81044a6e1cc3", "name": "<value>", "type": "snowflake"}]
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [800205, "<value>", 473062], "msg": "<value>", "type": "<value>"}]}
   update_destination:
     speakeasy-default-update-destination:
       parameters:
@@ -498,14 +498,14 @@ examples:
         "200":
           application/json: {"created_at": "2023-05-27T02:17:56.472Z", "destinations": [], "id": "5781a90a-c5ba-41a1-ac38-4b031d1d247d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["1ecf852c-a41e-4193-b8ae-7afe4e642c1d", "73825739-ddfe-44a7-b2e9-6adc9e5972ee", "32976128-e157-4711-b160-6c7e63baa0cb"], "status": "inactive", "workflow_nodes": [], "workflow_type": "platinum"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
   list_workflows:
     speakeasy-default-list-workflows:
       responses:
         "200":
           application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "embed"}], "workflow_type": "advanced"}]
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": [931730, 730320, 769892], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 862351, 882715], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
     speakeasy-default-run-workflow:
       parameters:
@@ -516,7 +516,7 @@ examples:
         "202":
           application/json: {"created_at": "2024-08-04T10:06:22.481Z", "destinations": [], "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "custom"}
         "422":
-          application/json: {"detail": [{"loc": [397022, 604524], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [397022, 604524], "msg": "<value>", "type": "<value>"}]}
   update_workflow:
     speakeasy-default-update-workflow:
       parameters:
