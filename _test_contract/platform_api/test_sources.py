@@ -22,7 +22,15 @@ def test_list_sources(httpx_mock, client: UnstructuredClient, platform_api_url: 
         headers={"Content-Type": "application/json"},
         json=[
             {
-                "config": {},
+                "config": {
+                    "client_id": "foo",
+                    "tenant": "foo",
+                    "authority_url": "foo",
+                    "user_pname": "foo",
+                    "client_cred": "foo",
+                    "recursive": False,
+                    "path": "foo",
+                },
                 "created_at": "2023-09-15T01:06:53.146Z",
                 "id": "a15d4161-77a0-4e08-b65e-86f398ce15ad",
                 "name": "test_source_name",
@@ -48,7 +56,7 @@ def test_list_sources(httpx_mock, client: UnstructuredClient, platform_api_url: 
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == {}
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -114,7 +122,15 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
         method="GET",
         headers={"Content-Type": "application/json"},
         json={
-            "config": {},
+            "config": {
+                "client_id": "foo",
+                "tenant": "foo",
+                "authority_url": "foo",
+                "user_pname": "foo",
+                "client_cred": "foo",
+                "recursive": False,
+                "path": "foo",
+            },
             "created_at": "2023-09-15T01:06:53.146Z",
             "id": "a15d4161-77a0-4e08-b65e-86f398ce15ad",
             "name": "test_source_name",
@@ -138,7 +154,7 @@ def test_get_source(httpx_mock, client: UnstructuredClient, platform_api_url: st
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == {}
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -171,7 +187,15 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
         method="POST",
         headers={"Content-Type": "application/json"},
         json={
-            "config": {},
+            "config": {
+                "client_id": "foo",
+                "tenant": "foo",
+                "authority_url": "foo",
+                "user_pname": "foo",
+                "client_cred": "foo",
+                "recursive": False,
+                "path": "foo",
+            },
             "created_at": "2023-09-15T01:06:53.146Z",
             "id": "a15d4161-77a0-4e08-b65e-86f398ce15ad",
             "name": "test_source_name",
@@ -185,7 +209,14 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
             create_source_connector=shared.CreateSourceConnector(
                 name="test_source_name",
                 type=SourceConnectorType.ONEDRIVE,
-                config={},
+                config={
+                    "client_id": "foo",
+                    "tenant": "foo",
+                    "authority_url": "foo",
+                    "user_pname": "foo",
+                    "client_cred": "foo",
+                    "path": "foo",
+                },
             )
         )
     )
@@ -201,7 +232,7 @@ def test_create_source(httpx_mock, client: UnstructuredClient, platform_api_url:
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert source.config == {}
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -214,7 +245,15 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
         headers={"Content-Type": "application/json"},
         status_code=200,
         json={
-            "config": {},
+            "config": {
+                "client_id": "foo",
+                "tenant": "foo",
+                "authority_url": "foo",
+                "user_pname": "foo",
+                "client_cred": "foo",
+                "recursive": False,
+                "path": "foo",
+            },
             "created_at": "2023-09-15T01:06:53.146Z",
             "id": "a15d4161-77a0-4e08-b65e-86f398ce15ad",
             "name": "test_source_name",
@@ -227,7 +266,15 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
         request=operations.UpdateSourceRequest(
             source_id=dest_id,
             update_source_connector=shared.UpdateSourceConnector(
-                config={}
+                config={
+                    "client_id": "foo",
+                    "tenant": "foo",
+                    "authority_url": "foo",
+                    "user_pname": "foo",
+                    "client_cred": "foo",
+                    "recursive": False,
+                    "path": "foo",
+                }
             ),
         )
     )
@@ -244,7 +291,7 @@ def test_update_source(httpx_mock, client: UnstructuredClient, platform_api_url:
     assert updated_source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert updated_source.name == "test_source_name"
     assert updated_source.type == "onedrive"
-    assert updated_source.config == {}
+    assert isinstance(updated_source.config, shared.OneDriveSourceConnectorConfig)
     assert updated_source.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
