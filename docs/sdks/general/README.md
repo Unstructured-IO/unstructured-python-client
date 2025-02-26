@@ -16,7 +16,10 @@ Description
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
