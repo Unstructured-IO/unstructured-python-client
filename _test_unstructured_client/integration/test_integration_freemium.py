@@ -238,8 +238,15 @@ def test_uvloop_partitions_without_errors(client, doc_path):
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("vlm_model", ["gpt-4o"])
 @pytest.mark.parametrize("vlm_model_provider", ["openai"])
-def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider, client, doc_path):
-    filename = "layout-parser-paper-fast.pdf"
+@pytest.mark.parametrize(
+    "filename", 
+    [
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
+    ]
+)
+def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
     with open(doc_path / filename, "rb") as f:
         files = shared.Files(
             content=f.read(),
@@ -279,8 +286,15 @@ def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider,
     ]
 )
 @pytest.mark.parametrize("vlm_model_provider", ["bedrock"])
-def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider, client, doc_path):
-    filename = "layout-parser-paper-fast.pdf"
+@pytest.mark.parametrize(
+    "filename", 
+    [
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
+    ]
+)
+def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
     with open(doc_path / filename, "rb") as f:
         files = shared.Files(
             content=f.read(),
@@ -307,14 +321,17 @@ def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider
 
 
 @pytest.mark.parametrize("split_pdf", [True, False])
-@pytest.mark.parametrize("vlm_model", 
+@pytest.mark.parametrize("vlm_model", ["claude-3-5-sonnet-20241022",])
+@pytest.mark.parametrize("vlm_model_provider", ["anthropic"])
+@pytest.mark.parametrize(
+    "filename", 
     [
-        "claude-3-5-sonnet-20241022",
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
     ]
 )
-@pytest.mark.parametrize("vlm_model_provider", ["anthropic"])
-def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provider, client, doc_path):
-    filename = "layout-parser-paper-fast.pdf"
+def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
     with open(doc_path / filename, "rb") as f:
         files = shared.Files(
             content=f.read(),
