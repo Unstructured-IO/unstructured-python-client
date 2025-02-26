@@ -22,7 +22,9 @@ Create a new workflow, either custom or auto, and configure its settings.
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.create_workflow(request={
         "create_workflow": {
@@ -69,7 +71,9 @@ Delete a workflow by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.delete_workflow(request={
         "workflow_id": "26c0bd77-269e-4239-86b8-71541359440c",
@@ -110,7 +114,9 @@ Retrieve detailed information for a specific workflow by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.get_workflow(request={
         "workflow_id": "270d9bb5-13f1-4e4d-bb84-4bcc30c93967",
@@ -151,7 +157,9 @@ Retrieve a list of workflows, optionally filtered by source, destination, or sta
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.list_workflows(request={})
 
@@ -190,7 +198,9 @@ Run a workflow by triggering a new job if none is currently active.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.run_workflow(request={
         "workflow_id": "6b67be6d-98e9-440c-88fd-721e5d2d0036",
@@ -231,7 +241,9 @@ Update an existing workflow's name, connectors, schedule, or workflow type.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.workflows.update_workflow(request={
         "update_workflow": {},

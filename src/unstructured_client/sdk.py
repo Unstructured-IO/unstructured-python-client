@@ -6,8 +6,7 @@ from .sdkconfiguration import SDKConfiguration
 from .utils.logger import Logger, get_default_logger
 from .utils.retries import RetryConfig
 import httpx
-from typing import Any, Callable, Dict, Optional, Union, cast
-from unstructured_client import utils
+from typing import Any, Callable, Optional, Union, cast
 from unstructured_client._hooks import SDKHooks
 from unstructured_client.destinations import Destinations
 from unstructured_client.general import General
@@ -28,11 +27,10 @@ class UnstructuredClient(BaseSDK):
 
     def __init__(
         self,
+        server_url: str,
         api_key_auth: Optional[
             Union[Optional[str], Callable[[], Optional[str]]]
         ] = None,
-        server_url: Optional[str] = None,
-        url_params: Optional[Dict[str, str]] = None,
         client: Optional[HttpClient] = None,
         async_client: Optional[AsyncHttpClient] = None,
         retry_config: OptionalNullable[RetryConfig] = UNSET,
@@ -72,10 +70,6 @@ class UnstructuredClient(BaseSDK):
             security = lambda: shared.Security(api_key_auth=api_key_auth())
         else:
             security = shared.Security(api_key_auth=api_key_auth)
-
-        if server_url is not None:
-            if url_params is not None:
-                server_url = utils.template_url(server_url, url_params)
 
         BaseSDK.__init__(
             self,
