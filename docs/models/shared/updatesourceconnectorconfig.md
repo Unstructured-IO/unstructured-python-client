@@ -9,6 +9,12 @@
 value: shared.AzureSourceConnectorConfigInput = /* values here */
 ```
 
+### `shared.BoxSourceConnectorConfigInput`
+
+```python
+value: shared.BoxSourceConnectorConfigInput = /* values here */
+```
+
 ### `shared.ConfluenceSourceConnectorConfigInput`
 
 ```python

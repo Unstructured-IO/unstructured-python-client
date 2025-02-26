@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 622461ba121cc2a105e29eab97b6bee3
+  docChecksum: 0f9100e28d13105be2af4e576ea4572c
   docVersion: 1.0.68
   speakeasyVersion: 1.490.0
   generationVersion: 2.512.0
-  releaseVersion: 0.30.4
-  configChecksum: 87e53f0ca57296c4cae62d4792edc2cf
+  releaseVersion: 0.30.5
+  configChecksum: 25a75f7add3305b685de164ad454cb9a
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -89,6 +89,8 @@ generatedFiles:
   - docs/models/shared/azureaisearchconnectorconfiginput.md
   - docs/models/shared/azuresourceconnectorconfig.md
   - docs/models/shared/azuresourceconnectorconfiginput.md
+  - docs/models/shared/boxsourceconnectorconfig.md
+  - docs/models/shared/boxsourceconnectorconfiginput.md
   - docs/models/shared/config.md
   - docs/models/shared/confluencesourceconnectorconfig.md
   - docs/models/shared/confluencesourceconnectorconfiginput.md
@@ -155,7 +157,6 @@ generatedFiles:
   - docs/models/shared/salesforcesourceconnectorconfiginput.md
   - docs/models/shared/schedule.md
   - docs/models/shared/security.md
-  - docs/models/shared/settings.md
   - docs/models/shared/sharepointsourceconnectorconfig.md
   - docs/models/shared/sharepointsourceconnectorconfiginput.md
   - docs/models/shared/snowflakedestinationconnectorconfig.md
@@ -235,6 +236,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/boxsourceconnectorconfig.py
+  - src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfig.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py

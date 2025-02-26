@@ -5,6 +5,10 @@ from .azuresourceconnectorconfig import (
     AzureSourceConnectorConfig,
     AzureSourceConnectorConfigTypedDict,
 )
+from .boxsourceconnectorconfig import (
+    BoxSourceConnectorConfig,
+    BoxSourceConnectorConfigTypedDict,
+)
 from .confluencesourceconnectorconfig import (
     ConfluenceSourceConnectorConfig,
     ConfluenceSourceConnectorConfigTypedDict,
@@ -82,6 +86,7 @@ from unstructured_client.types import (
 SourceConnectorInformationConfigTypedDict = TypeAliasType(
     "SourceConnectorInformationConfigTypedDict",
     Union[
+        BoxSourceConnectorConfigTypedDict,
         MongoDBConnectorConfigTypedDict,
         DropboxSourceConnectorConfigTypedDict,
         ElasticsearchConnectorConfigTypedDict,
@@ -90,8 +95,8 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
         GoogleDriveSourceConnectorConfigTypedDict,
         SharePointSourceConnectorConfigTypedDict,
         AzureSourceConnectorConfigTypedDict,
-        KafkaCloudSourceConnectorConfigTypedDict,
         DatabricksVolumesConnectorConfigTypedDict,
+        KafkaCloudSourceConnectorConfigTypedDict,
         OneDriveSourceConnectorConfigTypedDict,
         OutlookSourceConnectorConfigTypedDict,
         S3SourceConnectorConfigTypedDict,
@@ -105,6 +110,7 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
 SourceConnectorInformationConfig = TypeAliasType(
     "SourceConnectorInformationConfig",
     Union[
+        BoxSourceConnectorConfig,
         MongoDBConnectorConfig,
         DropboxSourceConnectorConfig,
         ElasticsearchConnectorConfig,
@@ -113,8 +119,8 @@ SourceConnectorInformationConfig = TypeAliasType(
         GoogleDriveSourceConnectorConfig,
         SharePointSourceConnectorConfig,
         AzureSourceConnectorConfig,
-        KafkaCloudSourceConnectorConfig,
         DatabricksVolumesConnectorConfig,
+        KafkaCloudSourceConnectorConfig,
         OneDriveSourceConnectorConfig,
         OutlookSourceConnectorConfig,
         S3SourceConnectorConfig,

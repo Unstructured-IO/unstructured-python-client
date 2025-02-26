@@ -6,6 +6,7 @@ from enum import Enum
 
 class SourceConnectorType(str, Enum):
     AZURE = "azure"
+    BOX = "box"
     CONFLUENCE = "confluence"
     COUCHBASE = "couchbase"
     DATABRICKS_VOLUMES = "databricks_volumes"

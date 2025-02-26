@@ -24,6 +24,14 @@ from .azuresourceconnectorconfiginput import (
     AzureSourceConnectorConfigInput,
     AzureSourceConnectorConfigInputTypedDict,
 )
+from .boxsourceconnectorconfig import (
+    BoxSourceConnectorConfig,
+    BoxSourceConnectorConfigTypedDict,
+)
+from .boxsourceconnectorconfiginput import (
+    BoxSourceConnectorConfigInput,
+    BoxSourceConnectorConfigInputTypedDict,
+)
 from .confluencesourceconnectorconfig import (
     ConfluenceSourceConnectorConfig,
     ConfluenceSourceConnectorConfigTypedDict,
@@ -318,12 +326,7 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
 from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
-from .workflownode import (
-    Settings,
-    SettingsTypedDict,
-    WorkflowNode,
-    WorkflowNodeTypedDict,
-)
+from .workflownode import WorkflowNode, WorkflowNodeTypedDict
 from .workflownodetype import WorkflowNodeType
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
@@ -343,6 +346,10 @@ __all__ = [
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",
     "AzureSourceConnectorConfigTypedDict",
+    "BoxSourceConnectorConfig",
+    "BoxSourceConnectorConfigInput",
+    "BoxSourceConnectorConfigInputTypedDict",
+    "BoxSourceConnectorConfigTypedDict",
     "Config",
     "ConfigTypedDict",
     "ConfluenceSourceConnectorConfig",
@@ -472,8 +479,6 @@ __all__ = [
     "Schedule",
     "Security",
     "SecurityTypedDict",
-    "Settings",
-    "SettingsTypedDict",
     "SharePointSourceConnectorConfig",
     "SharePointSourceConnectorConfigInput",
     "SharePointSourceConnectorConfigInputTypedDict",
