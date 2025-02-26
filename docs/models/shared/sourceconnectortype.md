@@ -6,6 +6,7 @@
 | Name                 | Value                |
 | -------------------- | -------------------- |
 | `AZURE`              | azure                |
+| `BOX`                | box                  |
 | `CONFLUENCE`         | confluence           |
 | `COUCHBASE`          | couchbase            |
 | `DATABRICKS_VOLUMES` | databricks_volumes   |

@@ -5,6 +5,10 @@ from .azuresourceconnectorconfiginput import (
     AzureSourceConnectorConfigInput,
     AzureSourceConnectorConfigInputTypedDict,
 )
+from .boxsourceconnectorconfiginput import (
+    BoxSourceConnectorConfigInput,
+    BoxSourceConnectorConfigInputTypedDict,
+)
 from .confluencesourceconnectorconfiginput import (
     ConfluenceSourceConnectorConfigInput,
     ConfluenceSourceConnectorConfigInputTypedDict,
@@ -74,6 +78,7 @@ UpdateSourceConnectorConfigTypedDict = TypeAliasType(
     "UpdateSourceConnectorConfigTypedDict",
     Union[
         MongoDBConnectorConfigInputTypedDict,
+        BoxSourceConnectorConfigInputTypedDict,
         DropboxSourceConnectorConfigInputTypedDict,
         ElasticsearchConnectorConfigInputTypedDict,
         GCSSourceConnectorConfigInputTypedDict,
@@ -81,8 +86,8 @@ UpdateSourceConnectorConfigTypedDict = TypeAliasType(
         GoogleDriveSourceConnectorConfigInputTypedDict,
         SharePointSourceConnectorConfigInputTypedDict,
         AzureSourceConnectorConfigInputTypedDict,
-        KafkaCloudSourceConnectorConfigInputTypedDict,
         DatabricksVolumesConnectorConfigInputTypedDict,
+        KafkaCloudSourceConnectorConfigInputTypedDict,
         OneDriveSourceConnectorConfigInputTypedDict,
         OutlookSourceConnectorConfigInputTypedDict,
         S3SourceConnectorConfigInputTypedDict,
@@ -97,6 +102,7 @@ UpdateSourceConnectorConfig = TypeAliasType(
     "UpdateSourceConnectorConfig",
     Union[
         MongoDBConnectorConfigInput,
+        BoxSourceConnectorConfigInput,
         DropboxSourceConnectorConfigInput,
         ElasticsearchConnectorConfigInput,
         GCSSourceConnectorConfigInput,
@@ -104,8 +110,8 @@ UpdateSourceConnectorConfig = TypeAliasType(
         GoogleDriveSourceConnectorConfigInput,
         SharePointSourceConnectorConfigInput,
         AzureSourceConnectorConfigInput,
-        KafkaCloudSourceConnectorConfigInput,
         DatabricksVolumesConnectorConfigInput,
+        KafkaCloudSourceConnectorConfigInput,
         OneDriveSourceConnectorConfigInput,
         OutlookSourceConnectorConfigInput,
         S3SourceConnectorConfigInput,

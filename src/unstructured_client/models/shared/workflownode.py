@@ -3,6 +3,7 @@
 from __future__ import annotations
 from .workflownodetype import WorkflowNodeType
 from pydantic import model_serializer
+from typing import Any, Dict
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -13,19 +14,11 @@ from unstructured_client.types import (
 )
 
 
-class SettingsTypedDict(TypedDict):
-    pass
-
-
-class Settings(BaseModel):
-    pass
-
-
 class WorkflowNodeTypedDict(TypedDict):
     name: str
     subtype: str
     type: WorkflowNodeType
-    settings: NotRequired[Nullable[SettingsTypedDict]]
+    settings: NotRequired[Nullable[Dict[str, Any]]]
 
 
 class WorkflowNode(BaseModel):
@@ -35,7 +28,7 @@ class WorkflowNode(BaseModel):
 
     type: WorkflowNodeType
 
-    settings: OptionalNullable[Settings] = UNSET
+    settings: OptionalNullable[Dict[str, Any]] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
