@@ -832,6 +832,6 @@ Based on:
 - OpenAPI Doc  
 - Speakeasy CLI 1.505.0 (2.531.0) https://github.com/speakeasy-api/speakeasy
 ### Generated
-- [python v0.31.0] .
+- [python v0.30.6] .
 ### Releases
-- [PyPI v0.31.0] https://pypi.org/project/unstructured-client/0.31.0 - .
+- [PyPI v0.30.6] https://pypi.org/project/unstructured-client/0.30.6 - .
