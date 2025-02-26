@@ -113,10 +113,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
@@ -144,9 +141,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
-
 with UnstructuredClient(
-    server_url="https://api.example.com",
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
 ) as uc_client:
 
@@ -198,10 +193,7 @@ When custom error responses are specified for an operation, the SDK may also rai
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import errors, shared
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
     res = None
     try:
 
@@ -333,10 +325,7 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
@@ -366,10 +355,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
-
-    async with UnstructuredClient(
-        server_url="https://api.example.com",
-    ) as uc_client:
+    async with UnstructuredClient() as uc_client:
 
         res = await uc_client.destinations.create_destination_async(request={
             "create_destination_connector": {
@@ -463,11 +449,9 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
@@ -479,6 +463,8 @@ with UnstructuredClient(
                 1,
                 10,
             ],
+            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
+            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
         },
     })
 
@@ -500,19 +486,13 @@ The `UnstructuredClient` class implements the context manager protocol and regis
 ```python
 from unstructured_client import UnstructuredClient
 def main():
-
-    with UnstructuredClient(
-        server_url="https://api.example.com",
-    ) as uc_client:
+    with UnstructuredClient() as uc_client:
         # Rest of application here...
 
 
 # Or when using async:
 async def amain():
-
-    async with UnstructuredClient(
-        server_url="https://api.example.com",
-    ) as uc_client:
+    async with UnstructuredClient() as uc_client:
         # Rest of application here...
 ```
 <!-- End Resource Management [resource-management] -->
@@ -528,7 +508,7 @@ from unstructured_client import UnstructuredClient
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-s = UnstructuredClient(server_url="https://example.com", debug_logger=logging.getLogger("unstructured_client"))
+s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 ```
 <!-- End Debugging [debug] -->
 

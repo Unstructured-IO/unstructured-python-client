@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: c20df03926ecb29814c3c1c36c99ddae
-  docVersion: 1.0.68
-  speakeasyVersion: 1.505.0
-  generationVersion: 2.531.0
-  releaseVersion: 0.31.0
-  configChecksum: faf5191e78f1597b78cd7600af4f1d96
+  docChecksum: 83f88cfa4bd77e1d3065b11a97119361
+  docVersion: 1.0.78
+  speakeasyVersion: 1.490.0
+  generationVersion: 2.512.0
+  releaseVersion: 0.35.6
+  configChecksum: 25ef7f396b3ae9baaa0c7d624b520182
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.12.1
+    core: 5.11.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -27,11 +27,11 @@ features:
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
-    nullables: 1.0.1
+    nullables: 1.0.0
     openEnums: 1.0.0
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.1
+    sdkHooks: 1.0.0
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
@@ -143,6 +143,8 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/partitionparametersschemasstrategy.md
+  - docs/models/shared/partitionparametersstrategy.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
   - docs/models/shared/postgresdestinationconnectorconfiginput.md
   - docs/models/shared/qdrantclouddestinationconnectorconfig.md
@@ -536,7 +538,7 @@ examples:
   partition:
     speakeasy-default-partition:
       requestBody:
-        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "hi_res", "table_ocr_agent": null, "unique_element_ids": false, "xml_keep_tags": false}
+        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "vlm", "table_ocr_agent": null, "unique_element_ids": false, "vlm_model": "gpt-4o", "vlm_model_provider": "openai", "xml_keep_tags": false}
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]

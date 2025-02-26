@@ -18,13 +18,11 @@ from unstructured_client.types import OptionalNullable, UNSET
 
 @dataclass
 class SDKConfiguration:
-    client: Union[HttpClient, None]
-    client_supplied: bool
-    async_client: Union[AsyncHttpClient, None]
-    async_client_supplied: bool
+    client: HttpClient
+    async_client: AsyncHttpClient
     debug_logger: Logger
-    server_url: str
     security: Optional[Union[shared.Security, Callable[[], shared.Security]]] = None
+    server_url: Optional[str] = ""
     language: str = "python"
     openapi_doc_version: str = __openapi_doc_version__
     sdk_version: str = __version__
@@ -37,6 +35,9 @@ class SDKConfiguration:
         self._hooks = SDKHooks()
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:
+        if self.server_url is None:
+            return "", {}
+
         return remove_suffix(self.server_url, "/"), {}
 
     def get_hooks(self) -> SDKHooks:

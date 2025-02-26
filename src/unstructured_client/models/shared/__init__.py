@@ -211,6 +211,8 @@ from .partition_parameters import (
     FilesTypedDict,
     OutputFormat,
     PartitionParameters,
+    PartitionParametersSchemasStrategy,
+    PartitionParametersStrategy,
     PartitionParametersTypedDict,
     Strategy,
 )
@@ -451,6 +453,8 @@ __all__ = [
     "OutlookSourceConnectorConfigTypedDict",
     "OutputFormat",
     "PartitionParameters",
+    "PartitionParametersSchemasStrategy",
+    "PartitionParametersStrategy",
     "PartitionParametersTypedDict",
     "PostgresDestinationConnectorConfig",
     "PostgresDestinationConnectorConfigInput",

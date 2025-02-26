@@ -15,11 +15,9 @@ Description
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
@@ -31,6 +29,8 @@ with UnstructuredClient(
                 1,
                 10,
             ],
+            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
+            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
         },
     })
 
