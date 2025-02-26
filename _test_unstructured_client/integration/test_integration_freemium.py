@@ -13,8 +13,7 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-# FREEMIUM_URL = "https://api.unstructured.io"
-FREEMIUM_URL = "http://127.0.0.1:8009"
+FREEMIUM_URL = "https://api.unstructured.io"
 
 
 @pytest.fixture(scope="module")
@@ -236,9 +235,6 @@ def test_uvloop_partitions_without_errors(client, doc_path):
     assert len(elements) > 0
 
 
-# TODO (klaijan) - still cannot test against vlm if the updated client vlm is not generated
-# `vlm_model cannot be empty for vlm requests.` because partition_parameters do not have the param.
-# TODO (klaijan) - test with more models and providers
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("vlm_model", ["gpt-4o"])
 @pytest.mark.parametrize("vlm_model_provider", ["openai"])
