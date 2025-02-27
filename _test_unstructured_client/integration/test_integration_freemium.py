@@ -269,7 +269,8 @@ def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider,
         request=req
     )
     assert response.status_code == 200
-    assert len(response.elements)
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
 
 
 @pytest.mark.parametrize("split_pdf", [True, False])
@@ -317,8 +318,8 @@ def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider
         request=req
     )
     assert response.status_code == 200
-    assert len(response.elements)
-
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
 
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("vlm_model", ["claude-3-5-sonnet-20241022",])
@@ -354,4 +355,5 @@ def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provid
         request=req
     )
     assert response.status_code == 200
-    assert len(response.elements)
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
