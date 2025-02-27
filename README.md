@@ -118,11 +118,9 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "account_key": "azure_account_key",
-                "account_name": "azure_account_name",
-                "anonymous": False,
-                "recursive": True,
-                "remote_url": "az://<path></path></container-name>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
             "type": shared.DestinationConnectorType.ASTRADB,
@@ -150,11 +148,9 @@ with UnstructuredClient(
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "account_key": "azure_account_key",
-                "account_name": "azure_account_name",
-                "anonymous": False,
-                "recursive": True,
-                "remote_url": "az://<path></path></container-name>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
             "type": shared.DestinationConnectorType.ASTRADB,
@@ -204,11 +200,9 @@ with UnstructuredClient() as uc_client:
         res = uc_client.destinations.create_destination(request={
             "create_destination_connector": {
                 "config": {
-                    "account_key": "azure_account_key",
-                    "account_name": "azure_account_name",
-                    "anonymous": False,
-                    "recursive": True,
-                    "remote_url": "az://<path></path></container-name>",
+                    "endpoint": "<value>",
+                    "index": "<value>",
+                    "key": "<key>",
                 },
                 "name": "<value>",
                 "type": shared.DestinationConnectorType.ASTRADB,
@@ -336,11 +330,9 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "account_key": "azure_account_key",
-                "account_name": "azure_account_name",
-                "anonymous": False,
-                "recursive": True,
-                "remote_url": "az://<path></path></container-name>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
             "type": shared.DestinationConnectorType.ASTRADB,
@@ -368,11 +360,9 @@ async def main():
         res = await uc_client.destinations.create_destination_async(request={
             "create_destination_connector": {
                 "config": {
-                    "account_key": "azure_account_key",
-                    "account_name": "azure_account_name",
-                    "anonymous": False,
-                    "recursive": True,
-                    "remote_url": "az://<path></path></container-name>",
+                    "endpoint": "<value>",
+                    "index": "<value>",
+                    "key": "<key>",
                 },
                 "name": "<value>",
                 "type": shared.DestinationConnectorType.ASTRADB,
@@ -459,6 +449,7 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
 with UnstructuredClient() as uc_client:
 
@@ -472,6 +463,8 @@ with UnstructuredClient() as uc_client:
                 1,
                 10,
             ],
+            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
+            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
         },
     })
 

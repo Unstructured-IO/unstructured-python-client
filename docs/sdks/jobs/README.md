@@ -11,7 +11,7 @@
 
 ## cancel_job
 
-Cancel Job
+Cancel the specified job.
 
 ### Example Usage
 
@@ -52,7 +52,7 @@ with UnstructuredClient() as uc_client:
 
 ## get_job
 
-Get Job
+Retrieve detailed information for a specific job by its ID.
 
 ### Example Usage
 
@@ -93,7 +93,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_jobs
 
-List Jobs
+Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
 ### Example Usage
 

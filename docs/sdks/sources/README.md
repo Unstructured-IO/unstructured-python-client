@@ -5,15 +5,15 @@
 
 ### Available Operations
 
-* [create_source](#create_source) - Create Source
-* [delete_source](#delete_source) - Delete Source
-* [get_source](#get_source) - Get Source
-* [list_sources](#list_sources) - List Sources
-* [update_source](#update_source) - Update Source
+* [create_source](#create_source) - Create source connector
+* [delete_source](#delete_source) - Delete source connector
+* [get_source](#get_source) - Get source connector
+* [list_sources](#list_sources) - List available source connectors
+* [update_source](#update_source) - Update source connector
 
 ## create_source
 
-Create Source
+Create a new source connector using the provided configuration and name.
 
 ### Example Usage
 
@@ -28,12 +28,12 @@ with UnstructuredClient() as uc_client:
             "config": {
                 "batch_size": 100,
                 "bucket": "bucket-name",
-                "collection": "collection_name",
                 "collection_id": "type",
                 "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
                 "password": "password",
-                "scope": "scope_name",
                 "username": "username",
+                "collection": "collection_name",
+                "scope": "scope_name",
             },
             "name": "<value>",
             "type": shared.SourceConnectorType.SALESFORCE,
@@ -68,7 +68,7 @@ with UnstructuredClient() as uc_client:
 
 ## delete_source
 
-Delete Source
+Delete a specific source connector identified by its ID.
 
 ### Example Usage
 
@@ -109,7 +109,7 @@ with UnstructuredClient() as uc_client:
 
 ## get_source
 
-Get Source
+Retrieve detailed information for a specific source connector by its ID.
 
 ### Example Usage
 
@@ -150,7 +150,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_sources
 
-List Sources
+Retrieve a list of available source connectors.
 
 ### Example Usage
 
@@ -189,7 +189,7 @@ with UnstructuredClient() as uc_client:
 
 ## update_source
 
-Update Source
+Update the configuration of an existing source connector.
 
 ### Example Usage
 
@@ -203,12 +203,12 @@ with UnstructuredClient() as uc_client:
             "config": {
                 "batch_size": 100,
                 "bucket": "bucket-name",
-                "collection": "collection_name",
                 "collection_id": "type",
                 "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
                 "password": "password",
-                "scope": "scope_name",
                 "username": "username",
+                "collection": "collection_name",
+                "scope": "scope_name",
             },
         },
         "source_id": "196d27d0-3173-4749-b69d-2ee5d8e2396e",

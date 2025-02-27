@@ -8,118 +8,118 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "list_destinations"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.list_destinations(request={})\n\n    assert res.response_list_destinations is not None\n\n    # Handle response\n    print(res.response_list_destinations)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.destinations.list_destinations(request={})\n\n    assert res.response_list_destinations is not None\n\n    # Handle response\n    print(res.response_list_destinations)"
   - target: $["paths"]["/api/v1/destinations/"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.AZURE_AI_SEARCH,\n            \"config\": {\n                \"account_key\": \"azure_account_key\",\n                \"account_name\": \"azure_account_name\",\n                \"anonymous\": False,\n                \"recursive\": True,\n                \"remote_url\": \"az://<path></path></container-name>\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.AZURE_AI_SEARCH,\n            \"config\": {\n                \"collection_name\": \"<value>\",\n                \"batch_size\": 20,\n                \"api_endpoint\": \"<value>\",\n                \"token\": \"<value>\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.delete_destination(request={\n        \"destination_id\": \"10a88d76-65fb-4c88-8488-9e7d272c6373\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.destinations.delete_destination(request={\n        \"destination_id\": \"10a88d76-65fb-4c88-8488-9e7d272c6373\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_destination(request={\n        \"destination_id\": \"41ba03fb-faa3-4e9e-8cfb-27f133c4198a\",\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.destinations.get_destination(request={\n        \"destination_id\": \"41ba03fb-faa3-4e9e-8cfb-27f133c4198a\",\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"0a0ddfee-087e-467d-abcc-fdb6451a6e6f\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"batch_size\": 100,\n                \"bucket\": \"bucket-name\",\n                \"collection\": \"collection_name\",\n                \"collection_id\": \"type\",\n                \"connection_string\": \"couchbases://cb.abcdefg.cloud.couchbase.com\",\n                \"password\": \"password\",\n                \"scope\": \"scope_name\",\n                \"username\": \"username\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9ea9d27c-4e2e-4cb5-9a69-71bd7ec9d226\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"host\": \"acidic-patroller.com\",\n                \"database\": \"<value>\",\n                \"port\": 832931,\n                \"username\": \"Salvador.Walsh-Thiel\",\n                \"password\": \"vIMqbllzrdJBExE\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 977983,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/jobs/"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "list_jobs"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.list_jobs(request={})\n\n    assert res.response_list_jobs is not None\n\n    # Handle response\n    print(res.response_list_jobs)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.jobs.list_jobs(request={})\n\n    assert res.response_list_jobs is not None\n\n    # Handle response\n    print(res.response_list_jobs)"
   - target: $["paths"]["/api/v1/jobs/{job_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_job"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job(request={\n        \"job_id\": \"6bb4cb72-a072-4398-9de3-194e59352a3c\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.jobs.get_job(request={\n        \"job_id\": \"6bb4cb72-a072-4398-9de3-194e59352a3c\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
   - target: $["paths"]["/api/v1/jobs/{job_id}/cancel"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "cancel_job"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.cancel_job(request={\n        \"job_id\": \"ec29bf67-0f30-4793-b5ee-8fc0da196032\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.jobs.cancel_job(request={\n        \"job_id\": \"ec29bf67-0f30-4793-b5ee-8fc0da196032\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "list_sources"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.list_sources(request={})\n\n    assert res.response_list_sources is not None\n\n    # Handle response\n    print(res.response_list_sources)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.sources.list_sources(request={})\n\n    assert res.response_list_sources is not None\n\n    # Handle response\n    print(res.response_list_sources)"
   - target: $["paths"]["/api/v1/sources/"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_source"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.SALESFORCE,\n            \"config\": {\n                \"batch_size\": 100,\n                \"bucket\": \"bucket-name\",\n                \"collection\": \"collection_name\",\n                \"collection_id\": \"type\",\n                \"connection_string\": \"couchbases://cb.abcdefg.cloud.couchbase.com\",\n                \"password\": \"password\",\n                \"scope\": \"scope_name\",\n                \"username\": \"username\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.S3,\n            \"config\": {\n                \"username\": \"Eldora_Casper\",\n                \"consumer_key\": \"<value>\",\n                \"private_key\": \"<value>\",\n                \"categories\": [\n                    \"<value>\",\n                ],\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_source"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.delete_source(request={\n        \"source_id\": \"8a24d7ae-5524-45e9-83f9-b0adba5303d4\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.sources.delete_source(request={\n        \"source_id\": \"8a24d7ae-5524-45e9-83f9-b0adba5303d4\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_source"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_source(request={\n        \"source_id\": \"e02d8147-b614-4e4c-9c6d-0cd9c4492ea0\",\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.sources.get_source(request={\n        \"source_id\": \"e02d8147-b614-4e4c-9c6d-0cd9c4492ea0\",\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_source"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"196d27d0-3173-4749-b69d-2ee5d8e2396e\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"batch_size\": 100,\n                \"bucket\": \"bucket-name\",\n                \"collection\": \"collection_name\",\n                \"collection_id\": \"type\",\n                \"connection_string\": \"couchbases://cb.abcdefg.cloud.couchbase.com\",\n                \"password\": \"password\",\n                \"scope\": \"scope_name\",\n                \"username\": \"username\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"7d031737-4969-4d2e-ae5d-8e2396edec43\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"client_id\": \"<id>\",\n                \"tenant\": \"<value>\",\n                \"authority_url\": \"https://pleasing-hammock.org/\",\n                \"user_pname\": \"<value>\",\n                \"client_cred\": \"<value>\",\n                \"recursive\": False,\n                \"path\": \"/etc/namedb\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "list_workflows"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.list_workflows(request={})\n\n    assert res.response_list_workflows is not None\n\n    # Handle response\n    print(res.response_list_workflows)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.list_workflows(request={})\n\n    assert res.response_list_workflows is not None\n\n    # Handle response\n    print(res.response_list_workflows)"
   - target: $["paths"]["/api/v1/workflows/"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_workflow"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"source_id\": \"b5baba90-bc88-4ea4-b45f-e894788e3f38\",\n            \"destination_id\": \"0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n            \"schedule\": shared.CreateWorkflowSchedule.EVERY_10_HOURS,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"source_id\": \"b5baba90-bc88-4ea4-b45f-e894788e3f38\",\n            \"destination_id\": \"0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.delete_workflow(request={\n        \"workflow_id\": \"26c0bd77-269e-4239-86b8-71541359440c\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.delete_workflow(request={\n        \"workflow_id\": \"26c0bd77-269e-4239-86b8-71541359440c\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.get_workflow(request={\n        \"workflow_id\": \"270d9bb5-13f1-4e4d-bb84-4bcc30c93967\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.get_workflow(request={\n        \"workflow_id\": \"270d9bb5-13f1-4e4d-bb84-4bcc30c93967\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.update_workflow(request={\n        \"workflow_id\": \"b63b90df-08ba-41e1-b15b-bc744e5781fa\",\n        \"update_workflow\": {},\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.update_workflow(request={\n        \"workflow_id\": \"b63b90df-08ba-41e1-b15b-bc744e5781fa\",\n        \"update_workflow\": {},\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}/run"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "run_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"6b67be6d-98e9-440c-88fd-721e5d2d0036\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"6b67be6d-98e9-440c-88fd-721e5d2d0036\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/general/v0/general"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "partition"
-          "source": "from unstructured_client import UnstructuredClient\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient(\n    server_url=\"https://api.example.com\",\n) as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"

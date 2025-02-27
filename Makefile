@@ -65,7 +65,7 @@ lint:
 ## download-openapi-specs:			         Download the openapi specs from the Serverless and Platform APIs
 .PHONY: download-openapi-specs
 download-openapi-specs:
-	wget -nv -q -O openapi_serverless.json https://api.unstructured.io/general/openapi.json
+	wget -nv -q -O openapi_serverless.json https://api.unstructuredapp.io/general/openapi.json
 	wget -nv -q -O openapi_platform_api.json https://platform.unstructuredapp.io/openapi.json
 
 ## client-merge-serverless-platform:		Merge the Serverless and Platform APIs specs into a single schema

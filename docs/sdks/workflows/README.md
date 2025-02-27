@@ -14,7 +14,7 @@
 
 ## create_workflow
 
-Create Workflow
+Create a new workflow, either custom or auto, and configure its settings.
 
 ### Example Usage
 
@@ -28,9 +28,9 @@ with UnstructuredClient() as uc_client:
         "create_workflow": {
             "destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38",
             "name": "<value>",
-            "schedule": shared.CreateWorkflowSchedule.EVERY_15_MINUTES,
             "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec",
             "workflow_type": shared.WorkflowType.PLATINUM,
+            "schedule": shared.Schedule.EVERY_15_MINUTES,
         },
     })
 
@@ -62,7 +62,7 @@ with UnstructuredClient() as uc_client:
 
 ## delete_workflow
 
-Delete Workflow
+Delete a workflow by its ID.
 
 ### Example Usage
 
@@ -103,7 +103,7 @@ with UnstructuredClient() as uc_client:
 
 ## get_workflow
 
-Get Workflow
+Retrieve detailed information for a specific workflow by its ID.
 
 ### Example Usage
 
@@ -144,7 +144,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_workflows
 
-List Workflows
+Retrieve a list of workflows, optionally filtered by source, destination, or state.
 
 ### Example Usage
 
@@ -183,7 +183,7 @@ with UnstructuredClient() as uc_client:
 
 ## run_workflow
 
-Run Workflow
+Run a workflow by triggering a new job if none is currently active.
 
 ### Example Usage
 
@@ -224,7 +224,7 @@ with UnstructuredClient() as uc_client:
 
 ## update_workflow
 
-Update Workflow
+Update an existing workflow's name, connectors, schedule, or workflow type.
 
 ### Example Usage
 

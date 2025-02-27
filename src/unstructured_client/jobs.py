@@ -22,6 +22,8 @@ class Jobs(BaseSDK):
     ) -> operations.CancelJobResponse:
         r"""Cancel Job
 
+        Cancel the specified job.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -130,6 +132,8 @@ class Jobs(BaseSDK):
     ) -> operations.CancelJobResponse:
         r"""Cancel Job
 
+        Cancel the specified job.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -235,6 +239,8 @@ class Jobs(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.GetJobResponse:
         r"""Get Job
+
+        Retrieve detailed information for a specific job by its ID.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -344,6 +350,8 @@ class Jobs(BaseSDK):
     ) -> operations.GetJobResponse:
         r"""Get Job
 
+        Retrieve detailed information for a specific job by its ID.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -452,6 +460,8 @@ class Jobs(BaseSDK):
     ) -> operations.ListJobsResponse:
         r"""List Jobs
 
+        Retrieve a list of jobs with optional filtering by workflow ID or job status.
+
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -559,6 +569,8 @@ class Jobs(BaseSDK):
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> operations.ListJobsResponse:
         r"""List Jobs
+
+        Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method

@@ -5,15 +5,15 @@
 
 ### Available Operations
 
-* [create_destination](#create_destination) - Create Destination
-* [delete_destination](#delete_destination) - Delete Destination
-* [get_destination](#get_destination) - Get Destination
-* [list_destinations](#list_destinations) - List Destinations
-* [update_destination](#update_destination) - Update Destination
+* [create_destination](#create_destination) - Create destination connector
+* [delete_destination](#delete_destination) - Delete destination connector
+* [get_destination](#get_destination) - Get destination connector
+* [list_destinations](#list_destinations) - List destination connectors
+* [update_destination](#update_destination) - Update destination connector
 
 ## create_destination
 
-Create Destination
+Create a new destination connector using the provided configuration and name.
 
 ### Example Usage
 
@@ -26,11 +26,9 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "account_key": "azure_account_key",
-                "account_name": "azure_account_name",
-                "anonymous": False,
-                "recursive": True,
-                "remote_url": "az://<path></path></container-name>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
             "type": shared.DestinationConnectorType.ASTRADB,
@@ -65,7 +63,7 @@ with UnstructuredClient() as uc_client:
 
 ## delete_destination
 
-Delete Destination
+Delete a specific destination connector by its ID.
 
 ### Example Usage
 
@@ -106,7 +104,7 @@ with UnstructuredClient() as uc_client:
 
 ## get_destination
 
-Get Destination
+Retrieve detailed information for a specific destination connector by its ID.
 
 ### Example Usage
 
@@ -147,7 +145,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_destinations
 
-List Destinations
+Retrieve a list of available destination connectors.
 
 ### Example Usage
 
@@ -186,7 +184,7 @@ with UnstructuredClient() as uc_client:
 
 ## update_destination
 
-Update Destination
+Update the configuration of an existing destination connector.
 
 ### Example Usage
 
@@ -198,14 +196,13 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.update_destination(request={
         "update_destination_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection": "collection_name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "scope": "scope_name",
-                "username": "username",
+                "batch_size": 7372,
+                "database": "<value>",
+                "host": "pushy-apparatus.net",
+                "password": "sxtPKvIMqbllzrd",
+                "port": 432315,
+                "table_name": "<value>",
+                "username": "Dulce38",
             },
         },
         "destination_id": "0a0ddfee-087e-467d-abcc-fdb6451a6e6f",
