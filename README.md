@@ -449,6 +449,7 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
 with UnstructuredClient() as uc_client:
 
@@ -462,6 +463,8 @@ with UnstructuredClient() as uc_client:
                 1,
                 10,
             ],
+            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
+            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
         },
     })
 
