@@ -3,7 +3,6 @@
 from .custom import (
     CleanServerUrlSDKInitHook,
     LoggerHook,
-    SuggestDefiningUrlIf401AfterErrorHook,
     SplitPdfHook,
 )
 from .types import Hooks
@@ -23,7 +22,6 @@ def init_hooks(hooks: Hooks):
 
     # Initialize custom hooks
     clean_server_url_hook = CleanServerUrlSDKInitHook()
-    suggest_defining_url_hook = SuggestDefiningUrlIf401AfterErrorHook()
     logger_hook = LoggerHook()
     split_pdf_hook = SplitPdfHook()
 
@@ -43,6 +41,5 @@ def init_hooks(hooks: Hooks):
     hooks.register_after_success_hook(logger_hook)
 
     # Register After Error hooks
-    hooks.register_after_error_hook(suggest_defining_url_hook)
     hooks.register_after_error_hook(split_pdf_hook)
     hooks.register_after_error_hook(logger_hook)  
