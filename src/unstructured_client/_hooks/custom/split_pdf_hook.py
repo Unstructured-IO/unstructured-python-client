@@ -57,9 +57,7 @@ MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
 
-def _run_coroutines_in_separate_thread(
-        coroutines_task: Coroutine[Any, Any, list[tuple[Any, httpx.Response]]]
-) -> list[httpx.Response]:
+def _get_asyncio_loop() -> asyncio.AbstractEventLoop:
     if sys.version_info < (3, 10):
         loop = asyncio.get_event_loop()
     else:
@@ -67,10 +65,22 @@ def _run_coroutines_in_separate_thread(
             loop = asyncio.get_running_loop()
         except RuntimeError:
             loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop
 
-        asyncio.set_event_loop(loop)
-
+def _run_coroutines_in_separate_thread(
+        coroutines_task: Coroutine[Any, Any, list[tuple[Any, httpx.Response]]]
+) -> list[httpx.Response]:
+    loop = _get_asyncio_loop()
     return loop.run_until_complete(coroutines_task)
+
+def _get_limiter(concurrency_level: int, executor: futures.ThreadPoolExecutor) -> asyncio.Semaphore:
+    def _setup_limiter_in_thread_loop():
+        _get_asyncio_loop()
+        return asyncio.Semaphore(concurrency_level)
+    with executor:
+        return executor.submit(_setup_limiter_in_thread_loop).result()
+
 
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
@@ -185,6 +195,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
         self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
         self.cache_tmp_data_dir: str = DEFAULT_CACHE_TMP_DATA_DIR
+        self.executor = futures.ThreadPoolExecutor(max_workers=1)
 
     def sdk_init(
             self, base_url: str, client: HttpClient
@@ -333,7 +344,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-        limiter = asyncio.Semaphore(concurrency_level)
+        limiter = _get_limiter(concurrency_level, self.executor)
 
         self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
@@ -621,7 +632,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # sending the coroutines to a separate thread to avoid blocking the current event loop
         # this operation should be removed when the SDK is updated to support async hooks
-        with futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with self.executor as executor:
             task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
             task_responses = task_responses_future.result()
 
