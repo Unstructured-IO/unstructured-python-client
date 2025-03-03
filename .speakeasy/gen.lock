@@ -1,7 +1,7 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 83f88cfa4bd77e1d3065b11a97119361
+  docChecksum: de9f013dc09f5ad50eaa7dd5716106ca
   docVersion: 1.0.78
   speakeasyVersion: 1.490.0
   generationVersion: 2.512.0
@@ -24,6 +24,7 @@ features:
     globalSecurity: 3.0.3
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
+    globalServerURLs: 3.1.0
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1

@@ -31,6 +31,7 @@ class UnstructuredClient(BaseSDK):
         api_key_auth: Optional[
             Union[Optional[str], Callable[[], Optional[str]]]
         ] = None,
+        server: Optional[str] = None,
         server_url: Optional[str] = None,
         url_params: Optional[Dict[str, str]] = None,
         client: Optional[HttpClient] = None,
@@ -42,6 +43,7 @@ class UnstructuredClient(BaseSDK):
         r"""Instantiates the SDK configuring it with the provided parameters.
 
         :param api_key_auth: The api_key_auth required for authentication
+        :param server: The server by name to use for all methods
         :param server_url: The server URL to use for all methods
         :param url_params: Parameters to optionally template the server URL with
         :param client: The HTTP client to use for all synchronous methods
@@ -84,6 +86,7 @@ class UnstructuredClient(BaseSDK):
                 async_client=async_client,
                 security=security,
                 server_url=server_url,
+                server=server,
                 retry_config=retry_config,
                 timeout_ms=timeout_ms,
                 debug_logger=debug_logger,
