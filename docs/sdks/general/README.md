@@ -17,10 +17,7 @@ Description
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-
-with UnstructuredClient(
-    server_url="https://api.example.com",
-) as uc_client:
+with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
