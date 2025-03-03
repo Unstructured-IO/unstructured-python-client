@@ -44,6 +44,12 @@ def choose_server_url(endpoint_url: str | None, client_url: str, default_endpoin
     Default endpoint URL as defined in the spec
     """
 
+    # If the client doesn't get a server_url, it sets a default of platform
+    # This is not always the correct default - we need to make sure default_endpoint_url is used
+    # So, only use the client url if it has been set to something else
+    if client_url == "https://platform.unstructuredapp.io":
+        client_url = ""
+
     url = endpoint_url if endpoint_url is not None else (client_url or default_endpoint_url)
     return clean_server_url(url)
 

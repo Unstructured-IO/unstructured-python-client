@@ -211,12 +211,6 @@ def test_unit_clean_server_url_fixes_malformed_localhost_url(server_url: str):
     assert client.general.sdk_configuration.server_url == "http://localhost:8000"
 
 
-
-def test_unit_clean_server_url_returns_None_given_no_server_url():
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
-    assert client.general.sdk_configuration.server_url == None
-
-
 @pytest.mark.parametrize(
     "server_url",
     [

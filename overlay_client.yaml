@@ -3,6 +3,12 @@ info:
   title: Overlay openapi.json to add client-specific features
   version: 0.0.0
 actions:
+  - target: $
+    update:
+      servers:
+        - url: "https://platform.unstructuredapp.io/"
+          description: "Unstructured Platform API"
+          x-speakeasy-server-id: "platform-api"
   - target: $["components"]["schemas"]["partition_parameters"]["properties"]
     update:
       "split_pdf_page":
