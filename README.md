@@ -17,9 +17,9 @@
   <p>Python SDK for the Unstructured API</p>
 </h2>
 
-This is a Python client for the [Unstructured API](https://docs.unstructured.io/api-reference/api-services/saas-api-development-guide) and you can sign up for your API key on https://app.unstructured.io.
+This is a HTTP client for the [Unstructured Platform API](https://docs.unstructured.io/platform-api/overview). You can sign up [here](https://unstructured.io/developers) and process 1000 free pages per day for 14 days.
 
-Please refer to the [Unstructured docs](https://docs.unstructured.io/api-reference/api-services/sdk-python) for a full guide to using the client.
+Please refer to the our documentation for a full guide on integrating the [Workflow Endpoint](https://docs.unstructured.io/platform-api/api/overview) and [Partition Endpoint](https://docs.unstructured.io/platform-api/partition-api/sdk-python) into your Python code.
 
 <!-- Start Summary [summary] -->
 ## Summary
