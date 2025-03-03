@@ -9,13 +9,13 @@ import os
 import tempfile
 import uuid
 from collections.abc import Awaitable
+from concurrent import futures
 from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
 import aiofiles
 import httpx
-import nest_asyncio  # type: ignore
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 
@@ -267,10 +267,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if context_is_uvloop():
             logger.warning("Splitting is currently incompatible with uvloop. Continuing without splitting.")
             return request
-
-        # This allows us to use an event loop in an env with an existing loop
-        # Temporary fix until we can improve the async splitting behavior
-        nest_asyncio.apply()
 
         # This is our key into coroutines_to_execute
         # We need to pass it on to after_success so
@@ -605,10 +601,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if tasks is None:
             return None
 
-        ioloop = asyncio.get_event_loop()
-        task_responses: list[tuple[int, httpx.Response]] = ioloop.run_until_complete(
-            run_tasks(tasks, allow_failed=self.allow_failed)
-        )
+        coroutines = run_tasks(tasks, allow_failed=self.allow_failed)
+
+        # sending the coroutines to a separate thread to avoid blocking the current event loop
+        # this operation should be removed when the SDK is updated to support async hooks
+        with futures.ThreadPoolExecutor(max_workers=1) as executor:
+            task_responses_future = executor.submit(asyncio.run, coroutines)
+            task_responses = task_responses_future.result()
 
         if task_responses is None:
             return None
