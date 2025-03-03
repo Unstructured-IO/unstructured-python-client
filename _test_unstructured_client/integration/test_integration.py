@@ -259,7 +259,6 @@ def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider,
     )
 
     response = client.general.partition(
-        server_url=FREEMIUM_URL,
         request=req
     )
     assert response.status_code == 200
@@ -308,7 +307,6 @@ def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider
     )
 
     response = client.general.partition(
-        server_url=FREEMIUM_URL,
         request=req
     )
     assert response.status_code == 200
@@ -345,7 +343,6 @@ def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provid
     )
 
     response = client.general.partition(
-        server_url=FREEMIUM_URL,
         request=req
     )
     assert response.status_code == 200
