@@ -1,21 +1,20 @@
-speakeasyVersion: 1.505.0
+speakeasyVersion: 1.508.1
 sources:
     my-source:
         sourceNamespace: my-source
-        sourceRevisionDigest: sha256:8cba0cf748e247efccefbb5d1839dbeb6e2e3210bb2c90f7b75b9034c22ae24a
-        sourceBlobDigest: sha256:69fef8ed681f1d68013e71f67927821d64fc1045d3956ace3775fe62ed76b8bb
+        sourceRevisionDigest: sha256:7c3885b2b10e35c3ce714ade8cf040b7af2d30c631aa9469af14c647e4eebd4c
+        sourceBlobDigest: sha256:49a96e011be598dc1667da0d814c547d9544305f503cb992018176bcf78f3817
         tags:
             - latest
-            - speakeasy-sdk-regen-1740605410
-            - 1.0.68
+            - 1.0.78
 targets:
     unstructured-python:
         source: my-source
         sourceNamespace: my-source
-        sourceRevisionDigest: sha256:8cba0cf748e247efccefbb5d1839dbeb6e2e3210bb2c90f7b75b9034c22ae24a
-        sourceBlobDigest: sha256:69fef8ed681f1d68013e71f67927821d64fc1045d3956ace3775fe62ed76b8bb
+        sourceRevisionDigest: sha256:7c3885b2b10e35c3ce714ade8cf040b7af2d30c631aa9469af14c647e4eebd4c
+        sourceBlobDigest: sha256:49a96e011be598dc1667da0d814c547d9544305f503cb992018176bcf78f3817
         codeSamplesNamespace: my-source-code-samples
-        codeSamplesRevisionDigest: sha256:d7a20fe1c8d687f377099cdb412c6d0dd733dd982ec4662052df0894da211da2
+        codeSamplesRevisionDigest: sha256:5f12b0195d8ed16e87269dc286ef0b48ba59a6c95b2ad935f85ec95e417394ae
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
@@ -23,7 +22,7 @@ workflow:
         my-source:
             inputs:
                 - location: https://platform.unstructuredapp.io/openapi.json
-                - location: https://api.unstructured.io/general/openapi.json
+                - location: https://api.unstructuredapp.io/general/openapi.json
             overlays:
                 - location: ./overlay_client.yaml
             registry:
