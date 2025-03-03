@@ -1,44 +1,8 @@
-import os
 from pathlib import Path
 
 import httpx
 import pytest
 from unstructured.partition.api import partition_via_api
-
-from unstructured_client import UnstructuredClient
-
-
-@pytest.fixture(scope="module")
-def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"), server='free-api')
-    yield _client
-
-
-@pytest.fixture(scope="module")
-def doc_path() -> Path:
-    samples_path = Path(__file__).resolve().parents[1] / "_sample_docs"
-    assert samples_path.exists()
-    return samples_path
-
-
-MOCK_TEXT = """[
-    {
-        "element_id": "f49fbd614ddf5b72e06f59e554e6ae2b",
-        "text": "This is a test email to use for unit tests.",
-        "type": "NarrativeText",
-        "metadata": {
-            "sent_from": [
-                "Matthew Robinson <mrobinson@unstructured.io>"
-            ],
-            "sent_to": [
-                "Matthew Robinson <mrobinson@unstructured.io>"
-            ],
-            "subject": "Test Email",
-            "filename": "fake-email.eml",
-            "filetype": "message/rfc822"
-        }
-    }
-]"""
 
 
 @pytest.mark.xfail
@@ -48,7 +12,13 @@ MOCK_TEXT = """[
         ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
     ]
 )
-def test_partition_via_api_custom_url(httpx_mock, doc_path: Path, url: str, full_url: str):
+def test_partition_via_api_custom_url(
+    httpx_mock,
+    doc_path: Path,
+    url: str,
+    full_url: str,
+    dummy_partitioned_text: str
+):
     """
     Assert that we can specify api_url and requests are sent to the right place
     """
@@ -60,21 +30,25 @@ def test_partition_via_api_custom_url(httpx_mock, doc_path: Path, url: str, full
         method="POST",
         url=full_url,
         headers={"Content-Type": "application/json"},
-        content=MOCK_TEXT.encode(),
+        content=dummy_partitioned_text.encode(),
     )
 
     partition_via_api(filename=str(doc_path / filename), api_url=url, metadata_filename=filename)
 
 
 @pytest.mark.xfail
-def test_partition_via_api_pass_list_type_parameters(httpx_mock, doc_path: Path):
+def test_partition_via_api_pass_list_type_parameters(
+    httpx_mock,
+    doc_path: Path,
+    dummy_partitioned_text: str
+):
     url = "http://localhost:8000/general/v0/general"
     filename = "layout-parser-paper-fast.pdf"
 
     httpx_mock.add_response(
         method="POST",
         headers={"Content-Type": "application/json"},
-        content=MOCK_TEXT.encode(),
+        content=dummy_partitioned_text.encode(),
         url=url,
     )
 

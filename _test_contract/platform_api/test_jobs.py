@@ -7,7 +7,7 @@ from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
 
 
-def test_list_jobs(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_list_jobs(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/jobs/"
 
     httpx_mock.add_response(
@@ -26,7 +26,7 @@ def test_list_jobs(httpx_mock, client: UnstructuredClient, platform_api_url: str
         url=url,
     )
 
-    jobs_response = client.jobs.list_jobs(request=operations.ListJobsRequest())
+    jobs_response = platform_client.jobs.list_jobs(request=operations.ListJobsRequest())
     assert jobs_response.status_code == 200
 
     requests = httpx_mock.get_requests()
@@ -44,7 +44,7 @@ def test_list_jobs(httpx_mock, client: UnstructuredClient, platform_api_url: str
     assert job.created_at == datetime.fromisoformat("2025-06-22T11:37:21.648+00:00")
 
 
-def test_get_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_get_job(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d"
 
     httpx_mock.add_response(
@@ -61,7 +61,7 @@ def test_get_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
         url=url,
     )
 
-    job_response = client.jobs.get_job(
+    job_response = platform_client.jobs.get_job(
         request=operations.GetJobRequest(job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d")
     )
     assert job_response.status_code == 200
@@ -81,7 +81,7 @@ def test_get_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
 
 
 def test_get_job_not_found(
-    httpx_mock, client: UnstructuredClient, platform_api_url: str
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
 ):
     url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d"
 
@@ -94,7 +94,7 @@ def test_get_job_not_found(
     )
 
     with pytest.raises(SDKError) as e:
-        client.jobs.get_job(
+        platform_client.jobs.get_job(
             request=operations.GetJobRequest(
                 job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d"
             )
@@ -110,7 +110,7 @@ def test_get_job_not_found(
     assert request.url == url
 
 
-def test_get_job_error(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_get_job_error(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d"
 
     httpx_mock.add_response(
@@ -122,7 +122,7 @@ def test_get_job_error(httpx_mock, client: UnstructuredClient, platform_api_url:
     )
 
     with pytest.raises(SDKError) as e:
-        client.jobs.get_job(
+        platform_client.jobs.get_job(
             request=operations.GetJobRequest(
                 job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d"
             )
@@ -138,7 +138,7 @@ def test_get_job_error(httpx_mock, client: UnstructuredClient, platform_api_url:
     assert request.url == url
 
 
-def test_cancel_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_cancel_job(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d/cancel"
 
     httpx_mock.add_response(
@@ -152,7 +152,7 @@ def test_cancel_job(httpx_mock, client: UnstructuredClient, platform_api_url: st
         },
     )
 
-    cancel_response = client.jobs.cancel_job(
+    cancel_response = platform_client.jobs.cancel_job(
         request=operations.CancelJobRequest(
             job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d"
         )
