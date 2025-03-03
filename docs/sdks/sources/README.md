@@ -21,7 +21,10 @@ Create a new source connector using the provided configuration and name.
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
@@ -75,7 +78,10 @@ Delete a specific source connector identified by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.sources.delete_source(request={
         "source_id": "8a24d7ae-5524-45e9-83f9-b0adba5303d4",
@@ -116,7 +122,10 @@ Retrieve detailed information for a specific source connector by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.sources.get_source(request={
         "source_id": "e02d8147-b614-4e4c-9c6d-0cd9c4492ea0",
@@ -157,7 +166,10 @@ Retrieve a list of available source connectors.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.sources.list_sources(request={})
 
@@ -196,7 +208,10 @@ Update the configuration of an existing source connector.
 ```python
 from unstructured_client import UnstructuredClient
 
-with UnstructuredClient() as uc_client:
+
+with UnstructuredClient(
+    server_url="https://api.example.com",
+) as uc_client:
 
     res = uc_client.sources.update_source(request={
         "update_source_connector": {
