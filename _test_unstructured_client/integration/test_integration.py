@@ -13,9 +13,6 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-FREEMIUM_URL = "https://api.unstructured.io"
-
-
 @pytest.fixture(scope="module")
 def client() -> UnstructuredClient:
     _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
@@ -47,7 +44,6 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
     )
 
     response = client.general.partition(
-        server_url=FREEMIUM_URL,
         request=req
     )
     assert response.status_code == 200
@@ -109,7 +105,6 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
 
     with pytest.raises(sdk_raises):
         response = client.general.partition(
-            server_url=FREEMIUM_URL,
             request=req
         )
 
@@ -220,7 +215,6 @@ def test_uvloop_partitions_without_errors(client, doc_path):
         )
 
         resp = client.general.partition(
-            server_url=FREEMIUM_URL,
             request=req
         )
 
