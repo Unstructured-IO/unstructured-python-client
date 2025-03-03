@@ -6,6 +6,7 @@ import json
 import logging
 import math
 import os
+import sys
 import tempfile
 import uuid
 from collections.abc import Awaitable
@@ -55,6 +56,21 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
+
+def _run_coroutines_in_separate_thread(
+        coroutines_task: Coroutine[Any, Any, list[tuple[Any, httpx.Response]]]
+) -> list[httpx.Response]:
+    if sys.version_info < (3, 10):
+        loop = asyncio.get_event_loop()
+    else:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+
+        asyncio.set_event_loop(loop)
+
+    return loop.run_until_complete(coroutines_task)
 
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
@@ -606,7 +622,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # sending the coroutines to a separate thread to avoid blocking the current event loop
         # this operation should be removed when the SDK is updated to support async hooks
         with futures.ThreadPoolExecutor(max_workers=1) as executor:
-            task_responses_future = executor.submit(asyncio.run, coroutines)
+            task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
             task_responses = task_responses_future.result()
 
         if task_responses is None:
