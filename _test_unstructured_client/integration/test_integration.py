@@ -13,9 +13,6 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-FREEMIUM_URL = "https://api.unstructured.io"
-
-
 @pytest.fixture(scope="module")
 def client() -> UnstructuredClient:
     _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
@@ -47,7 +44,6 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
     )
 
     response = client.general.partition(
-        server_url=FREEMIUM_URL,
         request=req
     )
     assert response.status_code == 200
@@ -109,7 +105,6 @@ def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path
 
     with pytest.raises(sdk_raises):
         response = client.general.partition(
-            server_url=FREEMIUM_URL,
             request=req
         )
 
@@ -220,7 +215,6 @@ def test_uvloop_partitions_without_errors(client, doc_path):
         )
 
         resp = client.general.partition(
-            server_url=FREEMIUM_URL,
             request=req
         )
 
@@ -233,3 +227,124 @@ def test_uvloop_partitions_without_errors(client, doc_path):
     uvloop.install()
     elements = asyncio.run(call_api())
     assert len(elements) > 0
+
+
+@pytest.mark.parametrize("split_pdf", [True, False])
+@pytest.mark.parametrize("vlm_model", ["gpt-4o"])
+@pytest.mark.parametrize("vlm_model_provider", ["openai"])
+@pytest.mark.parametrize(
+    "filename", 
+    [
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
+    ]
+)
+def test_partition_strategy_vlm_openai(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="vlm",
+            vlm_model=vlm_model,
+            vlm_model_provider=vlm_model_provider,
+            languages=["eng"],
+            split_pdf_page=split_pdf,
+        )
+    )
+
+    response = client.general.partition(
+        request=req
+    )
+    assert response.status_code == 200
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
+
+
+@pytest.mark.parametrize("split_pdf", [True, False])
+@pytest.mark.parametrize("vlm_model", 
+    [
+        "us.amazon.nova-pro-v1:0", 
+        "us.amazon.nova-lite-v1:0", 
+        "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+        "us.anthropic.claude-3-opus-20240229-v1:0",
+        "us.anthropic.claude-3-haiku-20240307-v1:0",
+        "us.anthropic.claude-3-sonnet-20240229-v1:0",
+        "us.meta.llama3-2-90b-instruct-v1:0",
+        "us.meta.llama3-2-11b-instruct-v1:0",
+    ]
+)
+@pytest.mark.parametrize("vlm_model_provider", ["bedrock"])
+@pytest.mark.parametrize(
+    "filename", 
+    [
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
+    ]
+)
+def test_partition_strategy_vlm_bedrock(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="vlm",
+            vlm_model=vlm_model,
+            vlm_model_provider=vlm_model_provider,
+            languages=["eng"],
+            split_pdf_page=split_pdf,
+        )
+    )
+
+    response = client.general.partition(
+        request=req
+    )
+    assert response.status_code == 200
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
+
+@pytest.mark.parametrize("split_pdf", [True, False])
+@pytest.mark.parametrize("vlm_model", ["claude-3-5-sonnet-20241022",])
+@pytest.mark.parametrize("vlm_model_provider", ["anthropic"])
+@pytest.mark.parametrize(
+    "filename", 
+    [
+        "layout-parser-paper-fast.pdf", 
+        "fake-power-point.ppt",
+        "embedded-images-tables.jpg",
+    ]
+)
+def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provider, client, doc_path, filename):
+    with open(doc_path / filename, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=filename,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="vlm",
+            vlm_model=vlm_model,
+            vlm_model_provider=vlm_model_provider,
+            languages=["eng"],
+            split_pdf_page=split_pdf,
+        )
+    )
+
+    response = client.general.partition(
+        request=req
+    )
+    assert response.status_code == 200
+    assert len(response.elements) > 0
+    assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"

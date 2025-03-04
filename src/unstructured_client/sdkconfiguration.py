@@ -16,13 +16,24 @@ from unstructured_client.models import shared
 from unstructured_client.types import OptionalNullable, UNSET
 
 
+SERVER_PLATFORM_API = "platform-api"
+r"""Unstructured Platform API"""
+SERVERS = {
+    SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
+}
+"""Contains the list of servers available to the SDK"""
+
+
 @dataclass
 class SDKConfiguration:
-    client: HttpClient
-    async_client: AsyncHttpClient
+    client: Union[HttpClient, None]
+    client_supplied: bool
+    async_client: Union[AsyncHttpClient, None]
+    async_client_supplied: bool
     debug_logger: Logger
     security: Optional[Union[shared.Security, Callable[[], shared.Security]]] = None
     server_url: Optional[str] = ""
+    server: Optional[str] = ""
     language: str = "python"
     openapi_doc_version: str = __openapi_doc_version__
     sdk_version: str = __version__
@@ -35,10 +46,15 @@ class SDKConfiguration:
         self._hooks = SDKHooks()
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:
-        if self.server_url is None:
-            return "", {}
+        if self.server_url is not None and self.server_url:
+            return remove_suffix(self.server_url, "/"), {}
+        if not self.server:
+            self.server = SERVER_PLATFORM_API
 
-        return remove_suffix(self.server_url, "/"), {}
+        if self.server not in SERVERS:
+            raise ValueError(f'Invalid server "{self.server}"')
+
+        return SERVERS[self.server], {}
 
     def get_hooks(self) -> SDKHooks:
         return self._hooks

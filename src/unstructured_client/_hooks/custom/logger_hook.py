@@ -78,7 +78,6 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
             # NOTE: Even though this is an after_error method, due to split_pdf_hook logic we may get
             # a success here when one of the split requests was partitioned successfully
             return response, error
-        logger.error("Failed to partition the document.")
         if response:
             logger.error("Server responded with %d - %s", response.status_code, response.text)
         if error is not None:
