@@ -4,6 +4,7 @@
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
@@ -34,6 +35,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
+
     async with UnstructuredClient() as uc_client:
 
         res = await uc_client.destinations.create_destination_async(request={
