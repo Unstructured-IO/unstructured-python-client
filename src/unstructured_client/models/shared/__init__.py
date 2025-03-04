@@ -142,6 +142,7 @@ from .googledrivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
 from .jobinformation import JobInformation, JobInformationTypedDict
+from .jobstatus import JobStatus
 from .kafkaclouddestinationconnectorconfig import (
     KafkaCloudDestinationConnectorConfig,
     KafkaCloudDestinationConnectorConfigTypedDict,
@@ -417,6 +418,7 @@ __all__ = [
     "GoogleDriveSourceConnectorConfigTypedDict",
     "JobInformation",
     "JobInformationTypedDict",
+    "JobStatus",
     "KafkaCloudDestinationConnectorConfig",
     "KafkaCloudDestinationConnectorConfigInput",
     "KafkaCloudDestinationConnectorConfigInputTypedDict",

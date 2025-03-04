@@ -21,6 +21,7 @@ Create a new destination connector using the provided configuration and name.
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
@@ -70,6 +71,7 @@ Delete a specific destination connector by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.delete_destination(request={
@@ -110,6 +112,7 @@ Retrieve detailed information for a specific destination connector by its ID.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 
@@ -152,6 +155,7 @@ Retrieve a list of available destination connectors.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.list_destinations(request={})
@@ -190,6 +194,7 @@ Update the configuration of an existing destination connector.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 

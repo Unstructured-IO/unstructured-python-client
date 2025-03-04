@@ -113,6 +113,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
@@ -140,6 +141,7 @@ If you'd like to override the default retry strategy for all operations that sup
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
+
 
 with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
@@ -192,6 +194,7 @@ When custom error responses are specified for an operation, the SDK may also rai
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import errors, shared
+
 
 with UnstructuredClient() as uc_client:
     res = None
@@ -325,6 +328,7 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_destination(request={
@@ -355,6 +359,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
 async def main():
+
     async with UnstructuredClient() as uc_client:
 
         res = await uc_client.destinations.create_destination_async(request={
@@ -451,6 +456,7 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
@@ -486,12 +492,14 @@ The `UnstructuredClient` class implements the context manager protocol and regis
 ```python
 from unstructured_client import UnstructuredClient
 def main():
+
     with UnstructuredClient() as uc_client:
         # Rest of application here...
 
 
 # Or when using async:
 async def amain():
+
     async with UnstructuredClient() as uc_client:
         # Rest of application here...
 ```
