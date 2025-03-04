@@ -17,7 +17,7 @@ def test_list_jobs(httpx_mock, client: UnstructuredClient, platform_api_url: str
             {
                 "created_at": "2025-06-22T11:37:21.648Z",
                 "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
-                "status": "active",
+                "status": "IN_PROGRESS",
                 "runtime": None,
                 "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
                 "workflow_name": "test_workflow",
@@ -40,7 +40,7 @@ def test_list_jobs(httpx_mock, client: UnstructuredClient, platform_api_url: str
     assert job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
     assert job.workflow_id == "16b80fee-64dc-472d-8f26-1d7729b6423d"
     assert job.workflow_name == "test_workflow"
-    assert job.status == "active"
+    assert job.status == "IN_PROGRESS"
     assert job.created_at == datetime.fromisoformat("2025-06-22T11:37:21.648+00:00")
 
 
@@ -53,7 +53,7 @@ def test_get_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
         json={
             "created_at": "2025-06-22T11:37:21.648Z",
             "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
-            "status": "active",
+            "status": "SCHEDULED",
             "runtime": None,
             "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
             "workflow_name": "test_workflow",
@@ -76,7 +76,7 @@ def test_get_job(httpx_mock, client: UnstructuredClient, platform_api_url: str):
     assert job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
     assert job.workflow_id == "16b80fee-64dc-472d-8f26-1d7729b6423d"
     assert job.workflow_name == "test_workflow"
-    assert job.status == "active"
+    assert job.status == "SCHEDULED"
     assert job.created_at == datetime.fromisoformat("2025-06-22T11:37:21.648+00:00")
 
 
