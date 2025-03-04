@@ -94,13 +94,18 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
 @pytest.mark.parametrize(
     ("status_code", "expect_retry"),
     [
-        [500, False],
+        [400, False],
+        [401, False],
+        [403, False],
+        [404, False],
+        [422, False],
+        [500, True],
         [502, True],
         [503, True],
         [504, True],
     ]
 )
-def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
+def test_unit_number_of_retries_in_failed_requests(status_code: int, expect_retry: bool):
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
         initial_interval=1, max_interval=10, exponent=1.5, max_elapsed_time=300
