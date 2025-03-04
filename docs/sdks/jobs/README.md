@@ -18,6 +18,7 @@ Cancel the specified job.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.cancel_job(request={
@@ -59,6 +60,7 @@ Retrieve detailed information for a specific job by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.get_job(request={
@@ -99,6 +101,7 @@ Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 

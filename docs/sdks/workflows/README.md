@@ -22,6 +22,7 @@ Create a new workflow, either custom or auto, and configure its settings.
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.create_workflow(request={
@@ -69,6 +70,7 @@ Delete a workflow by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.delete_workflow(request={
@@ -109,6 +111,7 @@ Retrieve detailed information for a specific workflow by its ID.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 
@@ -151,6 +154,7 @@ Retrieve a list of workflows, optionally filtered by source, destination, or sta
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.list_workflows(request={})
@@ -189,6 +193,7 @@ Run a workflow by triggering a new job if none is currently active.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 
@@ -230,6 +235,7 @@ Update an existing workflow's name, connectors, schedule, or workflow type.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 

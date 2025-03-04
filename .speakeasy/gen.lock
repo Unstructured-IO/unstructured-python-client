@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: de9f013dc09f5ad50eaa7dd5716106ca
+  docChecksum: 8befe9665bd102e8cc2241c80080859a
   docVersion: 1.0.78
-  speakeasyVersion: 1.490.0
-  generationVersion: 2.512.0
-  releaseVersion: 0.30.6
-  configChecksum: c946e26d3a3b2fe2756ff169416b448c
+  speakeasyVersion: 1.509.0
+  generationVersion: 2.539.0
+  releaseVersion: 0.31.0
+  configChecksum: faf5191e78f1597b78cd7600af4f1d96
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.11.0
+    core: 5.12.2
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -28,11 +28,11 @@ features:
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
-    nullables: 1.0.0
+    nullables: 1.0.1
     openEnums: 1.0.0
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.0
+    sdkHooks: 1.0.1
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
@@ -125,6 +125,7 @@ generatedFiles:
   - docs/models/shared/googledrivesourceconnectorconfig.md
   - docs/models/shared/googledrivesourceconnectorconfiginput.md
   - docs/models/shared/jobinformation.md
+  - docs/models/shared/jobstatus.md
   - docs/models/shared/kafkaclouddestinationconnectorconfig.md
   - docs/models/shared/kafkaclouddestinationconnectorconfiginput.md
   - docs/models/shared/kafkacloudsourceconnectorconfig.md
@@ -270,6 +271,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py
   - src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/jobinformation.py
+  - src/unstructured_client/models/shared/jobstatus.py
   - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py
   - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py
@@ -413,16 +415,16 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"created_at": "2025-01-14T00:09:32.358Z", "id": "d18f330b-506f-455c-9cb8-0cee2386ac29", "runtime": "<value>", "status": "<value>", "workflow_id": "136fd799-4c45-4417-a632-f460d8ebb2a2", "workflow_name": "<value>"}
+          application/json: {"created_at": "2025-01-14T00:09:32.358Z", "id": "d18f330b-506f-455c-9cb8-0cee2386ac29", "runtime": "<value>", "status": "IN_PROGRESS", "workflow_id": "136fd799-4c45-4417-a632-f460d8ebb2a2", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>", 701982], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   list_jobs:
     speakeasy-default-list-jobs:
       responses:
         "200":
-          application/json: [{"created_at": "2023-09-01T17:59:19.211Z", "id": "7098ff76-419f-4a5a-a313-d159507b629d", "runtime": "<value>", "status": "<value>", "workflow_id": "75cf761e-8c10-48e4-b3d7-6ae90ad4fd3e", "workflow_name": "<value>"}]
+          application/json: [{"created_at": "2023-09-01T17:59:19.211Z", "id": "7098ff76-419f-4a5a-a313-d159507b629d", "runtime": "<value>", "status": "SCHEDULED", "workflow_id": "75cf761e-8c10-48e4-b3d7-6ae90ad4fd3e", "workflow_name": "<value>"}]
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
   create_source:
     speakeasy-default-create-source:
       requestBody:

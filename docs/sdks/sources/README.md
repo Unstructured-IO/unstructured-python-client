@@ -21,6 +21,7 @@ Create a new source connector using the provided configuration and name.
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.create_source(request={
@@ -75,6 +76,7 @@ Delete a specific source connector identified by its ID.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.delete_source(request={
@@ -115,6 +117,7 @@ Retrieve detailed information for a specific source connector by its ID.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 
@@ -157,6 +160,7 @@ Retrieve a list of available source connectors.
 ```python
 from unstructured_client import UnstructuredClient
 
+
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.list_sources(request={})
@@ -195,6 +199,7 @@ Update the configuration of an existing source connector.
 
 ```python
 from unstructured_client import UnstructuredClient
+
 
 with UnstructuredClient() as uc_client:
 
