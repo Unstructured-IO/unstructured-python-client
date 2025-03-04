@@ -4,25 +4,48 @@ from pathlib import Path
 
 import pytest
 
-from unstructured_client import UnstructuredClient
+from unstructured_client import UnstructuredClient, utils
 
 FAKE_API_KEY = "91pmLBeETAbXCpNylRsLq11FdiZPTk"
 
+
 @pytest.fixture(scope="module")
 def platform_client(platform_api_url) -> UnstructuredClient:
+    # settings the retry config to always try 3 times after a fail = 4 requests sent
     _client = UnstructuredClient(
         api_key_auth=FAKE_API_KEY,
         server_url=platform_api_url,
+        retry_config=utils.RetryConfig(
+            "backoff", utils.BackoffStrategy(
+                initial_interval=3000,
+                max_interval=3000,
+                exponent=1.0,
+                max_elapsed_time=8000
+            ),
+            retry_connection_errors=True
+        )
     )
     yield _client
 
+
 @pytest.fixture(scope="module")
 def serverless_client(serverless_api_url) -> UnstructuredClient:
+    # settings the retry config to always try 3 times after a fail = 4 requests sent
     _client = UnstructuredClient(
         api_key_auth=FAKE_API_KEY,
-        server_url=serverless_api_url
+        server_url=serverless_api_url,
+        retry_config = utils.RetryConfig(
+        "backoff", utils.BackoffStrategy(
+            initial_interval=3000,
+            max_interval=3000,
+            exponent=1.0,
+            max_elapsed_time=8000
+        ),
+        retry_connection_errors=True
+    )
     )
     yield _client
+
 
 @pytest.fixture(autouse=True)
 def mock_sleep(mocker, freezer):
@@ -30,13 +53,16 @@ def mock_sleep(mocker, freezer):
     sleep_mock.side_effect = lambda seconds: freezer.tick(timedelta(seconds=seconds))
     yield sleep_mock
 
+
 @pytest.fixture(scope="module")
 def platform_api_url():
     return "https://platform.unstructuredapp.io"
 
+
 @pytest.fixture(scope="module")
 def serverless_api_url():
     return "https://api.unstructuredapp.io"
+
 
 @pytest.fixture(scope="module")
 def dummy_partitioned_text():
@@ -81,6 +107,7 @@ def dummy_partitioned_text():
     }
   }
 ]"""
+
 
 @pytest.fixture(scope="module")
 def doc_path() -> Path:

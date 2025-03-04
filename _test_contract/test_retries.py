@@ -90,7 +90,7 @@ serverless_api_url: str,
     requests = httpx_mock.get_requests()
     assert len(requests) == 3
     for request in requests:
-        assert request.method == "POSt"
+        assert request.method == "POST"
         assert request.url == url
 
     assert len(partition_response.elements) > 0

@@ -119,6 +119,7 @@ def test_get_job_error(httpx_mock, platform_client: UnstructuredClient, platform
         headers={"Content-Type": "application/json"},
         json={"detail": "Internal server error"},
         url=url,
+        is_reusable=True,
     )
 
     with pytest.raises(SDKError) as e:
@@ -132,7 +133,7 @@ def test_get_job_error(httpx_mock, platform_client: UnstructuredClient, platform
     assert e.value.message == "API error occurred"
 
     requests = httpx_mock.get_requests()
-    assert len(requests) == 1
+    assert len(requests) == 4
     request = requests[0]
     assert request.method == "GET"
     assert request.url == url
