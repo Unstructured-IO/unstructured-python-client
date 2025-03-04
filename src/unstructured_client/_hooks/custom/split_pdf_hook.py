@@ -6,16 +6,17 @@ import json
 import logging
 import math
 import os
+import sys
 import tempfile
 import uuid
 from collections.abc import Awaitable
+from concurrent import futures
 from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
 import aiofiles
 import httpx
-import nest_asyncio  # type: ignore
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 
@@ -55,6 +56,33 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
+
+def _get_asyncio_loop() -> asyncio.AbstractEventLoop:
+    if sys.version_info < (3, 10):
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+    else:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    return loop
+
+def _run_coroutines_in_separate_thread(
+        coroutines_task: Coroutine[Any, Any, list[tuple[Any, httpx.Response]]]
+) -> list[httpx.Response]:
+    loop = _get_asyncio_loop()
+    return loop.run_until_complete(coroutines_task)
+
+def _get_limiter(concurrency_level: int, executor: futures.ThreadPoolExecutor) -> asyncio.Semaphore:
+    def _setup_limiter_in_thread_loop():
+        _get_asyncio_loop()
+        return asyncio.Semaphore(concurrency_level)
+    return executor.submit(_setup_limiter_in_thread_loop).result()
+
 
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
@@ -165,6 +193,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         ] = {}
         self.api_successful_responses: dict[str, list[httpx.Response]] = {}
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
+        self.executors: dict[str, futures.ThreadPoolExecutor] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
         self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
@@ -268,10 +297,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.warning("Splitting is currently incompatible with uvloop. Continuing without splitting.")
             return request
 
-        # This allows us to use an event loop in an env with an existing loop
-        # Temporary fix until we can improve the async splitting behavior
-        nest_asyncio.apply()
-
         # This is our key into coroutines_to_execute
         # We need to pass it on to after_success so
         # we know which results are ours
@@ -321,7 +346,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-        limiter = asyncio.Semaphore(concurrency_level)
+
+        executor = futures.ThreadPoolExecutor(max_workers=1)
+        self.executors[operation_id] = executor
+        limiter = _get_limiter(concurrency_level, executor)
 
         self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
@@ -605,10 +633,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if tasks is None:
             return None
 
-        ioloop = asyncio.get_event_loop()
-        task_responses: list[tuple[int, httpx.Response]] = ioloop.run_until_complete(
-            run_tasks(tasks, allow_failed=self.allow_failed)
-        )
+        coroutines = run_tasks(tasks, allow_failed=self.allow_failed)
+
+        # sending the coroutines to a separate thread to avoid blocking the current event loop
+        # this operation should be removed when the SDK is updated to support async hooks
+        executor = self.executors.get(operation_id)
+        if executor is None:
+            raise RuntimeError("Executor not found for operation_id")
+        task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
+        task_responses = task_responses_future.result()
 
         if task_responses is None:
             return None
@@ -715,6 +748,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.coroutines_to_execute.pop(operation_id, None)
         self.api_successful_responses.pop(operation_id, None)
+        executor = self.executors.pop(operation_id, None)
+        if executor is not None:
+            executor.shutdown(wait=True)
         tempdir = self.tempdirs.pop(operation_id, None)
         if tempdir:
             tempdir.cleanup()
