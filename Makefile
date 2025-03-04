@@ -73,16 +73,20 @@ download-openapi-specs:
 client-merge-serverless-platform:
 	speakeasy merge -s ./openapi_platform_api.json -s ./openapi_serverless.json -o ./openapi_merged.yaml
 
-## client-generate-unified-sdk-local:		Generate the SDK using merged schemas
-.PHONY: client-generate-unified-sdk-local
-client-generate-unified-sdk-local:
+## client-apply-overlay:		            Apply overlay on the merged schema
+.PHONY: client-apply-overlay
+client-apply-overlay:
 	speakeasy overlay validate -o ./overlay_client.yaml
 	speakeasy overlay apply -s ./openapi_merged.yaml -o ./overlay_client.yaml > ./openapi_platform_serverless_client.yaml
+
+## client-generate-unified-sdk-local:		Generate the SDK from the merged schema
+.PHONY: client-generate-unified-sdk-local
+client-generate-unified-sdk-local:
 	speakeasy generate sdk -s ./openapi_platform_serverless_client.yaml -o ./ -l python
 
 ## client-generate-sdk:			             Do all the steps to generate the SDK
 .PHONY: client-generate-sdk
-client-generate-sdk: download-openapi-specs client-merge-serverless-platform client-generate-unified-sdk-local
+client-generate-sdk: download-openapi-specs client-merge-serverless-platform client-apply-overlay client-generate-unified-sdk-local
 
 
 .PHONY: publish
