@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 8befe9665bd102e8cc2241c80080859a
+  docChecksum: 761bdf240b7e572d6a866cee2c950c70
   docVersion: 1.0.78
-  speakeasyVersion: 1.509.0
-  generationVersion: 2.539.0
-  releaseVersion: 0.31.0
-  configChecksum: faf5191e78f1597b78cd7600af4f1d96
+  speakeasyVersion: 1.513.0
+  generationVersion: 2.545.1
+  releaseVersion: 0.31.1
+  configChecksum: 569b9e45b4960f94a43454c345d9b38c
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -197,7 +197,7 @@ generatedFiles:
   - py.typed
   - pylintrc
   - pyproject.toml
-  - scripts/prepare-readme.py
+  - scripts/prepare_readme.py
   - scripts/publish.sh
   - src/unstructured_client/__init__.py
   - src/unstructured_client/_hooks/__init__.py
@@ -208,6 +208,7 @@ generatedFiles:
   - src/unstructured_client/destinations.py
   - src/unstructured_client/httpclient.py
   - src/unstructured_client/jobs.py
+  - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
   - src/unstructured_client/models/errors/sdkerror.py
@@ -417,14 +418,14 @@ examples:
         "200":
           application/json: {"created_at": "2025-01-14T00:09:32.358Z", "id": "d18f330b-506f-455c-9cb8-0cee2386ac29", "runtime": "<value>", "status": "IN_PROGRESS", "workflow_id": "136fd799-4c45-4417-a632-f460d8ebb2a2", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": ["<value>", 701982], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   list_jobs:
     speakeasy-default-list-jobs:
       responses:
         "200":
           application/json: [{"created_at": "2023-09-01T17:59:19.211Z", "id": "7098ff76-419f-4a5a-a313-d159507b629d", "runtime": "<value>", "status": "SCHEDULED", "workflow_id": "75cf761e-8c10-48e4-b3d7-6ae90ad4fd3e", "workflow_name": "<value>"}]
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   create_source:
     speakeasy-default-create-source:
       requestBody:
@@ -522,9 +523,9 @@ examples:
         header: {}
       responses:
         "202":
-          application/json: {"created_at": "2024-08-04T10:06:22.481Z", "destinations": [], "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "custom"}
+          application/json: {"created_at": "2024-08-04T10:06:22.481Z", "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445", "runtime": "<value>", "status": "COMPLETED", "workflow_id": "b67be6d9-8e94-40c8-afd7-21e5d2d00363", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [397022, 604524], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"loc": ["<value>", 233068, "<value>"], "msg": "<value>", "type": "<value>"}]}
   update_workflow:
     speakeasy-default-update-workflow:
       parameters:

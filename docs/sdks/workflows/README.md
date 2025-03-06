@@ -201,10 +201,10 @@ with UnstructuredClient() as uc_client:
         "workflow_id": "6b67be6d-98e9-440c-88fd-721e5d2d0036",
     })
 
-    assert res.workflow_information is not None
+    assert res.job_information is not None
 
     # Handle response
-    print(res.workflow_information)
+    print(res.job_information)
 
 ```
 

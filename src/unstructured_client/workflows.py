@@ -987,8 +987,8 @@ class Workflows(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "202", "application/json"):
             return operations.RunWorkflowResponse(
-                workflow_information=utils.unmarshal_json(
-                    http_res.text, Optional[shared.WorkflowInformation]
+                job_information=utils.unmarshal_json(
+                    http_res.text, Optional[shared.JobInformation]
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -1099,8 +1099,8 @@ class Workflows(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "202", "application/json"):
             return operations.RunWorkflowResponse(
-                workflow_information=utils.unmarshal_json(
-                    http_res.text, Optional[shared.WorkflowInformation]
+                job_information=utils.unmarshal_json(
+                    http_res.text, Optional[shared.JobInformation]
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
