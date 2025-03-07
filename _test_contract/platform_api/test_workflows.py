@@ -7,7 +7,7 @@ from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
 
 
-def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_list_workflows(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/workflows/"
 
     httpx_mock.add_response(
@@ -32,7 +32,7 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
         ],
     )
 
-    workflows_response = client.workflows.list_workflows(
+    workflows_response = platform_client.workflows.list_workflows(
         request=operations.ListWorkflowsRequest()
     )
     assert workflows_response.status_code == 200
@@ -67,7 +67,7 @@ def test_list_workflows(httpx_mock, client: UnstructuredClient, platform_api_url
 
 
 def test_list_workflows_empty(
-    httpx_mock, client: UnstructuredClient, platform_api_url: str
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
 ):
     url = f"{platform_api_url}/api/v1/workflows/"
 
@@ -77,7 +77,7 @@ def test_list_workflows_empty(
         json=[],
     )
 
-    workflows_response = client.workflows.list_workflows(
+    workflows_response = platform_client.workflows.list_workflows(
         request=operations.ListWorkflowsRequest()
     )
     assert workflows_response.status_code == 200
@@ -96,7 +96,7 @@ def test_list_workflows_empty(
 @pytest.mark.httpx_mock(can_send_already_matched_responses=True)  # in case of retries
 def test_list_workflows_error(
     httpx_mock,
-    client: UnstructuredClient,
+    platform_client: UnstructuredClient,
     platform_api_url: str,
     error_status_code: int,
 ):
@@ -109,12 +109,12 @@ def test_list_workflows_error(
     )
 
     with pytest.raises(SDKError) as excinfo:
-        client.workflows.list_workflows(request=operations.ListWorkflowsRequest())
+        platform_client.workflows.list_workflows(request=operations.ListWorkflowsRequest())
     assert excinfo.value.status_code == error_status_code
     assert excinfo.value.message == "API error occurred"
 
 
-def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_create_workflow(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/workflows/"
 
     httpx_mock.add_response(
@@ -138,7 +138,7 @@ def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
         },
     )
 
-    create_workflow_response = client.workflows.create_workflow(
+    create_workflow_response = platform_client.workflows.create_workflow(
         request=operations.CreateWorkflowRequest(
             create_workflow=shared.CreateWorkflow(
                 name="test_workflow",
@@ -159,7 +159,7 @@ def test_create_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
     assert request.url == url
 
 
-def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_update_workflow(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = f"{platform_api_url}/api/v1/workflows/16b80fee-64dc-472d-8f26-1d7729b6423d"
 
     httpx_mock.add_response(
@@ -183,7 +183,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
         },
     )
 
-    update_workflow_response = client.workflows.update_workflow(
+    update_workflow_response = platform_client.workflows.update_workflow(
         request=operations.UpdateWorkflowRequest(
             workflow_id="16b80fee-64dc-472d-8f26-1d7729b6423d",
             update_workflow=shared.UpdateWorkflow(
@@ -219,7 +219,7 @@ def test_update_workflow(httpx_mock, client: UnstructuredClient, platform_api_ur
     assert updated_workflow.destinations == ["aeebecc7-9d8e-4625-bf1d-815c2f084869"]
 
 
-def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: str):
+def test_run_workflow(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
     url = (
         f"{platform_api_url}/api/v1/workflows/16b80fee-64dc-472d-8f26-1d7729b6423d/run"
     )
@@ -229,21 +229,16 @@ def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: 
         url=url,
         status_code=202,
         json={
-            "created_at": "2024-08-04T10:06:22.481Z",
-            "id": "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445",
-            "name": "test_workflow",
-            "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * 0"}]},
-            "sources": ["a9593964-92eb-496f-84ac-c8f067ba24c3"],
-            "destinations": [
-                "aeebecc7-9d8e-4625-bf1d-815c2f084869",
-            ],
-            "workflow_nodes": [],
-            "status": "active",
-            "workflow_type": "platinum",
+            "created_at": "2025-06-22T11:37:21.648Z",
+            "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
+            "status": "SCHEDULED",
+            "runtime": None,
+            "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
+            "workflow_name": "test_workflow",
         },
     )
 
-    run_workflow_response = client.workflows.run_workflow(
+    run_workflow_response = platform_client.workflows.run_workflow(
         request=operations.RunWorkflowRequest(
             workflow_id="16b80fee-64dc-472d-8f26-1d7729b6423d"
         )
@@ -257,16 +252,10 @@ def test_run_workflow(httpx_mock, client: UnstructuredClient, platform_api_url: 
     assert request.method == "POST"
     assert request.url == url
 
-    workflow_run = run_workflow_response.workflow_information
-    assert workflow_run.id == "6c4f327c-7ca2-4933-a68d-2ebe9d9f1445"
-    assert workflow_run.name == "test_workflow"
-    assert workflow_run.workflow_type == "platinum"
-    assert workflow_run.status == "active"
+    workflow_run = run_workflow_response.job_information
+    assert workflow_run.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
+    assert workflow_run.workflow_name == "test_workflow"
+    assert workflow_run.status == "SCHEDULED"
     assert workflow_run.created_at == datetime.fromisoformat(
-        "2024-08-04T10:06:22.481+00:00"
+        "2025-06-22T11:37:21.648+00:00"
     )
-    assert workflow_run.schedule == shared.WorkflowSchedule(
-        crontab_entries=[shared.crontabentry.CronTabEntry(cron_expression="0 0 * * 0")]
-    )
-    assert workflow_run.sources == ["a9593964-92eb-496f-84ac-c8f067ba24c3"]
-    assert workflow_run.destinations == ["aeebecc7-9d8e-4625-bf1d-815c2f084869"]

@@ -18,6 +18,7 @@ python:
       deepdiff: '>=6.0'
       pytest: '>=8.3.3'
       pytest-asyncio: '>=0.24.0'
+      pytest-freezegun: '>=0.4.2'
       pytest-mock: '>=3.14.0'
       types-aiofiles: '>=24.1.0'
       uvloop: '>=0.20.0'

@@ -169,11 +169,7 @@ async def call_api_async(
         retry_connection_errors=True
     )
 
-    retryable_codes = [
-        "502",
-        "503",
-        "504"
-    ]
+    retryable_codes = ["5xx"]
 
     async def do_request():
         return await client.send(pdf_chunk_request)
