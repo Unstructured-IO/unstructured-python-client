@@ -116,7 +116,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "run_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"6b67be6d-98e9-440c-88fd-721e5d2d0036\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"6b67be6d-98e9-440c-88fd-721e5d2d0036\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
   - target: $["paths"]["/general/v0/general"]["post"]
     update:
       "x-codeSamples":

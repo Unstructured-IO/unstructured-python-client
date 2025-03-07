@@ -11,7 +11,7 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 .PHONY: install
 install:
 	pip install -U poetry
-	python scripts/prepare-readme.py
+	python scripts/prepare_readme.py
 	poetry install
 
 ## install-speakeasy-cli:			download the speakeasy cli tool
