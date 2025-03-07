@@ -17,11 +17,12 @@ def test_list_jobs_retries(httpx_mock, platform_client: UnstructuredClient, plat
     httpx_mock.add_response(
         method="GET",
         headers={"Content-Type": "application/json"},
+        status_code=200,
         json=[
             {
                 "created_at": "2025-06-22T11:37:21.648Z",
                 "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
-                "status": "active",
+                "status": "COMPLETED",
                 "runtime": None,
                 "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
                 "workflow_name": "test_workflow",
