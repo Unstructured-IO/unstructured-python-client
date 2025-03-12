@@ -72,8 +72,8 @@ def _get_asyncio_loop() -> asyncio.AbstractEventLoop:
     return loop
 
 def _run_coroutines_in_separate_thread(
-        coroutines_task: Coroutine[Any, Any, list[tuple[Any, httpx.Response]]]
-) -> list[httpx.Response]:
+        coroutines_task: Coroutine[Any, Any, list[tuple[int, httpx.Response]]],
+) -> list[tuple[int, httpx.Response]]:
     loop = _get_asyncio_loop()
     return loop.run_until_complete(coroutines_task)
 
