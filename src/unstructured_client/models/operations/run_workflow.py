@@ -6,9 +6,7 @@ import pydantic
 from pydantic import model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
-from unstructured_client.models.shared import (
-    workflowinformation as shared_workflowinformation,
-)
+from unstructured_client.models.shared import jobinformation as shared_jobinformation
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -80,9 +78,7 @@ class RunWorkflowResponseTypedDict(TypedDict):
     r"""HTTP response status code for this operation"""
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
-    workflow_information: NotRequired[
-        shared_workflowinformation.WorkflowInformationTypedDict
-    ]
+    job_information: NotRequired[shared_jobinformation.JobInformationTypedDict]
     r"""Successful Response"""
 
 
@@ -96,7 +92,5 @@ class RunWorkflowResponse(BaseModel):
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
 
-    workflow_information: Optional[shared_workflowinformation.WorkflowInformation] = (
-        None
-    )
+    job_information: Optional[shared_jobinformation.JobInformation] = None
     r"""Successful Response"""

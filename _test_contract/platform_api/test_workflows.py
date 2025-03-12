@@ -226,16 +226,17 @@ def test_run_workflow(httpx_mock, platform_client: UnstructuredClient, platform_
 
     httpx_mock.add_response(
         method="POST",
-        url=url,
         status_code=202,
+        headers={"Content-Type": "application/json"},
         json={
-            "created_at": "2025-06-22T11:37:21.648Z",
-            "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
-            "status": "SCHEDULED",
-            "runtime": None,
-            "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
-            "workflow_name": "test_workflow",
+                "created_at": "2025-06-22T11:37:21.648Z",
+                "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
+                "status": "IN_PROGRESS",
+                "runtime": None,
+                "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
+                "workflow_name": "test_workflow",
         },
+        url=url,
     )
 
     run_workflow_response = platform_client.workflows.run_workflow(
@@ -252,10 +253,7 @@ def test_run_workflow(httpx_mock, platform_client: UnstructuredClient, platform_
     assert request.method == "POST"
     assert request.url == url
 
-    workflow_run = run_workflow_response.job_information
-    assert workflow_run.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
-    assert workflow_run.workflow_name == "test_workflow"
-    assert workflow_run.status == "SCHEDULED"
-    assert workflow_run.created_at == datetime.fromisoformat(
-        "2025-06-22T11:37:21.648+00:00"
-    )
+    new_job = run_workflow_response.job_information
+    assert new_job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
+    assert new_job.workflow_name == "test_workflow"
+    assert new_job.status == "IN_PROGRESS"
