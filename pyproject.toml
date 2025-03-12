@@ -1,6 +1,6 @@
 [project]
 name = "unstructured-client"
-version = "0.31.0"
+version = "0.31.1"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -14,7 +14,7 @@ dependencies = [
     "pypdf >=4.0",
     "python-dateutil >=2.8.2",
     "requests-toolbelt >=1.0.0",
-    "typing-inspect >=0.9.0",
+    "typing-inspection >=0.4.0",
 ]
 
 [tool.poetry]
