@@ -6,7 +6,6 @@ import json
 import logging
 import math
 import os
-import sys
 import tempfile
 import uuid
 from collections.abc import Awaitable
@@ -612,7 +611,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if tasks is None:
             return None
 
-        concurrency_level = self.concurrency_level.get(operation_id)
+        concurrency_level = self.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL)
         coroutines = run_tasks(tasks, allow_failed=self.allow_failed, concurrency_level=concurrency_level)
 
         # sending the coroutines to a separate thread to avoid blocking the current event loop
