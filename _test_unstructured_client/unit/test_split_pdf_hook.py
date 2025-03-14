@@ -339,6 +339,7 @@ def test_unit_get_page_range_returns_valid_range(page_range, expected_result):
 
 async def _request_mock(
         async_client: httpx.AsyncClient, # not used by mock
+        limiter: asyncio.Semaphore, # not used by mock
         fails: bool,
         content: str) -> requests.Response:
     response = requests.Response()
@@ -405,6 +406,7 @@ async def test_unit_disallow_failed_coroutines(
 
 async def _fetch_canceller_error(
         async_client: httpx.AsyncClient, # not used by mock
+        limiter: asyncio.Semaphore, # not used by mock
         fails: bool,
         content: str,
         cancelled_counter: Counter):
@@ -414,7 +416,7 @@ async def _fetch_canceller_error(
             print("Doesn't fail")
         else:
             print("Fails")
-        return await _request_mock(async_client=async_client, fails=fails, content=content)
+        return await _request_mock(async_client=async_client, limiter=limiter, fails=fails, content=content)
     except asyncio.CancelledError:
         cancelled_counter.update(["cancelled"])
         print(cancelled_counter["cancelled"])
