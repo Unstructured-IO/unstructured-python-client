@@ -5,12 +5,12 @@ from typing_extensions import TypedDict
 from unstructured_client.types import BaseModel
 
 
-class GcsSourceConnectorConfigInputTypedDict(TypedDict):
+class GCSSourceConnectorConfigInputTypedDict(TypedDict):
     remote_url: str
     service_account_key: str
 
 
-class GcsSourceConnectorConfigInput(BaseModel):
+class GCSSourceConnectorConfigInput(BaseModel):
     remote_url: str
 
     service_account_key: str

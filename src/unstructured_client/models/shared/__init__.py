@@ -148,28 +148,36 @@ from .gcsdestinationconnectorconfiginput import (
     GCSDestinationConnectorConfigInputTypedDict,
 )
 from .gcssourceconnectorconfig import (
-    GcsSourceConnectorConfig,
-    GcsSourceConnectorConfigTypedDict,
+    GCSSourceConnectorConfig,
+    GCSSourceConnectorConfigTypedDict,
 )
 from .gcssourceconnectorconfiginput import (
-    GcsSourceConnectorConfigInput,
-    GcsSourceConnectorConfigInputTypedDict,
+    GCSSourceConnectorConfigInput,
+    GCSSourceConnectorConfigInputTypedDict,
 )
-from .google_drivesourceconnectorconfig import (
+from .googledrivesourceconnectorconfig import (
     GoogleDriveSourceConnectorConfig,
     GoogleDriveSourceConnectorConfigTypedDict,
 )
-from .google_drivesourceconnectorconfiginput import (
+from .googledrivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInput,
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
+from .jirasourceconnectorconfig import (
+    JiraSourceConnectorConfig,
+    JiraSourceConnectorConfigTypedDict,
+)
+from .jirasourceconnectorconfiginput import (
+    JiraSourceConnectorConfigInput,
+    JiraSourceConnectorConfigInputTypedDict,
+)
 from .jobinformation import JobInformation, JobInformationTypedDict
 from .jobstatus import JobStatus
-from .kafka_cloudsourceconnectorconfig import (
+from .kafkacloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
 )
-from .kafka_cloudsourceconnectorconfiginput import (
+from .kafkacloudsourceconnectorconfiginput import (
     KafkaCloudSourceConnectorConfigInput,
     KafkaCloudSourceConnectorConfigInputTypedDict,
 )
@@ -215,12 +223,12 @@ from .onedrivedestinationconnectorconfiginput import (
     OneDriveDestinationConnectorConfigInputTypedDict,
 )
 from .onedrivesourceconnectorconfig import (
-    OnedriveSourceConnectorConfig,
-    OnedriveSourceConnectorConfigTypedDict,
+    OneDriveSourceConnectorConfig,
+    OneDriveSourceConnectorConfigTypedDict,
 )
 from .onedrivesourceconnectorconfiginput import (
-    OnedriveSourceConnectorConfigInput,
-    OnedriveSourceConnectorConfigInputTypedDict,
+    OneDriveSourceConnectorConfigInput,
+    OneDriveSourceConnectorConfigInputTypedDict,
 )
 from .outlooksourceconnectorconfig import (
     OutlookSourceConnectorConfig,
@@ -239,6 +247,14 @@ from .partition_parameters import (
     Strategy,
     VLMModel,
     VLMModelProvider,
+)
+from .pineconedestinationconnectorconfig import (
+    PineconeDestinationConnectorConfig,
+    PineconeDestinationConnectorConfigTypedDict,
+)
+from .pineconedestinationconnectorconfiginput import (
+    PineconeDestinationConnectorConfigInput,
+    PineconeDestinationConnectorConfigInputTypedDict,
 )
 from .postgresdestinationconnectorconfig import (
     PostgresDestinationConnectorConfig,
@@ -407,8 +423,6 @@ __all__ = [
     "CreateSourceConnectorConfigTypedDict",
     "CreateSourceConnectorTypedDict",
     "CreateWorkflow",
-    "CreateWorkflowNode",
-    "CreateWorkflowNodeTypedDict",
     "CreateWorkflowTypedDict",
     "CronTabEntry",
     "CronTabEntryTypedDict",
@@ -451,16 +465,20 @@ __all__ = [
     "GCSDestinationConnectorConfigInput",
     "GCSDestinationConnectorConfigInputTypedDict",
     "GCSDestinationConnectorConfigTypedDict",
-    "GcsSourceConnectorConfig",
-    "GcsSourceConnectorConfigInput",
-    "GcsSourceConnectorConfigInputTypedDict",
-    "GcsSourceConnectorConfigTypedDict",
+    "GCSSourceConnectorConfig",
+    "GCSSourceConnectorConfigInput",
+    "GCSSourceConnectorConfigInputTypedDict",
+    "GCSSourceConnectorConfigTypedDict",
     "GoogleDriveSourceConnectorConfig",
     "GoogleDriveSourceConnectorConfigInput",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
     "GoogleDriveSourceConnectorConfigTypedDict",
     "InputFiles",
     "InputFilesTypedDict",
+    "JiraSourceConnectorConfig",
+    "JiraSourceConnectorConfigInput",
+    "JiraSourceConnectorConfigInputTypedDict",
+    "JiraSourceConnectorConfigTypedDict",
     "JobInformation",
     "JobInformationTypedDict",
     "JobStatus",
@@ -492,10 +510,10 @@ __all__ = [
     "OneDriveDestinationConnectorConfigInput",
     "OneDriveDestinationConnectorConfigInputTypedDict",
     "OneDriveDestinationConnectorConfigTypedDict",
-    "OnedriveSourceConnectorConfig",
-    "OnedriveSourceConnectorConfigInput",
-    "OnedriveSourceConnectorConfigInputTypedDict",
-    "OnedriveSourceConnectorConfigTypedDict",
+    "OneDriveSourceConnectorConfig",
+    "OneDriveSourceConnectorConfigInput",
+    "OneDriveSourceConnectorConfigInputTypedDict",
+    "OneDriveSourceConnectorConfigTypedDict",
     "OutlookSourceConnectorConfig",
     "OutlookSourceConnectorConfigInput",
     "OutlookSourceConnectorConfigInputTypedDict",
@@ -503,6 +521,10 @@ __all__ = [
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
+    "PineconeDestinationConnectorConfig",
+    "PineconeDestinationConnectorConfigInput",
+    "PineconeDestinationConnectorConfigInputTypedDict",
+    "PineconeDestinationConnectorConfigTypedDict",
     "PostgresDestinationConnectorConfig",
     "PostgresDestinationConnectorConfigInput",
     "PostgresDestinationConnectorConfigInputTypedDict",

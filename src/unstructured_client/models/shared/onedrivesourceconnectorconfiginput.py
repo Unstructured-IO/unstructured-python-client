@@ -6,7 +6,7 @@ from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import BaseModel
 
 
-class OnedriveSourceConnectorConfigInputTypedDict(TypedDict):
+class OneDriveSourceConnectorConfigInputTypedDict(TypedDict):
     client_cred: str
     client_id: str
     path: str
@@ -16,7 +16,7 @@ class OnedriveSourceConnectorConfigInputTypedDict(TypedDict):
     tenant: NotRequired[str]
 
 
-class OnedriveSourceConnectorConfigInput(BaseModel):
+class OneDriveSourceConnectorConfigInput(BaseModel):
     client_cred: str
 
     client_id: str

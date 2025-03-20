@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: ec5b1519ee12f8e116a26101bd037747
+  docChecksum: c4f3983b5eb89f59323e9fff5afa0acb
   docVersion: 1.0.81
-  speakeasyVersion: 1.521.0
-  generationVersion: 2.558.2
-  releaseVersion: 0.31.2
-  configChecksum: 0bf706114cdb05e694ef463063a71afe
+  speakeasyVersion: 1.521.1
+  generationVersion: 2.558.5
+  releaseVersion: 0.31.3
+  configChecksum: 04f975b0bdaad8df79df20dcb379d0b4
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -106,7 +106,6 @@ generatedFiles:
   - docs/models/shared/createsourceconnector.md
   - docs/models/shared/createsourceconnectorconfig.md
   - docs/models/shared/createworkflow.md
-  - docs/models/shared/createworkflownode.md
   - docs/models/shared/crontabentry.md
   - docs/models/shared/databricksvdtdestinationconnectorconfig.md
   - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
@@ -133,6 +132,8 @@ generatedFiles:
   - docs/models/shared/googledrivesourceconnectorconfig.md
   - docs/models/shared/googledrivesourceconnectorconfiginput.md
   - docs/models/shared/inputfiles.md
+  - docs/models/shared/jirasourceconnectorconfig.md
+  - docs/models/shared/jirasourceconnectorconfiginput.md
   - docs/models/shared/jobinformation.md
   - docs/models/shared/jobstatus.md
   - docs/models/shared/kafkacloudsourceconnectorconfig.md
@@ -155,6 +156,8 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/pineconedestinationconnectorconfig.md
+  - docs/models/shared/pineconedestinationconnectorconfiginput.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
   - docs/models/shared/postgresdestinationconnectorconfiginput.md
   - docs/models/shared/postgressourceconnectorconfig.md
@@ -266,7 +269,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/createdestinationconnector.py
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
-  - src/unstructured_client/models/shared/createworkflownode.py
   - src/unstructured_client/models/shared/crontabentry.py
   - src/unstructured_client/models/shared/databricks_volumessourceconnectorconfig.py
   - src/unstructured_client/models/shared/databricks_volumessourceconnectorconfiginput.py
@@ -288,12 +290,14 @@ generatedFiles:
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/gcssourceconnectorconfig.py
   - src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py
-  - src/unstructured_client/models/shared/google_drivesourceconnectorconfig.py
-  - src/unstructured_client/models/shared/google_drivesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py
+  - src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/jirasourceconnectorconfig.py
+  - src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/jobinformation.py
   - src/unstructured_client/models/shared/jobstatus.py
-  - src/unstructured_client/models/shared/kafka_cloudsourceconnectorconfig.py
-  - src/unstructured_client/models/shared/kafka_cloudsourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py
+  - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/mongodbconnectorconfig.py
@@ -310,6 +314,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgressourceconnectorconfig.py
@@ -505,9 +511,9 @@ examples:
         application/json: {"destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38", "name": "<value>", "schedule": "every 15 minutes", "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec", "workflow_type": "platinum"}
       responses:
         "200":
-          application/json: {"created_at": "2025-06-03T14:40:43.213Z", "destinations": ["7a3141b6-19c5-4d0d-aa5f-5edb0b22f19c", "e4d2c1c2-a0f5-404c-b37f-b0f07c5417c9"], "id": "2569dec8-72ff-4e46-b78b-ffe279bdaafc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47b1728b-a663-4345-8bae-a1ae67a567f1"], "status": "active", "workflow_nodes": [{"id": "b5baba90-bc88-4ea4-b45f-e894788e3f38", "name": "<value>", "subtype": "<value>", "type": "prompter"}, {"id": "0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e", "name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "advanced"}
+          application/json: {"created_at": "2025-06-03T14:40:43.213Z", "destinations": ["7a3141b6-19c5-4d0d-aa5f-5edb0b22f19c", "e4d2c1c2-a0f5-404c-b37f-b0f07c5417c9"], "id": "2569dec8-72ff-4e46-b78b-ffe279bdaafc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47b1728b-a663-4345-8bae-a1ae67a567f1"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "prompter"}, {"name": "<value>", "subtype": "<value>", "type": "chunk"}], "workflow_type": "advanced"}
         "422":
-          application/json: {"detail": [{"loc": [465265, 204573, "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   delete_workflow:
     speakeasy-default-delete-workflow:
       parameters:
@@ -534,9 +540,9 @@ examples:
     speakeasy-default-list-workflows:
       responses:
         "200":
-          application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_nodes": [{"id": "4dfaeebe-cc79-4d8e-a625-f1d815c2f084", "name": "<value>", "subtype": "<value>", "type": "embed"}], "workflow_type": "advanced"}]
+          application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "embed"}], "workflow_type": "advanced"}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>", 392481], "msg": "<value>", "type": "<value>"}, {"loc": [701047], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"loc": [931730, 730320, 769892], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 862351, 882715], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
     speakeasy-default-run-workflow:
       parameters:
@@ -558,7 +564,7 @@ examples:
         application/json: {}
       responses:
         "200":
-          application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_nodes": [{"id": "b63b90df-08ba-41e1-b15b-bc744e5781fa", "name": "<value>", "subtype": "<value>", "type": "prompter"}, {"id": "524348c6-8393-4782-a117-a6ea9307f1cb", "name": "<value>", "subtype": "<value>", "type": "partition"}], "workflow_type": "platinum"}
+          application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "prompter"}, {"name": "<value>", "subtype": "<value>", "type": "partition"}], "workflow_type": "platinum"}
         "422":
           application/json: {"detail": "<value>"}
   partition:

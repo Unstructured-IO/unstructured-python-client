@@ -75,6 +75,12 @@ value: shared.Neo4jDestinationConnectorConfig = /* values here */
 value: shared.OneDriveDestinationConnectorConfig = /* values here */
 ```
 
+### `shared.PineconeDestinationConnectorConfigInput`
+
+```python
+value: shared.PineconeDestinationConnectorConfigInput = /* values here */
+```
+
 ### `shared.PostgresDestinationConnectorConfig`
 
 ```python
