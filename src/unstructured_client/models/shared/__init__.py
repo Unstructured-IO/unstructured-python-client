@@ -75,7 +75,6 @@ from .createsourceconnector import (
     CreateSourceConnectorTypedDict,
 )
 from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
-from .createworkflownode import CreateWorkflowNode, CreateWorkflowNodeTypedDict
 from .crontabentry import CronTabEntry, CronTabEntryTypedDict
 from .databricks_volumessourceconnectorconfig import (
     DatabricksVolumesSourceConnectorConfig,

@@ -15,7 +15,6 @@ from unstructured_client.types import (
 
 
 class WorkflowNodeTypedDict(TypedDict):
-    id: str
     name: str
     subtype: str
     type: WorkflowNodeType
@@ -23,8 +22,6 @@ class WorkflowNodeTypedDict(TypedDict):
 
 
 class WorkflowNode(BaseModel):
-    id: str
-
     name: str
 
     subtype: str
