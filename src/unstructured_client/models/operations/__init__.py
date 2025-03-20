@@ -56,6 +56,14 @@ from .delete_workflow import (
     DeleteWorkflowResponse,
     DeleteWorkflowResponseTypedDict,
 )
+from .download_playground_job import (
+    DOWNLOAD_PLAYGROUND_JOB_SERVERS,
+    DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API,
+    DownloadPlaygroundJobRequest,
+    DownloadPlaygroundJobRequestTypedDict,
+    DownloadPlaygroundJobResponse,
+    DownloadPlaygroundJobResponseTypedDict,
+)
 from .get_destination import (
     GET_DESTINATION_SERVERS,
     GET_DESTINATION_SERVER_PLATFORM_API,
@@ -195,6 +203,8 @@ __all__ = [
     "DELETE_SOURCE_SERVER_PLATFORM_API",
     "DELETE_WORKFLOW_SERVERS",
     "DELETE_WORKFLOW_SERVER_PLATFORM_API",
+    "DOWNLOAD_PLAYGROUND_JOB_SERVERS",
+    "DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API",
     "DeleteDestinationRequest",
     "DeleteDestinationRequestTypedDict",
     "DeleteDestinationResponse",
@@ -207,6 +217,10 @@ __all__ = [
     "DeleteWorkflowRequestTypedDict",
     "DeleteWorkflowResponse",
     "DeleteWorkflowResponseTypedDict",
+    "DownloadPlaygroundJobRequest",
+    "DownloadPlaygroundJobRequestTypedDict",
+    "DownloadPlaygroundJobResponse",
+    "DownloadPlaygroundJobResponseTypedDict",
     "GET_DESTINATION_SERVERS",
     "GET_DESTINATION_SERVER_PLATFORM_API",
     "GET_JOB_SERVERS",

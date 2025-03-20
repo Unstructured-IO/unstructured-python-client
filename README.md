@@ -469,8 +469,8 @@ with UnstructuredClient() as uc_client:
                 1,
                 10,
             ],
-            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
-            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
+            "vlm_model": shared.VLMModel.GPT_4O,
+            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
     })
 

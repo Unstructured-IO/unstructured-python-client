@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -13,19 +14,17 @@ from unstructured_client.types import (
 
 
 class CouchbaseSourceConnectorConfigInputTypedDict(TypedDict):
-    batch_size: int
     bucket: str
     collection_id: str
     connection_string: str
     password: str
     username: str
+    batch_size: NotRequired[int]
     collection: NotRequired[Nullable[str]]
     scope: NotRequired[Nullable[str]]
 
 
 class CouchbaseSourceConnectorConfigInput(BaseModel):
-    batch_size: int
-
     bucket: str
 
     collection_id: str
@@ -35,6 +34,8 @@ class CouchbaseSourceConnectorConfigInput(BaseModel):
     password: str
 
     username: str
+
+    batch_size: Optional[int] = 50
 
     collection: OptionalNullable[str] = UNSET
 
@@ -42,7 +43,7 @@ class CouchbaseSourceConnectorConfigInput(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["collection", "scope"]
+        optional_fields = ["batch_size", "collection", "scope"]
         nullable_fields = ["collection", "scope"]
         null_default_fields = []
 

@@ -27,12 +27,12 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
             "config": {
-                "batch_size": 100,
                 "bucket": "bucket-name",
                 "collection_id": "type",
                 "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
                 "password": "password",
                 "username": "username",
+                "batch_size": 100,
                 "collection": "collection_name",
                 "scope": "scope_name",
             },
@@ -206,12 +206,12 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.update_source(request={
         "update_source_connector": {
             "config": {
-                "batch_size": 100,
                 "bucket": "bucket-name",
                 "collection_id": "type",
                 "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
                 "password": "password",
                 "username": "username",
+                "batch_size": 100,
                 "collection": "collection_name",
                 "scope": "scope_name",
             },

@@ -3,7 +3,6 @@
 from __future__ import annotations
 import pydantic
 from pydantic import model_serializer
-from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,16 +16,11 @@ from unstructured_client.types import (
 class SnowflakeSourceConnectorConfigInputTypedDict(TypedDict):
     account: str
     database: str
-    host: str
-    id_column: str
     password: str
-    role: str
     schema_: str
-    table_name: str
-    user: str
-    batch_size: NotRequired[int]
-    fields: NotRequired[Nullable[List[str]]]
-    port: NotRequired[int]
+    username: str
+    warehouse: str
+    role: NotRequired[Nullable[str]]
 
 
 class SnowflakeSourceConnectorConfigInput(BaseModel):
@@ -34,30 +28,20 @@ class SnowflakeSourceConnectorConfigInput(BaseModel):
 
     database: str
 
-    host: str
-
-    id_column: str
-
     password: str
-
-    role: str
 
     schema_: Annotated[str, pydantic.Field(alias="schema")]
 
-    table_name: str
+    username: str
 
-    user: str
+    warehouse: str
 
-    batch_size: Optional[int] = 100
-
-    fields: OptionalNullable[List[str]] = UNSET
-
-    port: Optional[int] = 443
+    role: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["batch_size", "fields", "port"]
-        nullable_fields = ["fields"]
+        optional_fields = ["role"]
+        nullable_fields = ["role"]
         null_default_fields = []
 
         serialized = handler(self)

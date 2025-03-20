@@ -6,7 +6,10 @@ import pydantic
 from pydantic import model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
-from unstructured_client.models.shared import jobinformation as shared_jobinformation
+from unstructured_client.models.shared import (
+    body_run_workflow as shared_body_run_workflow,
+    jobinformation as shared_jobinformation,
+)
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -14,7 +17,12 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
+from unstructured_client.utils import (
+    FieldMetadata,
+    HeaderMetadata,
+    PathParamMetadata,
+    RequestMetadata,
+)
 
 RUN_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
 r"""Unstructured Platform API"""
@@ -26,6 +34,7 @@ RUN_WORKFLOW_SERVERS = {
 
 class RunWorkflowRequestTypedDict(TypedDict):
     workflow_id: str
+    body_run_workflow: NotRequired[shared_body_run_workflow.BodyRunWorkflowTypedDict]
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
@@ -33,6 +42,11 @@ class RunWorkflowRequest(BaseModel):
     workflow_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
+
+    body_run_workflow: Annotated[
+        Optional[shared_body_run_workflow.BodyRunWorkflow],
+        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
+    ] = None
 
     unstructured_api_key: Annotated[
         OptionalNullable[str],
@@ -42,7 +56,7 @@ class RunWorkflowRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["unstructured-api-key"]
+        optional_fields = ["Body_run_workflow", "unstructured-api-key"]
         nullable_fields = ["unstructured-api-key"]
         null_default_fields = []
 

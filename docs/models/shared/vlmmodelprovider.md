@@ -1,4 +1,4 @@
-# PartitionParametersSchemasStrategy
+# VLMModelProvider
 
 The VLM Model provider to use.
 

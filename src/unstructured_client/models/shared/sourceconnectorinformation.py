@@ -17,41 +17,45 @@ from .couchbasesourceconnectorconfig import (
     CouchbaseSourceConnectorConfig,
     CouchbaseSourceConnectorConfigTypedDict,
 )
-from .databricksvolumesconnectorconfig import (
-    DatabricksVolumesConnectorConfig,
-    DatabricksVolumesConnectorConfigTypedDict,
+from .databricks_volumessourceconnectorconfig import (
+    DatabricksVolumesSourceConnectorConfig,
+    DatabricksVolumesSourceConnectorConfigTypedDict,
 )
 from .dropboxsourceconnectorconfig import (
     DropboxSourceConnectorConfig,
     DropboxSourceConnectorConfigTypedDict,
 )
-from .elasticsearchconnectorconfig import (
-    ElasticsearchConnectorConfig,
-    ElasticsearchConnectorConfigTypedDict,
+from .elasticsearchsourceconnectorconfig import (
+    ElasticsearchSourceConnectorConfig,
+    ElasticsearchSourceConnectorConfigTypedDict,
 )
 from .gcssourceconnectorconfig import (
-    GCSSourceConnectorConfig,
-    GCSSourceConnectorConfigTypedDict,
+    GcsSourceConnectorConfig,
+    GcsSourceConnectorConfigTypedDict,
 )
-from .googledrivesourceconnectorconfig import (
+from .google_drivesourceconnectorconfig import (
     GoogleDriveSourceConnectorConfig,
     GoogleDriveSourceConnectorConfigTypedDict,
 )
-from .kafkacloudsourceconnectorconfig import (
+from .kafka_cloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
 )
-from .mongodbconnectorconfig import (
-    MongoDBConnectorConfig,
-    MongoDBConnectorConfigTypedDict,
+from .mongodbsourceconnectorconfig import (
+    MongodbSourceConnectorConfig,
+    MongodbSourceConnectorConfigTypedDict,
 )
 from .onedrivesourceconnectorconfig import (
-    OneDriveSourceConnectorConfig,
-    OneDriveSourceConnectorConfigTypedDict,
+    OnedriveSourceConnectorConfig,
+    OnedriveSourceConnectorConfigTypedDict,
 )
 from .outlooksourceconnectorconfig import (
     OutlookSourceConnectorConfig,
     OutlookSourceConnectorConfigTypedDict,
+)
+from .postgressourceconnectorconfig import (
+    PostgresSourceConnectorConfig,
+    PostgresSourceConnectorConfigTypedDict,
 )
 from .s3sourceconnectorconfig import (
     S3SourceConnectorConfig,
@@ -62,8 +66,8 @@ from .salesforcesourceconnectorconfig import (
     SalesforceSourceConnectorConfigTypedDict,
 )
 from .sharepointsourceconnectorconfig import (
-    SharePointSourceConnectorConfig,
-    SharePointSourceConnectorConfigTypedDict,
+    SharepointSourceConnectorConfig,
+    SharepointSourceConnectorConfigTypedDict,
 )
 from .snowflakesourceconnectorconfig import (
     SnowflakeSourceConnectorConfig,
@@ -87,22 +91,23 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
     "SourceConnectorInformationConfigTypedDict",
     Union[
         BoxSourceConnectorConfigTypedDict,
-        MongoDBConnectorConfigTypedDict,
+        GcsSourceConnectorConfigTypedDict,
+        MongodbSourceConnectorConfigTypedDict,
         DropboxSourceConnectorConfigTypedDict,
-        ElasticsearchConnectorConfigTypedDict,
-        GCSSourceConnectorConfigTypedDict,
+        ElasticsearchSourceConnectorConfigTypedDict,
+        SharepointSourceConnectorConfigTypedDict,
         SalesforceSourceConnectorConfigTypedDict,
         GoogleDriveSourceConnectorConfigTypedDict,
-        SharePointSourceConnectorConfigTypedDict,
         AzureSourceConnectorConfigTypedDict,
-        DatabricksVolumesConnectorConfigTypedDict,
+        DatabricksVolumesSourceConnectorConfigTypedDict,
         KafkaCloudSourceConnectorConfigTypedDict,
-        OneDriveSourceConnectorConfigTypedDict,
+        OnedriveSourceConnectorConfigTypedDict,
         OutlookSourceConnectorConfigTypedDict,
+        PostgresSourceConnectorConfigTypedDict,
         S3SourceConnectorConfigTypedDict,
+        SnowflakeSourceConnectorConfigTypedDict,
         CouchbaseSourceConnectorConfigTypedDict,
         ConfluenceSourceConnectorConfigTypedDict,
-        SnowflakeSourceConnectorConfigTypedDict,
     ],
 )
 
@@ -111,22 +116,23 @@ SourceConnectorInformationConfig = TypeAliasType(
     "SourceConnectorInformationConfig",
     Union[
         BoxSourceConnectorConfig,
-        MongoDBConnectorConfig,
+        GcsSourceConnectorConfig,
+        MongodbSourceConnectorConfig,
         DropboxSourceConnectorConfig,
-        ElasticsearchConnectorConfig,
-        GCSSourceConnectorConfig,
+        ElasticsearchSourceConnectorConfig,
+        SharepointSourceConnectorConfig,
         SalesforceSourceConnectorConfig,
         GoogleDriveSourceConnectorConfig,
-        SharePointSourceConnectorConfig,
         AzureSourceConnectorConfig,
-        DatabricksVolumesConnectorConfig,
+        DatabricksVolumesSourceConnectorConfig,
         KafkaCloudSourceConnectorConfig,
-        OneDriveSourceConnectorConfig,
+        OnedriveSourceConnectorConfig,
         OutlookSourceConnectorConfig,
+        PostgresSourceConnectorConfig,
         S3SourceConnectorConfig,
+        SnowflakeSourceConnectorConfig,
         CouchbaseSourceConnectorConfig,
         ConfluenceSourceConnectorConfig,
-        SnowflakeSourceConnectorConfig,
     ],
 )
 

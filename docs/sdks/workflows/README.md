@@ -27,11 +27,11 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.create_workflow(request={
         "create_workflow": {
-            "destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38",
             "name": "<value>",
-            "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec",
             "workflow_type": shared.WorkflowType.PLATINUM,
+            "destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38",
             "schedule": shared.Schedule.EVERY_15_MINUTES,
+            "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec",
         },
     })
 

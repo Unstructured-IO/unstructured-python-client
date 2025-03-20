@@ -75,7 +75,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -190,7 +190,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
@@ -302,7 +302,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -412,7 +412,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
@@ -522,7 +522,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -634,7 +634,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
@@ -746,7 +746,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -858,7 +858,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
@@ -957,6 +957,13 @@ class Workflows(BaseSDK):
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.body_run_workflow,
+                False,
+                True,
+                "multipart",
+                Optional[shared.BodyRunWorkflow],
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -970,7 +977,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -1069,6 +1076,13 @@ class Workflows(BaseSDK):
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.body_run_workflow,
+                False,
+                True,
+                "multipart",
+                Optional[shared.BodyRunWorkflow],
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -1082,7 +1096,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
@@ -1197,7 +1211,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = self.do_request(
             hook_ctx=HookContext(
@@ -1312,7 +1326,7 @@ class Workflows(BaseSDK):
 
         retry_config = None
         if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["502", "503", "504"])
+            retry_config = (retries, ["5xx"])
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(

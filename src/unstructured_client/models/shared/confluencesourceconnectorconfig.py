@@ -16,10 +16,10 @@ class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
     cloud: bool
     max_num_of_docs_from_each_space: int
     max_num_of_spaces: int
-    spaces: Nullable[str]
     url: str
     username: str
     password: NotRequired[Nullable[str]]
+    spaces: NotRequired[Nullable[str]]
     token: NotRequired[Nullable[str]]
 
 
@@ -30,20 +30,20 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
     max_num_of_spaces: int
 
-    spaces: Nullable[str]
-
     url: str
 
     username: str
 
     password: OptionalNullable[str] = UNSET
 
+    spaces: OptionalNullable[str] = UNSET
+
     token: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["password", "token"]
-        nullable_fields = ["spaces", "password", "token"]
+        optional_fields = ["password", "spaces", "token"]
+        nullable_fields = ["password", "spaces", "token"]
         null_default_fields = []
 
         serialized = handler(self)
