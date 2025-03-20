@@ -24,6 +24,12 @@ from .azuresourceconnectorconfiginput import (
     AzureSourceConnectorConfigInput,
     AzureSourceConnectorConfigInputTypedDict,
 )
+from .body_run_workflow import (
+    BodyRunWorkflow,
+    BodyRunWorkflowTypedDict,
+    InputFiles,
+    InputFilesTypedDict,
+)
 from .boxsourceconnectorconfig import (
     BoxSourceConnectorConfig,
     BoxSourceConnectorConfigTypedDict,
@@ -70,6 +76,14 @@ from .createsourceconnector import (
 )
 from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
 from .crontabentry import CronTabEntry, CronTabEntryTypedDict
+from .databricks_volumessourceconnectorconfig import (
+    DatabricksVolumesSourceConnectorConfig,
+    DatabricksVolumesSourceConnectorConfigTypedDict,
+)
+from .databricks_volumessourceconnectorconfiginput import (
+    DatabricksVolumesSourceConnectorConfigInput,
+    DatabricksVolumesSourceConnectorConfigInputTypedDict,
+)
 from .databricksvdtdestinationconnectorconfig import (
     DatabricksVDTDestinationConnectorConfig,
     DatabricksVDTDestinationConnectorConfigTypedDict,
@@ -117,6 +131,14 @@ from .elasticsearchconnectorconfiginput import (
     ElasticsearchConnectorConfigInput,
     ElasticsearchConnectorConfigInputTypedDict,
 )
+from .elasticsearchsourceconnectorconfig import (
+    ElasticsearchSourceConnectorConfig,
+    ElasticsearchSourceConnectorConfigTypedDict,
+)
+from .elasticsearchsourceconnectorconfiginput import (
+    ElasticsearchSourceConnectorConfigInput,
+    ElasticsearchSourceConnectorConfigInputTypedDict,
+)
 from .gcsdestinationconnectorconfig import (
     GCSDestinationConnectorConfig,
     GCSDestinationConnectorConfigTypedDict,
@@ -126,36 +148,28 @@ from .gcsdestinationconnectorconfiginput import (
     GCSDestinationConnectorConfigInputTypedDict,
 )
 from .gcssourceconnectorconfig import (
-    GCSSourceConnectorConfig,
-    GCSSourceConnectorConfigTypedDict,
+    GcsSourceConnectorConfig,
+    GcsSourceConnectorConfigTypedDict,
 )
 from .gcssourceconnectorconfiginput import (
-    GCSSourceConnectorConfigInput,
-    GCSSourceConnectorConfigInputTypedDict,
+    GcsSourceConnectorConfigInput,
+    GcsSourceConnectorConfigInputTypedDict,
 )
-from .googledrivesourceconnectorconfig import (
+from .google_drivesourceconnectorconfig import (
     GoogleDriveSourceConnectorConfig,
     GoogleDriveSourceConnectorConfigTypedDict,
 )
-from .googledrivesourceconnectorconfiginput import (
+from .google_drivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInput,
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
 from .jobinformation import JobInformation, JobInformationTypedDict
 from .jobstatus import JobStatus
-from .kafkaclouddestinationconnectorconfig import (
-    KafkaCloudDestinationConnectorConfig,
-    KafkaCloudDestinationConnectorConfigTypedDict,
-)
-from .kafkaclouddestinationconnectorconfiginput import (
-    KafkaCloudDestinationConnectorConfigInput,
-    KafkaCloudDestinationConnectorConfigInputTypedDict,
-)
-from .kafkacloudsourceconnectorconfig import (
+from .kafka_cloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
 )
-from .kafkacloudsourceconnectorconfiginput import (
+from .kafka_cloudsourceconnectorconfiginput import (
     KafkaCloudSourceConnectorConfigInput,
     KafkaCloudSourceConnectorConfigInputTypedDict,
 )
@@ -175,6 +189,14 @@ from .mongodbconnectorconfiginput import (
     MongoDBConnectorConfigInput,
     MongoDBConnectorConfigInputTypedDict,
 )
+from .mongodbsourceconnectorconfig import (
+    MongodbSourceConnectorConfig,
+    MongodbSourceConnectorConfigTypedDict,
+)
+from .mongodbsourceconnectorconfiginput import (
+    MongodbSourceConnectorConfigInput,
+    MongodbSourceConnectorConfigInputTypedDict,
+)
 from .neo4jdestinationconnectorconfig import (
     Neo4jDestinationConnectorConfig,
     Neo4jDestinationConnectorConfigTypedDict,
@@ -183,6 +205,7 @@ from .neo4jdestinationconnectorconfiginput import (
     Neo4jDestinationConnectorConfigInput,
     Neo4jDestinationConnectorConfigInputTypedDict,
 )
+from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
 from .onedrivedestinationconnectorconfig import (
     OneDriveDestinationConnectorConfig,
     OneDriveDestinationConnectorConfigTypedDict,
@@ -192,12 +215,12 @@ from .onedrivedestinationconnectorconfiginput import (
     OneDriveDestinationConnectorConfigInputTypedDict,
 )
 from .onedrivesourceconnectorconfig import (
-    OneDriveSourceConnectorConfig,
-    OneDriveSourceConnectorConfigTypedDict,
+    OnedriveSourceConnectorConfig,
+    OnedriveSourceConnectorConfigTypedDict,
 )
 from .onedrivesourceconnectorconfiginput import (
-    OneDriveSourceConnectorConfigInput,
-    OneDriveSourceConnectorConfigInputTypedDict,
+    OnedriveSourceConnectorConfigInput,
+    OnedriveSourceConnectorConfigInputTypedDict,
 )
 from .outlooksourceconnectorconfig import (
     OutlookSourceConnectorConfig,
@@ -212,10 +235,10 @@ from .partition_parameters import (
     FilesTypedDict,
     OutputFormat,
     PartitionParameters,
-    PartitionParametersSchemasStrategy,
-    PartitionParametersStrategy,
     PartitionParametersTypedDict,
     Strategy,
+    VLMModel,
+    VLMModelProvider,
 )
 from .postgresdestinationconnectorconfig import (
     PostgresDestinationConnectorConfig,
@@ -224,6 +247,14 @@ from .postgresdestinationconnectorconfig import (
 from .postgresdestinationconnectorconfiginput import (
     PostgresDestinationConnectorConfigInput,
     PostgresDestinationConnectorConfigInputTypedDict,
+)
+from .postgressourceconnectorconfig import (
+    PostgresSourceConnectorConfig,
+    PostgresSourceConnectorConfigTypedDict,
+)
+from .postgressourceconnectorconfiginput import (
+    PostgresSourceConnectorConfigInput,
+    PostgresSourceConnectorConfigInputTypedDict,
 )
 from .qdrantclouddestinationconnectorconfig import (
     QdrantCloudDestinationConnectorConfig,
@@ -267,12 +298,12 @@ from .salesforcesourceconnectorconfiginput import (
 )
 from .security import Security, SecurityTypedDict
 from .sharepointsourceconnectorconfig import (
-    SharePointSourceConnectorConfig,
-    SharePointSourceConnectorConfigTypedDict,
+    SharepointSourceConnectorConfig,
+    SharepointSourceConnectorConfigTypedDict,
 )
 from .sharepointsourceconnectorconfiginput import (
-    SharePointSourceConnectorConfigInput,
-    SharePointSourceConnectorConfigInputTypedDict,
+    SharepointSourceConnectorConfigInput,
+    SharepointSourceConnectorConfigInputTypedDict,
 )
 from .snowflakedestinationconnectorconfig import (
     SnowflakeDestinationConnectorConfig,
@@ -349,6 +380,8 @@ __all__ = [
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",
     "AzureSourceConnectorConfigTypedDict",
+    "BodyRunWorkflow",
+    "BodyRunWorkflowTypedDict",
     "BoxSourceConnectorConfig",
     "BoxSourceConnectorConfigInput",
     "BoxSourceConnectorConfigInputTypedDict",
@@ -374,6 +407,8 @@ __all__ = [
     "CreateSourceConnectorConfigTypedDict",
     "CreateSourceConnectorTypedDict",
     "CreateWorkflow",
+    "CreateWorkflowNode",
+    "CreateWorkflowNodeTypedDict",
     "CreateWorkflowTypedDict",
     "CronTabEntry",
     "CronTabEntryTypedDict",
@@ -385,6 +420,10 @@ __all__ = [
     "DatabricksVolumesConnectorConfigInput",
     "DatabricksVolumesConnectorConfigInputTypedDict",
     "DatabricksVolumesConnectorConfigTypedDict",
+    "DatabricksVolumesSourceConnectorConfig",
+    "DatabricksVolumesSourceConnectorConfigInput",
+    "DatabricksVolumesSourceConnectorConfigInputTypedDict",
+    "DatabricksVolumesSourceConnectorConfigTypedDict",
     "DeltaTableConnectorConfig",
     "DeltaTableConnectorConfigInput",
     "DeltaTableConnectorConfigInputTypedDict",
@@ -402,27 +441,29 @@ __all__ = [
     "ElasticsearchConnectorConfigInput",
     "ElasticsearchConnectorConfigInputTypedDict",
     "ElasticsearchConnectorConfigTypedDict",
+    "ElasticsearchSourceConnectorConfig",
+    "ElasticsearchSourceConnectorConfigInput",
+    "ElasticsearchSourceConnectorConfigInputTypedDict",
+    "ElasticsearchSourceConnectorConfigTypedDict",
     "Files",
     "FilesTypedDict",
     "GCSDestinationConnectorConfig",
     "GCSDestinationConnectorConfigInput",
     "GCSDestinationConnectorConfigInputTypedDict",
     "GCSDestinationConnectorConfigTypedDict",
-    "GCSSourceConnectorConfig",
-    "GCSSourceConnectorConfigInput",
-    "GCSSourceConnectorConfigInputTypedDict",
-    "GCSSourceConnectorConfigTypedDict",
+    "GcsSourceConnectorConfig",
+    "GcsSourceConnectorConfigInput",
+    "GcsSourceConnectorConfigInputTypedDict",
+    "GcsSourceConnectorConfigTypedDict",
     "GoogleDriveSourceConnectorConfig",
     "GoogleDriveSourceConnectorConfigInput",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
     "GoogleDriveSourceConnectorConfigTypedDict",
+    "InputFiles",
+    "InputFilesTypedDict",
     "JobInformation",
     "JobInformationTypedDict",
     "JobStatus",
-    "KafkaCloudDestinationConnectorConfig",
-    "KafkaCloudDestinationConnectorConfigInput",
-    "KafkaCloudDestinationConnectorConfigInputTypedDict",
-    "KafkaCloudDestinationConnectorConfigTypedDict",
     "KafkaCloudSourceConnectorConfig",
     "KafkaCloudSourceConnectorConfigInput",
     "KafkaCloudSourceConnectorConfigInputTypedDict",
@@ -437,31 +478,39 @@ __all__ = [
     "MongoDBConnectorConfigInput",
     "MongoDBConnectorConfigInputTypedDict",
     "MongoDBConnectorConfigTypedDict",
+    "MongodbSourceConnectorConfig",
+    "MongodbSourceConnectorConfigInput",
+    "MongodbSourceConnectorConfigInputTypedDict",
+    "MongodbSourceConnectorConfigTypedDict",
     "Neo4jDestinationConnectorConfig",
     "Neo4jDestinationConnectorConfigInput",
     "Neo4jDestinationConnectorConfigInputTypedDict",
     "Neo4jDestinationConnectorConfigTypedDict",
+    "NodeFileMetadata",
+    "NodeFileMetadataTypedDict",
     "OneDriveDestinationConnectorConfig",
     "OneDriveDestinationConnectorConfigInput",
     "OneDriveDestinationConnectorConfigInputTypedDict",
     "OneDriveDestinationConnectorConfigTypedDict",
-    "OneDriveSourceConnectorConfig",
-    "OneDriveSourceConnectorConfigInput",
-    "OneDriveSourceConnectorConfigInputTypedDict",
-    "OneDriveSourceConnectorConfigTypedDict",
+    "OnedriveSourceConnectorConfig",
+    "OnedriveSourceConnectorConfigInput",
+    "OnedriveSourceConnectorConfigInputTypedDict",
+    "OnedriveSourceConnectorConfigTypedDict",
     "OutlookSourceConnectorConfig",
     "OutlookSourceConnectorConfigInput",
     "OutlookSourceConnectorConfigInputTypedDict",
     "OutlookSourceConnectorConfigTypedDict",
     "OutputFormat",
     "PartitionParameters",
-    "PartitionParametersSchemasStrategy",
-    "PartitionParametersStrategy",
     "PartitionParametersTypedDict",
     "PostgresDestinationConnectorConfig",
     "PostgresDestinationConnectorConfigInput",
     "PostgresDestinationConnectorConfigInputTypedDict",
     "PostgresDestinationConnectorConfigTypedDict",
+    "PostgresSourceConnectorConfig",
+    "PostgresSourceConnectorConfigInput",
+    "PostgresSourceConnectorConfigInputTypedDict",
+    "PostgresSourceConnectorConfigTypedDict",
     "QdrantCloudDestinationConnectorConfig",
     "QdrantCloudDestinationConnectorConfigInput",
     "QdrantCloudDestinationConnectorConfigInputTypedDict",
@@ -485,10 +534,10 @@ __all__ = [
     "Schedule",
     "Security",
     "SecurityTypedDict",
-    "SharePointSourceConnectorConfig",
-    "SharePointSourceConnectorConfigInput",
-    "SharePointSourceConnectorConfigInputTypedDict",
-    "SharePointSourceConnectorConfigTypedDict",
+    "SharepointSourceConnectorConfig",
+    "SharepointSourceConnectorConfigInput",
+    "SharepointSourceConnectorConfigInputTypedDict",
+    "SharepointSourceConnectorConfigTypedDict",
     "SnowflakeDestinationConnectorConfig",
     "SnowflakeDestinationConnectorConfigInput",
     "SnowflakeDestinationConnectorConfigInputTypedDict",
@@ -514,6 +563,8 @@ __all__ = [
     "UpdateWorkflow",
     "UpdateWorkflowSchedule",
     "UpdateWorkflowTypedDict",
+    "VLMModel",
+    "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
     "WeaviateDestinationConnectorConfig",

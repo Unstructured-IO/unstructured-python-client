@@ -1,12 +1,11 @@
-# SharePointSourceConnectorConfig
+# SharepointSourceConnectorConfig
 
 
 ## Fields
 
-| Field                   | Type                    | Required                | Description             |
-| ----------------------- | ----------------------- | ----------------------- | ----------------------- |
-| `client_cred`           | *str*                   | :heavy_check_mark:      | N/A                     |
-| `client_id`             | *str*                   | :heavy_check_mark:      | N/A                     |
-| `recursive`             | *bool*                  | :heavy_check_mark:      | N/A                     |
-| `site`                  | *str*                   | :heavy_check_mark:      | N/A                     |
-| `path`                  | *OptionalNullable[str]* | :heavy_minus_sign:      | N/A                     |
+| Field              | Type               | Required           | Description        |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| `client_id`        | *str*              | :heavy_check_mark: | N/A                |
+| `client_secret`    | *str*              | :heavy_check_mark: | N/A                |
+| `site_url`         | *str*              | :heavy_check_mark: | N/A                |
+| `tenant_id`        | *str*              | :heavy_check_mark: | N/A                |

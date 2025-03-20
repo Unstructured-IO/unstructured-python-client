@@ -1,4 +1,4 @@
-# PartitionParametersStrategy
+# VLMModel
 
 The VLM Model to use.
 

@@ -27,10 +27,10 @@ value: shared.ConfluenceSourceConnectorConfig = /* values here */
 value: shared.CouchbaseSourceConnectorConfig = /* values here */
 ```
 
-### `shared.DatabricksVolumesConnectorConfig`
+### `shared.DatabricksVolumesSourceConnectorConfig`
 
 ```python
-value: shared.DatabricksVolumesConnectorConfig = /* values here */
+value: shared.DatabricksVolumesSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.DropboxSourceConnectorConfig`
@@ -39,16 +39,16 @@ value: shared.DatabricksVolumesConnectorConfig = /* values here */
 value: shared.DropboxSourceConnectorConfig = /* values here */
 ```
 
-### `shared.ElasticsearchConnectorConfig`
+### `shared.ElasticsearchSourceConnectorConfig`
 
 ```python
-value: shared.ElasticsearchConnectorConfig = /* values here */
+value: shared.ElasticsearchSourceConnectorConfig = /* values here */
 ```
 
-### `shared.GCSSourceConnectorConfig`
+### `shared.GcsSourceConnectorConfig`
 
 ```python
-value: shared.GCSSourceConnectorConfig = /* values here */
+value: shared.GcsSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.GoogleDriveSourceConnectorConfig`
@@ -63,22 +63,28 @@ value: shared.GoogleDriveSourceConnectorConfig = /* values here */
 value: shared.KafkaCloudSourceConnectorConfig = /* values here */
 ```
 
-### `shared.MongoDBConnectorConfig`
+### `shared.MongodbSourceConnectorConfig`
 
 ```python
-value: shared.MongoDBConnectorConfig = /* values here */
+value: shared.MongodbSourceConnectorConfig = /* values here */
 ```
 
-### `shared.OneDriveSourceConnectorConfig`
+### `shared.OnedriveSourceConnectorConfig`
 
 ```python
-value: shared.OneDriveSourceConnectorConfig = /* values here */
+value: shared.OnedriveSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.OutlookSourceConnectorConfig`
 
 ```python
 value: shared.OutlookSourceConnectorConfig = /* values here */
+```
+
+### `shared.PostgresSourceConnectorConfig`
+
+```python
+value: shared.PostgresSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.S3SourceConnectorConfig`
@@ -93,10 +99,10 @@ value: shared.S3SourceConnectorConfig = /* values here */
 value: shared.SalesforceSourceConnectorConfig = /* values here */
 ```
 
-### `shared.SharePointSourceConnectorConfig`
+### `shared.SharepointSourceConnectorConfig`
 
 ```python
-value: shared.SharePointSourceConnectorConfig = /* values here */
+value: shared.SharepointSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.SnowflakeSourceConnectorConfig`

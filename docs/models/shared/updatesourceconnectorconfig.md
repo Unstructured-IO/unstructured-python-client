@@ -27,10 +27,10 @@ value: shared.ConfluenceSourceConnectorConfigInput = /* values here */
 value: shared.CouchbaseSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.DatabricksVolumesConnectorConfigInput`
+### `shared.DatabricksVolumesSourceConnectorConfigInput`
 
 ```python
-value: shared.DatabricksVolumesConnectorConfigInput = /* values here */
+value: shared.DatabricksVolumesSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.DropboxSourceConnectorConfigInput`
@@ -39,16 +39,16 @@ value: shared.DatabricksVolumesConnectorConfigInput = /* values here */
 value: shared.DropboxSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.ElasticsearchConnectorConfigInput`
+### `shared.ElasticsearchSourceConnectorConfigInput`
 
 ```python
-value: shared.ElasticsearchConnectorConfigInput = /* values here */
+value: shared.ElasticsearchSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.GCSSourceConnectorConfigInput`
+### `shared.GcsSourceConnectorConfigInput`
 
 ```python
-value: shared.GCSSourceConnectorConfigInput = /* values here */
+value: shared.GcsSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.GoogleDriveSourceConnectorConfigInput`
@@ -63,22 +63,28 @@ value: shared.GoogleDriveSourceConnectorConfigInput = /* values here */
 value: shared.KafkaCloudSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.MongoDBConnectorConfigInput`
+### `shared.MongodbSourceConnectorConfigInput`
 
 ```python
-value: shared.MongoDBConnectorConfigInput = /* values here */
+value: shared.MongodbSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.OneDriveSourceConnectorConfigInput`
+### `shared.OnedriveSourceConnectorConfigInput`
 
 ```python
-value: shared.OneDriveSourceConnectorConfigInput = /* values here */
+value: shared.OnedriveSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.OutlookSourceConnectorConfigInput`
 
 ```python
 value: shared.OutlookSourceConnectorConfigInput = /* values here */
+```
+
+### `shared.PostgresSourceConnectorConfigInput`
+
+```python
+value: shared.PostgresSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.S3SourceConnectorConfigInput`
@@ -93,10 +99,10 @@ value: shared.S3SourceConnectorConfigInput = /* values here */
 value: shared.SalesforceSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.SharePointSourceConnectorConfigInput`
+### `shared.SharepointSourceConnectorConfigInput`
 
 ```python
-value: shared.SharePointSourceConnectorConfigInput = /* values here */
+value: shared.SharepointSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.SnowflakeSourceConnectorConfigInput`

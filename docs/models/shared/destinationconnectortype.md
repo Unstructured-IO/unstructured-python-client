@@ -13,7 +13,6 @@
 | `DELTA_TABLE`                    | delta_table                      |
 | `ELASTICSEARCH`                  | elasticsearch                    |
 | `GCS`                            | gcs                              |
-| `KAFKA_CLOUD`                    | kafka-cloud                      |
 | `MILVUS`                         | milvus                           |
 | `MONGODB`                        | mongodb                          |
 | `MOTHERDUCK`                     | motherduck                       |

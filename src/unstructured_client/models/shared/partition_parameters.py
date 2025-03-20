@@ -64,7 +64,7 @@ class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
     VLM = "vlm"
 
 
-class PartitionParametersStrategy(str, Enum, metaclass=utils.OpenEnumMeta):
+class VLMModel(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The VLM Model to use."""
 
     CLAUDE_3_5_SONNET_20241022 = "claude-3-5-sonnet-20241022"
@@ -89,7 +89,7 @@ class PartitionParametersStrategy(str, Enum, metaclass=utils.OpenEnumMeta):
     GEMINI_2_0_FLASH_001 = "gemini-2.0-flash-001"
 
 
-class PartitionParametersSchemasStrategy(str, Enum, metaclass=utils.OpenEnumMeta):
+class VLMModelProvider(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The VLM Model provider to use."""
 
     OPENAI = "openai"
@@ -168,9 +168,9 @@ class PartitionParametersTypedDict(TypedDict):
     r"""The OCR agent to use for table ocr inference."""
     unique_element_ids: NotRequired[bool]
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
-    vlm_model: NotRequired[PartitionParametersStrategy]
+    vlm_model: NotRequired[VLMModel]
     r"""The VLM Model to use."""
-    vlm_model_provider: NotRequired[PartitionParametersSchemasStrategy]
+    vlm_model_provider: NotRequired[VLMModelProvider]
     r"""The VLM Model provider to use."""
     xml_keep_tags: NotRequired[bool]
     r"""If `True`, will retain the XML tags in the output. Otherwise it will simply extract the text from within the tags. Only applies to XML documents."""
@@ -321,18 +321,14 @@ class PartitionParameters(BaseModel):
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
 
     vlm_model: Annotated[
-        Annotated[
-            Optional[PartitionParametersStrategy],
-            PlainValidator(validate_open_enum(False)),
-        ],
+        Annotated[Optional[VLMModel], PlainValidator(validate_open_enum(False))],
         FieldMetadata(multipart=True),
     ] = None
     r"""The VLM Model to use."""
 
     vlm_model_provider: Annotated[
         Annotated[
-            Optional[PartitionParametersSchemasStrategy],
-            PlainValidator(validate_open_enum(False)),
+            Optional[VLMModelProvider], PlainValidator(validate_open_enum(False))
         ],
         FieldMetadata(multipart=True),
     ] = None

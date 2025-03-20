@@ -5,7 +5,7 @@ from typing_extensions import TypedDict
 from unstructured_client.types import BaseModel
 
 
-class OneDriveSourceConnectorConfigTypedDict(TypedDict):
+class OnedriveSourceConnectorConfigTypedDict(TypedDict):
     authority_url: str
     client_cred: str
     client_id: str
@@ -15,7 +15,7 @@ class OneDriveSourceConnectorConfigTypedDict(TypedDict):
     user_pname: str
 
 
-class OneDriveSourceConnectorConfig(BaseModel):
+class OnedriveSourceConnectorConfig(BaseModel):
     authority_url: str
 
     client_cred: str

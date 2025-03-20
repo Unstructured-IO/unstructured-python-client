@@ -6,27 +6,27 @@ from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import BaseModel
 
 
-class OneDriveSourceConnectorConfigInputTypedDict(TypedDict):
-    authority_url: str
+class OnedriveSourceConnectorConfigInputTypedDict(TypedDict):
     client_cred: str
     client_id: str
     path: str
-    tenant: str
     user_pname: str
+    authority_url: NotRequired[str]
     recursive: NotRequired[bool]
+    tenant: NotRequired[str]
 
 
-class OneDriveSourceConnectorConfigInput(BaseModel):
-    authority_url: str
-
+class OnedriveSourceConnectorConfigInput(BaseModel):
     client_cred: str
 
     client_id: str
 
     path: str
 
-    tenant: str
-
     user_pname: str
+
+    authority_url: Optional[str] = "https://login.microsoftonline.com"
 
     recursive: Optional[bool] = False
+
+    tenant: Optional[str] = "common"

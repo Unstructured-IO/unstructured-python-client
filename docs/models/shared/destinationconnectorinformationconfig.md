@@ -51,12 +51,6 @@ value: shared.ElasticsearchConnectorConfig = /* values here */
 value: shared.GCSDestinationConnectorConfig = /* values here */
 ```
 
-### `shared.KafkaCloudDestinationConnectorConfig`
-
-```python
-value: shared.KafkaCloudDestinationConnectorConfig = /* values here */
-```
-
 ### `shared.MilvusDestinationConnectorConfig`
 
 ```python

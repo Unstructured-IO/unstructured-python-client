@@ -1,4 +1,4 @@
-# OneDriveSourceConnectorConfig
+# OnedriveSourceConnectorConfig
 
 
 ## Fields
