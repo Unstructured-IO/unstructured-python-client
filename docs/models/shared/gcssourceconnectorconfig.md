@@ -1,4 +1,4 @@
-# GcsSourceConnectorConfig
+# GCSSourceConnectorConfig
 
 
 ## Fields

@@ -45,10 +45,10 @@ value: shared.DropboxSourceConnectorConfigInput = /* values here */
 value: shared.ElasticsearchSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.GcsSourceConnectorConfigInput`
+### `shared.GCSSourceConnectorConfigInput`
 
 ```python
-value: shared.GcsSourceConnectorConfigInput = /* values here */
+value: shared.GCSSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.GoogleDriveSourceConnectorConfigInput`
@@ -69,10 +69,10 @@ value: shared.KafkaCloudSourceConnectorConfigInput = /* values here */
 value: shared.MongodbSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.OnedriveSourceConnectorConfigInput`
+### `shared.OneDriveSourceConnectorConfigInput`
 
 ```python
-value: shared.OnedriveSourceConnectorConfigInput = /* values here */
+value: shared.OneDriveSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.OutlookSourceConnectorConfigInput`
@@ -109,5 +109,11 @@ value: shared.SharepointSourceConnectorConfigInput = /* values here */
 
 ```python
 value: shared.SnowflakeSourceConnectorConfigInput = /* values here */
+```
+
+### `shared.JiraSourceConnectorConfigInput`
+
+```python
+value: shared.JiraSourceConnectorConfigInput = /* values here */
 ```
 

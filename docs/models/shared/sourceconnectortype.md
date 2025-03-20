@@ -14,7 +14,7 @@
 | `ELASTICSEARCH`      | elasticsearch        |
 | `GCS`                | gcs                  |
 | `GOOGLE_DRIVE`       | google_drive         |
-| `KAFKA_CLOUD`        | kafka-cloud          |
+| `KAFKA_CLOUD`        | kafka_cloud          |
 | `MONGODB`            | mongodb              |
 | `ONEDRIVE`           | onedrive             |
 | `OUTLOOK`            | outlook              |
@@ -23,3 +23,4 @@
 | `SALESFORCE`         | salesforce           |
 | `SHAREPOINT`         | sharepoint           |
 | `SNOWFLAKE`          | snowflake            |
+| `JIRA`               | jira                 |
