@@ -33,6 +33,10 @@ from .gcsdestinationconnectorconfiginput import (
     GCSDestinationConnectorConfigInput,
     GCSDestinationConnectorConfigInputTypedDict,
 )
+from .kafkaclouddestinationconnectorconfiginput import (
+    KafkaCloudDestinationConnectorConfigInput,
+    KafkaCloudDestinationConnectorConfigInputTypedDict,
+)
 from .milvusdestinationconnectorconfiginput import (
     MilvusDestinationConnectorConfigInput,
     MilvusDestinationConnectorConfigInputTypedDict,
@@ -49,9 +53,9 @@ from .onedrivedestinationconnectorconfiginput import (
     OneDriveDestinationConnectorConfigInput,
     OneDriveDestinationConnectorConfigInputTypedDict,
 )
-from .pineconedestinationconnectorconfig import (
-    PineconeDestinationConnectorConfig,
-    PineconeDestinationConnectorConfigTypedDict,
+from .pineconedestinationconnectorconfiginput import (
+    PineconeDestinationConnectorConfigInput,
+    PineconeDestinationConnectorConfigInputTypedDict,
 )
 from .postgresdestinationconnectorconfiginput import (
     PostgresDestinationConnectorConfigInput,
@@ -86,23 +90,24 @@ UpdateDestinationConnectorConfigTypedDict = TypeAliasType(
     "UpdateDestinationConnectorConfigTypedDict",
     Union[
         GCSDestinationConnectorConfigInputTypedDict,
+        ElasticsearchConnectorConfigInputTypedDict,
         AzureAISearchConnectorConfigInputTypedDict,
         WeaviateDestinationConnectorConfigInputTypedDict,
-        ElasticsearchConnectorConfigInputTypedDict,
         MongoDBConnectorConfigInputTypedDict,
-        PineconeDestinationConnectorConfigTypedDict,
         DeltaTableConnectorConfigInputTypedDict,
         QdrantCloudDestinationConnectorConfigInputTypedDict,
+        PineconeDestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
         Neo4jDestinationConnectorConfigInputTypedDict,
-        S3DestinationConnectorConfigInputTypedDict,
         OneDriveDestinationConnectorConfigInputTypedDict,
-        DatabricksVDTDestinationConnectorConfigInputTypedDict,
-        PostgresDestinationConnectorConfigInputTypedDict,
+        S3DestinationConnectorConfigInputTypedDict,
         MilvusDestinationConnectorConfigInputTypedDict,
         DatabricksVolumesConnectorConfigInputTypedDict,
+        PostgresDestinationConnectorConfigInputTypedDict,
+        KafkaCloudDestinationConnectorConfigInputTypedDict,
         CouchbaseDestinationConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
+        DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
     ],
 )
@@ -112,23 +117,24 @@ UpdateDestinationConnectorConfig = TypeAliasType(
     "UpdateDestinationConnectorConfig",
     Union[
         GCSDestinationConnectorConfigInput,
+        ElasticsearchConnectorConfigInput,
         AzureAISearchConnectorConfigInput,
         WeaviateDestinationConnectorConfigInput,
-        ElasticsearchConnectorConfigInput,
         MongoDBConnectorConfigInput,
-        PineconeDestinationConnectorConfig,
         DeltaTableConnectorConfigInput,
         QdrantCloudDestinationConnectorConfigInput,
+        PineconeDestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
         Neo4jDestinationConnectorConfigInput,
-        S3DestinationConnectorConfigInput,
         OneDriveDestinationConnectorConfigInput,
-        DatabricksVDTDestinationConnectorConfigInput,
-        PostgresDestinationConnectorConfigInput,
+        S3DestinationConnectorConfigInput,
         MilvusDestinationConnectorConfigInput,
         DatabricksVolumesConnectorConfigInput,
+        PostgresDestinationConnectorConfigInput,
+        KafkaCloudDestinationConnectorConfigInput,
         CouchbaseDestinationConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
+        DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
     ],
 )

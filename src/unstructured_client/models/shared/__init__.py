@@ -76,14 +76,6 @@ from .createsourceconnector import (
 )
 from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
 from .crontabentry import CronTabEntry, CronTabEntryTypedDict
-from .databricks_volumessourceconnectorconfig import (
-    DatabricksVolumesSourceConnectorConfig,
-    DatabricksVolumesSourceConnectorConfigTypedDict,
-)
-from .databricks_volumessourceconnectorconfiginput import (
-    DatabricksVolumesSourceConnectorConfigInput,
-    DatabricksVolumesSourceConnectorConfigInputTypedDict,
-)
 from .databricksvdtdestinationconnectorconfig import (
     DatabricksVDTDestinationConnectorConfig,
     DatabricksVDTDestinationConnectorConfigTypedDict,
@@ -131,14 +123,6 @@ from .elasticsearchconnectorconfiginput import (
     ElasticsearchConnectorConfigInput,
     ElasticsearchConnectorConfigInputTypedDict,
 )
-from .elasticsearchsourceconnectorconfig import (
-    ElasticsearchSourceConnectorConfig,
-    ElasticsearchSourceConnectorConfigTypedDict,
-)
-from .elasticsearchsourceconnectorconfiginput import (
-    ElasticsearchSourceConnectorConfigInput,
-    ElasticsearchSourceConnectorConfigInputTypedDict,
-)
 from .gcsdestinationconnectorconfig import (
     GCSDestinationConnectorConfig,
     GCSDestinationConnectorConfigTypedDict,
@@ -173,6 +157,14 @@ from .jirasourceconnectorconfiginput import (
 )
 from .jobinformation import JobInformation, JobInformationTypedDict
 from .jobstatus import JobStatus
+from .kafkaclouddestinationconnectorconfig import (
+    KafkaCloudDestinationConnectorConfig,
+    KafkaCloudDestinationConnectorConfigTypedDict,
+)
+from .kafkaclouddestinationconnectorconfiginput import (
+    KafkaCloudDestinationConnectorConfigInput,
+    KafkaCloudDestinationConnectorConfigInputTypedDict,
+)
 from .kafkacloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
@@ -196,14 +188,6 @@ from .mongodbconnectorconfig import (
 from .mongodbconnectorconfiginput import (
     MongoDBConnectorConfigInput,
     MongoDBConnectorConfigInputTypedDict,
-)
-from .mongodbsourceconnectorconfig import (
-    MongodbSourceConnectorConfig,
-    MongodbSourceConnectorConfigTypedDict,
-)
-from .mongodbsourceconnectorconfiginput import (
-    MongodbSourceConnectorConfigInput,
-    MongodbSourceConnectorConfigInputTypedDict,
 )
 from .neo4jdestinationconnectorconfig import (
     Neo4jDestinationConnectorConfig,
@@ -314,12 +298,12 @@ from .salesforcesourceconnectorconfiginput import (
 )
 from .security import Security, SecurityTypedDict
 from .sharepointsourceconnectorconfig import (
-    SharepointSourceConnectorConfig,
-    SharepointSourceConnectorConfigTypedDict,
+    SharePointSourceConnectorConfig,
+    SharePointSourceConnectorConfigTypedDict,
 )
 from .sharepointsourceconnectorconfiginput import (
-    SharepointSourceConnectorConfigInput,
-    SharepointSourceConnectorConfigInputTypedDict,
+    SharePointSourceConnectorConfigInput,
+    SharePointSourceConnectorConfigInputTypedDict,
 )
 from .snowflakedestinationconnectorconfig import (
     SnowflakeDestinationConnectorConfig,
@@ -381,6 +365,14 @@ from .workflownodetype import WorkflowNodeType
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
 from .workflowtype import WorkflowType
+from .zendesksourceconnectorconfig import (
+    ZendeskSourceConnectorConfig,
+    ZendeskSourceConnectorConfigTypedDict,
+)
+from .zendesksourceconnectorconfiginput import (
+    ZendeskSourceConnectorConfigInput,
+    ZendeskSourceConnectorConfigInputTypedDict,
+)
 
 
 __all__ = [
@@ -434,10 +426,6 @@ __all__ = [
     "DatabricksVolumesConnectorConfigInput",
     "DatabricksVolumesConnectorConfigInputTypedDict",
     "DatabricksVolumesConnectorConfigTypedDict",
-    "DatabricksVolumesSourceConnectorConfig",
-    "DatabricksVolumesSourceConnectorConfigInput",
-    "DatabricksVolumesSourceConnectorConfigInputTypedDict",
-    "DatabricksVolumesSourceConnectorConfigTypedDict",
     "DeltaTableConnectorConfig",
     "DeltaTableConnectorConfigInput",
     "DeltaTableConnectorConfigInputTypedDict",
@@ -455,10 +443,6 @@ __all__ = [
     "ElasticsearchConnectorConfigInput",
     "ElasticsearchConnectorConfigInputTypedDict",
     "ElasticsearchConnectorConfigTypedDict",
-    "ElasticsearchSourceConnectorConfig",
-    "ElasticsearchSourceConnectorConfigInput",
-    "ElasticsearchSourceConnectorConfigInputTypedDict",
-    "ElasticsearchSourceConnectorConfigTypedDict",
     "Files",
     "FilesTypedDict",
     "GCSDestinationConnectorConfig",
@@ -482,6 +466,10 @@ __all__ = [
     "JobInformation",
     "JobInformationTypedDict",
     "JobStatus",
+    "KafkaCloudDestinationConnectorConfig",
+    "KafkaCloudDestinationConnectorConfigInput",
+    "KafkaCloudDestinationConnectorConfigInputTypedDict",
+    "KafkaCloudDestinationConnectorConfigTypedDict",
     "KafkaCloudSourceConnectorConfig",
     "KafkaCloudSourceConnectorConfigInput",
     "KafkaCloudSourceConnectorConfigInputTypedDict",
@@ -496,10 +484,6 @@ __all__ = [
     "MongoDBConnectorConfigInput",
     "MongoDBConnectorConfigInputTypedDict",
     "MongoDBConnectorConfigTypedDict",
-    "MongodbSourceConnectorConfig",
-    "MongodbSourceConnectorConfigInput",
-    "MongodbSourceConnectorConfigInputTypedDict",
-    "MongodbSourceConnectorConfigTypedDict",
     "Neo4jDestinationConnectorConfig",
     "Neo4jDestinationConnectorConfigInput",
     "Neo4jDestinationConnectorConfigInputTypedDict",
@@ -556,10 +540,10 @@ __all__ = [
     "Schedule",
     "Security",
     "SecurityTypedDict",
-    "SharepointSourceConnectorConfig",
-    "SharepointSourceConnectorConfigInput",
-    "SharepointSourceConnectorConfigInputTypedDict",
-    "SharepointSourceConnectorConfigTypedDict",
+    "SharePointSourceConnectorConfig",
+    "SharePointSourceConnectorConfigInput",
+    "SharePointSourceConnectorConfigInputTypedDict",
+    "SharePointSourceConnectorConfigTypedDict",
     "SnowflakeDestinationConnectorConfig",
     "SnowflakeDestinationConnectorConfigInput",
     "SnowflakeDestinationConnectorConfigInputTypedDict",
@@ -602,4 +586,8 @@ __all__ = [
     "WorkflowScheduleTypedDict",
     "WorkflowState",
     "WorkflowType",
+    "ZendeskSourceConnectorConfig",
+    "ZendeskSourceConnectorConfigInput",
+    "ZendeskSourceConnectorConfigInputTypedDict",
+    "ZendeskSourceConnectorConfigTypedDict",
 ]

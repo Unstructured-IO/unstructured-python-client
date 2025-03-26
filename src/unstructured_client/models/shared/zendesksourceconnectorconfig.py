@@ -12,38 +12,29 @@ from unstructured_client.types import (
 )
 
 
-class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
-    cloud: bool
-    max_num_of_docs_from_each_space: int
-    max_num_of_spaces: int
-    spaces: Nullable[str]
-    url: str
-    username: str
-    password: NotRequired[Nullable[str]]
-    token: NotRequired[Nullable[str]]
+class ZendeskSourceConnectorConfigTypedDict(TypedDict):
+    api_token: str
+    email: str
+    subdomain: str
+    batch_size: NotRequired[Nullable[int]]
+    item_type: NotRequired[Nullable[str]]
 
 
-class ConfluenceSourceConnectorConfig(BaseModel):
-    cloud: bool
+class ZendeskSourceConnectorConfig(BaseModel):
+    api_token: str
 
-    max_num_of_docs_from_each_space: int
+    email: str
 
-    max_num_of_spaces: int
+    subdomain: str
 
-    spaces: Nullable[str]
+    batch_size: OptionalNullable[int] = UNSET
 
-    url: str
-
-    username: str
-
-    password: OptionalNullable[str] = UNSET
-
-    token: OptionalNullable[str] = UNSET
+    item_type: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["password", "token"]
-        nullable_fields = ["spaces", "password", "token"]
+        optional_fields = ["batch_size", "item_type"]
+        nullable_fields = ["batch_size", "item_type"]
         null_default_fields = []
 
         serialized = handler(self)

@@ -17,17 +17,17 @@ from .couchbasesourceconnectorconfig import (
     CouchbaseSourceConnectorConfig,
     CouchbaseSourceConnectorConfigTypedDict,
 )
-from .databricks_volumessourceconnectorconfig import (
-    DatabricksVolumesSourceConnectorConfig,
-    DatabricksVolumesSourceConnectorConfigTypedDict,
+from .databricksvolumesconnectorconfig import (
+    DatabricksVolumesConnectorConfig,
+    DatabricksVolumesConnectorConfigTypedDict,
 )
 from .dropboxsourceconnectorconfig import (
     DropboxSourceConnectorConfig,
     DropboxSourceConnectorConfigTypedDict,
 )
-from .elasticsearchsourceconnectorconfig import (
-    ElasticsearchSourceConnectorConfig,
-    ElasticsearchSourceConnectorConfigTypedDict,
+from .elasticsearchconnectorconfig import (
+    ElasticsearchConnectorConfig,
+    ElasticsearchConnectorConfigTypedDict,
 )
 from .gcssourceconnectorconfig import (
     GCSSourceConnectorConfig,
@@ -45,9 +45,9 @@ from .kafkacloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
 )
-from .mongodbsourceconnectorconfig import (
-    MongodbSourceConnectorConfig,
-    MongodbSourceConnectorConfigTypedDict,
+from .mongodbconnectorconfig import (
+    MongoDBConnectorConfig,
+    MongoDBConnectorConfigTypedDict,
 )
 from .onedrivesourceconnectorconfig import (
     OneDriveSourceConnectorConfig,
@@ -70,14 +70,18 @@ from .salesforcesourceconnectorconfig import (
     SalesforceSourceConnectorConfigTypedDict,
 )
 from .sharepointsourceconnectorconfig import (
-    SharepointSourceConnectorConfig,
-    SharepointSourceConnectorConfigTypedDict,
+    SharePointSourceConnectorConfig,
+    SharePointSourceConnectorConfigTypedDict,
 )
 from .snowflakesourceconnectorconfig import (
     SnowflakeSourceConnectorConfig,
     SnowflakeSourceConnectorConfigTypedDict,
 )
 from .sourceconnectortype import SourceConnectorType
+from .zendesksourceconnectorconfig import (
+    ZendeskSourceConnectorConfig,
+    ZendeskSourceConnectorConfigTypedDict,
+)
 from datetime import datetime
 from pydantic import model_serializer
 from typing import Union
@@ -95,24 +99,25 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
     "SourceConnectorInformationConfigTypedDict",
     Union[
         BoxSourceConnectorConfigTypedDict,
-        GCSSourceConnectorConfigTypedDict,
-        MongodbSourceConnectorConfigTypedDict,
+        MongoDBConnectorConfigTypedDict,
         DropboxSourceConnectorConfigTypedDict,
-        ElasticsearchSourceConnectorConfigTypedDict,
-        SharepointSourceConnectorConfigTypedDict,
+        ElasticsearchConnectorConfigTypedDict,
+        GCSSourceConnectorConfigTypedDict,
         SalesforceSourceConnectorConfigTypedDict,
         GoogleDriveSourceConnectorConfigTypedDict,
+        ZendeskSourceConnectorConfigTypedDict,
+        SharePointSourceConnectorConfigTypedDict,
         AzureSourceConnectorConfigTypedDict,
-        DatabricksVolumesSourceConnectorConfigTypedDict,
-        KafkaCloudSourceConnectorConfigTypedDict,
         OneDriveSourceConnectorConfigTypedDict,
+        DatabricksVolumesConnectorConfigTypedDict,
         OutlookSourceConnectorConfigTypedDict,
-        PostgresSourceConnectorConfigTypedDict,
         S3SourceConnectorConfigTypedDict,
-        SnowflakeSourceConnectorConfigTypedDict,
-        CouchbaseSourceConnectorConfigTypedDict,
+        KafkaCloudSourceConnectorConfigTypedDict,
         ConfluenceSourceConnectorConfigTypedDict,
         JiraSourceConnectorConfigTypedDict,
+        CouchbaseSourceConnectorConfigTypedDict,
+        PostgresSourceConnectorConfigTypedDict,
+        SnowflakeSourceConnectorConfigTypedDict,
     ],
 )
 
@@ -121,24 +126,25 @@ SourceConnectorInformationConfig = TypeAliasType(
     "SourceConnectorInformationConfig",
     Union[
         BoxSourceConnectorConfig,
-        GCSSourceConnectorConfig,
-        MongodbSourceConnectorConfig,
+        MongoDBConnectorConfig,
         DropboxSourceConnectorConfig,
-        ElasticsearchSourceConnectorConfig,
-        SharepointSourceConnectorConfig,
+        ElasticsearchConnectorConfig,
+        GCSSourceConnectorConfig,
         SalesforceSourceConnectorConfig,
         GoogleDriveSourceConnectorConfig,
+        ZendeskSourceConnectorConfig,
+        SharePointSourceConnectorConfig,
         AzureSourceConnectorConfig,
-        DatabricksVolumesSourceConnectorConfig,
-        KafkaCloudSourceConnectorConfig,
         OneDriveSourceConnectorConfig,
+        DatabricksVolumesConnectorConfig,
         OutlookSourceConnectorConfig,
-        PostgresSourceConnectorConfig,
         S3SourceConnectorConfig,
-        SnowflakeSourceConnectorConfig,
-        CouchbaseSourceConnectorConfig,
+        KafkaCloudSourceConnectorConfig,
         ConfluenceSourceConnectorConfig,
         JiraSourceConnectorConfig,
+        CouchbaseSourceConnectorConfig,
+        PostgresSourceConnectorConfig,
+        SnowflakeSourceConnectorConfig,
     ],
 )
 

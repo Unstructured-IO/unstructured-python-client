@@ -6,11 +6,14 @@ from unstructured_client.types import BaseModel
 
 
 class GCSSourceConnectorConfigTypedDict(TypedDict):
+    recursive: bool
     remote_url: str
     service_account_key: str
 
 
 class GCSSourceConnectorConfig(BaseModel):
+    recursive: bool
+
     remote_url: str
 
     service_account_key: str

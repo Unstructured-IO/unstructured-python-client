@@ -229,21 +229,21 @@ class Jobs(BaseSDK):
             http_res,
         )
 
-    def download_playground_job(
+    def download_job_output(
         self,
         *,
         request: Union[
-            operations.DownloadPlaygroundJobRequest,
-            operations.DownloadPlaygroundJobRequestTypedDict,
+            operations.DownloadJobOutputRequest,
+            operations.DownloadJobOutputRequestTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> operations.DownloadPlaygroundJobResponse:
+    ) -> operations.DownloadJobOutputResponse:
         r"""Download Job output
 
-        Download the output of a playground job.
+        Download the output of a job from a local workflow.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -259,13 +259,13 @@ class Jobs(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.DOWNLOAD_PLAYGROUND_JOB_SERVERS[
-                operations.DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API
+            base_url = operations.DOWNLOAD_JOB_OUTPUT_SERVERS[
+                operations.DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API
             ]
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, operations.DownloadPlaygroundJobRequest)
-        request = cast(operations.DownloadPlaygroundJobRequest, request)
+            request = utils.unmarshal(request, operations.DownloadJobOutputRequest)
+        request = cast(operations.DownloadJobOutputRequest, request)
 
         req = self._build_request(
             method="GET",
@@ -298,7 +298,7 @@ class Jobs(BaseSDK):
         http_res = self.do_request(
             hook_ctx=HookContext(
                 base_url=base_url or "",
-                operation_id="download_playground_job",
+                operation_id="download_job_output",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
@@ -309,7 +309,7 @@ class Jobs(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return operations.DownloadPlaygroundJobResponse(
+            return operations.DownloadJobOutputResponse(
                 any=utils.unmarshal_json(http_res.text, Optional[Any]),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -340,21 +340,21 @@ class Jobs(BaseSDK):
             http_res,
         )
 
-    async def download_playground_job_async(
+    async def download_job_output_async(
         self,
         *,
         request: Union[
-            operations.DownloadPlaygroundJobRequest,
-            operations.DownloadPlaygroundJobRequestTypedDict,
+            operations.DownloadJobOutputRequest,
+            operations.DownloadJobOutputRequestTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> operations.DownloadPlaygroundJobResponse:
+    ) -> operations.DownloadJobOutputResponse:
         r"""Download Job output
 
-        Download the output of a playground job.
+        Download the output of a job from a local workflow.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -370,13 +370,13 @@ class Jobs(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.DOWNLOAD_PLAYGROUND_JOB_SERVERS[
-                operations.DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API
+            base_url = operations.DOWNLOAD_JOB_OUTPUT_SERVERS[
+                operations.DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API
             ]
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, operations.DownloadPlaygroundJobRequest)
-        request = cast(operations.DownloadPlaygroundJobRequest, request)
+            request = utils.unmarshal(request, operations.DownloadJobOutputRequest)
+        request = cast(operations.DownloadJobOutputRequest, request)
 
         req = self._build_request_async(
             method="GET",
@@ -409,7 +409,7 @@ class Jobs(BaseSDK):
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
                 base_url=base_url or "",
-                operation_id="download_playground_job",
+                operation_id="download_job_output",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
@@ -420,7 +420,7 @@ class Jobs(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return operations.DownloadPlaygroundJobResponse(
+            return operations.DownloadJobOutputResponse(
                 any=utils.unmarshal_json(http_res.text, Optional[Any]),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
