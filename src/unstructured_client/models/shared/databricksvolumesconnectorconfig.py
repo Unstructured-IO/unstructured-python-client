@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 import pydantic
-from typing_extensions import Annotated, TypedDict
+from typing import Optional
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import BaseModel
 
 
@@ -11,9 +12,9 @@ class DatabricksVolumesConnectorConfigTypedDict(TypedDict):
     client_id: str
     client_secret: str
     host: str
-    schema_: str
     volume: str
     volume_path: str
+    schema_: NotRequired[str]
 
 
 class DatabricksVolumesConnectorConfig(BaseModel):
@@ -25,8 +26,8 @@ class DatabricksVolumesConnectorConfig(BaseModel):
 
     host: str
 
-    schema_: Annotated[str, pydantic.Field(alias="schema")]
-
     volume: str
 
     volume_path: str
+
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = "default"

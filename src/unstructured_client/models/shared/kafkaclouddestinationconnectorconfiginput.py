@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -12,38 +13,35 @@ from unstructured_client.types import (
 )
 
 
-class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
-    cloud: bool
-    max_num_of_docs_from_each_space: int
-    max_num_of_spaces: int
-    spaces: Nullable[str]
-    url: str
-    username: str
-    password: NotRequired[Nullable[str]]
-    token: NotRequired[Nullable[str]]
+class KafkaCloudDestinationConnectorConfigInputTypedDict(TypedDict):
+    bootstrap_servers: str
+    kafka_api_key: str
+    secret: str
+    topic: str
+    batch_size: NotRequired[int]
+    group_id: NotRequired[Nullable[str]]
+    port: NotRequired[int]
 
 
-class ConfluenceSourceConnectorConfig(BaseModel):
-    cloud: bool
+class KafkaCloudDestinationConnectorConfigInput(BaseModel):
+    bootstrap_servers: str
 
-    max_num_of_docs_from_each_space: int
+    kafka_api_key: str
 
-    max_num_of_spaces: int
+    secret: str
 
-    spaces: Nullable[str]
+    topic: str
 
-    url: str
+    batch_size: Optional[int] = 100
 
-    username: str
+    group_id: OptionalNullable[str] = UNSET
 
-    password: OptionalNullable[str] = UNSET
-
-    token: OptionalNullable[str] = UNSET
+    port: Optional[int] = 9092
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["password", "token"]
-        nullable_fields = ["spaces", "password", "token"]
+        optional_fields = ["batch_size", "group_id", "port"]
+        nullable_fields = ["group_id"]
         null_default_fields = []
 
         serialized = handler(self)

@@ -27,10 +27,10 @@ value: shared.ConfluenceSourceConnectorConfig = /* values here */
 value: shared.CouchbaseSourceConnectorConfig = /* values here */
 ```
 
-### `shared.DatabricksVolumesSourceConnectorConfig`
+### `shared.DatabricksVolumesConnectorConfig`
 
 ```python
-value: shared.DatabricksVolumesSourceConnectorConfig = /* values here */
+value: shared.DatabricksVolumesConnectorConfig = /* values here */
 ```
 
 ### `shared.DropboxSourceConnectorConfig`
@@ -39,10 +39,10 @@ value: shared.DatabricksVolumesSourceConnectorConfig = /* values here */
 value: shared.DropboxSourceConnectorConfig = /* values here */
 ```
 
-### `shared.ElasticsearchSourceConnectorConfig`
+### `shared.ElasticsearchConnectorConfig`
 
 ```python
-value: shared.ElasticsearchSourceConnectorConfig = /* values here */
+value: shared.ElasticsearchConnectorConfig = /* values here */
 ```
 
 ### `shared.GCSSourceConnectorConfig`
@@ -63,10 +63,10 @@ value: shared.GoogleDriveSourceConnectorConfig = /* values here */
 value: shared.KafkaCloudSourceConnectorConfig = /* values here */
 ```
 
-### `shared.MongodbSourceConnectorConfig`
+### `shared.MongoDBConnectorConfig`
 
 ```python
-value: shared.MongodbSourceConnectorConfig = /* values here */
+value: shared.MongoDBConnectorConfig = /* values here */
 ```
 
 ### `shared.OneDriveSourceConnectorConfig`
@@ -99,10 +99,10 @@ value: shared.S3SourceConnectorConfig = /* values here */
 value: shared.SalesforceSourceConnectorConfig = /* values here */
 ```
 
-### `shared.SharepointSourceConnectorConfig`
+### `shared.SharePointSourceConnectorConfig`
 
 ```python
-value: shared.SharepointSourceConnectorConfig = /* values here */
+value: shared.SharePointSourceConnectorConfig = /* values here */
 ```
 
 ### `shared.SnowflakeSourceConnectorConfig`
@@ -115,5 +115,11 @@ value: shared.SnowflakeSourceConnectorConfig = /* values here */
 
 ```python
 value: shared.JiraSourceConnectorConfig = /* values here */
+```
+
+### `shared.ZendeskSourceConnectorConfig`
+
+```python
+value: shared.ZendeskSourceConnectorConfig = /* values here */
 ```
 

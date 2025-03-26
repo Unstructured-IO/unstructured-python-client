@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: c4f3983b5eb89f59323e9fff5afa0acb
+  docChecksum: 46600a7b471a8b66237d0a37fb0c0286
   docVersion: 1.0.81
-  speakeasyVersion: 1.521.1
-  generationVersion: 2.558.5
-  releaseVersion: 0.31.3
-  configChecksum: 04f975b0bdaad8df79df20dcb379d0b4
+  speakeasyVersion: 1.523.2
+  generationVersion: 2.560.1
+  releaseVersion: 0.31.4
+  configChecksum: 118a51b76b663b1fe71ffc9ffa63b747
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -58,8 +58,8 @@ generatedFiles:
   - docs/models/operations/deletesourceresponse.md
   - docs/models/operations/deleteworkflowrequest.md
   - docs/models/operations/deleteworkflowresponse.md
-  - docs/models/operations/downloadplaygroundjobrequest.md
-  - docs/models/operations/downloadplaygroundjobresponse.md
+  - docs/models/operations/downloadjoboutputrequest.md
+  - docs/models/operations/downloadjoboutputresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
   - docs/models/operations/getjobrequest.md
@@ -111,8 +111,6 @@ generatedFiles:
   - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
   - docs/models/shared/databricksvolumesconnectorconfig.md
   - docs/models/shared/databricksvolumesconnectorconfiginput.md
-  - docs/models/shared/databricksvolumessourceconnectorconfig.md
-  - docs/models/shared/databricksvolumessourceconnectorconfiginput.md
   - docs/models/shared/deltatableconnectorconfig.md
   - docs/models/shared/deltatableconnectorconfiginput.md
   - docs/models/shared/destinationconnectorinformation.md
@@ -122,8 +120,6 @@ generatedFiles:
   - docs/models/shared/dropboxsourceconnectorconfiginput.md
   - docs/models/shared/elasticsearchconnectorconfig.md
   - docs/models/shared/elasticsearchconnectorconfiginput.md
-  - docs/models/shared/elasticsearchsourceconnectorconfig.md
-  - docs/models/shared/elasticsearchsourceconnectorconfiginput.md
   - docs/models/shared/files.md
   - docs/models/shared/gcsdestinationconnectorconfig.md
   - docs/models/shared/gcsdestinationconnectorconfiginput.md
@@ -136,6 +132,8 @@ generatedFiles:
   - docs/models/shared/jirasourceconnectorconfiginput.md
   - docs/models/shared/jobinformation.md
   - docs/models/shared/jobstatus.md
+  - docs/models/shared/kafkaclouddestinationconnectorconfig.md
+  - docs/models/shared/kafkaclouddestinationconnectorconfiginput.md
   - docs/models/shared/kafkacloudsourceconnectorconfig.md
   - docs/models/shared/kafkacloudsourceconnectorconfiginput.md
   - docs/models/shared/loc.md
@@ -143,8 +141,6 @@ generatedFiles:
   - docs/models/shared/milvusdestinationconnectorconfiginput.md
   - docs/models/shared/mongodbconnectorconfig.md
   - docs/models/shared/mongodbconnectorconfiginput.md
-  - docs/models/shared/mongodbsourceconnectorconfig.md
-  - docs/models/shared/mongodbsourceconnectorconfiginput.md
   - docs/models/shared/neo4jdestinationconnectorconfig.md
   - docs/models/shared/neo4jdestinationconnectorconfiginput.md
   - docs/models/shared/nodefilemetadata.md
@@ -201,6 +197,8 @@ generatedFiles:
   - docs/models/shared/workflowschedule.md
   - docs/models/shared/workflowstate.md
   - docs/models/shared/workflowtype.md
+  - docs/models/shared/zendesksourceconnectorconfig.md
+  - docs/models/shared/zendesksourceconnectorconfiginput.md
   - docs/models/utils/retryconfig.md
   - docs/sdks/destinations/README.md
   - docs/sdks/general/README.md
@@ -236,7 +234,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/delete_destination.py
   - src/unstructured_client/models/operations/delete_source.py
   - src/unstructured_client/models/operations/delete_workflow.py
-  - src/unstructured_client/models/operations/download_playground_job.py
+  - src/unstructured_client/models/operations/download_job_output.py
   - src/unstructured_client/models/operations/get_destination.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_source.py
@@ -270,8 +268,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
   - src/unstructured_client/models/shared/crontabentry.py
-  - src/unstructured_client/models/shared/databricks_volumessourceconnectorconfig.py
-  - src/unstructured_client/models/shared/databricks_volumessourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py
@@ -284,8 +280,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
-  - src/unstructured_client/models/shared/elasticsearchsourceconnectorconfig.py
-  - src/unstructured_client/models/shared/elasticsearchsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/gcssourceconnectorconfig.py
@@ -296,14 +290,14 @@ generatedFiles:
   - src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/jobinformation.py
   - src/unstructured_client/models/shared/jobstatus.py
+  - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py
   - src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/mongodbconnectorconfig.py
   - src/unstructured_client/models/shared/mongodbconnectorconfiginput.py
-  - src/unstructured_client/models/shared/mongodbsourceconnectorconfig.py
-  - src/unstructured_client/models/shared/mongodbsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/neo4jdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/neo4jdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/nodefilemetadata.py
@@ -351,6 +345,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/workflowschedule.py
   - src/unstructured_client/models/shared/workflowstate.py
   - src/unstructured_client/models/shared/workflowtype.py
+  - src/unstructured_client/models/shared/zendesksourceconnectorconfig.py
+  - src/unstructured_client/models/shared/zendesksourceconnectorconfiginput.py
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
@@ -402,9 +398,9 @@ examples:
         header: {}
       responses:
         "200":
-          application/json: {"config": {"catalog": "<value>", "database": "<value>", "table_name": "<value>", "volume": "<value>"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
+          application/json: {"config": {"aws_access_key_id": "<id>", "aws_region": "<value>", "aws_secret_access_key": "<value>", "table_uri": "https://similar-outlaw.com/"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"loc": [673293, 205350], "msg": "<value>", "type": "<value>"}, {"loc": [892410, 956769, 161297], "msg": "<value>", "type": "<value>"}, {"loc": [107816], "msg": "<value>", "type": "<value>"}]}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
@@ -584,6 +580,19 @@ examples:
       parameters:
         path:
           job_id: "844a9b13-d032-43c7-8e81-b20a874c4c79"
+        query:
+          file_id: "<id>"
+        header: {}
+      responses:
+        "200":
+          application/json: "<value>"
+        "422":
+          application/json: {"detail": "<value>"}
+  download_job_output:
+    speakeasy-default-download-job-output:
+      parameters:
+        path:
+          job_id: "bddbb621-2124-4cc2-9fa7-c6cdc21dac44"
         query:
           file_id: "<id>"
         header: {}

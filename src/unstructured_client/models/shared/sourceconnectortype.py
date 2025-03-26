@@ -24,3 +24,4 @@ class SourceConnectorType(str, Enum):
     SHAREPOINT = "sharepoint"
     SNOWFLAKE = "snowflake"
     JIRA = "jira"
+    ZENDESK = "zendesk"

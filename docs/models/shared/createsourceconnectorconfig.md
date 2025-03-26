@@ -27,10 +27,10 @@ value: shared.ConfluenceSourceConnectorConfigInput = /* values here */
 value: shared.CouchbaseSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.DatabricksVolumesSourceConnectorConfigInput`
+### `shared.DatabricksVolumesConnectorConfigInput`
 
 ```python
-value: shared.DatabricksVolumesSourceConnectorConfigInput = /* values here */
+value: shared.DatabricksVolumesConnectorConfigInput = /* values here */
 ```
 
 ### `shared.DropboxSourceConnectorConfigInput`
@@ -39,10 +39,10 @@ value: shared.DatabricksVolumesSourceConnectorConfigInput = /* values here */
 value: shared.DropboxSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.ElasticsearchSourceConnectorConfigInput`
+### `shared.ElasticsearchConnectorConfigInput`
 
 ```python
-value: shared.ElasticsearchSourceConnectorConfigInput = /* values here */
+value: shared.ElasticsearchConnectorConfigInput = /* values here */
 ```
 
 ### `shared.GCSSourceConnectorConfigInput`
@@ -63,10 +63,10 @@ value: shared.GoogleDriveSourceConnectorConfigInput = /* values here */
 value: shared.KafkaCloudSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.MongodbSourceConnectorConfigInput`
+### `shared.MongoDBConnectorConfigInput`
 
 ```python
-value: shared.MongodbSourceConnectorConfigInput = /* values here */
+value: shared.MongoDBConnectorConfigInput = /* values here */
 ```
 
 ### `shared.OneDriveSourceConnectorConfigInput`
@@ -99,10 +99,10 @@ value: shared.S3SourceConnectorConfigInput = /* values here */
 value: shared.SalesforceSourceConnectorConfigInput = /* values here */
 ```
 
-### `shared.SharepointSourceConnectorConfigInput`
+### `shared.SharePointSourceConnectorConfigInput`
 
 ```python
-value: shared.SharepointSourceConnectorConfigInput = /* values here */
+value: shared.SharePointSourceConnectorConfigInput = /* values here */
 ```
 
 ### `shared.SnowflakeSourceConnectorConfigInput`
@@ -115,5 +115,11 @@ value: shared.SnowflakeSourceConnectorConfigInput = /* values here */
 
 ```python
 value: shared.JiraSourceConnectorConfigInput = /* values here */
+```
+
+### `shared.ZendeskSourceConnectorConfigInput`
+
+```python
+value: shared.ZendeskSourceConnectorConfigInput = /* values here */
 ```
 
