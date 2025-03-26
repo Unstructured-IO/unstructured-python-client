@@ -14,7 +14,7 @@ class SourceConnectorType(str, Enum):
     ELASTICSEARCH = "elasticsearch"
     GCS = "gcs"
     GOOGLE_DRIVE = "google_drive"
-    KAFKA_CLOUD = "kafka_cloud"
+    KAFKA_CLOUD = "kafka-cloud"
     MONGODB = "mongodb"
     ONEDRIVE = "onedrive"
     OUTLOOK = "outlook"
