@@ -20,15 +20,15 @@ from unstructured_client.utils import (
     QueryParamMetadata,
 )
 
-DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API = "platform-api"
+DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API = "platform-api"
 r"""Unstructured Platform API"""
 
-DOWNLOAD_PLAYGROUND_JOB_SERVERS = {
-    DOWNLOAD_PLAYGROUND_JOB_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
+DOWNLOAD_JOB_OUTPUT_SERVERS = {
+    DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
 }
 
 
-class DownloadPlaygroundJobRequestTypedDict(TypedDict):
+class DownloadJobOutputRequestTypedDict(TypedDict):
     file_id: str
     r"""ID of the file to download"""
     job_id: str
@@ -37,7 +37,7 @@ class DownloadPlaygroundJobRequestTypedDict(TypedDict):
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
-class DownloadPlaygroundJobRequest(BaseModel):
+class DownloadJobOutputRequest(BaseModel):
     file_id: Annotated[
         str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
     ]
@@ -90,7 +90,7 @@ class DownloadPlaygroundJobRequest(BaseModel):
         return m
 
 
-class DownloadPlaygroundJobResponseTypedDict(TypedDict):
+class DownloadJobOutputResponseTypedDict(TypedDict):
     content_type: str
     r"""HTTP response content type for this operation"""
     status_code: int
@@ -101,7 +101,7 @@ class DownloadPlaygroundJobResponseTypedDict(TypedDict):
     r"""Successful Response"""
 
 
-class DownloadPlaygroundJobResponse(BaseModel):
+class DownloadJobOutputResponse(BaseModel):
     content_type: str
     r"""HTTP response content type for this operation"""
 

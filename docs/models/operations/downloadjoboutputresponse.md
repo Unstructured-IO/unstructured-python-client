@@ -1,4 +1,4 @@
-# DownloadPlaygroundJobResponse
+# DownloadJobOutputResponse
 
 
 ## Fields

@@ -24,3 +24,4 @@
 | `SHAREPOINT`         | sharepoint           |
 | `SNOWFLAKE`          | snowflake            |
 | `JIRA`               | jira                 |
+| `ZENDESK`            | zendesk              |

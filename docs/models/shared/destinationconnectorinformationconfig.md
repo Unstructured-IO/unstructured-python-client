@@ -51,6 +51,12 @@ value: shared.ElasticsearchConnectorConfig = /* values here */
 value: shared.GCSDestinationConnectorConfig = /* values here */
 ```
 
+### `shared.KafkaCloudDestinationConnectorConfig`
+
+```python
+value: shared.KafkaCloudDestinationConnectorConfig = /* values here */
+```
+
 ### `shared.MilvusDestinationConnectorConfig`
 
 ```python
@@ -75,10 +81,10 @@ value: shared.Neo4jDestinationConnectorConfig = /* values here */
 value: shared.OneDriveDestinationConnectorConfig = /* values here */
 ```
 
-### `shared.PineconeDestinationConnectorConfigInput`
+### `shared.PineconeDestinationConnectorConfig`
 
 ```python
-value: shared.PineconeDestinationConnectorConfigInput = /* values here */
+value: shared.PineconeDestinationConnectorConfig = /* values here */
 ```
 
 ### `shared.PostgresDestinationConnectorConfig`

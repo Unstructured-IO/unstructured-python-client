@@ -12,38 +12,35 @@ from unstructured_client.types import (
 )
 
 
-class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
-    cloud: bool
-    max_num_of_docs_from_each_space: int
-    max_num_of_spaces: int
-    spaces: Nullable[str]
-    url: str
-    username: str
-    password: NotRequired[Nullable[str]]
-    token: NotRequired[Nullable[str]]
+class KafkaCloudDestinationConnectorConfigTypedDict(TypedDict):
+    batch_size: int
+    bootstrap_servers: str
+    kafka_api_key: str
+    port: int
+    secret: str
+    topic: str
+    group_id: NotRequired[Nullable[str]]
 
 
-class ConfluenceSourceConnectorConfig(BaseModel):
-    cloud: bool
+class KafkaCloudDestinationConnectorConfig(BaseModel):
+    batch_size: int
 
-    max_num_of_docs_from_each_space: int
+    bootstrap_servers: str
 
-    max_num_of_spaces: int
+    kafka_api_key: str
 
-    spaces: Nullable[str]
+    port: int
 
-    url: str
+    secret: str
 
-    username: str
+    topic: str
 
-    password: OptionalNullable[str] = UNSET
-
-    token: OptionalNullable[str] = UNSET
+    group_id: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["password", "token"]
-        nullable_fields = ["spaces", "password", "token"]
+        optional_fields = ["group_id"]
+        nullable_fields = ["group_id"]
         null_default_fields = []
 
         serialized = handler(self)
