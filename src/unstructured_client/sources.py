@@ -85,7 +85,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="create_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -204,7 +204,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="create_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -316,7 +316,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="delete_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -426,7 +426,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="delete_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -536,7 +536,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -648,7 +648,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -760,7 +760,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_sources",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -872,7 +872,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_sources",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -991,7 +991,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="update_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1110,7 +1110,7 @@ class Sources(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="update_source",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,

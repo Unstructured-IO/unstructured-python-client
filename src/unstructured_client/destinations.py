@@ -86,7 +86,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="create_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -206,7 +206,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="create_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -319,7 +319,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="delete_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -430,7 +430,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="delete_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -540,7 +540,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -652,7 +652,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -765,7 +765,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_destinations",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -879,7 +879,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_destinations",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1000,7 +1000,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="update_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1120,7 +1120,7 @@ class Destinations(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="update_destination",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,

@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 46600a7b471a8b66237d0a37fb0c0286
+  docChecksum: 980094d4c1cc005e5d065733ea9dda37
   docVersion: 1.0.81
-  speakeasyVersion: 1.523.2
-  generationVersion: 2.560.1
-  releaseVersion: 0.31.4
-  configChecksum: 118a51b76b663b1fe71ffc9ffa63b747
+  speakeasyVersion: 1.524.0
+  generationVersion: 2.562.2
+  releaseVersion: 0.31.5
+  configChecksum: 8691cb4d978f562abacc4daa272fb165
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -400,7 +400,7 @@ examples:
         "200":
           application/json: {"config": {"aws_access_key_id": "<id>", "aws_region": "<value>", "aws_secret_access_key": "<value>", "table_uri": "https://similar-outlaw.com/"}, "created_at": "2024-10-14T19:54:11.006Z", "id": "42a89289-d2ad-4317-9f06-cb55de8b2b8c", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": [{"loc": [673293, 205350], "msg": "<value>", "type": "<value>"}, {"loc": [892410, 956769, 161297], "msg": "<value>", "type": "<value>"}, {"loc": [107816], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
