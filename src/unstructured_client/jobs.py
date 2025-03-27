@@ -78,7 +78,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="cancel_job",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -188,7 +188,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="cancel_job",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -299,7 +299,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="download_job_output",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -410,7 +410,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="download_job_output",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -518,7 +518,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_job",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -628,7 +628,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="get_job",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -738,7 +738,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_jobs",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -848,7 +848,7 @@ class Jobs(BaseSDK):
             hook_ctx=HookContext(
                 base_url=base_url or "",
                 operation_id="list_jobs",
-                oauth2_scopes=[],
+                oauth2_scopes=None,
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
