@@ -144,6 +144,14 @@ class PartitionParametersTypedDict(TypedDict):
     r"""When `True`, apply overlap between 'normal' chunks formed from whole elements and not subject to text-splitting. Use this with caution as it entails a certain level of 'pollution' of otherwise clean semantic chunk boundaries. Default: False"""
     pdf_infer_table_structure: NotRequired[bool]
     r"""Deprecated! Use skip_infer_table_types to opt out of table extraction for any file type. If False and strategy=hi_res, no Table Elements will be extracted from pdf files regardless of skip_infer_table_types contents."""
+    pdfminer_char_margin: NotRequired[Nullable[float]]
+    r"""If two characters are closer together than this margin they are considered part of the same line. The margin is specified relative to the width of the character."""
+    pdfminer_line_margin: NotRequired[Nullable[float]]
+    r"""If two lines are close together they are considered to be part of the same paragraph. The margin is specified relative to the height of a line."""
+    pdfminer_line_overlap: NotRequired[Nullable[float]]
+    r"""If two characters have more overlap than this they are considered to be on the same line. The overlap is specified relative to the minimum height of both characters."""
+    pdfminer_word_margin: NotRequired[Nullable[float]]
+    r"""If two characters on the same line are further apart than this margin then they are considered to be two separate words, and an intermediate space will be added for readability. The margin is specified relative to the width of the character."""
     similarity_threshold: NotRequired[Nullable[float]]
     r"""A value between 0.0 and 1.0 describing the minimum similarity two elements must have to be included in the same chunk. Note that similar elements may be separated to meet chunk-size criteria; this value can only guarantees that two elements with similarity below the threshold will appear in separate chunks."""
     skip_infer_table_types: NotRequired[List[str]]
@@ -263,6 +271,26 @@ class PartitionParameters(BaseModel):
     ] = True
     r"""Deprecated! Use skip_infer_table_types to opt out of table extraction for any file type. If False and strategy=hi_res, no Table Elements will be extracted from pdf files regardless of skip_infer_table_types contents."""
 
+    pdfminer_char_margin: Annotated[
+        OptionalNullable[float], FieldMetadata(multipart=True)
+    ] = None
+    r"""If two characters are closer together than this margin they are considered part of the same line. The margin is specified relative to the width of the character."""
+
+    pdfminer_line_margin: Annotated[
+        OptionalNullable[float], FieldMetadata(multipart=True)
+    ] = None
+    r"""If two lines are close together they are considered to be part of the same paragraph. The margin is specified relative to the height of a line."""
+
+    pdfminer_line_overlap: Annotated[
+        OptionalNullable[float], FieldMetadata(multipart=True)
+    ] = None
+    r"""If two characters have more overlap than this they are considered to be on the same line. The overlap is specified relative to the minimum height of both characters."""
+
+    pdfminer_word_margin: Annotated[
+        OptionalNullable[float], FieldMetadata(multipart=True)
+    ] = None
+    r"""If two characters on the same line are further apart than this margin then they are considered to be two separate words, and an intermediate space will be added for readability. The margin is specified relative to the width of the character."""
+
     similarity_threshold: Annotated[
         OptionalNullable[float], FieldMetadata(multipart=True)
     ] = None
@@ -360,6 +388,10 @@ class PartitionParameters(BaseModel):
             "overlap",
             "overlap_all",
             "pdf_infer_table_structure",
+            "pdfminer_char_margin",
+            "pdfminer_line_margin",
+            "pdfminer_line_overlap",
+            "pdfminer_word_margin",
             "similarity_threshold",
             "skip_infer_table_types",
             "split_pdf_allow_failed",
@@ -386,6 +418,10 @@ class PartitionParameters(BaseModel):
             "include_orig_elements",
             "max_characters",
             "new_after_n_chars",
+            "pdfminer_char_margin",
+            "pdfminer_line_margin",
+            "pdfminer_line_overlap",
+            "pdfminer_word_margin",
             "similarity_threshold",
             "starting_page_number",
             "table_ocr_agent",
@@ -400,6 +436,10 @@ class PartitionParameters(BaseModel):
             "include_orig_elements",
             "max_characters",
             "new_after_n_chars",
+            "pdfminer_char_margin",
+            "pdfminer_line_margin",
+            "pdfminer_line_overlap",
+            "pdfminer_word_margin",
             "similarity_threshold",
             "starting_page_number",
             "table_ocr_agent",
