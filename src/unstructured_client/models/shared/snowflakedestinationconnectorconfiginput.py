@@ -22,12 +22,12 @@ class SnowflakeDestinationConnectorConfigInputTypedDict(TypedDict):
     id_column: str
     password: str
     role: str
-    schema_: str
     table_name: str
     user: str
     batch_size: NotRequired[int]
     port: NotRequired[int]
     record_id_key: NotRequired[Nullable[str]]
+    schema_: NotRequired[str]
 
 
 class SnowflakeDestinationConnectorConfigInput(BaseModel):
@@ -45,8 +45,6 @@ class SnowflakeDestinationConnectorConfigInput(BaseModel):
 
     role: str
 
-    schema_: Annotated[str, pydantic.Field(alias="schema")]
-
     table_name: str
 
     user: str
@@ -57,9 +55,11 @@ class SnowflakeDestinationConnectorConfigInput(BaseModel):
 
     record_id_key: OptionalNullable[str] = UNSET
 
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["batch_size", "port", "record_id_key"]
+        optional_fields = ["batch_size", "port", "record_id_key", "schema"]
         nullable_fields = ["record_id_key"]
         null_default_fields = []
 

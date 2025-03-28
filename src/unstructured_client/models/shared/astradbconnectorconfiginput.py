@@ -18,6 +18,7 @@ class AstraDBConnectorConfigInputTypedDict(TypedDict):
     collection_name: str
     token: str
     batch_size: NotRequired[int]
+    flatten_metadata: NotRequired[bool]
     keyspace: NotRequired[Nullable[str]]
 
 
@@ -30,11 +31,13 @@ class AstraDBConnectorConfigInput(BaseModel):
 
     batch_size: Optional[int] = 20
 
+    flatten_metadata: Optional[bool] = False
+
     keyspace: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["batch_size", "keyspace"]
+        optional_fields = ["batch_size", "flatten_metadata", "keyspace"]
         nullable_fields = ["keyspace"]
         null_default_fields = []
 

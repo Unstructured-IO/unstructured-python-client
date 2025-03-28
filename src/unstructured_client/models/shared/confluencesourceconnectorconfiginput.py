@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
-from typing import Optional
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,10 +17,12 @@ class ConfluenceSourceConnectorConfigInputTypedDict(TypedDict):
     url: str
     username: str
     cloud: NotRequired[bool]
+    extract_files: NotRequired[bool]
+    extract_images: NotRequired[bool]
     max_num_of_docs_from_each_space: NotRequired[int]
     max_num_of_spaces: NotRequired[int]
     password: NotRequired[Nullable[str]]
-    spaces: NotRequired[Nullable[str]]
+    spaces: NotRequired[Nullable[List[str]]]
     token: NotRequired[Nullable[str]]
 
 
@@ -31,13 +33,17 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
 
     cloud: Optional[bool] = False
 
+    extract_files: Optional[bool] = False
+
+    extract_images: Optional[bool] = False
+
     max_num_of_docs_from_each_space: Optional[int] = 150
 
     max_num_of_spaces: Optional[int] = 500
 
     password: OptionalNullable[str] = UNSET
 
-    spaces: OptionalNullable[str] = UNSET
+    spaces: OptionalNullable[List[str]] = UNSET
 
     token: OptionalNullable[str] = UNSET
 
@@ -45,6 +51,8 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
     def serialize_model(self, handler):
         optional_fields = [
             "cloud",
+            "extract_files",
+            "extract_images",
             "max_num_of_docs_from_each_space",
             "max_num_of_spaces",
             "password",

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 import pydantic
-from typing_extensions import Annotated, TypedDict
+from typing import Optional
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import BaseModel
 
 
@@ -15,9 +16,9 @@ class SnowflakeDestinationConnectorConfigTypedDict(TypedDict):
     port: int
     record_id_key: str
     role: str
-    schema_: str
     table_name: str
     user: str
+    schema_: NotRequired[str]
 
 
 class SnowflakeDestinationConnectorConfig(BaseModel):
@@ -37,8 +38,8 @@ class SnowflakeDestinationConnectorConfig(BaseModel):
 
     role: str
 
-    schema_: Annotated[str, pydantic.Field(alias="schema")]
-
     table_name: str
 
     user: str
+
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
