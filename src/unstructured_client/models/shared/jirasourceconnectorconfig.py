@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import List
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -15,11 +16,11 @@ from unstructured_client.types import (
 class JiraSourceConnectorConfigTypedDict(TypedDict):
     url: str
     username: str
-    boards: NotRequired[Nullable[str]]
+    boards: NotRequired[Nullable[List[str]]]
     cloud: NotRequired[Nullable[bool]]
-    issues: NotRequired[Nullable[str]]
+    issues: NotRequired[Nullable[List[str]]]
     password: NotRequired[Nullable[str]]
-    projects: NotRequired[Nullable[str]]
+    projects: NotRequired[Nullable[List[str]]]
     token: NotRequired[Nullable[str]]
 
 
@@ -28,15 +29,15 @@ class JiraSourceConnectorConfig(BaseModel):
 
     username: str
 
-    boards: OptionalNullable[str] = UNSET
+    boards: OptionalNullable[List[str]] = UNSET
 
     cloud: OptionalNullable[bool] = UNSET
 
-    issues: OptionalNullable[str] = UNSET
+    issues: OptionalNullable[List[str]] = UNSET
 
     password: OptionalNullable[str] = UNSET
 
-    projects: OptionalNullable[str] = UNSET
+    projects: OptionalNullable[List[str]] = UNSET
 
     token: OptionalNullable[str] = UNSET
 
