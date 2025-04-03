@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 82d55672df290a1b6b3641bf1c0385a0
+  docChecksum: f5acf2abe837ecf85e4549af6c864e95
   docVersion: 1.1.4
-  speakeasyVersion: 1.526.0
-  generationVersion: 2.563.0
-  releaseVersion: 0.32.0
-  configChecksum: aaffd2f8109b46337a8b440562051f7a
+  speakeasyVersion: 1.528.1
+  generationVersion: 2.565.1
+  releaseVersion: 0.32.1
+  configChecksum: 0ee63f2ec67ee05b651d54a09c7c935e
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.12.4
+    core: 5.12.5
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -29,7 +29,7 @@ features:
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
     nullables: 1.0.1
-    openEnums: 1.0.0
+    openEnums: 1.0.1
     responseFormat: 1.0.1
     retries: 3.0.2
     sdkHooks: 1.0.1
@@ -90,6 +90,8 @@ generatedFiles:
   - docs/models/shared/astradbconnectorconfiginput.md
   - docs/models/shared/azureaisearchconnectorconfig.md
   - docs/models/shared/azureaisearchconnectorconfiginput.md
+  - docs/models/shared/azuredestinationconnectorconfig.md
+  - docs/models/shared/azuredestinationconnectorconfiginput.md
   - docs/models/shared/azuresourceconnectorconfig.md
   - docs/models/shared/azuresourceconnectorconfiginput.md
   - docs/models/shared/bodyrunworkflow.md
@@ -253,6 +255,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/astradbconnectorconfiginput.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfig.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
+  - src/unstructured_client/models/shared/azuredestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/body_run_workflow.py

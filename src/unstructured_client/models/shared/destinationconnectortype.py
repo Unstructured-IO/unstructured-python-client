@@ -5,6 +5,7 @@ from enum import Enum
 
 
 class DestinationConnectorType(str, Enum):
+    AZURE = "azure"
     ASTRADB = "astradb"
     AZURE_AI_SEARCH = "azure_ai_search"
     COUCHBASE = "couchbase"
