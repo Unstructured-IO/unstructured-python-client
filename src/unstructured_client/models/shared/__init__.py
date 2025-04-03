@@ -16,6 +16,14 @@ from .azureaisearchconnectorconfiginput import (
     AzureAISearchConnectorConfigInput,
     AzureAISearchConnectorConfigInputTypedDict,
 )
+from .azuredestinationconnectorconfig import (
+    AzureDestinationConnectorConfig,
+    AzureDestinationConnectorConfigTypedDict,
+)
+from .azuredestinationconnectorconfiginput import (
+    AzureDestinationConnectorConfigInput,
+    AzureDestinationConnectorConfigInputTypedDict,
+)
 from .azuresourceconnectorconfig import (
     AzureSourceConnectorConfig,
     AzureSourceConnectorConfigTypedDict,
@@ -384,6 +392,10 @@ __all__ = [
     "AzureAISearchConnectorConfigInput",
     "AzureAISearchConnectorConfigInputTypedDict",
     "AzureAISearchConnectorConfigTypedDict",
+    "AzureDestinationConnectorConfig",
+    "AzureDestinationConnectorConfigInput",
+    "AzureDestinationConnectorConfigInputTypedDict",
+    "AzureDestinationConnectorConfigTypedDict",
     "AzureSourceConnectorConfig",
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",

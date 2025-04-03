@@ -3,6 +3,12 @@
 
 ## Supported Types
 
+### `shared.AzureDestinationConnectorConfig`
+
+```python
+value: shared.AzureDestinationConnectorConfig = /* values here */
+```
+
 ### `shared.AstraDBConnectorConfig`
 
 ```python

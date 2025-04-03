@@ -12,23 +12,39 @@ from unstructured_client.types import (
 )
 
 
-class WeaviateDestinationConnectorConfigTypedDict(TypedDict):
-    api_key: str
-    cluster_url: str
-    collection: NotRequired[Nullable[str]]
+class AzureDestinationConnectorConfigTypedDict(TypedDict):
+    remote_url: str
+    account_key: NotRequired[Nullable[str]]
+    account_name: NotRequired[Nullable[str]]
+    connection_string: NotRequired[Nullable[str]]
+    sas_token: NotRequired[Nullable[str]]
 
 
-class WeaviateDestinationConnectorConfig(BaseModel):
-    api_key: str
+class AzureDestinationConnectorConfig(BaseModel):
+    remote_url: str
 
-    cluster_url: str
+    account_key: OptionalNullable[str] = UNSET
 
-    collection: OptionalNullable[str] = UNSET
+    account_name: OptionalNullable[str] = UNSET
+
+    connection_string: OptionalNullable[str] = UNSET
+
+    sas_token: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["collection"]
-        nullable_fields = ["collection"]
+        optional_fields = [
+            "account_key",
+            "account_name",
+            "connection_string",
+            "sas_token",
+        ]
+        nullable_fields = [
+            "account_key",
+            "account_name",
+            "connection_string",
+            "sas_token",
+        ]
         null_default_fields = []
 
         serialized = handler(self)
