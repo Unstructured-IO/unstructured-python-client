@@ -34,6 +34,7 @@ in-project = true
 
 [tool.poetry.group.dev.dependencies]
 deepdiff = ">=6.0"
+freezegun = ">=1.5.1"
 mypy = "==1.14.1"
 pylint = "==3.2.3"
 pytest = ">=8.3.3"
