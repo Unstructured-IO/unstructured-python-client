@@ -18,6 +18,7 @@ class WorkflowNodeTypedDict(TypedDict):
     name: str
     subtype: str
     type: WorkflowNodeType
+    id: NotRequired[Nullable[str]]
     settings: NotRequired[Nullable[Dict[str, Any]]]
 
 
@@ -28,19 +29,21 @@ class WorkflowNode(BaseModel):
 
     type: WorkflowNodeType
 
+    id: OptionalNullable[str] = UNSET
+
     settings: OptionalNullable[Dict[str, Any]] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["settings"]
-        nullable_fields = ["settings"]
+        optional_fields = ["id", "settings"]
+        nullable_fields = ["id", "settings"]
         null_default_fields = []
 
         serialized = handler(self)
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

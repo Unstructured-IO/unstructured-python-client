@@ -3,6 +3,7 @@
 from __future__ import annotations
 import pydantic
 from pydantic import model_serializer
+from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -16,9 +17,14 @@ from unstructured_client.types import (
 class DatabricksVDTDestinationConnectorConfigTypedDict(TypedDict):
     catalog: str
     database: str
+    http_path: str
+    server_hostname: str
     table_name: str
     volume: str
-    schema_: NotRequired[Nullable[str]]
+    client_id: NotRequired[Nullable[str]]
+    client_secret: NotRequired[Nullable[str]]
+    schema_: NotRequired[str]
+    token: NotRequired[Nullable[str]]
     volume_path: NotRequired[Nullable[str]]
 
 
@@ -27,25 +33,41 @@ class DatabricksVDTDestinationConnectorConfig(BaseModel):
 
     database: str
 
+    http_path: str
+
+    server_hostname: str
+
     table_name: str
 
     volume: str
 
-    schema_: Annotated[OptionalNullable[str], pydantic.Field(alias="schema")] = UNSET
+    client_id: OptionalNullable[str] = UNSET
+
+    client_secret: OptionalNullable[str] = UNSET
+
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = "default"
+
+    token: OptionalNullable[str] = UNSET
 
     volume_path: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["schema", "volume_path"]
-        nullable_fields = ["schema", "volume_path"]
+        optional_fields = [
+            "client_id",
+            "client_secret",
+            "schema",
+            "token",
+            "volume_path",
+        ]
+        nullable_fields = ["client_id", "client_secret", "token", "volume_path"]
         null_default_fields = []
 
         serialized = handler(self)
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

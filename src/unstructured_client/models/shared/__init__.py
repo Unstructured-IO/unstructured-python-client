@@ -16,6 +16,14 @@ from .azureaisearchconnectorconfiginput import (
     AzureAISearchConnectorConfigInput,
     AzureAISearchConnectorConfigInputTypedDict,
 )
+from .azuredestinationconnectorconfig import (
+    AzureDestinationConnectorConfig,
+    AzureDestinationConnectorConfigTypedDict,
+)
+from .azuredestinationconnectorconfiginput import (
+    AzureDestinationConnectorConfigInput,
+    AzureDestinationConnectorConfigInputTypedDict,
+)
 from .azuresourceconnectorconfig import (
     AzureSourceConnectorConfig,
     AzureSourceConnectorConfigTypedDict,
@@ -23,6 +31,12 @@ from .azuresourceconnectorconfig import (
 from .azuresourceconnectorconfiginput import (
     AzureSourceConnectorConfigInput,
     AzureSourceConnectorConfigInputTypedDict,
+)
+from .body_run_workflow import (
+    BodyRunWorkflow,
+    BodyRunWorkflowTypedDict,
+    InputFiles,
+    InputFilesTypedDict,
 )
 from .boxsourceconnectorconfig import (
     BoxSourceConnectorConfig,
@@ -141,6 +155,14 @@ from .googledrivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInput,
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
+from .jirasourceconnectorconfig import (
+    JiraSourceConnectorConfig,
+    JiraSourceConnectorConfigTypedDict,
+)
+from .jirasourceconnectorconfiginput import (
+    JiraSourceConnectorConfigInput,
+    JiraSourceConnectorConfigInputTypedDict,
+)
 from .jobinformation import JobInformation, JobInformationTypedDict
 from .jobstatus import JobStatus
 from .kafkaclouddestinationconnectorconfig import (
@@ -183,6 +205,7 @@ from .neo4jdestinationconnectorconfiginput import (
     Neo4jDestinationConnectorConfigInput,
     Neo4jDestinationConnectorConfigInputTypedDict,
 )
+from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
 from .onedrivedestinationconnectorconfig import (
     OneDriveDestinationConnectorConfig,
     OneDriveDestinationConnectorConfigTypedDict,
@@ -212,10 +235,18 @@ from .partition_parameters import (
     FilesTypedDict,
     OutputFormat,
     PartitionParameters,
-    PartitionParametersSchemasStrategy,
-    PartitionParametersStrategy,
     PartitionParametersTypedDict,
     Strategy,
+    VLMModel,
+    VLMModelProvider,
+)
+from .pineconedestinationconnectorconfig import (
+    PineconeDestinationConnectorConfig,
+    PineconeDestinationConnectorConfigTypedDict,
+)
+from .pineconedestinationconnectorconfiginput import (
+    PineconeDestinationConnectorConfigInput,
+    PineconeDestinationConnectorConfigInputTypedDict,
 )
 from .postgresdestinationconnectorconfig import (
     PostgresDestinationConnectorConfig,
@@ -224,6 +255,14 @@ from .postgresdestinationconnectorconfig import (
 from .postgresdestinationconnectorconfiginput import (
     PostgresDestinationConnectorConfigInput,
     PostgresDestinationConnectorConfigInputTypedDict,
+)
+from .postgressourceconnectorconfig import (
+    PostgresSourceConnectorConfig,
+    PostgresSourceConnectorConfigTypedDict,
+)
+from .postgressourceconnectorconfiginput import (
+    PostgresSourceConnectorConfigInput,
+    PostgresSourceConnectorConfigInputTypedDict,
 )
 from .qdrantclouddestinationconnectorconfig import (
     QdrantCloudDestinationConnectorConfig,
@@ -334,6 +373,14 @@ from .workflownodetype import WorkflowNodeType
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
 from .workflowtype import WorkflowType
+from .zendesksourceconnectorconfig import (
+    ZendeskSourceConnectorConfig,
+    ZendeskSourceConnectorConfigTypedDict,
+)
+from .zendesksourceconnectorconfiginput import (
+    ZendeskSourceConnectorConfigInput,
+    ZendeskSourceConnectorConfigInputTypedDict,
+)
 
 
 __all__ = [
@@ -345,10 +392,16 @@ __all__ = [
     "AzureAISearchConnectorConfigInput",
     "AzureAISearchConnectorConfigInputTypedDict",
     "AzureAISearchConnectorConfigTypedDict",
+    "AzureDestinationConnectorConfig",
+    "AzureDestinationConnectorConfigInput",
+    "AzureDestinationConnectorConfigInputTypedDict",
+    "AzureDestinationConnectorConfigTypedDict",
     "AzureSourceConnectorConfig",
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",
     "AzureSourceConnectorConfigTypedDict",
+    "BodyRunWorkflow",
+    "BodyRunWorkflowTypedDict",
     "BoxSourceConnectorConfig",
     "BoxSourceConnectorConfigInput",
     "BoxSourceConnectorConfigInputTypedDict",
@@ -416,6 +469,12 @@ __all__ = [
     "GoogleDriveSourceConnectorConfigInput",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
     "GoogleDriveSourceConnectorConfigTypedDict",
+    "InputFiles",
+    "InputFilesTypedDict",
+    "JiraSourceConnectorConfig",
+    "JiraSourceConnectorConfigInput",
+    "JiraSourceConnectorConfigInputTypedDict",
+    "JiraSourceConnectorConfigTypedDict",
     "JobInformation",
     "JobInformationTypedDict",
     "JobStatus",
@@ -441,6 +500,8 @@ __all__ = [
     "Neo4jDestinationConnectorConfigInput",
     "Neo4jDestinationConnectorConfigInputTypedDict",
     "Neo4jDestinationConnectorConfigTypedDict",
+    "NodeFileMetadata",
+    "NodeFileMetadataTypedDict",
     "OneDriveDestinationConnectorConfig",
     "OneDriveDestinationConnectorConfigInput",
     "OneDriveDestinationConnectorConfigInputTypedDict",
@@ -455,13 +516,19 @@ __all__ = [
     "OutlookSourceConnectorConfigTypedDict",
     "OutputFormat",
     "PartitionParameters",
-    "PartitionParametersSchemasStrategy",
-    "PartitionParametersStrategy",
     "PartitionParametersTypedDict",
+    "PineconeDestinationConnectorConfig",
+    "PineconeDestinationConnectorConfigInput",
+    "PineconeDestinationConnectorConfigInputTypedDict",
+    "PineconeDestinationConnectorConfigTypedDict",
     "PostgresDestinationConnectorConfig",
     "PostgresDestinationConnectorConfigInput",
     "PostgresDestinationConnectorConfigInputTypedDict",
     "PostgresDestinationConnectorConfigTypedDict",
+    "PostgresSourceConnectorConfig",
+    "PostgresSourceConnectorConfigInput",
+    "PostgresSourceConnectorConfigInputTypedDict",
+    "PostgresSourceConnectorConfigTypedDict",
     "QdrantCloudDestinationConnectorConfig",
     "QdrantCloudDestinationConnectorConfigInput",
     "QdrantCloudDestinationConnectorConfigInputTypedDict",
@@ -514,6 +581,8 @@ __all__ = [
     "UpdateWorkflow",
     "UpdateWorkflowSchedule",
     "UpdateWorkflowTypedDict",
+    "VLMModel",
+    "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
     "WeaviateDestinationConnectorConfig",
@@ -529,4 +598,8 @@ __all__ = [
     "WorkflowScheduleTypedDict",
     "WorkflowState",
     "WorkflowType",
+    "ZendeskSourceConnectorConfig",
+    "ZendeskSourceConnectorConfigInput",
+    "ZendeskSourceConnectorConfigInputTypedDict",
+    "ZendeskSourceConnectorConfigTypedDict",
 ]

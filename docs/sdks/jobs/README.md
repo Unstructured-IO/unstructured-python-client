@@ -6,6 +6,7 @@
 ### Available Operations
 
 * [cancel_job](#cancel_job) - Cancel Job
+* [download_job_output](#download_job_output) - Download Job output
 * [get_job](#get_job) - Get Job
 * [list_jobs](#list_jobs) - List Jobs
 
@@ -43,6 +44,49 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.CancelJobResponse](../../models/operations/canceljobresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## download_job_output
+
+Download the output of a job from a local workflow.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.download_job_output(request={
+        "file_id": "<id>",
+        "job_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
+    })
+
+    assert res.any is not None
+
+    # Handle response
+    print(res.any)
+
+```
+
+### Parameters
+
+| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `request`                                                                                  | [operations.DownloadJobOutputRequest](../../models/operations/downloadjoboutputrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
+| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| `server_url`                                                                               | *Optional[str]*                                                                            | :heavy_minus_sign:                                                                         | An optional server URL to use.                                                             |
+
+### Response
+
+**[operations.DownloadJobOutputResponse](../../models/operations/downloadjoboutputresponse.md)**
 
 ### Errors
 

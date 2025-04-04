@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
-from typing import Optional
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -16,7 +16,7 @@ from unstructured_client.types import (
 class GoogleDriveSourceConnectorConfigInputTypedDict(TypedDict):
     drive_id: str
     service_account_key: str
-    extensions: NotRequired[Nullable[str]]
+    extensions: NotRequired[Nullable[List[str]]]
     recursive: NotRequired[bool]
 
 
@@ -25,7 +25,7 @@ class GoogleDriveSourceConnectorConfigInput(BaseModel):
 
     service_account_key: str
 
-    extensions: OptionalNullable[str] = UNSET
+    extensions: OptionalNullable[List[str]] = UNSET
 
     recursive: Optional[bool] = True
 
@@ -39,7 +39,7 @@ class GoogleDriveSourceConnectorConfigInput(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

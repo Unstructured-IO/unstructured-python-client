@@ -37,6 +37,10 @@ from .googledrivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInput,
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
+from .jirasourceconnectorconfiginput import (
+    JiraSourceConnectorConfigInput,
+    JiraSourceConnectorConfigInputTypedDict,
+)
 from .kafkacloudsourceconnectorconfiginput import (
     KafkaCloudSourceConnectorConfigInput,
     KafkaCloudSourceConnectorConfigInputTypedDict,
@@ -52,6 +56,10 @@ from .onedrivesourceconnectorconfiginput import (
 from .outlooksourceconnectorconfiginput import (
     OutlookSourceConnectorConfigInput,
     OutlookSourceConnectorConfigInputTypedDict,
+)
+from .postgressourceconnectorconfiginput import (
+    PostgresSourceConnectorConfigInput,
+    PostgresSourceConnectorConfigInputTypedDict,
 )
 from .s3sourceconnectorconfiginput import (
     S3SourceConnectorConfigInput,
@@ -70,6 +78,10 @@ from .snowflakesourceconnectorconfiginput import (
     SnowflakeSourceConnectorConfigInputTypedDict,
 )
 from .sourceconnectortype import SourceConnectorType
+from .zendesksourceconnectorconfiginput import (
+    ZendeskSourceConnectorConfigInput,
+    ZendeskSourceConnectorConfigInputTypedDict,
+)
 from typing import Union
 from typing_extensions import TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
@@ -80,19 +92,22 @@ CreateSourceConnectorConfigTypedDict = TypeAliasType(
     Union[
         MongoDBConnectorConfigInputTypedDict,
         BoxSourceConnectorConfigInputTypedDict,
-        DropboxSourceConnectorConfigInputTypedDict,
-        ElasticsearchConnectorConfigInputTypedDict,
         GCSSourceConnectorConfigInputTypedDict,
-        SalesforceSourceConnectorConfigInputTypedDict,
+        ElasticsearchConnectorConfigInputTypedDict,
+        DropboxSourceConnectorConfigInputTypedDict,
         GoogleDriveSourceConnectorConfigInputTypedDict,
-        SharePointSourceConnectorConfigInputTypedDict,
+        SalesforceSourceConnectorConfigInputTypedDict,
+        ZendeskSourceConnectorConfigInputTypedDict,
         AzureSourceConnectorConfigInputTypedDict,
+        S3SourceConnectorConfigInputTypedDict,
         DatabricksVolumesConnectorConfigInputTypedDict,
         KafkaCloudSourceConnectorConfigInputTypedDict,
         OneDriveSourceConnectorConfigInputTypedDict,
         OutlookSourceConnectorConfigInputTypedDict,
-        S3SourceConnectorConfigInputTypedDict,
+        SharePointSourceConnectorConfigInputTypedDict,
+        JiraSourceConnectorConfigInputTypedDict,
         CouchbaseSourceConnectorConfigInputTypedDict,
+        PostgresSourceConnectorConfigInputTypedDict,
         ConfluenceSourceConnectorConfigInputTypedDict,
         SnowflakeSourceConnectorConfigInputTypedDict,
     ],
@@ -104,19 +119,22 @@ CreateSourceConnectorConfig = TypeAliasType(
     Union[
         MongoDBConnectorConfigInput,
         BoxSourceConnectorConfigInput,
-        DropboxSourceConnectorConfigInput,
-        ElasticsearchConnectorConfigInput,
         GCSSourceConnectorConfigInput,
-        SalesforceSourceConnectorConfigInput,
+        ElasticsearchConnectorConfigInput,
+        DropboxSourceConnectorConfigInput,
         GoogleDriveSourceConnectorConfigInput,
-        SharePointSourceConnectorConfigInput,
+        SalesforceSourceConnectorConfigInput,
+        ZendeskSourceConnectorConfigInput,
         AzureSourceConnectorConfigInput,
+        S3SourceConnectorConfigInput,
         DatabricksVolumesConnectorConfigInput,
         KafkaCloudSourceConnectorConfigInput,
         OneDriveSourceConnectorConfigInput,
         OutlookSourceConnectorConfigInput,
-        S3SourceConnectorConfigInput,
+        SharePointSourceConnectorConfigInput,
+        JiraSourceConnectorConfigInput,
         CouchbaseSourceConnectorConfigInput,
+        PostgresSourceConnectorConfigInput,
         ConfluenceSourceConnectorConfigInput,
         SnowflakeSourceConnectorConfigInput,
     ],

@@ -3,6 +3,12 @@
 
 ## Supported Types
 
+### `shared.AzureDestinationConnectorConfig`
+
+```python
+value: shared.AzureDestinationConnectorConfig = /* values here */
+```
+
 ### `shared.AstraDBConnectorConfig`
 
 ```python
@@ -79,6 +85,12 @@ value: shared.Neo4jDestinationConnectorConfig = /* values here */
 
 ```python
 value: shared.OneDriveDestinationConnectorConfig = /* values here */
+```
+
+### `shared.PineconeDestinationConnectorConfig`
+
+```python
+value: shared.PineconeDestinationConnectorConfig = /* values here */
 ```
 
 ### `shared.PostgresDestinationConnectorConfig`

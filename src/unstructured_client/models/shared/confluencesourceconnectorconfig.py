@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -16,9 +17,11 @@ class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
     cloud: bool
     max_num_of_docs_from_each_space: int
     max_num_of_spaces: int
-    spaces: Nullable[str]
+    spaces: Nullable[List[str]]
     url: str
     username: str
+    extract_files: NotRequired[bool]
+    extract_images: NotRequired[bool]
     password: NotRequired[Nullable[str]]
     token: NotRequired[Nullable[str]]
 
@@ -30,11 +33,15 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
     max_num_of_spaces: int
 
-    spaces: Nullable[str]
+    spaces: Nullable[List[str]]
 
     url: str
 
     username: str
+
+    extract_files: Optional[bool] = False
+
+    extract_images: Optional[bool] = False
 
     password: OptionalNullable[str] = UNSET
 
@@ -42,7 +49,7 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["password", "token"]
+        optional_fields = ["extract_files", "extract_images", "password", "token"]
         nullable_fields = ["spaces", "password", "token"]
         null_default_fields = []
 
@@ -50,7 +57,7 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

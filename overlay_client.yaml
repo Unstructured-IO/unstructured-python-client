@@ -69,4 +69,4 @@ actions:
   - target: $["components"]["schemas"]["partition_parameters"]["properties"][*].anyOf[0]
     description: Add a null default to all optional parameters. Prevents the sdk from sending a default string when param is not specified.
     update:
-        "default": null
+      "default": null
