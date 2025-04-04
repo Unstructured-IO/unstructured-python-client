@@ -56,7 +56,7 @@ def test_list_sources(httpx_mock, platform_client: UnstructuredClient, platform_
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert isinstance(source.config, shared.OnedriveSourceConnectorConfig)
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -154,7 +154,7 @@ def test_get_source(httpx_mock, platform_client: UnstructuredClient, platform_ap
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert isinstance(source.config, shared.OnedriveSourceConnectorConfig)
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -232,7 +232,7 @@ def test_create_source(httpx_mock, platform_client: UnstructuredClient, platform
     assert source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert source.name == "test_source_name"
     assert source.type == "onedrive"
-    assert isinstance(source.config, shared.OnedriveSourceConnectorConfig)
+    assert isinstance(source.config, shared.OneDriveSourceConnectorConfig)
     assert source.created_at == datetime.fromisoformat("2023-09-15T01:06:53.146+00:00")
 
 
@@ -291,7 +291,7 @@ def test_update_source(httpx_mock, platform_client: UnstructuredClient, platform
     assert updated_source.id == "a15d4161-77a0-4e08-b65e-86f398ce15ad"
     assert updated_source.name == "test_source_name"
     assert updated_source.type == "onedrive"
-    assert isinstance(updated_source.config, shared.OnedriveSourceConnectorConfig)
+    assert isinstance(updated_source.config, shared.OneDriveSourceConnectorConfig)
     assert updated_source.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
