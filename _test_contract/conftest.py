@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from freezegun import freeze_time
 import pytest
 
 from unstructured_client import UnstructuredClient, utils
@@ -46,6 +47,14 @@ def serverless_client(serverless_api_url) -> UnstructuredClient:
     )
     yield _client
 
+
+@pytest.fixture()
+def freezer():
+    ignore = ['_pytest.terminal', '_pytest.runner']
+    freezer = freeze_time(ignore=ignore)
+    frozen_time = freezer.start()
+    yield frozen_time
+    freezer.stop()
 
 @pytest.fixture(autouse=True)
 def mock_sleep(mocker, freezer):
