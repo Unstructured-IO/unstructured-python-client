@@ -14,6 +14,6 @@
 | `password`         | *str*              | :heavy_check_mark: | N/A                |
 | `port`             | *int*              | :heavy_check_mark: | N/A                |
 | `role`             | *str*              | :heavy_check_mark: | N/A                |
+| `schema_`          | *Optional[str]*    | :heavy_minus_sign: | N/A                |
 | `table_name`       | *str*              | :heavy_check_mark: | N/A                |
 | `user`             | *str*              | :heavy_check_mark: | N/A                |
-| `schema_`          | *Optional[str]*    | :heavy_minus_sign: | N/A                |
