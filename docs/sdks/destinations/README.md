@@ -27,12 +27,14 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
+                "api_endpoint": "<value>",
+                "batch_size": 20,
+                "collection_name": "<value>",
+                "flatten_metadata": False,
+                "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
+            "type": shared.DestinationConnectorType.AZURE,
         },
     })
 
@@ -210,7 +212,7 @@ with UnstructuredClient() as uc_client:
                 "username": "Dulce38",
             },
         },
-        "destination_id": "0a0ddfee-087e-467d-abcc-fdb6451a6e6f",
+        "destination_id": "6f9ea9d2-7c4e-42ec-8b5a-6971bd7ec9d2",
     })
 
     assert res.destination_connector_information is not None

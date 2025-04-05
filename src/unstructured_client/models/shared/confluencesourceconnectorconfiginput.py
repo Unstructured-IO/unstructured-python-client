@@ -16,6 +16,7 @@ from unstructured_client.types import (
 class ConfluenceSourceConnectorConfigInputTypedDict(TypedDict):
     url: str
     username: str
+    api_token: NotRequired[Nullable[str]]
     cloud: NotRequired[bool]
     extract_files: NotRequired[bool]
     extract_images: NotRequired[bool]
@@ -30,6 +31,8 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
     url: str
 
     username: str
+
+    api_token: OptionalNullable[str] = UNSET
 
     cloud: Optional[bool] = False
 
@@ -50,6 +53,7 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = [
+            "api_token",
             "cloud",
             "extract_files",
             "extract_images",
@@ -59,7 +63,7 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
             "spaces",
             "token",
         ]
-        nullable_fields = ["password", "spaces", "token"]
+        nullable_fields = ["api_token", "password", "spaces", "token"]
         null_default_fields = []
 
         serialized = handler(self)
