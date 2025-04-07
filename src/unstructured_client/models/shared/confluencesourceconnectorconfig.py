@@ -20,6 +20,7 @@ class ConfluenceSourceConnectorConfigTypedDict(TypedDict):
     spaces: Nullable[List[str]]
     url: str
     username: str
+    api_token: NotRequired[Nullable[str]]
     extract_files: NotRequired[bool]
     extract_images: NotRequired[bool]
     password: NotRequired[Nullable[str]]
@@ -39,6 +40,8 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
     username: str
 
+    api_token: OptionalNullable[str] = UNSET
+
     extract_files: Optional[bool] = False
 
     extract_images: Optional[bool] = False
@@ -49,8 +52,14 @@ class ConfluenceSourceConnectorConfig(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["extract_files", "extract_images", "password", "token"]
-        nullable_fields = ["spaces", "password", "token"]
+        optional_fields = [
+            "api_token",
+            "extract_files",
+            "extract_images",
+            "password",
+            "token",
+        ]
+        nullable_fields = ["api_token", "password", "spaces", "token"]
         null_default_fields = []
 
         serialized = handler(self)
