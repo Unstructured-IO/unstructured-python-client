@@ -131,7 +131,6 @@ from .list_workflows import (
 from .partition import (
     PARTITION_SERVERS,
     PARTITION_SERVER_DEVELOPMENT,
-    PARTITION_SERVER_FREE_API,
     PARTITION_SERVER_SAAS_API,
     PartitionRequest,
     PartitionRequestTypedDict,
@@ -271,7 +270,6 @@ __all__ = [
     "ListWorkflowsResponseTypedDict",
     "PARTITION_SERVERS",
     "PARTITION_SERVER_DEVELOPMENT",
-    "PARTITION_SERVER_FREE_API",
     "PARTITION_SERVER_SAAS_API",
     "PartitionRequest",
     "PartitionRequestTypedDict",
