@@ -16,14 +16,14 @@ from unstructured_client.types import (
 
 class DatabricksVDTDestinationConnectorConfigTypedDict(TypedDict):
     catalog: str
-    database: str
     http_path: str
     server_hostname: str
-    table_name: str
     volume: str
     client_id: NotRequired[Nullable[str]]
     client_secret: NotRequired[Nullable[str]]
+    database: NotRequired[str]
     schema_: NotRequired[str]
+    table_name: NotRequired[Nullable[str]]
     token: NotRequired[Nullable[str]]
     volume_path: NotRequired[Nullable[str]]
 
@@ -31,13 +31,9 @@ class DatabricksVDTDestinationConnectorConfigTypedDict(TypedDict):
 class DatabricksVDTDestinationConnectorConfig(BaseModel):
     catalog: str
 
-    database: str
-
     http_path: str
 
     server_hostname: str
-
-    table_name: str
 
     volume: str
 
@@ -45,7 +41,11 @@ class DatabricksVDTDestinationConnectorConfig(BaseModel):
 
     client_secret: OptionalNullable[str] = UNSET
 
+    database: Optional[str] = "default"
+
     schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = "default"
+
+    table_name: OptionalNullable[str] = UNSET
 
     token: OptionalNullable[str] = UNSET
 
@@ -56,11 +56,19 @@ class DatabricksVDTDestinationConnectorConfig(BaseModel):
         optional_fields = [
             "client_id",
             "client_secret",
+            "database",
             "schema",
+            "table_name",
             "token",
             "volume_path",
         ]
-        nullable_fields = ["client_id", "client_secret", "token", "volume_path"]
+        nullable_fields = [
+            "client_id",
+            "client_secret",
+            "table_name",
+            "token",
+            "volume_path",
+        ]
         null_default_fields = []
 
         serialized = handler(self)

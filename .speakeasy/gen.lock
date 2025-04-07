@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: fe1a72ff72f30cb24949c82881fd55e5
-  docVersion: 1.1.4
-  speakeasyVersion: 1.529.1
-  generationVersion: 2.566.5
-  releaseVersion: 0.32.2
-  configChecksum: 8baeaa6b1e97a95f3b697d2f9e8f3b48
+  docChecksum: 3aa362e60bfd40fded2c230b83285656
+  docVersion: 1.1.7
+  speakeasyVersion: 1.531.0
+  generationVersion: 2.568.2
+  releaseVersion: 0.32.3
+  configChecksum: af0d8669486cc7faf305ae45ca484a80
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -382,7 +382,7 @@ examples:
         "200":
           application/json: {"config": {"api_key": "<value>", "batch_size": 290189, "collection_name": "<value>", "url": "https://gray-rawhide.name/"}, "created_at": "2023-10-16T03:44:52.760Z", "id": "b3cbed99-76f0-4238-9635-119a590e2345", "name": "<value>", "type": "postgres"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": []}
   delete_destination:
     speakeasy-default-delete-destination:
       parameters:
@@ -393,7 +393,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   get_destination:
     speakeasy-default-get-destination:
       parameters:
@@ -404,14 +404,14 @@ examples:
         "200":
           application/json: {"config": {"account": "52165515", "batch_size": 573742, "database": "<value>", "host": "superb-community.net", "password": "t4MDigDpyPb0cVm", "port": 365686, "record_id_key": "<value>", "role": "<value>", "table_name": "<value>", "user": "Chadd_Cruickshank1"}, "created_at": "2024-09-10T03:26:06.668Z", "id": "7c1c550a-e537-4636-936b-2eb555e41376", "name": "<value>", "type": "weaviate-cloud"}
         "422":
-          application/json: {"detail": [{"loc": [422695, 470761], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
         "200":
           application/json: [{"config": {"anonymous": true, "remote_url": "https://distorted-heating.biz"}, "created_at": "2025-08-15T11:14:14.367Z", "id": "ec3c705e-e041-4481-9044-a6e1cc3bfa02", "name": "<value>", "type": "couchbase"}]
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [800205, "<value>", 473062], "msg": "<value>", "type": "<value>"}]}
   update_destination:
     speakeasy-default-update-destination:
       parameters:
@@ -435,7 +435,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   download_job_output:
     speakeasy-default-download-job-output:
       parameters:
@@ -459,14 +459,14 @@ examples:
         "200":
           application/json: {"created_at": "2025-01-14T00:09:32.358Z", "id": "d18f330b-506f-455c-9cb8-0cee2386ac29", "status": "SCHEDULED", "workflow_id": "36fd7994-c454-4176-932f-460d8ebb2a28", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": ["<value>", 701982], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   list_jobs:
     speakeasy-default-list-jobs:
       responses:
         "200":
           application/json: [{"created_at": "2023-09-01T17:59:19.211Z", "id": "7098ff76-419f-4a5a-a313-d159507b629d", "status": "COMPLETED", "workflow_id": "5cf761e8-c108-4e43-8d76-ae90ad4fd3ef", "workflow_name": "<value>"}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [87014, 240939, 368916], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   create_source:
     speakeasy-default-create-source:
       requestBody:
@@ -475,7 +475,7 @@ examples:
         "200":
           application/json: {"config": {"recursive": true, "remote_url": "https://narrow-sport.name/", "token": "<value>"}, "created_at": "2024-04-17T19:44:53.556Z", "id": "0093eb22-2a87-4593-8c81-4e4cdc9b4256", "name": "<value>", "type": "sharepoint"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": "<value>"}
   delete_source:
     speakeasy-default-delete-source:
       parameters:
@@ -486,7 +486,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": [{"loc": ["<value>", 35394, 978741], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   get_source:
     speakeasy-default-get-source:
       parameters:
@@ -504,7 +504,7 @@ examples:
         "200":
           application/json: [{"config": {"catalog": "<value>", "client_id": "<id>", "client_secret": "<value>", "host": "puzzled-brush.info", "schema": "default", "volume": "<value>", "volume_path": "<value>"}, "created_at": "2025-06-09T21:34:29.686Z", "id": "416177a0-e086-45e8-b6f3-98ce15adfacd", "name": "<value>", "type": "couchbase"}]
         "422":
-          application/json: {"detail": [{"loc": [169235], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": []}
   update_source:
     speakeasy-default-update-source:
       parameters:
@@ -517,7 +517,7 @@ examples:
         "200":
           application/json: {"config": {"anonymous": false, "recursive": false, "remote_url": "https://worldly-knight.net/"}, "created_at": "2025-12-12T19:45:38.471Z", "id": "5b0e95cb-89b3-4d7d-8591-0ea1d623a0bf", "name": "<value>", "type": "onedrive"}
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   create_workflow:
     speakeasy-default-create-workflow:
       requestBody:
@@ -537,7 +537,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": ["<value>", 852050, "<value>"], "msg": "<value>", "type": "<value>"}]}
   get_workflow:
     speakeasy-default-get-workflow:
       parameters:
@@ -548,14 +548,14 @@ examples:
         "200":
           application/json: {"created_at": "2023-05-27T02:17:56.472Z", "destinations": [], "id": "5781a90a-c5ba-41a1-ac38-4b031d1d247d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["1ecf852c-a41e-4193-b8ae-7afe4e642c1d", "73825739-ddfe-44a7-b2e9-6adc9e5972ee", "32976128-e157-4711-b160-6c7e63baa0cb"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "embed"}, {"name": "<value>", "subtype": "<value>", "type": "embed"}]}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
   list_workflows:
     speakeasy-default-list-workflows:
       responses:
         "200":
           application/json: [{"created_at": "2025-06-22T11:37:21.648Z", "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869", "01866db9-54f2-4be7-93c3-062b8107d001", "fcdc4994-eea5-425c-91fa-e03f2bd8030d"], "id": "16b80fee-64dc-472d-8f26-1d7729b6423d", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": [], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "partition"}]}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [741590, 997491], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"loc": [931730, 730320, 769892], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 862351, 882715], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
     speakeasy-default-run-workflow:
       parameters:
@@ -566,7 +566,7 @@ examples:
         "202":
           application/json: {"created_at": "2024-08-04T10:06:22.481Z", "id": "16c4f327-c7ca-4293-9368-d2ebe9d9f144", "status": "STOPPED", "workflow_id": "4a959396-492e-4b96-8f4a-cc8f067ba24c", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": [771091, "<value>", 906992], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [397022, 604524], "msg": "<value>", "type": "<value>"}]}
   update_workflow:
     speakeasy-default-update-workflow:
       parameters:
@@ -579,7 +579,7 @@ examples:
         "200":
           application/json: {"created_at": "2024-02-01T21:33:30.305Z", "destinations": [], "id": "4348c683-9378-4211-a7a6-ea9307f1cbb9", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["179309ff-51c8-4023-9475-af5f2a03511d"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "partition"}, {"name": "<value>", "subtype": "<value>", "type": "embed"}]}
         "422":
-          application/json: {"detail": [{"loc": ["<value>", 7586], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": "<value>"}
   partition:
     speakeasy-default-partition:
       requestBody:
