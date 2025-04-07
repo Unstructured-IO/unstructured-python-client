@@ -10,12 +10,14 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
+                "api_endpoint": "<value>",
+                "batch_size": 20,
+                "collection_name": "<value>",
+                "flatten_metadata": False,
+                "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
+            "type": shared.DestinationConnectorType.AZURE,
         },
     })
 
@@ -41,12 +43,14 @@ async def main():
         res = await uc_client.destinations.create_destination_async(request={
             "create_destination_connector": {
                 "config": {
-                    "endpoint": "<value>",
-                    "index": "<value>",
-                    "key": "<key>",
+                    "api_endpoint": "<value>",
+                    "batch_size": 20,
+                    "collection_name": "<value>",
+                    "flatten_metadata": False,
+                    "token": "<value>",
                 },
                 "name": "<value>",
-                "type": shared.DestinationConnectorType.ASTRADB,
+                "type": shared.DestinationConnectorType.AZURE,
             },
         })
 

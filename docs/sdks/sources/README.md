@@ -27,17 +27,16 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "username": "username",
-                "collection": "collection_name",
-                "scope": "scope_name",
+                "authority_url": "https://login.microsoftonline.com",
+                "client_cred": "<value>",
+                "client_id": "<id>",
+                "recursive": False,
+                "site": "<value>",
+                "tenant": "<value>",
+                "user_pname": "<value>",
             },
             "name": "<value>",
-            "type": shared.SourceConnectorType.SALESFORCE,
+            "type": shared.SourceConnectorType.SNOWFLAKE,
         },
     })
 
@@ -206,17 +205,17 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.update_source(request={
         "update_source_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "username": "username",
-                "collection": "collection_name",
-                "scope": "scope_name",
+                "batch_size": 69608,
+                "database": "<value>",
+                "host": "pleasing-hammock.org",
+                "id_column": "id",
+                "password": "Ns3L8K8WEZq1xvB",
+                "port": 834056,
+                "table_name": "<value>",
+                "username": "Justyn.Daugherty",
             },
         },
-        "source_id": "196d27d0-3173-4749-b69d-2ee5d8e2396e",
+        "source_id": "edec439e-8ef6-4c69-bc9e-3ba7a8418be7",
     })
 
     assert res.source_connector_information is not None
