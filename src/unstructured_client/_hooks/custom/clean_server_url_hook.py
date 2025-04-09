@@ -24,7 +24,7 @@ def clean_server_url(base_url: str) -> str:
             parsed_url = parsed_url._replace(scheme="https")
 
     # We only want the base url
-    return urlunparse(parsed_url._replace(path="", params="", query="", fragment=""))
+    return urlunparse(parsed_url._replace(params="", query="", fragment=""))
 
 
 def choose_server_url(endpoint_url: str | None, client_url: str, default_endpoint_url: str) -> str:
