@@ -5,65 +5,11 @@
 
 ### Available Operations
 
-* [check_connection_api_v1_sources_source_id_connection_check_post](#check_connection_api_v1_sources_source_id_connection_check_post) - Check Connection
 * [create_source](#create_source) - Create source connector
 * [delete_source](#delete_source) - Delete source connector
-* [get_connection_check_api_v1_sources_source_id_connection_check_get](#get_connection_check_api_v1_sources_source_id_connection_check_get) - Get Connection Check
 * [get_source](#get_source) - Get source connector
 * [list_sources](#list_sources) - List available source connectors
 * [update_source](#update_source) - Update source connector
-
-## check_connection_api_v1_sources_source_id_connection_check_post
-
-Check Connection
-
-Initiates a connection check for the specified source connector.
-
-**Parameters:**
-- **source_id**: The UUID of the source connector.
-- **db_session**: Database session dependency.
-- **user_data**: Information about the authenticated user.
-
-**Returns:**
-- The result of the connection check.
-
-### Example Usage
-
-```python
-from unstructured_client import UnstructuredClient
-
-
-with UnstructuredClient() as uc_client:
-
-    res = uc_client.sources.check_connection_api_v1_sources_source_id_connection_check_post(request={
-        "source_id": "8cb54f13-5652-423e-889c-1df1f8147126",
-    })
-
-    assert res.dag_node_connection_check is not None
-
-    # Handle response
-    print(res.dag_node_connection_check)
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                            | Type                                                                                                                                                                 | Required                                                                                                                                                             | Description                                                                                                                                                          |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `request`                                                                                                                                                            | [operations.CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostRequest](../../models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostrequest.md) | :heavy_check_mark:                                                                                                                                                   | The request object to use for the request.                                                                                                                           |
-| `retries`                                                                                                                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                     | :heavy_minus_sign:                                                                                                                                                   | Configuration to override the default retry behavior of the client.                                                                                                  |
-| `server_url`                                                                                                                                                         | *Optional[str]*                                                                                                                                                      | :heavy_minus_sign:                                                                                                                                                   | An optional server URL to use.                                                                                                                                       |
-
-### Response
-
-**[operations.CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostResponse](../../models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostresponse.md)**
-
-### Errors
-
-| Error Type                 | Status Code                | Content Type               |
-| -------------------------- | -------------------------- | -------------------------- |
-| errors.HTTPValidationError | 422                        | application/json           |
-| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
 
 ## create_source
 
@@ -154,58 +100,6 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.DeleteSourceResponse](../../models/operations/deletesourceresponse.md)**
-
-### Errors
-
-| Error Type                 | Status Code                | Content Type               |
-| -------------------------- | -------------------------- | -------------------------- |
-| errors.HTTPValidationError | 422                        | application/json           |
-| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
-
-## get_connection_check_api_v1_sources_source_id_connection_check_get
-
-Get Connection Checks
-
-Retrieves the most recent connection check for the specified source connector.
-
-**Parameters:**
-- **source_id**: The UUID of the source connector.
-- **db_session**: Database session dependency.
-- **user_data**: Information about the authenticated user.
-
-**Returns:**
-- Connection check results.
-
-### Example Usage
-
-```python
-from unstructured_client import UnstructuredClient
-
-
-with UnstructuredClient() as uc_client:
-
-    res = uc_client.sources.get_connection_check_api_v1_sources_source_id_connection_check_get(request={
-        "source_id": "d9c3daec-ddf9-4cef-ae8d-3a989813cc7b",
-    })
-
-    assert res.dag_node_connection_check is not None
-
-    # Handle response
-    print(res.dag_node_connection_check)
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                                | Type                                                                                                                                                                     | Required                                                                                                                                                                 | Description                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                | [operations.GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetRequest](../../models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetrequest.md) | :heavy_check_mark:                                                                                                                                                       | The request object to use for the request.                                                                                                                               |
-| `retries`                                                                                                                                                                | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                         | :heavy_minus_sign:                                                                                                                                                       | Configuration to override the default retry behavior of the client.                                                                                                      |
-| `server_url`                                                                                                                                                             | *Optional[str]*                                                                                                                                                          | :heavy_minus_sign:                                                                                                                                                       | An optional server URL to use.                                                                                                                                           |
-
-### Response
-
-**[operations.GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetResponse](../../models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetresponse.md)**
 
 ### Errors
 
