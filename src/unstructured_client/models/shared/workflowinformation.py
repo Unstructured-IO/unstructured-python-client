@@ -26,6 +26,7 @@ class WorkflowInformationTypedDict(TypedDict):
     sources: List[str]
     status: WorkflowState
     workflow_nodes: List[WorkflowNodeTypedDict]
+    reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[WorkflowScheduleTypedDict]]
     updated_at: NotRequired[Nullable[datetime]]
     workflow_type: NotRequired[Nullable[WorkflowType]]
@@ -46,6 +47,8 @@ class WorkflowInformation(BaseModel):
 
     workflow_nodes: List[WorkflowNode]
 
+    reprocess_all: OptionalNullable[bool] = UNSET
+
     schedule: OptionalNullable[WorkflowSchedule] = UNSET
 
     updated_at: OptionalNullable[datetime] = UNSET
@@ -54,8 +57,8 @@ class WorkflowInformation(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["schedule", "updated_at", "workflow_type"]
-        nullable_fields = ["schedule", "updated_at", "workflow_type"]
+        optional_fields = ["reprocess_all", "schedule", "updated_at", "workflow_type"]
+        nullable_fields = ["reprocess_all", "schedule", "updated_at", "workflow_type"]
         null_default_fields = []
 
         serialized = handler(self)

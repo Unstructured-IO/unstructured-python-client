@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 3aa362e60bfd40fded2c230b83285656
+  docChecksum: a22c1e202b7ac1f3305521fb7827a79d
   docVersion: 1.1.7
-  speakeasyVersion: 1.531.0
-  generationVersion: 2.568.2
-  releaseVersion: 0.32.3
-  configChecksum: af0d8669486cc7faf305ae45ca484a80
+  speakeasyVersion: 1.534.0
+  generationVersion: 2.585.0
+  releaseVersion: 0.32.4
+  configChecksum: cb28766c7ee08012d26a252eff80b540
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.12.6
+    core: 5.14.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -90,8 +90,6 @@ generatedFiles:
   - docs/models/shared/astradbconnectorconfiginput.md
   - docs/models/shared/azureaisearchconnectorconfig.md
   - docs/models/shared/azureaisearchconnectorconfiginput.md
-  - docs/models/shared/azuredestinationconnectorconfig.md
-  - docs/models/shared/azuredestinationconnectorconfiginput.md
   - docs/models/shared/azuresourceconnectorconfig.md
   - docs/models/shared/azuresourceconnectorconfiginput.md
   - docs/models/shared/bodyrunworkflow.md
@@ -195,7 +193,6 @@ generatedFiles:
   - docs/models/shared/weaviatedestinationconnectorconfiginput.md
   - docs/models/shared/workflowinformation.md
   - docs/models/shared/workflownode.md
-  - docs/models/shared/workflownodetype.md
   - docs/models/shared/workflowschedule.md
   - docs/models/shared/workflowstate.md
   - docs/models/shared/workflowtype.md
@@ -255,8 +252,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/astradbconnectorconfiginput.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfig.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
-  - src/unstructured_client/models/shared/azuredestinationconnectorconfig.py
-  - src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/body_run_workflow.py
@@ -345,7 +340,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/workflowinformation.py
   - src/unstructured_client/models/shared/workflownode.py
-  - src/unstructured_client/models/shared/workflownodetype.py
   - src/unstructured_client/models/shared/workflowschedule.py
   - src/unstructured_client/models/shared/workflowstate.py
   - src/unstructured_client/models/shared/workflowtype.py
@@ -377,7 +371,7 @@ examples:
   create_destination:
     speakeasy-default-create-destination:
       requestBody:
-        application/json: {"config": {"api_endpoint": "<value>", "batch_size": 20, "collection_name": "<value>", "flatten_metadata": false, "token": "<value>"}, "name": "<value>", "type": "azure"}
+        application/json: {"config": {"api_endpoint": "<value>", "batch_size": 20, "collection_name": "<value>", "flatten_metadata": false, "token": "<value>"}, "name": "<value>", "type": "azure_ai_search"}
       responses:
         "200":
           application/json: {"config": {"api_key": "<value>", "batch_size": 290189, "collection_name": "<value>", "url": "https://gray-rawhide.name/"}, "created_at": "2023-10-16T03:44:52.760Z", "id": "b3cbed99-76f0-4238-9635-119a590e2345", "name": "<value>", "type": "postgres"}
@@ -592,5 +586,49 @@ examples:
           application/json: {"detail": []}
         5XX:
           application/json: {"detail": "An error occurred"}
+  check_destination_connection_api_v1_destinations__destination_id__connection_check_post:
+    speakeasy-default-check-destination-connection-api-v1-destinations-destination-id-connection-check-post:
+      parameters:
+        path:
+          destination_id: "b65169f5-79ba-4464-918f-b0be2c07b962"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2024-12-11T22:17:57.402Z", "id": "337e8f13-6b28-466e-a173-b8a939d2c047", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": "<value>"}
+  get_destination_connection_check_api_v1_destinations__destination_id__connection_check_get:
+    speakeasy-default-get-destination-connection-check-api-v1-destinations-destination-id-connection-check-get:
+      parameters:
+        path:
+          destination_id: "3c48df35-2b2c-46f2-9aa2-d7eae993797c"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2023-08-18T13:08:22.968Z", "id": "d3ed5db0-557c-45b6-b496-8d8ddcf95c3a", "status": "SCHEDULED"}
+        "422":
+          application/json: {"detail": [{"loc": [855847], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 411199], "msg": "<value>", "type": "<value>"}]}
+  check_connection_api_v1_sources__source_id__connection_check_post:
+    speakeasy-default-check-connection-api-v1-sources-source-id-connection-check-post:
+      parameters:
+        path:
+          source_id: "8cb54f13-5652-423e-889c-1df1f8147126"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2023-08-17T02:17:54.227Z", "id": "12f4c45a-e6b2-4d0f-849d-2ab042bf13d2", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": "<value>"}
+  get_connection_check_api_v1_sources__source_id__connection_check_get:
+    speakeasy-default-get-connection-check-api-v1-sources-source-id-connection-check-get:
+      parameters:
+        path:
+          source_id: "d9c3daec-ddf9-4cef-ae8d-3a989813cc7b"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2025-01-25T05:08:46.547Z", "id": "7cc92d68-dc16-49f9-a119-c651a18a978d", "status": "SCHEDULED"}
+        "422":
+          application/json: {"detail": "<value>"}
 examplesVersion: 1.0.1
 generatedTests: {}
