@@ -8,22 +8,6 @@ from .cancel_job import (
     CancelJobResponse,
     CancelJobResponseTypedDict,
 )
-from .check_connection_api_v1_sources_source_id_connection_check_post import (
-    CHECK_CONNECTION_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_POST_SERVERS,
-    CHECK_CONNECTION_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_POST_SERVER_PLATFORM_API,
-    CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostRequest,
-    CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostRequestTypedDict,
-    CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostResponse,
-    CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostResponseTypedDict,
-)
-from .check_destination_connection_api_v1_destinations_destination_id_connection_check_post import (
-    CHECK_DESTINATION_CONNECTION_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_POST_SERVERS,
-    CHECK_DESTINATION_CONNECTION_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_POST_SERVER_PLATFORM_API,
-    CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostRequest,
-    CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostRequestTypedDict,
-    CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostResponse,
-    CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostResponseTypedDict,
-)
 from .create_destination import (
     CREATE_DESTINATION_SERVERS,
     CREATE_DESTINATION_SERVER_PLATFORM_API,
@@ -80,14 +64,6 @@ from .download_job_output import (
     DownloadJobOutputResponse,
     DownloadJobOutputResponseTypedDict,
 )
-from .get_connection_check_api_v1_sources_source_id_connection_check_get import (
-    GET_CONNECTION_CHECK_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_GET_SERVERS,
-    GET_CONNECTION_CHECK_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_GET_SERVER_PLATFORM_API,
-    GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetRequest,
-    GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetRequestTypedDict,
-    GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetResponse,
-    GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetResponseTypedDict,
-)
 from .get_destination import (
     GET_DESTINATION_SERVERS,
     GET_DESTINATION_SERVER_PLATFORM_API,
@@ -95,14 +71,6 @@ from .get_destination import (
     GetDestinationRequestTypedDict,
     GetDestinationResponse,
     GetDestinationResponseTypedDict,
-)
-from .get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get import (
-    GET_DESTINATION_CONNECTION_CHECK_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_GET_SERVERS,
-    GET_DESTINATION_CONNECTION_CHECK_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_GET_SERVER_PLATFORM_API,
-    GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetRequest,
-    GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetRequestTypedDict,
-    GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetResponse,
-    GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetResponseTypedDict,
 )
 from .get_job import (
     GET_JOB_SERVERS,
@@ -206,10 +174,6 @@ from .update_workflow import (
 __all__ = [
     "CANCEL_JOB_SERVERS",
     "CANCEL_JOB_SERVER_PLATFORM_API",
-    "CHECK_CONNECTION_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_POST_SERVERS",
-    "CHECK_CONNECTION_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_POST_SERVER_PLATFORM_API",
-    "CHECK_DESTINATION_CONNECTION_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_POST_SERVERS",
-    "CHECK_DESTINATION_CONNECTION_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_POST_SERVER_PLATFORM_API",
     "CREATE_DESTINATION_SERVERS",
     "CREATE_DESTINATION_SERVER_PLATFORM_API",
     "CREATE_SOURCE_SERVERS",
@@ -220,14 +184,6 @@ __all__ = [
     "CancelJobRequestTypedDict",
     "CancelJobResponse",
     "CancelJobResponseTypedDict",
-    "CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostRequest",
-    "CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostRequestTypedDict",
-    "CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostResponse",
-    "CheckConnectionAPIV1SourcesSourceIDConnectionCheckPostResponseTypedDict",
-    "CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostRequest",
-    "CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostRequestTypedDict",
-    "CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostResponse",
-    "CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostResponseTypedDict",
     "CreateDestinationRequest",
     "CreateDestinationRequestTypedDict",
     "CreateDestinationResponse",
@@ -264,10 +220,6 @@ __all__ = [
     "DownloadJobOutputRequestTypedDict",
     "DownloadJobOutputResponse",
     "DownloadJobOutputResponseTypedDict",
-    "GET_CONNECTION_CHECK_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_GET_SERVERS",
-    "GET_CONNECTION_CHECK_API_V1_SOURCES_SOURCE_ID_CONNECTION_CHECK_GET_SERVER_PLATFORM_API",
-    "GET_DESTINATION_CONNECTION_CHECK_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_GET_SERVERS",
-    "GET_DESTINATION_CONNECTION_CHECK_API_V1_DESTINATIONS_DESTINATION_ID_CONNECTION_CHECK_GET_SERVER_PLATFORM_API",
     "GET_DESTINATION_SERVERS",
     "GET_DESTINATION_SERVER_PLATFORM_API",
     "GET_JOB_SERVERS",
@@ -276,14 +228,6 @@ __all__ = [
     "GET_SOURCE_SERVER_PLATFORM_API",
     "GET_WORKFLOW_SERVERS",
     "GET_WORKFLOW_SERVER_PLATFORM_API",
-    "GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetRequest",
-    "GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetRequestTypedDict",
-    "GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetResponse",
-    "GetConnectionCheckAPIV1SourcesSourceIDConnectionCheckGetResponseTypedDict",
-    "GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetRequest",
-    "GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetRequestTypedDict",
-    "GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetResponse",
-    "GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetResponseTypedDict",
     "GetDestinationRequest",
     "GetDestinationRequestTypedDict",
     "GetDestinationResponse",

@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: e3c8da4d880f93f1bf483a45d1fe2016
+  docChecksum: a22c1e202b7ac1f3305521fb7827a79d
   docVersion: 1.1.7
-  speakeasyVersion: 1.535.0
-  generationVersion: 2.585.1
-  releaseVersion: 0.32.5
-  configChecksum: 5d74cee3ebe277ae6317c1ab5ec5aba1
+  speakeasyVersion: 1.534.0
+  generationVersion: 2.585.0
+  releaseVersion: 0.33.0
+  configChecksum: d3a6fe7f2ae7f430c8fff9c158af4f46
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -46,10 +46,6 @@ generatedFiles:
   - docs/models/errors/servererror.md
   - docs/models/operations/canceljobrequest.md
   - docs/models/operations/canceljobresponse.md
-  - docs/models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostrequest.md
-  - docs/models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostresponse.md
-  - docs/models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostrequest.md
-  - docs/models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostresponse.md
   - docs/models/operations/createdestinationrequest.md
   - docs/models/operations/createdestinationresponse.md
   - docs/models/operations/createsourcerequest.md
@@ -64,10 +60,6 @@ generatedFiles:
   - docs/models/operations/deleteworkflowresponse.md
   - docs/models/operations/downloadjoboutputrequest.md
   - docs/models/operations/downloadjoboutputresponse.md
-  - docs/models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetrequest.md
-  - docs/models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetresponse.md
-  - docs/models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetrequest.md
-  - docs/models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
   - docs/models/operations/getjobrequest.md
@@ -106,7 +98,6 @@ generatedFiles:
   - docs/models/shared/config.md
   - docs/models/shared/confluencesourceconnectorconfig.md
   - docs/models/shared/confluencesourceconnectorconfiginput.md
-  - docs/models/shared/connectioncheckstatus.md
   - docs/models/shared/couchbasedestinationconnectorconfig.md
   - docs/models/shared/couchbasedestinationconnectorconfiginput.md
   - docs/models/shared/couchbasesourceconnectorconfig.md
@@ -116,7 +107,6 @@ generatedFiles:
   - docs/models/shared/createsourceconnectorconfig.md
   - docs/models/shared/createworkflow.md
   - docs/models/shared/crontabentry.md
-  - docs/models/shared/dagnodeconnectioncheck.md
   - docs/models/shared/databricksvdtdestinationconnectorconfig.md
   - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
   - docs/models/shared/databricksvolumesconnectorconfig.md
@@ -237,8 +227,6 @@ generatedFiles:
   - src/unstructured_client/models/errors/servererror.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/operations/cancel_job.py
-  - src/unstructured_client/models/operations/check_connection_api_v1_sources_source_id_connection_check_post.py
-  - src/unstructured_client/models/operations/check_destination_connection_api_v1_destinations_destination_id_connection_check_post.py
   - src/unstructured_client/models/operations/create_destination.py
   - src/unstructured_client/models/operations/create_source.py
   - src/unstructured_client/models/operations/create_workflow.py
@@ -246,9 +234,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/delete_source.py
   - src/unstructured_client/models/operations/delete_workflow.py
   - src/unstructured_client/models/operations/download_job_output.py
-  - src/unstructured_client/models/operations/get_connection_check_api_v1_sources_source_id_connection_check_get.py
   - src/unstructured_client/models/operations/get_destination.py
-  - src/unstructured_client/models/operations/get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_source.py
   - src/unstructured_client/models/operations/get_workflow.py
@@ -273,7 +259,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfig.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py
-  - src/unstructured_client/models/shared/connectioncheckstatus.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py
@@ -282,7 +267,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
   - src/unstructured_client/models/shared/crontabentry.py
-  - src/unstructured_client/models/shared/dagnodeconnectioncheck.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py
