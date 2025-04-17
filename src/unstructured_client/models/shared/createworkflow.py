@@ -34,6 +34,7 @@ class CreateWorkflowTypedDict(TypedDict):
     name: str
     workflow_type: WorkflowType
     destination_id: NotRequired[Nullable[str]]
+    reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[Schedule]]
     source_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
@@ -46,6 +47,8 @@ class CreateWorkflow(BaseModel):
 
     destination_id: OptionalNullable[str] = UNSET
 
+    reprocess_all: OptionalNullable[bool] = UNSET
+
     schedule: OptionalNullable[Schedule] = UNSET
 
     source_id: OptionalNullable[str] = UNSET
@@ -54,8 +57,20 @@ class CreateWorkflow(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["destination_id", "schedule", "source_id", "workflow_nodes"]
-        nullable_fields = ["destination_id", "schedule", "source_id", "workflow_nodes"]
+        optional_fields = [
+            "destination_id",
+            "reprocess_all",
+            "schedule",
+            "source_id",
+            "workflow_nodes",
+        ]
+        nullable_fields = [
+            "destination_id",
+            "reprocess_all",
+            "schedule",
+            "source_id",
+            "workflow_nodes",
+        ]
         null_default_fields = []
 
         serialized = handler(self)

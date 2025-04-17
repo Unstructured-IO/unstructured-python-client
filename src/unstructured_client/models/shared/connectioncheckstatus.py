@@ -4,8 +4,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class WorkflowNodeType(str, Enum):
-    PARTITION = "partition"
-    PROMPTER = "prompter"
-    CHUNK = "chunk"
-    EMBED = "embed"
+class ConnectionCheckStatus(str, Enum):
+    SCHEDULED = "SCHEDULED"
+    SUCCESS = "SUCCESS"
+    FAILURE = "FAILURE"

@@ -3,7 +3,7 @@
 from __future__ import annotations
 import pydantic
 from pydantic import model_serializer
-from typing import List, Optional
+from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,17 +17,15 @@ from unstructured_client.types import (
 class SnowflakeDestinationConnectorConfigInputTypedDict(TypedDict):
     account: str
     database: str
-    fields: List[str]
     host: str
-    id_column: str
     password: str
     role: str
-    table_name: str
     user: str
     batch_size: NotRequired[int]
     port: NotRequired[int]
     record_id_key: NotRequired[Nullable[str]]
     schema_: NotRequired[str]
+    table_name: NotRequired[str]
 
 
 class SnowflakeDestinationConnectorConfigInput(BaseModel):
@@ -35,21 +33,15 @@ class SnowflakeDestinationConnectorConfigInput(BaseModel):
 
     database: str
 
-    fields: List[str]
-
     host: str
-
-    id_column: str
 
     password: str
 
     role: str
 
-    table_name: str
-
     user: str
 
-    batch_size: Optional[int] = 100
+    batch_size: Optional[int] = 50
 
     port: Optional[int] = 443
 
@@ -57,9 +49,17 @@ class SnowflakeDestinationConnectorConfigInput(BaseModel):
 
     schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
 
+    table_name: Optional[str] = "elements"
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["batch_size", "port", "record_id_key", "schema"]
+        optional_fields = [
+            "batch_size",
+            "port",
+            "record_id_key",
+            "schema",
+            "table_name",
+        ]
         nullable_fields = ["record_id_key"]
         null_default_fields = []
 

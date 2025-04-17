@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 3aa362e60bfd40fded2c230b83285656
+  docChecksum: e3c8da4d880f93f1bf483a45d1fe2016
   docVersion: 1.1.7
-  speakeasyVersion: 1.531.0
-  generationVersion: 2.568.2
-  releaseVersion: 0.32.3
-  configChecksum: af0d8669486cc7faf305ae45ca484a80
+  speakeasyVersion: 1.533.0
+  generationVersion: 2.578.0
+  releaseVersion: 0.33.0
+  configChecksum: d3a6fe7f2ae7f430c8fff9c158af4f46
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.12.6
+    core: 5.14.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -46,6 +46,10 @@ generatedFiles:
   - docs/models/errors/servererror.md
   - docs/models/operations/canceljobrequest.md
   - docs/models/operations/canceljobresponse.md
+  - docs/models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostrequest.md
+  - docs/models/operations/checkconnectionapiv1sourcessourceidconnectioncheckpostresponse.md
+  - docs/models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostrequest.md
+  - docs/models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostresponse.md
   - docs/models/operations/createdestinationrequest.md
   - docs/models/operations/createdestinationresponse.md
   - docs/models/operations/createsourcerequest.md
@@ -60,6 +64,10 @@ generatedFiles:
   - docs/models/operations/deleteworkflowresponse.md
   - docs/models/operations/downloadjoboutputrequest.md
   - docs/models/operations/downloadjoboutputresponse.md
+  - docs/models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetrequest.md
+  - docs/models/operations/getconnectioncheckapiv1sourcessourceidconnectioncheckgetresponse.md
+  - docs/models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetrequest.md
+  - docs/models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
   - docs/models/operations/getjobrequest.md
@@ -90,8 +98,6 @@ generatedFiles:
   - docs/models/shared/astradbconnectorconfiginput.md
   - docs/models/shared/azureaisearchconnectorconfig.md
   - docs/models/shared/azureaisearchconnectorconfiginput.md
-  - docs/models/shared/azuredestinationconnectorconfig.md
-  - docs/models/shared/azuredestinationconnectorconfiginput.md
   - docs/models/shared/azuresourceconnectorconfig.md
   - docs/models/shared/azuresourceconnectorconfiginput.md
   - docs/models/shared/bodyrunworkflow.md
@@ -100,6 +106,7 @@ generatedFiles:
   - docs/models/shared/config.md
   - docs/models/shared/confluencesourceconnectorconfig.md
   - docs/models/shared/confluencesourceconnectorconfiginput.md
+  - docs/models/shared/connectioncheckstatus.md
   - docs/models/shared/couchbasedestinationconnectorconfig.md
   - docs/models/shared/couchbasedestinationconnectorconfiginput.md
   - docs/models/shared/couchbasesourceconnectorconfig.md
@@ -109,6 +116,7 @@ generatedFiles:
   - docs/models/shared/createsourceconnectorconfig.md
   - docs/models/shared/createworkflow.md
   - docs/models/shared/crontabentry.md
+  - docs/models/shared/dagnodeconnectioncheck.md
   - docs/models/shared/databricksvdtdestinationconnectorconfig.md
   - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
   - docs/models/shared/databricksvolumesconnectorconfig.md
@@ -195,7 +203,6 @@ generatedFiles:
   - docs/models/shared/weaviatedestinationconnectorconfiginput.md
   - docs/models/shared/workflowinformation.md
   - docs/models/shared/workflownode.md
-  - docs/models/shared/workflownodetype.md
   - docs/models/shared/workflowschedule.md
   - docs/models/shared/workflowstate.md
   - docs/models/shared/workflowtype.md
@@ -230,6 +237,8 @@ generatedFiles:
   - src/unstructured_client/models/errors/servererror.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/operations/cancel_job.py
+  - src/unstructured_client/models/operations/check_connection_api_v1_sources_source_id_connection_check_post.py
+  - src/unstructured_client/models/operations/check_destination_connection_api_v1_destinations_destination_id_connection_check_post.py
   - src/unstructured_client/models/operations/create_destination.py
   - src/unstructured_client/models/operations/create_source.py
   - src/unstructured_client/models/operations/create_workflow.py
@@ -237,7 +246,9 @@ generatedFiles:
   - src/unstructured_client/models/operations/delete_source.py
   - src/unstructured_client/models/operations/delete_workflow.py
   - src/unstructured_client/models/operations/download_job_output.py
+  - src/unstructured_client/models/operations/get_connection_check_api_v1_sources_source_id_connection_check_get.py
   - src/unstructured_client/models/operations/get_destination.py
+  - src/unstructured_client/models/operations/get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_source.py
   - src/unstructured_client/models/operations/get_workflow.py
@@ -255,8 +266,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/astradbconnectorconfiginput.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfig.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
-  - src/unstructured_client/models/shared/azuredestinationconnectorconfig.py
-  - src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/body_run_workflow.py
@@ -264,6 +273,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfig.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/connectioncheckstatus.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py
@@ -272,6 +282,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
   - src/unstructured_client/models/shared/crontabentry.py
+  - src/unstructured_client/models/shared/dagnodeconnectioncheck.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py
@@ -345,7 +356,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/workflowinformation.py
   - src/unstructured_client/models/shared/workflownode.py
-  - src/unstructured_client/models/shared/workflownodetype.py
   - src/unstructured_client/models/shared/workflowschedule.py
   - src/unstructured_client/models/shared/workflowstate.py
   - src/unstructured_client/models/shared/workflowtype.py
@@ -377,12 +387,12 @@ examples:
   create_destination:
     speakeasy-default-create-destination:
       requestBody:
-        application/json: {"config": {"api_endpoint": "<value>", "batch_size": 20, "collection_name": "<value>", "flatten_metadata": false, "token": "<value>"}, "name": "<value>", "type": "azure"}
+        application/json: {"config": {"api_endpoint": "<value>", "batch_size": 20, "collection_name": "<value>", "flatten_metadata": false, "token": "<value>"}, "name": "<value>", "type": "azure_ai_search"}
       responses:
         "200":
           application/json: {"config": {"api_key": "<value>", "batch_size": 290189, "collection_name": "<value>", "url": "https://gray-rawhide.name/"}, "created_at": "2023-10-16T03:44:52.760Z", "id": "b3cbed99-76f0-4238-9635-119a590e2345", "name": "<value>", "type": "postgres"}
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [623109], "msg": "<value>", "type": "<value>"}, {"loc": [218326], "msg": "<value>", "type": "<value>"}]}
   delete_destination:
     speakeasy-default-delete-destination:
       parameters:
@@ -592,5 +602,49 @@ examples:
           application/json: {"detail": []}
         5XX:
           application/json: {"detail": "An error occurred"}
+  check_destination_connection_api_v1_destinations__destination_id__connection_check_post:
+    speakeasy-default-check-destination-connection-api-v1-destinations-destination-id-connection-check-post:
+      parameters:
+        path:
+          destination_id: "b65169f5-79ba-4464-918f-b0be2c07b962"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2024-12-11T22:17:57.402Z", "id": "337e8f13-6b28-466e-a173-b8a939d2c047", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 580213], "msg": "<value>", "type": "<value>"}]}
+  get_destination_connection_check_api_v1_destinations__destination_id__connection_check_get:
+    speakeasy-default-get-destination-connection-check-api-v1-destinations-destination-id-connection-check-get:
+      parameters:
+        path:
+          destination_id: "3c48df35-2b2c-46f2-9aa2-d7eae993797c"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2023-08-18T13:08:22.968Z", "id": "d3ed5db0-557c-45b6-b496-8d8ddcf95c3a", "status": "SCHEDULED"}
+        "422":
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>", 661733, "<value>"], "msg": "<value>", "type": "<value>"}]}
+  check_connection_api_v1_sources__source_id__connection_check_post:
+    speakeasy-default-check-connection-api-v1-sources-source-id-connection-check-post:
+      parameters:
+        path:
+          source_id: "8cb54f13-5652-423e-889c-1df1f8147126"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2023-08-17T02:17:54.227Z", "id": "12f4c45a-e6b2-4d0f-849d-2ab042bf13d2", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
+  get_connection_check_api_v1_sources__source_id__connection_check_get:
+    speakeasy-default-get-connection-check-api-v1-sources-source-id-connection-check-get:
+      parameters:
+        path:
+          source_id: "d9c3daec-ddf9-4cef-ae8d-3a989813cc7b"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2025-01-25T05:08:46.547Z", "id": "7cc92d68-dc16-49f9-a119-c651a18a978d", "status": "SCHEDULED"}
+        "422":
+          application/json: {"detail": [{"loc": [146117], "msg": "<value>", "type": "<value>"}, {"loc": [417709], "msg": "<value>", "type": "<value>"}]}
 examplesVersion: 1.0.1
 generatedTests: {}
