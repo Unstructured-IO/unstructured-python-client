@@ -14,7 +14,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.AZURE_AI_SEARCH,\n            \"config\": {\n                \"collection_name\": \"<value>\",\n                \"batch_size\": 20,\n                \"api_endpoint\": \"<value>\",\n                \"token\": \"<value>\",\n                \"flatten_metadata\": False,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.ASTRADB,\n            \"config\": {\n                \"remote_url\": \"https://fortunate-appliance.info\",\n                \"anonymous\": False,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -33,18 +33,6 @@ actions:
         - "lang": "python"
           "label": "update_destination"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9ea9d27c-4e2e-4cb5-9a69-71bd7ec9d226\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"host\": \"acidic-patroller.com\",\n                \"database\": \"<value>\",\n                \"port\": 832931,\n                \"username\": \"Salvador.Walsh-Thiel\",\n                \"password\": \"vIMqbllzrdJBExE\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 977983,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
-  - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["get"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "get_destination_connection_check_api_v1_destinations__destination_id__connection_check_get"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get(request={\n        \"destination_id\": \"3c48df35-2b2c-46f2-9aa2-d7eae993797c\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
-  - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["post"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "check_destination_connection_api_v1_destinations__destination_id__connection_check_post"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={\n        \"destination_id\": \"b65169f5-79ba-4464-918f-b0be2c07b962\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/jobs/"]["get"]
     update:
       "x-codeSamples":
@@ -99,18 +87,6 @@ actions:
         - "lang": "python"
           "label": "update_source"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"396edec4-39e8-4ef6-ac69-c9e3ba7a8418\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"host\": \"black-and-white-obesity.info\",\n                \"database\": \"<value>\",\n                \"port\": 848106,\n                \"username\": \"Bruce.Stracke19\",\n                \"password\": \"L8K8WEZq1xvBpSw\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 177849,\n                \"id_column\": \"id\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
-  - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["get"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "get_connection_check_api_v1_sources__source_id__connection_check_get"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_connection_check_api_v1_sources_source_id_connection_check_get(request={\n        \"source_id\": \"d9c3daec-ddf9-4cef-ae8d-3a989813cc7b\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
-  - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["post"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "check_connection_api_v1_sources__source_id__connection_check_post"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.check_connection_api_v1_sources_source_id_connection_check_post(request={\n        \"source_id\": \"8cb54f13-5652-423e-889c-1df1f8147126\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
