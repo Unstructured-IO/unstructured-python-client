@@ -5,11 +5,65 @@
 
 ### Available Operations
 
+* [check_destination_connection_api_v1_destinations_destination_id_connection_check_post](#check_destination_connection_api_v1_destinations_destination_id_connection_check_post) - Check Destination Connection
 * [create_destination](#create_destination) - Create destination connector
 * [delete_destination](#delete_destination) - Delete destination connector
 * [get_destination](#get_destination) - Get destination connector
+* [get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get](#get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get) - Get Destination Connection Check
 * [list_destinations](#list_destinations) - List destination connectors
 * [update_destination](#update_destination) - Update destination connector
+
+## check_destination_connection_api_v1_destinations_destination_id_connection_check_post
+
+Check Destination Connection
+
+Initiates a connection check for the specified destination connector.
+
+**Parameters:**
+- **destination_id**: The UUID of the destination connector.
+- **db_session**: Database session dependency.
+- **user_data**: Information about the authenticated user.
+
+**Returns:**
+- The result of the connection check.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={
+        "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                      | Type                                                                                                                                                                                                           | Required                                                                                                                                                                                                       | Description                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                                                                                                                      | [operations.CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostRequest](../../models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostrequest.md) | :heavy_check_mark:                                                                                                                                                                                             | The request object to use for the request.                                                                                                                                                                     |
+| `retries`                                                                                                                                                                                                      | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                               | :heavy_minus_sign:                                                                                                                                                                                             | Configuration to override the default retry behavior of the client.                                                                                                                                            |
+| `server_url`                                                                                                                                                                                                   | *Optional[str]*                                                                                                                                                                                                | :heavy_minus_sign:                                                                                                                                                                                             | An optional server URL to use.                                                                                                                                                                                 |
+
+### Response
+
+**[operations.CheckDestinationConnectionAPIV1DestinationsDestinationIDConnectionCheckPostResponse](../../models/operations/checkdestinationconnectionapiv1destinationsdestinationidconnectioncheckpostresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
 
 ## create_destination
 
@@ -34,7 +88,7 @@ with UnstructuredClient() as uc_client:
                 "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
+            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
         },
     })
 
@@ -140,6 +194,58 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.GetDestinationResponse](../../models/operations/getdestinationresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get
+
+Get Destination Connection Check
+
+Retrieves the most recent connection check for the specified destination connector.
+
+**Parameters:**
+- **destination_id**: The UUID of the destination connector.
+- **db_session**: Database session dependency.
+- **user_data**: Information about the authenticated user.
+
+**Returns:**
+- Connection check results.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.destinations.get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get(request={
+        "destination_id": "3c48df35-2b2c-46f2-9aa2-d7eae993797c",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                          | Type                                                                                                                                                                                                               | Required                                                                                                                                                                                                           | Description                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                                                          | [operations.GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetRequest](../../models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetrequest.md) | :heavy_check_mark:                                                                                                                                                                                                 | The request object to use for the request.                                                                                                                                                                         |
+| `retries`                                                                                                                                                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                   | :heavy_minus_sign:                                                                                                                                                                                                 | Configuration to override the default retry behavior of the client.                                                                                                                                                |
+| `server_url`                                                                                                                                                                                                       | *Optional[str]*                                                                                                                                                                                                    | :heavy_minus_sign:                                                                                                                                                                                                 | An optional server URL to use.                                                                                                                                                                                     |
+
+### Response
+
+**[operations.GetDestinationConnectionCheckAPIV1DestinationsDestinationIDConnectionCheckGetResponse](../../models/operations/getdestinationconnectioncheckapiv1destinationsdestinationidconnectioncheckgetresponse.md)**
 
 ### Errors
 

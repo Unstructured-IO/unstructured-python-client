@@ -110,38 +110,26 @@ Some of the endpoints in this SDK support retries. If you use the SDK without an
 To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "api_endpoint": "<value>",
-                "batch_size": 20,
-                "collection_name": "<value>",
-                "flatten_metadata": False,
-                "token": "<value>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
-        },
+    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={
+        "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 
 ```
 
 If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
@@ -149,24 +137,14 @@ with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
 ) as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "api_endpoint": "<value>",
-                "batch_size": 20,
-                "collection_name": "<value>",
-                "flatten_metadata": False,
-                "token": "<value>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
-        },
+    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={
+        "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
     })
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 
 ```
 <!-- End Retries [retries] -->
@@ -186,7 +164,7 @@ By default, an API error will raise a errors.SDKError exception, which has the f
 | `.raw_response` | *httpx.Response* | The raw HTTP response |
 | `.body`         | *str*            | The response content  |
 
-When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `create_destination_async` method may raise the following exceptions:
+When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `check_destination_connection_api_v1_destinations_destination_id_connection_check_post_async` method may raise the following exceptions:
 
 | Error Type                 | Status Code | Content Type     |
 | -------------------------- | ----------- | ---------------- |
@@ -197,31 +175,21 @@ When custom error responses are specified for an operation, the SDK may also rai
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import errors, shared
+from unstructured_client.models import errors
 
 
 with UnstructuredClient() as uc_client:
     res = None
     try:
 
-        res = uc_client.destinations.create_destination(request={
-            "create_destination_connector": {
-                "config": {
-                    "api_endpoint": "<value>",
-                    "batch_size": 20,
-                    "collection_name": "<value>",
-                    "flatten_metadata": False,
-                    "token": "<value>",
-                },
-                "name": "<value>",
-                "type": shared.DestinationConnectorType.AZURE,
-            },
+        res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={
+            "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
         })
 
-        assert res.destination_connector_information is not None
+        assert res.dag_node_connection_check is not None
 
         # Handle response
-        print(res.destination_connector_information)
+        print(res.dag_node_connection_check)
 
     except errors.HTTPValidationError as e:
         # handle e.data: errors.HTTPValidationErrorData
@@ -332,29 +300,18 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 ```python
 # Synchronous Example
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "api_endpoint": "<value>",
-                "batch_size": 20,
-                "collection_name": "<value>",
-                "flatten_metadata": False,
-                "token": "<value>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
-        },
+    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={
+        "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
     })
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 ```
 
 </br>
@@ -364,30 +321,19 @@ The same SDK client can also be used to make asychronous requests by importing a
 # Asynchronous Example
 import asyncio
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 async def main():
 
     async with UnstructuredClient() as uc_client:
 
-        res = await uc_client.destinations.create_destination_async(request={
-            "create_destination_connector": {
-                "config": {
-                    "api_endpoint": "<value>",
-                    "batch_size": 20,
-                    "collection_name": "<value>",
-                    "flatten_metadata": False,
-                    "token": "<value>",
-                },
-                "name": "<value>",
-                "type": shared.DestinationConnectorType.AZURE,
-            },
+        res = await uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post_async(request={
+            "destination_id": "b65169f5-79ba-4464-918f-b0be2c07b962",
         })
 
-        assert res.destination_connector_information is not None
+        assert res.dag_node_connection_check is not None
 
         # Handle response
-        print(res.destination_connector_information)
+        print(res.dag_node_connection_check)
 
 asyncio.run(main())
 ```

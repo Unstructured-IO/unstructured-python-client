@@ -16,14 +16,6 @@ from .azureaisearchconnectorconfiginput import (
     AzureAISearchConnectorConfigInput,
     AzureAISearchConnectorConfigInputTypedDict,
 )
-from .azuredestinationconnectorconfig import (
-    AzureDestinationConnectorConfig,
-    AzureDestinationConnectorConfigTypedDict,
-)
-from .azuredestinationconnectorconfiginput import (
-    AzureDestinationConnectorConfigInput,
-    AzureDestinationConnectorConfigInputTypedDict,
-)
 from .azuresourceconnectorconfig import (
     AzureSourceConnectorConfig,
     AzureSourceConnectorConfigTypedDict,
@@ -54,6 +46,7 @@ from .confluencesourceconnectorconfiginput import (
     ConfluenceSourceConnectorConfigInput,
     ConfluenceSourceConnectorConfigInputTypedDict,
 )
+from .connectioncheckstatus import ConnectionCheckStatus
 from .couchbasedestinationconnectorconfig import (
     CouchbaseDestinationConnectorConfig,
     CouchbaseDestinationConnectorConfigTypedDict,
@@ -84,6 +77,10 @@ from .createsourceconnector import (
 )
 from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
 from .crontabentry import CronTabEntry, CronTabEntryTypedDict
+from .dagnodeconnectioncheck import (
+    DagNodeConnectionCheck,
+    DagNodeConnectionCheckTypedDict,
+)
 from .databricksvdtdestinationconnectorconfig import (
     DatabricksVDTDestinationConnectorConfig,
     DatabricksVDTDestinationConnectorConfigTypedDict,
@@ -369,7 +366,6 @@ from .weaviatedestinationconnectorconfiginput import (
 )
 from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
 from .workflownode import WorkflowNode, WorkflowNodeTypedDict
-from .workflownodetype import WorkflowNodeType
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
 from .workflowtype import WorkflowType
@@ -392,10 +388,6 @@ __all__ = [
     "AzureAISearchConnectorConfigInput",
     "AzureAISearchConnectorConfigInputTypedDict",
     "AzureAISearchConnectorConfigTypedDict",
-    "AzureDestinationConnectorConfig",
-    "AzureDestinationConnectorConfigInput",
-    "AzureDestinationConnectorConfigInputTypedDict",
-    "AzureDestinationConnectorConfigTypedDict",
     "AzureSourceConnectorConfig",
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",
@@ -412,6 +404,7 @@ __all__ = [
     "ConfluenceSourceConnectorConfigInput",
     "ConfluenceSourceConnectorConfigInputTypedDict",
     "ConfluenceSourceConnectorConfigTypedDict",
+    "ConnectionCheckStatus",
     "CouchbaseDestinationConnectorConfig",
     "CouchbaseDestinationConnectorConfigInput",
     "CouchbaseDestinationConnectorConfigInputTypedDict",
@@ -430,6 +423,8 @@ __all__ = [
     "CreateWorkflowTypedDict",
     "CronTabEntry",
     "CronTabEntryTypedDict",
+    "DagNodeConnectionCheck",
+    "DagNodeConnectionCheckTypedDict",
     "DatabricksVDTDestinationConnectorConfig",
     "DatabricksVDTDestinationConnectorConfigInput",
     "DatabricksVDTDestinationConnectorConfigInputTypedDict",
@@ -592,7 +587,6 @@ __all__ = [
     "WorkflowInformation",
     "WorkflowInformationTypedDict",
     "WorkflowNode",
-    "WorkflowNodeType",
     "WorkflowNodeTypedDict",
     "WorkflowSchedule",
     "WorkflowScheduleTypedDict",
