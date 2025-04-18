@@ -126,7 +126,7 @@ with UnstructuredClient() as uc_client:
                 "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
+            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
         },
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
@@ -159,7 +159,7 @@ with UnstructuredClient(
                 "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
+            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
         },
     })
 
@@ -214,7 +214,7 @@ with UnstructuredClient() as uc_client:
                     "token": "<value>",
                 },
                 "name": "<value>",
-                "type": shared.DestinationConnectorType.AZURE,
+                "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
             },
         })
 
@@ -347,7 +347,7 @@ with UnstructuredClient() as uc_client:
                 "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
+            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
         },
     })
 
@@ -380,7 +380,7 @@ async def main():
                     "token": "<value>",
                 },
                 "name": "<value>",
-                "type": shared.DestinationConnectorType.AZURE,
+                "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
             },
         })
 

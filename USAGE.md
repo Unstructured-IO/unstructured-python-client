@@ -17,7 +17,7 @@ with UnstructuredClient() as uc_client:
                 "token": "<value>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE,
+            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
         },
     })
 
@@ -50,7 +50,7 @@ async def main():
                     "token": "<value>",
                 },
                 "name": "<value>",
-                "type": shared.DestinationConnectorType.AZURE,
+                "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
             },
         })
 

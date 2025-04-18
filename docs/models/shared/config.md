@@ -3,12 +3,6 @@
 
 ## Supported Types
 
-### `shared.AzureDestinationConnectorConfigInput`
-
-```python
-value: shared.AzureDestinationConnectorConfigInput = /* values here */
-```
-
 ### `shared.AstraDBConnectorConfigInput`
 
 ```python
