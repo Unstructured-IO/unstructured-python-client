@@ -8,7 +8,7 @@ from unstructured_client.httpclient import HttpClient
 
 
 def clean_server_url(base_url: str) -> str:
-    """Fix url scheme and remove the '/general/v0/general' path."""
+    """Fix url scheme and remove subpath for URLs under Unstructured domains."""
 
     if not base_url:
         return ""
@@ -19,12 +19,18 @@ def clean_server_url(base_url: str) -> str:
 
     parsed_url: ParseResult = urlparse(base_url)
     
-    if "api.unstructuredapp.io" in parsed_url.netloc:
+    if "unstructuredapp.io" in parsed_url.netloc:
         if parsed_url.scheme != "https":
             parsed_url = parsed_url._replace(scheme="https")
+        # We only want the base url for Unstructured domains
+        clean_url =  urlunparse(parsed_url._replace(path="", params="", query="", fragment=""))
+    
+    else:
+        # For other domains, we want to keep the path
+        clean_url = urlunparse(parsed_url._replace(params="", query="", fragment=""))
 
-    # We only want the base url
-    return urlunparse(parsed_url._replace(path="", params="", query="", fragment=""))
+    return clean_url
+    
 
 
 def choose_server_url(endpoint_url: str | None, client_url: str, default_endpoint_url: str) -> str:
