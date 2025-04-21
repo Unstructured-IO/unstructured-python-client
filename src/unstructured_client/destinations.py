@@ -6,9 +6,16 @@ from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
-
+from unstructured_client.sdkconfiguration import SERVER_PLATFORM_API, SERVERS
 
 class Destinations(BaseSDK):
+    def get_default_server_url(self) -> str:
+        client_url, *_ = self.sdk_configuration.get_server_details()
+        if client_url is None:
+            return utils.remove_suffix(SERVERS[SERVER_PLATFORM_API], "/")
+        return client_url
+
+
     def create_destination(
         self,
         *,
@@ -31,17 +38,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
+
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_DESTINATION_SERVERS[
-                operations.CREATE_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateDestinationRequest)
@@ -151,17 +152,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_DESTINATION_SERVERS[
-                operations.CREATE_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateDestinationRequest)
@@ -271,17 +266,12 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_DESTINATION_SERVERS[
-                operations.DELETE_DESTINATION_SERVER_PLATFORM_API
-            ]
+
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteDestinationRequest)
@@ -382,17 +372,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_DESTINATION_SERVERS[
-                operations.DELETE_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteDestinationRequest)
@@ -492,17 +476,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_DESTINATION_SERVERS[
-                operations.GET_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetDestinationRequest)
@@ -604,17 +582,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_DESTINATION_SERVERS[
-                operations.GET_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetDestinationRequest)
@@ -717,17 +689,10 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_DESTINATIONS_SERVERS[
-                operations.LIST_DESTINATIONS_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListDestinationsRequest)
@@ -831,17 +796,10 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_DESTINATIONS_SERVERS[
-                operations.LIST_DESTINATIONS_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListDestinationsRequest)
@@ -945,17 +903,11 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_DESTINATION_SERVERS[
-                operations.UPDATE_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateDestinationRequest)
@@ -1065,17 +1017,10 @@ class Destinations(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_DESTINATION_SERVERS[
-                operations.UPDATE_DESTINATION_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateDestinationRequest)

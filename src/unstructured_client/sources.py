@@ -6,9 +6,15 @@ from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
-
+from unstructured_client.sdkconfiguration import SERVER_PLATFORM_API, SERVERS
 
 class Sources(BaseSDK):
+    def get_default_server_url(self) -> str:
+        client_url, *_ = self.sdk_configuration.get_server_details()
+        if client_url is None:
+            return utils.remove_suffix(SERVERS[SERVER_PLATFORM_API], "/") 
+        return client_url
+    
     def create_source(
         self,
         *,
@@ -30,17 +36,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_SOURCE_SERVERS[
-                operations.CREATE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -149,17 +149,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_SOURCE_SERVERS[
-                operations.CREATE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateSourceRequest)
@@ -268,17 +262,10 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_SOURCE_SERVERS[
-                operations.DELETE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -378,17 +365,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_SOURCE_SERVERS[
-                operations.DELETE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteSourceRequest)
@@ -488,17 +469,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_SOURCE_SERVERS[
-                operations.GET_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -600,17 +575,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_SOURCE_SERVERS[
-                operations.GET_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetSourceRequest)
@@ -712,17 +681,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_SOURCES_SERVERS[
-                operations.LIST_SOURCES_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -824,17 +787,10 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_SOURCES_SERVERS[
-                operations.LIST_SOURCES_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListSourcesRequest)
@@ -936,17 +892,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_SOURCE_SERVERS[
-                operations.UPDATE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)
@@ -1055,17 +1005,11 @@ class Sources(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_SOURCE_SERVERS[
-                operations.UPDATE_SOURCE_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateSourceRequest)

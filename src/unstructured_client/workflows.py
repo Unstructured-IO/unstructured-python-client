@@ -6,9 +6,16 @@ from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
+from unstructured_client.sdkconfiguration import SERVER_PLATFORM_API, SERVERS
 
 
 class Workflows(BaseSDK):
+    def get_default_server_url(self) -> str:
+        client_url, *_ = self.sdk_configuration.get_server_details()
+        if client_url is None:
+            return utils.remove_suffix(SERVERS[SERVER_PLATFORM_API], "/")
+        return client_url
+    
     def create_workflow(
         self,
         *,
@@ -30,17 +37,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_WORKFLOW_SERVERS[
-                operations.CREATE_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateWorkflowRequest)
@@ -145,17 +146,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.CREATE_WORKFLOW_SERVERS[
-                operations.CREATE_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.CreateWorkflowRequest)
@@ -260,17 +255,12 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_WORKFLOW_SERVERS[
-                operations.DELETE_WORKFLOW_SERVER_PLATFORM_API
-            ]
+
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteWorkflowRequest)
@@ -370,17 +360,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.DELETE_WORKFLOW_SERVERS[
-                operations.DELETE_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.DeleteWorkflowRequest)
@@ -480,17 +464,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_WORKFLOW_SERVERS[
-                operations.GET_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetWorkflowRequest)
@@ -592,17 +570,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.GET_WORKFLOW_SERVERS[
-                operations.GET_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.GetWorkflowRequest)
@@ -704,17 +676,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_WORKFLOWS_SERVERS[
-                operations.LIST_WORKFLOWS_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListWorkflowsRequest)
@@ -816,17 +782,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.LIST_WORKFLOWS_SERVERS[
-                operations.LIST_WORKFLOWS_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.ListWorkflowsRequest)
@@ -928,17 +888,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.RUN_WORKFLOW_SERVERS[
-                operations.RUN_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.RunWorkflowRequest)
@@ -1047,17 +1001,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.RUN_WORKFLOW_SERVERS[
-                operations.RUN_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.RunWorkflowRequest)
@@ -1166,17 +1114,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_WORKFLOW_SERVERS[
-                operations.UPDATE_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateWorkflowRequest)
@@ -1281,17 +1223,11 @@ class Workflows(BaseSDK):
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
         :param http_headers: Additional headers to set or replace on requests.
         """
-        base_url = None
+        base_url = server_url if server_url is not None else self.get_default_server_url()
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
 
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = operations.UPDATE_WORKFLOW_SERVERS[
-                operations.UPDATE_WORKFLOW_SERVER_PLATFORM_API
-            ]
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.UpdateWorkflowRequest)
