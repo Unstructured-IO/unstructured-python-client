@@ -69,14 +69,14 @@ class URLTestCase:
         URLTestCase(
             description="non UNST domain client-level URL, no path",
             sdk_endpoint_name="general.partition_async",
-            client_url="http://localhost:8000",
+            client_url="http://localhost:8000/",
             endpoint_url=None,
             expected_url="http://localhost:8000"
         ),
         URLTestCase(
             description="non UNST domain client-level URL, with path",
             sdk_endpoint_name="general.partition_async",
-            client_url="http://localhost:8000/my/endpoint",
+            client_url="http://localhost:8000/my/endpoint/",
             endpoint_url=None,
             expected_url="http://localhost:8000/my/endpoint"
         ),
@@ -84,14 +84,14 @@ class URLTestCase:
             description="non UNST domain endpoint-level URL, no path",
             sdk_endpoint_name="general.partition_async",
             client_url=None,
-            endpoint_url="http://localhost:8000",
+            endpoint_url="http://localhost:8000/",
             expected_url="http://localhost:8000"
         ),
         URLTestCase(
             description="non UNST domain endpoint-level URL, with path",
             sdk_endpoint_name="general.partition_async",
             client_url=None,
-            endpoint_url="http://localhost:8000/my/endpoint",
+            endpoint_url="http://localhost:8000/my/endpoint/",
             expected_url="http://localhost:8000/my/endpoint"
         ),
         URLTestCase(
@@ -162,28 +162,28 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
     [
         URLTestCase(
             description="non UNST domain client-level URL, no path",
-            sdk_endpoint_name="general.partition",
-            client_url="http://localhost:8000",
+            sdk_endpoint_name="destinations.create_destination",
+            client_url="http://localhost:8000/",
             endpoint_url=None,
             expected_url="http://localhost:8000"
         ),
         URLTestCase(
             description="non UNST domain client-level URL, with path",
-            sdk_endpoint_name="general.partition",
-            client_url="http://localhost:8000/my/endpoint",
+            sdk_endpoint_name="sources.create_source",
+            client_url="http://localhost:8000/my/endpoint/",
             endpoint_url=None,
             expected_url="http://localhost:8000/my/endpoint"
         ),
         URLTestCase(
             description="non UNST domain endpoint-level URL, no path",
-            sdk_endpoint_name="general.partition",
+            sdk_endpoint_name="jobs.get_job",
             client_url=None,
             endpoint_url="http://localhost:8000",
             expected_url="http://localhost:8000"
         ),
         URLTestCase(
             description="non UNST domain endpoint-level URL, with path",
-            sdk_endpoint_name="general.partition",
+            sdk_endpoint_name="workflows.create_workflow",
             client_url=None,
             endpoint_url="http://localhost:8000/my/endpoint",
             expected_url="http://localhost:8000/my/endpoint"

@@ -29,7 +29,7 @@ def clean_server_url(base_url: str) -> str:
         # For other domains, we want to keep the path
         clean_url = urlunparse(parsed_url._replace(params="", query="", fragment=""))
 
-    return clean_url
+    return clean_url.rstrip("/")
     
 
 

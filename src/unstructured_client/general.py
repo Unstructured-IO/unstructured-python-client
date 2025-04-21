@@ -18,12 +18,12 @@ class PartitionAcceptEnum(str, Enum):
 class General(BaseSDK):
     def get_default_server_url(self) -> str:
         client_url, *_ = self.sdk_configuration.get_server_details()
-        if client_url ==  utils.remove_suffix(SERVERS[SERVER_PLATFORM_API], "/"):
+        if client_url ==  SERVERS[SERVER_PLATFORM_API].rstrip("/"):
             #Note(yuming):get_server_details will set the default server to platform-api
             return operations.PARTITION_SERVERS[
                 operations.PARTITION_SERVER_SAAS_API
-            ]
-        return client_url
+            ].rstrip("/")
+        return clean_server_url(client_url)
 
     def partition(
         self,

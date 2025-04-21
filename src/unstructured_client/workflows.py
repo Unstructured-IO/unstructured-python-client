@@ -11,7 +11,7 @@ from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 class Workflows(BaseSDK):
     def get_default_server_url(self) -> str:
         client_url, *_ = self.sdk_configuration.get_server_details()
-        return client_url
+        return clean_server_url(client_url)
     
     def create_workflow(
         self,
