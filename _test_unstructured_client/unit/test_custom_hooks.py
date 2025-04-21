@@ -169,7 +169,7 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     with pytest.raises(Exception):
         session.general.partition(request=req, retries=retries)
 
-    pattern = re.compile(f"Failed to process a request due to connection error .*? "
+    pattern = re.compile("Failed to process a request due to connection error .*? "
                          "Attempting retry number 1 after sleep.")
     assert bool(pattern.search(caplog.text))
 
