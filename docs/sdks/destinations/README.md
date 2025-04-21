@@ -5,11 +5,55 @@
 
 ### Available Operations
 
+* [create_connection_check_destinations](#create_connection_check_destinations) - Create destination connection check
 * [create_destination](#create_destination) - Create destination connector
 * [delete_destination](#delete_destination) - Delete destination connector
+* [get_connection_check_destinations](#get_connection_check_destinations) - Get the latest destination connector connection check
 * [get_destination](#get_destination) - Get destination connector
 * [list_destinations](#list_destinations) - List destination connectors
 * [update_destination](#update_destination) - Update destination connector
+
+## create_connection_check_destinations
+
+Initiate a connection check for the destination connector
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.destinations.create_connection_check_destinations(request={
+        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                  | Type                                                                                                                       | Required                                                                                                                   | Description                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                                  | [operations.CreateConnectionCheckDestinationsRequest](../../models/operations/createconnectioncheckdestinationsrequest.md) | :heavy_check_mark:                                                                                                         | The request object to use for the request.                                                                                 |
+| `retries`                                                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                           | :heavy_minus_sign:                                                                                                         | Configuration to override the default retry behavior of the client.                                                        |
+| `server_url`                                                                                                               | *Optional[str]*                                                                                                            | :heavy_minus_sign:                                                                                                         | An optional server URL to use.                                                                                             |
+
+### Response
+
+**[operations.CreateConnectionCheckDestinationsResponse](../../models/operations/createconnectioncheckdestinationsresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
 
 ## create_destination
 
@@ -98,6 +142,48 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.DeleteDestinationResponse](../../models/operations/deletedestinationresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_connection_check_destinations
+
+Retrieves the most recent connection check for the specified destination connector.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.destinations.get_connection_check_destinations(request={
+        "destination_id": "eb6a7890-5661-44a2-840b-bc59e9bb3318",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                            | Type                                                                                                                 | Required                                                                                                             | Description                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                            | [operations.GetConnectionCheckDestinationsRequest](../../models/operations/getconnectioncheckdestinationsrequest.md) | :heavy_check_mark:                                                                                                   | The request object to use for the request.                                                                           |
+| `retries`                                                                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                     | :heavy_minus_sign:                                                                                                   | Configuration to override the default retry behavior of the client.                                                  |
+| `server_url`                                                                                                         | *Optional[str]*                                                                                                      | :heavy_minus_sign:                                                                                                   | An optional server URL to use.                                                                                       |
+
+### Response
+
+**[operations.GetConnectionCheckDestinationsResponse](../../models/operations/getconnectioncheckdestinationsresponse.md)**
 
 ### Errors
 

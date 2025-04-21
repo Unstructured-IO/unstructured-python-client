@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: a22c1e202b7ac1f3305521fb7827a79d
+  docChecksum: 6433f28e5b70c3c0d7754fc7a88db327
   docVersion: 1.1.7
-  speakeasyVersion: 1.534.0
-  generationVersion: 2.585.0
-  releaseVersion: 0.33.0
-  configChecksum: d3a6fe7f2ae7f430c8fff9c158af4f46
+  speakeasyVersion: 1.535.1
+  generationVersion: 2.585.2
+  releaseVersion: 0.33.1
+  configChecksum: 8b5e7fbd95d040ba09964f3c97c3156a
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -46,6 +46,10 @@ generatedFiles:
   - docs/models/errors/servererror.md
   - docs/models/operations/canceljobrequest.md
   - docs/models/operations/canceljobresponse.md
+  - docs/models/operations/createconnectioncheckdestinationsrequest.md
+  - docs/models/operations/createconnectioncheckdestinationsresponse.md
+  - docs/models/operations/createconnectionchecksourcesrequest.md
+  - docs/models/operations/createconnectionchecksourcesresponse.md
   - docs/models/operations/createdestinationrequest.md
   - docs/models/operations/createdestinationresponse.md
   - docs/models/operations/createsourcerequest.md
@@ -60,6 +64,10 @@ generatedFiles:
   - docs/models/operations/deleteworkflowresponse.md
   - docs/models/operations/downloadjoboutputrequest.md
   - docs/models/operations/downloadjoboutputresponse.md
+  - docs/models/operations/getconnectioncheckdestinationsrequest.md
+  - docs/models/operations/getconnectioncheckdestinationsresponse.md
+  - docs/models/operations/getconnectionchecksourcesrequest.md
+  - docs/models/operations/getconnectionchecksourcesresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
   - docs/models/operations/getjobrequest.md
@@ -98,6 +106,7 @@ generatedFiles:
   - docs/models/shared/config.md
   - docs/models/shared/confluencesourceconnectorconfig.md
   - docs/models/shared/confluencesourceconnectorconfiginput.md
+  - docs/models/shared/connectioncheckstatus.md
   - docs/models/shared/couchbasedestinationconnectorconfig.md
   - docs/models/shared/couchbasedestinationconnectorconfiginput.md
   - docs/models/shared/couchbasesourceconnectorconfig.md
@@ -107,6 +116,7 @@ generatedFiles:
   - docs/models/shared/createsourceconnectorconfig.md
   - docs/models/shared/createworkflow.md
   - docs/models/shared/crontabentry.md
+  - docs/models/shared/dagnodeconnectioncheck.md
   - docs/models/shared/databricksvdtdestinationconnectorconfig.md
   - docs/models/shared/databricksvdtdestinationconnectorconfiginput.md
   - docs/models/shared/databricksvolumesconnectorconfig.md
@@ -227,6 +237,8 @@ generatedFiles:
   - src/unstructured_client/models/errors/servererror.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/operations/cancel_job.py
+  - src/unstructured_client/models/operations/create_connection_check_destinations.py
+  - src/unstructured_client/models/operations/create_connection_check_sources.py
   - src/unstructured_client/models/operations/create_destination.py
   - src/unstructured_client/models/operations/create_source.py
   - src/unstructured_client/models/operations/create_workflow.py
@@ -234,6 +246,8 @@ generatedFiles:
   - src/unstructured_client/models/operations/delete_source.py
   - src/unstructured_client/models/operations/delete_workflow.py
   - src/unstructured_client/models/operations/download_job_output.py
+  - src/unstructured_client/models/operations/get_connection_check_destinations.py
+  - src/unstructured_client/models/operations/get_connection_check_sources.py
   - src/unstructured_client/models/operations/get_destination.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_source.py
@@ -259,6 +273,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfig.py
   - src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/connectioncheckstatus.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py
@@ -267,6 +282,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/createsourceconnector.py
   - src/unstructured_client/models/shared/createworkflow.py
   - src/unstructured_client/models/shared/crontabentry.py
+  - src/unstructured_client/models/shared/dagnodeconnectioncheck.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py
@@ -437,6 +453,7 @@ examples:
           job_id: "bddbb621-2124-4cc2-9fa7-c6cdc21dac44"
         query:
           file_id: "<id>"
+          node_id: "bddbb621-2124-4cc2-9fa7-c6cdc21dac44"
         header: {}
       responses:
         "200":
@@ -630,5 +647,49 @@ examples:
           application/json: {"created_at": "2025-01-25T05:08:46.547Z", "id": "7cc92d68-dc16-49f9-a119-c651a18a978d", "status": "SCHEDULED"}
         "422":
           application/json: {"detail": "<value>"}
+  create_connection_check_destinations:
+    speakeasy-default-create-connection-check-destinations:
+      parameters:
+        path:
+          destination_id: "d9795fb7-2135-4e48-a51d-009dd6ca38a1"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2025-10-23T17:00:52.828Z", "id": "2b33c132-612e-425e-9ef0-4c89923fc202", "status": "SCHEDULED"}
+        "422":
+          application/json: {"detail": "<value>"}
+  get_connection_check_destinations:
+    speakeasy-default-get-connection-check-destinations:
+      parameters:
+        path:
+          destination_id: "eb6a7890-5661-44a2-840b-bc59e9bb3318"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2025-03-13T23:31:02.383Z", "id": "c3274f55-9861-4e4e-8526-4273aa4d2772", "status": "FAILURE"}
+        "422":
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
+  create_connection_check_sources:
+    speakeasy-default-create-connection-check-sources:
+      parameters:
+        path:
+          source_id: "e5658517-3282-4845-9c22-88de48549d21"
+        header: {}
+      responses:
+        "202":
+          application/json: {"created_at": "2023-03-12T05:54:05.025Z", "id": "b5793adb-057f-470c-ae7e-309d786a99eb", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": []}
+  get_connection_check_sources:
+    speakeasy-default-get-connection-check-sources:
+      parameters:
+        path:
+          source_id: "b3b6b67d-aca9-4b1c-89c0-5788869c1383"
+        header: {}
+      responses:
+        "200":
+          application/json: {"created_at": "2023-09-12T00:38:55.692Z", "id": "f7d1d931-a753-4fe9-ae3f-671f188a9b55", "status": "SUCCESS"}
+        "422":
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
 examplesVersion: 1.0.1
 generatedTests: {}

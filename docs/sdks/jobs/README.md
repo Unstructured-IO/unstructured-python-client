@@ -54,7 +54,7 @@ with UnstructuredClient() as uc_client:
 
 ## download_job_output
 
-Download the output of a job from a local workflow.
+Download the output of a job from a workflow where the input file was provided at runtime.
 
 ### Example Usage
 
@@ -67,6 +67,7 @@ with UnstructuredClient() as uc_client:
     res = uc_client.jobs.download_job_output(request={
         "file_id": "<id>",
         "job_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
+        "node_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
     })
 
     assert res.any is not None
