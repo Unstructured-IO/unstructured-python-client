@@ -1,8 +1,6 @@
-import httpx
 import pytest
-
-from unstructured_client.models import operations
-from unstructured_client import UnstructuredClient, basesdk, utils
+from dataclasses import dataclass
+from unstructured_client import UnstructuredClient, utils
 
 
 # Raise one of these from our mock to return to the test code
@@ -53,195 +51,107 @@ def get_client_method_with_mock(
 
     return endpoint_method
 
-
-@pytest.mark.parametrize(
-    "sdk_endpoint_name",
-    [
-        ("general.partition"),
-    ],
-)
-def test_endpoint_uses_correct_url(monkeypatch, sdk_endpoint_name):
-    # Test 1
-    # Pass server_url to the client, no path
-    s = UnstructuredClient(server_url="http://localhost:8000")
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        client_method(request={})
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to client and ignored, got {e}")
-
-    # Test 2
-    # Pass server_url to the client, with path
-    s = UnstructuredClient(server_url="http://localhost:8000/my/endpoint")
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        client_method(request={})
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to client and was not stripped, got {e}")
-
-    # Test 3
-    # Pass server_url to the endpoint, no path
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        client_method(request={}, server_url="http://localhost:8000")
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to endpoint and ignored, got {e}")
-
-    # Test 4
-    # Pass server_url to the endpoint, with path
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        client_method(request={}, server_url="http://localhost:8000/my/endpoint")
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to endpoint and ignored, got {e}")
-
-
-    # Test 5
-    # No server_url, should take the default
-    server_url = "https://api.unstructuredapp.io" if "partition" in sdk_endpoint_name else "https://platform.unstructuredapp.io"
-
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        server_url,
-        monkeypatch
-    )
-
-    try:
-        client_method(request={})
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"Default url not used, got {e}")
-
+@dataclass
+class URLTestCase:
+    description: str
+    sdk_endpoint_name: str
+    # url when you init the client (global for all endpoints)
+    client_url: str | None
+    # url when you init the SDK endpoint (vary per endpoint)
+    endpoint_url: str | None
+    # expected url when actually making the HTTP request in build_request
+    expected_url: str
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "sdk_endpoint_name",
+    "case",
     [
-        ("general.partition_async"),
-    ],
+        URLTestCase(
+            description="non UNST domain client-level URL, no path",
+            sdk_endpoint_name="general.partition_async",
+            client_url="http://localhost:8000",
+            endpoint_url=None,
+            expected_url="http://localhost:8000"
+        ),
+        URLTestCase(
+            description="non UNST domain client-level URL, with path",
+            sdk_endpoint_name="general.partition_async",
+            client_url="http://localhost:8000/my/endpoint",
+            endpoint_url=None,
+            expected_url="http://localhost:8000/my/endpoint"
+        ),
+        URLTestCase(
+            description="non UNST domain endpoint-level URL, no path",
+            sdk_endpoint_name="general.partition_async",
+            client_url=None,
+            endpoint_url="http://localhost:8000",
+            expected_url="http://localhost:8000"
+        ),
+        URLTestCase(
+            description="non UNST domain endpoint-level URL, with path",
+            sdk_endpoint_name="general.partition_async",
+            client_url=None,
+            endpoint_url="http://localhost:8000/my/endpoint",
+            expected_url="http://localhost:8000/my/endpoint"
+        ),
+        URLTestCase(
+            description="UNST domain client-level URL, no path",
+            sdk_endpoint_name="general.partition_async",
+            client_url="https://unstructured-000mock.api.unstructuredapp.io",
+            endpoint_url=None,
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain client-level URL, with path",
+            sdk_endpoint_name="general.partition_async",
+            client_url="https://unstructured-000mock.api.unstructuredapp.io/my/endpoint/",
+            endpoint_url=None,
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain endpoint-level URL, no path",
+            sdk_endpoint_name="general.partition_async",
+            client_url=None,
+            endpoint_url="https://unstructured-000mock.api.unstructuredapp.io",
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain endpoint-level URL, with path",
+            sdk_endpoint_name="general.partition_async",
+            client_url=None,
+            endpoint_url="https://unstructured-000mock.api.unstructuredapp.io/my/endpoint/",
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="general.partition_async",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://api.unstructuredapp.io"
+        ),
+    ]
 )
-async def test_async_endpoint_uses_correct_url(monkeypatch, sdk_endpoint_name):
-    # Test 1
-    # Pass server_url to the client, no path
-    s = UnstructuredClient(server_url="http://localhost:8000")
+async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
+    if case.client_url:
+        s = UnstructuredClient(server_url=case.client_url)
+    else:
+        s = UnstructuredClient()
+
     client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
+        case.sdk_endpoint_name,
         s,
-        "http://localhost:8000",
+        case.expected_url,
         monkeypatch
     )
 
     try:
-        await client_method(request={})
+        if case.endpoint_url:
+            await client_method(request={}, server_url=case.endpoint_url)
+        else:
+            await client_method(request={})
     except BaseUrlCorrect:
         pass
     except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to client and ignored, got {e}")
-
-    # Test 2
-    # Pass server_url to the client, with path
-    s = UnstructuredClient(server_url="http://localhost:8000/my/endpoint")
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        await client_method(request={})
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to client and was not stripped, got {e}")
-
-    # Test 3
-    # Pass server_url to the endpoint, no path
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        await client_method(request={}, server_url="http://localhost:8000")
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to endpoint and ignored, got {e}")
-
-    # Test 4
-    # Pass server_url to the endpoint, with path
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        "http://localhost:8000",
-        monkeypatch
-    )
-
-    try:
-        await client_method(request={}, server_url="http://localhost:8000/my/endpoint")
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"server_url was passed to endpoint and ignored, got {e}")
-
-
-    # Test 5
-    # No server_url, should take the default
-    server_url = "https://api.unstructuredapp.io" if "partition" in sdk_endpoint_name else "https://platform.unstructuredapp.io"
-
-    s = UnstructuredClient()
-    client_method = get_client_method_with_mock(
-        sdk_endpoint_name,
-        s,
-        server_url,
-        monkeypatch
-    )
-
-    try:
-        await client_method(request={})
-    except BaseUrlCorrect:
-        pass
-    except BaseUrlIncorrect as e:
-        pytest.fail(f"Default url not used, got {e}")
+        pytest.fail(
+            f"{case.description}: Expected {case.expected_url}, got {e}"
+        )
