@@ -8,6 +8,22 @@ from .cancel_job import (
     CancelJobResponse,
     CancelJobResponseTypedDict,
 )
+from .create_connection_check_destinations import (
+    CREATE_CONNECTION_CHECK_DESTINATIONS_SERVERS,
+    CREATE_CONNECTION_CHECK_DESTINATIONS_SERVER_PLATFORM_API,
+    CreateConnectionCheckDestinationsRequest,
+    CreateConnectionCheckDestinationsRequestTypedDict,
+    CreateConnectionCheckDestinationsResponse,
+    CreateConnectionCheckDestinationsResponseTypedDict,
+)
+from .create_connection_check_sources import (
+    CREATE_CONNECTION_CHECK_SOURCES_SERVERS,
+    CREATE_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API,
+    CreateConnectionCheckSourcesRequest,
+    CreateConnectionCheckSourcesRequestTypedDict,
+    CreateConnectionCheckSourcesResponse,
+    CreateConnectionCheckSourcesResponseTypedDict,
+)
 from .create_destination import (
     CREATE_DESTINATION_SERVERS,
     CREATE_DESTINATION_SERVER_PLATFORM_API,
@@ -63,6 +79,22 @@ from .download_job_output import (
     DownloadJobOutputRequestTypedDict,
     DownloadJobOutputResponse,
     DownloadJobOutputResponseTypedDict,
+)
+from .get_connection_check_destinations import (
+    GET_CONNECTION_CHECK_DESTINATIONS_SERVERS,
+    GET_CONNECTION_CHECK_DESTINATIONS_SERVER_PLATFORM_API,
+    GetConnectionCheckDestinationsRequest,
+    GetConnectionCheckDestinationsRequestTypedDict,
+    GetConnectionCheckDestinationsResponse,
+    GetConnectionCheckDestinationsResponseTypedDict,
+)
+from .get_connection_check_sources import (
+    GET_CONNECTION_CHECK_SOURCES_SERVERS,
+    GET_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API,
+    GetConnectionCheckSourcesRequest,
+    GetConnectionCheckSourcesRequestTypedDict,
+    GetConnectionCheckSourcesResponse,
+    GetConnectionCheckSourcesResponseTypedDict,
 )
 from .get_destination import (
     GET_DESTINATION_SERVERS,
@@ -174,6 +206,10 @@ from .update_workflow import (
 __all__ = [
     "CANCEL_JOB_SERVERS",
     "CANCEL_JOB_SERVER_PLATFORM_API",
+    "CREATE_CONNECTION_CHECK_DESTINATIONS_SERVERS",
+    "CREATE_CONNECTION_CHECK_DESTINATIONS_SERVER_PLATFORM_API",
+    "CREATE_CONNECTION_CHECK_SOURCES_SERVERS",
+    "CREATE_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API",
     "CREATE_DESTINATION_SERVERS",
     "CREATE_DESTINATION_SERVER_PLATFORM_API",
     "CREATE_SOURCE_SERVERS",
@@ -184,6 +220,14 @@ __all__ = [
     "CancelJobRequestTypedDict",
     "CancelJobResponse",
     "CancelJobResponseTypedDict",
+    "CreateConnectionCheckDestinationsRequest",
+    "CreateConnectionCheckDestinationsRequestTypedDict",
+    "CreateConnectionCheckDestinationsResponse",
+    "CreateConnectionCheckDestinationsResponseTypedDict",
+    "CreateConnectionCheckSourcesRequest",
+    "CreateConnectionCheckSourcesRequestTypedDict",
+    "CreateConnectionCheckSourcesResponse",
+    "CreateConnectionCheckSourcesResponseTypedDict",
     "CreateDestinationRequest",
     "CreateDestinationRequestTypedDict",
     "CreateDestinationResponse",
@@ -220,6 +264,10 @@ __all__ = [
     "DownloadJobOutputRequestTypedDict",
     "DownloadJobOutputResponse",
     "DownloadJobOutputResponseTypedDict",
+    "GET_CONNECTION_CHECK_DESTINATIONS_SERVERS",
+    "GET_CONNECTION_CHECK_DESTINATIONS_SERVER_PLATFORM_API",
+    "GET_CONNECTION_CHECK_SOURCES_SERVERS",
+    "GET_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API",
     "GET_DESTINATION_SERVERS",
     "GET_DESTINATION_SERVER_PLATFORM_API",
     "GET_JOB_SERVERS",
@@ -228,6 +276,14 @@ __all__ = [
     "GET_SOURCE_SERVER_PLATFORM_API",
     "GET_WORKFLOW_SERVERS",
     "GET_WORKFLOW_SERVER_PLATFORM_API",
+    "GetConnectionCheckDestinationsRequest",
+    "GetConnectionCheckDestinationsRequestTypedDict",
+    "GetConnectionCheckDestinationsResponse",
+    "GetConnectionCheckDestinationsResponseTypedDict",
+    "GetConnectionCheckSourcesRequest",
+    "GetConnectionCheckSourcesRequestTypedDict",
+    "GetConnectionCheckSourcesResponse",
+    "GetConnectionCheckSourcesResponseTypedDict",
     "GetDestinationRequest",
     "GetDestinationRequestTypedDict",
     "GetDestinationResponse",
