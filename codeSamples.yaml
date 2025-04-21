@@ -37,14 +37,14 @@ actions:
     update:
       "x-codeSamples":
         - "lang": "python"
-          "label": "get_destination_connection_check_api_v1_destinations__destination_id__connection_check_get"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_destination_connection_check_api_v1_destinations_destination_id_connection_check_get(request={\n        \"destination_id\": \"3c48df35-2b2c-46f2-9aa2-d7eae993797c\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+          "label": "get_connection_check_destinations"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_connection_check_destinations(request={\n        \"destination_id\": \"eb6a7890-5661-44a2-840b-bc59e9bb3318\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
-          "label": "check_destination_connection_api_v1_destinations__destination_id__connection_check_post"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.check_destination_connection_api_v1_destinations_destination_id_connection_check_post(request={\n        \"destination_id\": \"b65169f5-79ba-4464-918f-b0be2c07b962\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+          "label": "create_connection_check_destinations"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_connection_check_destinations(request={\n        \"destination_id\": \"d9795fb7-2135-4e48-a51d-009dd6ca38a1\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/jobs/"]["get"]
     update:
       "x-codeSamples":
@@ -68,7 +68,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "download_job_output"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"bddbb621-2124-4cc2-9fa7-c6cdc21dac44\",\n        \"file_id\": \"<id>\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"bddbb621-2124-4cc2-9fa7-c6cdc21dac44\",\n        \"file_id\": \"<id>\",\n        \"node_id\": \"a949c7ba-31b1-4a2b-b7df-f144e8cc5768\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
@@ -103,14 +103,14 @@ actions:
     update:
       "x-codeSamples":
         - "lang": "python"
-          "label": "get_connection_check_api_v1_sources__source_id__connection_check_get"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_connection_check_api_v1_sources_source_id_connection_check_get(request={\n        \"source_id\": \"d9c3daec-ddf9-4cef-ae8d-3a989813cc7b\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+          "label": "get_connection_check_sources"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_connection_check_sources(request={\n        \"source_id\": \"b3b6b67d-aca9-4b1c-89c0-5788869c1383\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
-          "label": "check_connection_api_v1_sources__source_id__connection_check_post"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.check_connection_api_v1_sources_source_id_connection_check_post(request={\n        \"source_id\": \"8cb54f13-5652-423e-889c-1df1f8147126\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+          "label": "create_connection_check_sources"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"e5658517-3282-4845-9c22-88de48549d21\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":

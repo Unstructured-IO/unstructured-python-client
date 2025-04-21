@@ -234,7 +234,7 @@ class Jobs(BaseSDK):
     ) -> operations.DownloadJobOutputResponse:
         r"""Download Job output
 
-        Download the output of a job from a local workflow.
+        Download the output of a job from a workflow where the input file was provided at runtime.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -340,7 +340,7 @@ class Jobs(BaseSDK):
     ) -> operations.DownloadJobOutputResponse:
         r"""Download Job output
 
-        Download the output of a job from a local workflow.
+        Download the output of a job from a workflow where the input file was provided at runtime.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
