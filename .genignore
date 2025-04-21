@@ -1,4 +1,4 @@
-# https://www.speakeasyapi.dev/docs/customize-sdks/monkey-patching
+# https://www.speakeasy.com/docs/customize/code/monkey-patching
 
 # ignore human-written files and directories
 # src/unstructured_client/_unstructured
