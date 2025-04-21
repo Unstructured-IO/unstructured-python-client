@@ -155,3 +155,125 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
         pytest.fail(
             f"{case.description}: Expected {case.expected_url}, got {e}"
         )
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        URLTestCase(
+            description="non UNST domain client-level URL, no path",
+            sdk_endpoint_name="general.partition",
+            client_url="http://localhost:8000",
+            endpoint_url=None,
+            expected_url="http://localhost:8000"
+        ),
+        URLTestCase(
+            description="non UNST domain client-level URL, with path",
+            sdk_endpoint_name="general.partition",
+            client_url="http://localhost:8000/my/endpoint",
+            endpoint_url=None,
+            expected_url="http://localhost:8000/my/endpoint"
+        ),
+        URLTestCase(
+            description="non UNST domain endpoint-level URL, no path",
+            sdk_endpoint_name="general.partition",
+            client_url=None,
+            endpoint_url="http://localhost:8000",
+            expected_url="http://localhost:8000"
+        ),
+        URLTestCase(
+            description="non UNST domain endpoint-level URL, with path",
+            sdk_endpoint_name="general.partition",
+            client_url=None,
+            endpoint_url="http://localhost:8000/my/endpoint",
+            expected_url="http://localhost:8000/my/endpoint"
+        ),
+        URLTestCase(
+            description="UNST domain client-level URL, no path",
+            sdk_endpoint_name="general.partition",
+            client_url="https://unstructured-000mock.api.unstructuredapp.io",
+            endpoint_url=None,
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain client-level URL, with path",
+            sdk_endpoint_name="general.partition",
+            client_url="https://unstructured-000mock.api.unstructuredapp.io/my/endpoint/",
+            endpoint_url=None,
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain endpoint-level URL, no path",
+            sdk_endpoint_name="general.partition",
+            client_url=None,
+            endpoint_url="https://unstructured-000mock.api.unstructuredapp.io",
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="UNST domain endpoint-level URL, with path",
+            sdk_endpoint_name="general.partition",
+            client_url=None,
+            endpoint_url="https://unstructured-000mock.api.unstructuredapp.io/my/endpoint/",
+            expected_url="https://unstructured-000mock.api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="general.partition",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://api.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="destinations.create_destination",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://platform.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="sources.create_source",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://platform.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="jobs.get_job",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://platform.unstructuredapp.io"
+        ),
+        URLTestCase(
+            description="default URL fallback",
+            sdk_endpoint_name="workflows.create_workflow",
+            client_url=None,
+            endpoint_url=None,
+            expected_url="https://platform.unstructuredapp.io"
+        ),
+    ]
+)
+def test_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
+    if case.client_url:
+        s = UnstructuredClient(server_url=case.client_url)
+    else:
+        s = UnstructuredClient()
+
+    client_method = get_client_method_with_mock(
+        case.sdk_endpoint_name,
+        s,
+        case.expected_url,
+        monkeypatch
+    )
+
+    try:
+        if case.endpoint_url:
+            client_method(request={}, server_url=case.endpoint_url)
+        else:
+            client_method(request={})
+    except BaseUrlCorrect:
+        pass
+    except BaseUrlIncorrect as e:
+        pytest.fail(
+            f"{case.description}: Expected {case.expected_url}, got {e}"
+        )
