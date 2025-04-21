@@ -1,7 +1,7 @@
 # https://www.speakeasyapi.dev/docs/customize-sdks/monkey-patching
 
 # ignore human-written files and directories
-src/unstructured_client/_unstructured
+# src/unstructured_client/_unstructured
 _jupyter
 _sample_docs
 _test_unstructured_client
@@ -10,4 +10,4 @@ _test_unstructured_client
 Makefile
 
 # Ignore the general.partition code until we can fix the base_url issue
-src/unstructured_client/general.py
+# src/unstructured_client/general.py
