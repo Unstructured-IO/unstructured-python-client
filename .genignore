@@ -8,3 +8,9 @@ _test_unstructured_client
 # ignore Makefile
 Makefile
 
+# Ignore the endpoints code until we can fix the base_url issue
+src/unstructured_client/general.py
+src/unstructured_client/destinations.py
+src/unstructured_client/sources.py
+src/unstructured_client/jobs.py
+src/unstructured_client/workflows.py
