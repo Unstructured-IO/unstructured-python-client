@@ -32,7 +32,7 @@ jobs:
       run: make install
     - name: Run unit tests
       run: |
-        poetry run make test-unit
+        make test-unit
 
   lint:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
       run: make install
     - name: Lint
       run: |
-        poetry run make lint
+        make lint
 
   test_integration:
     strategy:
@@ -59,7 +59,7 @@ jobs:
       run: make install
     - name: Run all tests
       run: |
-        poetry run make test
+        make test
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 
@@ -81,5 +81,5 @@ jobs:
           make install
       - name: Run contract tests
         run: |
-          poetry run make test-contract
+          make test-contract
 
