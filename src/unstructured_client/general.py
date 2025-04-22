@@ -16,7 +16,6 @@ class PartitionAcceptEnum(str, Enum):
 
 
 class General(BaseSDK):
-    # region sdk-class-body
     def get_default_server_url(self) -> str:
         client_url, *_ = self.sdk_configuration.get_server_details()
         if client_url ==  SERVERS[SERVER_PLATFORM_API].rstrip("/"):
@@ -25,7 +24,7 @@ class General(BaseSDK):
                 operations.PARTITION_SERVER_SAAS_API
             ].rstrip("/")
         return clean_server_url(client_url)
-    # endregion sdk-class-body
+
     def partition(
         self,
         *,
@@ -49,13 +48,12 @@ class General(BaseSDK):
         :param accept_header_override: Override the default accept header for this method
         :param http_headers: Additional headers to set or replace on requests.
         """
-        # endregion sdk-class-body
         base_url = clean_server_url(server_url) if server_url is not None else self.get_default_server_url()
 
         url_variables = None
         if timeout_ms is None:
             timeout_ms = self.sdk_configuration.timeout_ms
-        # endregion sdk-class-body
+
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.PartitionRequest)
         request = cast(operations.PartitionRequest, request)
