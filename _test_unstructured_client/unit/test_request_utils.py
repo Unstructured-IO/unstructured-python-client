@@ -7,7 +7,6 @@ from unstructured_client._hooks.custom.request_utils import (
     get_base_url,
     get_multipart_stream_fields,
 )
-from unstructured_client.models import shared
 
 
 # make the above test using @pytest.mark.parametrize

@@ -169,7 +169,7 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     with pytest.raises(Exception):
         session.general.partition(request=req, retries=retries)
 
-    pattern = re.compile(f"Failed to process a request due to connection error .*? "
+    pattern = re.compile("Failed to process a request due to connection error .*? "
                          "Attempting retry number 1 after sleep.")
     assert bool(pattern.search(caplog.text))
 
@@ -198,23 +198,20 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
 
 
 @pytest.mark.parametrize(
-    "server_url",
+    "server_url,expected_url",
     [
-        # -- well-formed url --
-        "http://localhost:8000",
-        # -- common malformed urls --
-        "localhost:8000",
-        "localhost:8000/general/v0/general",
-        "http://localhost:8000/general/v0/general",
+        ("http://localhost:8000", "http://localhost:8000"),
+        ("localhost:8000", "http://localhost:8000"),
+        ("localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
+        ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
     ],
 )
-def test_unit_clean_server_url_fixes_malformed_localhost_url(server_url: str):
+def test_unit_clean_server_url_fixes_non_unst_domain_url(server_url: str, expected_url: str):
     client = UnstructuredClient(
         server_url=server_url,
         api_key_auth=FAKE_KEY,
     )
-    assert client.general.sdk_configuration.server_url == "http://localhost:8000"
-
+    assert client.general.sdk_configuration.server_url == expected_url
 
 @pytest.mark.parametrize(
     "server_url",
