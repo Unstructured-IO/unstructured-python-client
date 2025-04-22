@@ -79,7 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           make install
-          source .venv/bin/activate && make install-test-contract
+          make install-test-contract
       - name: Run unit tests
         run: |
           poetry run make test-contract
