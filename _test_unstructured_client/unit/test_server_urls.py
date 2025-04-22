@@ -56,9 +56,9 @@ class URLTestCase:
     description: str
     sdk_endpoint_name: str
     # url when you init the client (global for all endpoints)
-    client_url: str | None
+    client_url: str | None = None
     # url when you init the SDK endpoint (vary per endpoint)
-    endpoint_url: str | None
+    endpoint_url: str | None = None
     # expected url when actually making the HTTP request in build_request
     expected_url: str
 
