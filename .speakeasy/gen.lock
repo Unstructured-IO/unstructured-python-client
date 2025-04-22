@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 008302e535886666d303b5a03b8236c2
+  docChecksum: 6433f28e5b70c3c0d7754fc7a88db327
   docVersion: 1.1.7
-  speakeasyVersion: 1.537.0
-  generationVersion: 2.588.0
-  releaseVersion: 0.34.0
-  configChecksum: 0ba814fcbe0d0489903de407d36313af
+  speakeasyVersion: 1.535.1
+  generationVersion: 2.585.2
+  releaseVersion: 0.33.1
+  configChecksum: 8b5e7fbd95d040ba09964f3c97c3156a
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.15.0
+    core: 5.14.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -228,7 +228,6 @@ generatedFiles:
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
   - src/unstructured_client/destinations.py
-  - src/unstructured_client/general.py
   - src/unstructured_client/httpclient.py
   - src/unstructured_client/jobs.py
   - src/unstructured_client/models/__init__.py
@@ -370,7 +369,6 @@ generatedFiles:
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/annotations.py
-  - src/unstructured_client/utils/datetimes.py
   - src/unstructured_client/utils/enums.py
   - src/unstructured_client/utils/eventstreaming.py
   - src/unstructured_client/utils/forms.py
@@ -670,7 +668,7 @@ examples:
         "200":
           application/json: {"created_at": "2025-03-13T23:31:02.383Z", "id": "c3274f55-9861-4e4e-8526-4273aa4d2772", "status": "FAILURE"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
   create_connection_check_sources:
     speakeasy-default-create-connection-check-sources:
       parameters:
@@ -681,7 +679,7 @@ examples:
         "202":
           application/json: {"created_at": "2023-03-12T05:54:05.025Z", "id": "b5793adb-057f-470c-ae7e-309d786a99eb", "status": "SUCCESS"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": []}
   get_connection_check_sources:
     speakeasy-default-get-connection-check-sources:
       parameters:
@@ -692,6 +690,6 @@ examples:
         "200":
           application/json: {"created_at": "2023-09-12T00:38:55.692Z", "id": "f7d1d931-a753-4fe9-ae3f-671f188a9b55", "status": "SUCCESS"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
 examplesVersion: 1.0.1
 generatedTests: {}

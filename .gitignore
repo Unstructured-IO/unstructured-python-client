@@ -1,4 +1,3 @@
-.speakeasy/temp/
 .speakeasy/reports
 .venv/
 README-PYPI.md
@@ -12,8 +11,10 @@ __pycache__/
 # human-added igore files
 .ipynb_checkpoints/
 .idea/
+
 .local
 *.ipynb
+
 openapi.json
 openapi_client.json
 openapi_serverless.json
