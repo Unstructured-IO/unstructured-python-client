@@ -1,7 +1,7 @@
 import pytest
 from dataclasses import dataclass
 from unstructured_client import UnstructuredClient, utils
-
+from typing import Optional
 
 # Raise one of these from our mock to return to the test code
 class BaseUrlCorrect(Exception):
@@ -55,12 +55,12 @@ def get_client_method_with_mock(
 class URLTestCase:
     description: str
     sdk_endpoint_name: str
-    # url when you init the client (global for all endpoints)
-    client_url: str | None = None
-    # url when you init the SDK endpoint (vary per endpoint)
-    endpoint_url: str | None = None
     # expected url when actually making the HTTP request in build_request
     expected_url: str
+    # url when you init the client (global for all endpoints)
+    client_url: Optional[str] = None
+    # url when you init the SDK endpoint (vary per endpoint)
+    endpoint_url: Optional[str] = None  
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
