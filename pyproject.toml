@@ -43,6 +43,7 @@ types-aiofiles = ">=24.1.0"
 uvloop = ">=0.20.0"
 pytest-httpx = ">=0.35.0"
 unstructured = ">= 0.17.2"
+pytest-xdist = "^3.5.0"
 
 [build-system]
 requires = ["poetry-core"]
