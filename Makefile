@@ -19,11 +19,6 @@ install:
 install-speakeasy-cli:
 	curl -fsSL https://raw.githubusercontent.com/speakeasy-api/speakeasy/main/install.sh | sh
 
-## install-test:				install test requirements as they cannot be put into pyproject.toml due to python version requirements mismatch
-.PHONY: install-test-contract
-install-test-contract:
-	pip install unstructured pytest-httpx
-
 #################
 # Test and Lint #
 #################
@@ -33,16 +28,16 @@ test: test-unit test-integration-docker
 
 .PHONY: test-unit
 test-unit:
-	PYTHONPATH=. pytest _test_unstructured_client -v -k "unit"
+	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "unit"
 
 .PHONY: test-contract
 test-contract:
-	PYTHONPATH=. pytest _test_contract -v
+	PYTHONPATH=. poetry run pytest -n auto _test_contract -v
 
 # Assumes you have unstructured-api running on localhost:8000
 .PHONY: test-integration
 test-integration:
-	PYTHONPATH=. pytest _test_unstructured_client -v -k "integration"
+	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "integration"
 
 # Runs the unstructured-api in docker for tests
 .PHONY: test-integration-docker
@@ -50,13 +45,13 @@ test-integration-docker:
 	-docker stop unstructured-api && docker kill unstructured-api
 	docker run --name unstructured-api -p 8000:8000 -d --rm ${DOCKER_IMAGE} --host 0.0.0.0 && \
 	curl -s -o /dev/null --retry 10 --retry-delay 5 --retry-all-errors http://localhost:8000/general/docs && \
-	PYTHONPATH=. pytest _test_unstructured_client -v -k "integration" && \
+	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "integration" && \
 	docker kill unstructured-api
 
 .PHONY: lint
 lint:
-	pylint --rcfile=pylintrc src
-	mypy src
+	poetry run pylint --rcfile=pylintrc src
+	poetry run mypy src
 
 #############
 # Speakeasy #
