@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .jobstatus import JobStatus
 from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
+from .workflowjobtype import WorkflowJobType
 from datetime import datetime
 from pydantic import model_serializer
-from typing import List
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -23,6 +24,7 @@ class JobInformationTypedDict(TypedDict):
     workflow_id: str
     workflow_name: str
     input_file_ids: NotRequired[Nullable[List[str]]]
+    job_type: NotRequired[WorkflowJobType]
     output_node_files: NotRequired[Nullable[List[NodeFileMetadataTypedDict]]]
     runtime: NotRequired[Nullable[str]]
 
@@ -40,13 +42,15 @@ class JobInformation(BaseModel):
 
     input_file_ids: OptionalNullable[List[str]] = UNSET
 
+    job_type: Optional[WorkflowJobType] = None
+
     output_node_files: OptionalNullable[List[NodeFileMetadata]] = UNSET
 
     runtime: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["input_file_ids", "output_node_files", "runtime"]
+        optional_fields = ["input_file_ids", "job_type", "output_node_files", "runtime"]
         nullable_fields = ["input_file_ids", "output_node_files", "runtime"]
         null_default_fields = []
 
