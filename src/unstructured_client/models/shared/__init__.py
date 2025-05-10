@@ -365,6 +365,7 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
 from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
+from .workflowjobtype import WorkflowJobType
 from .workflownode import WorkflowNode, WorkflowNodeTypedDict
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
@@ -586,6 +587,7 @@ __all__ = [
     "WeaviateDestinationConnectorConfigTypedDict",
     "WorkflowInformation",
     "WorkflowInformationTypedDict",
+    "WorkflowJobType",
     "WorkflowNode",
     "WorkflowNodeTypedDict",
     "WorkflowSchedule",
