@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 6433f28e5b70c3c0d7754fc7a88db327
-  docVersion: 1.1.7
-  speakeasyVersion: 1.537.0
-  generationVersion: 2.588.0
-  releaseVersion: 0.34.0
-  configChecksum: 0ba814fcbe0d0489903de407d36313af
+  docChecksum: f525a810cf1c08e0a1f75d631b085137
+  docVersion: 1.1.13
+  speakeasyVersion: 1.544.0
+  generationVersion: 2.599.0
+  releaseVersion: 0.35.0
+  configChecksum: 4a04b453af70e9dafd8f5541d24840b5
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.15.0
+    core: 5.18.0
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
@@ -24,7 +24,7 @@ features:
     globalSecurity: 3.0.3
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
-    globalServerURLs: 3.1.0
+    globalServerURLs: 3.1.1
     methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
@@ -137,6 +137,8 @@ generatedFiles:
   - docs/models/shared/gcssourceconnectorconfiginput.md
   - docs/models/shared/googledrivesourceconnectorconfig.md
   - docs/models/shared/googledrivesourceconnectorconfiginput.md
+  - docs/models/shared/ibmwatsonxs3destinationconnectorconfig.md
+  - docs/models/shared/ibmwatsonxs3destinationconnectorconfiginput.md
   - docs/models/shared/inputfiles.md
   - docs/models/shared/jirasourceconnectorconfig.md
   - docs/models/shared/jirasourceconnectorconfiginput.md
@@ -202,6 +204,7 @@ generatedFiles:
   - docs/models/shared/weaviatedestinationconnectorconfig.md
   - docs/models/shared/weaviatedestinationconnectorconfiginput.md
   - docs/models/shared/workflowinformation.md
+  - docs/models/shared/workflowjobtype.md
   - docs/models/shared/workflownode.md
   - docs/models/shared/workflowschedule.md
   - docs/models/shared/workflowstate.md
@@ -227,10 +230,7 @@ generatedFiles:
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
-  - src/unstructured_client/destinations.py
-  - src/unstructured_client/general.py
   - src/unstructured_client/httpclient.py
-  - src/unstructured_client/jobs.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
@@ -302,6 +302,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py
   - src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfig.py
+  - src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/jirasourceconnectorconfig.py
   - src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/jobinformation.py
@@ -356,6 +358,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/weaviatedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/workflowinformation.py
+  - src/unstructured_client/models/shared/workflowjobtype.py
   - src/unstructured_client/models/shared/workflownode.py
   - src/unstructured_client/models/shared/workflowschedule.py
   - src/unstructured_client/models/shared/workflowstate.py
@@ -365,7 +368,6 @@ generatedFiles:
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
-  - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
@@ -384,7 +386,6 @@ generatedFiles:
   - src/unstructured_client/utils/serializers.py
   - src/unstructured_client/utils/url.py
   - src/unstructured_client/utils/values.py
-  - src/unstructured_client/workflows.py
 examples:
   create_destination:
     speakeasy-default-create-destination:

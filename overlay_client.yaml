@@ -70,3 +70,6 @@ actions:
     description: Add a null default to all optional parameters. Prevents the sdk from sending a default string when param is not specified.
     update:
       "default": null
+  - target: $["components"]["schemas"]["partition_parameters"]["properties"]["tracking_enabled"]
+    description: Remove tracking_enabled from partition_parameters
+    remove: true

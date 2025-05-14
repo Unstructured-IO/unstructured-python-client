@@ -123,3 +123,9 @@ value: shared.SnowflakeDestinationConnectorConfigInput = /* values here */
 value: shared.WeaviateDestinationConnectorConfigInput = /* values here */
 ```
 
+### `shared.IBMWatsonxS3DestinationConnectorConfigInput`
+
+```python
+value: shared.IBMWatsonxS3DestinationConnectorConfigInput = /* values here */
+```
+

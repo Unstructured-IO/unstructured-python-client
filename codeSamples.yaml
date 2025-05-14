@@ -32,7 +32,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9ea9d27c-4e2e-4cb5-9a69-71bd7ec9d226\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"host\": \"acidic-patroller.com\",\n                \"database\": \"<value>\",\n                \"port\": 832931,\n                \"username\": \"Salvador.Walsh-Thiel\",\n                \"password\": \"vIMqbllzrdJBExE\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 977983,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"ddfee087-e67d-4bcc-afdb-6451a6e6f9ea\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"host\": \"acidic-patroller.com\",\n                \"port\": 6379,\n                \"database\": 0,\n                \"ssl\": True,\n                \"batch_size\": 100,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["get"]
     update:
       "x-codeSamples":

@@ -34,6 +34,10 @@ from .gcsdestinationconnectorconfiginput import (
     GCSDestinationConnectorConfigInput,
     GCSDestinationConnectorConfigInputTypedDict,
 )
+from .ibmwatsonxs3destinationconnectorconfiginput import (
+    IBMWatsonxS3DestinationConnectorConfigInput,
+    IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
+)
 from .kafkaclouddestinationconnectorconfiginput import (
     KafkaCloudDestinationConnectorConfigInput,
     KafkaCloudDestinationConnectorConfigInputTypedDict,
@@ -110,6 +114,7 @@ ConfigTypedDict = TypeAliasType(
         RedisDestinationConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
+        IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
     ],
 )
 
@@ -137,6 +142,7 @@ Config = TypeAliasType(
         RedisDestinationConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
+        IBMWatsonxS3DestinationConnectorConfigInput,
     ],
 )
 
