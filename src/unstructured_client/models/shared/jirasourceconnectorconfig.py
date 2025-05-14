@@ -18,9 +18,11 @@ class JiraSourceConnectorConfigTypedDict(TypedDict):
     username: str
     boards: NotRequired[Nullable[List[str]]]
     cloud: NotRequired[Nullable[bool]]
+    download_attachments: NotRequired[Nullable[bool]]
     issues: NotRequired[Nullable[List[str]]]
     password: NotRequired[Nullable[str]]
     projects: NotRequired[Nullable[List[str]]]
+    status_filters: NotRequired[Nullable[List[str]]]
     token: NotRequired[Nullable[str]]
 
 
@@ -33,18 +35,40 @@ class JiraSourceConnectorConfig(BaseModel):
 
     cloud: OptionalNullable[bool] = UNSET
 
+    download_attachments: OptionalNullable[bool] = UNSET
+
     issues: OptionalNullable[List[str]] = UNSET
 
     password: OptionalNullable[str] = UNSET
 
     projects: OptionalNullable[List[str]] = UNSET
 
+    status_filters: OptionalNullable[List[str]] = UNSET
+
     token: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["boards", "cloud", "issues", "password", "projects", "token"]
-        nullable_fields = ["boards", "cloud", "issues", "password", "projects", "token"]
+        optional_fields = [
+            "boards",
+            "cloud",
+            "download_attachments",
+            "issues",
+            "password",
+            "projects",
+            "status_filters",
+            "token",
+        ]
+        nullable_fields = [
+            "boards",
+            "cloud",
+            "download_attachments",
+            "issues",
+            "password",
+            "projects",
+            "status_filters",
+            "token",
+        ]
         null_default_fields = []
 
         serialized = handler(self)

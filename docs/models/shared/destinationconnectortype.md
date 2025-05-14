@@ -26,3 +26,4 @@
 | `S3`                             | s3                               |
 | `SNOWFLAKE`                      | snowflake                        |
 | `WEAVIATE_CLOUD`                 | weaviate-cloud                   |
+| `IBM_WATSONX_S3`                 | ibm_watsonx_s3                   |

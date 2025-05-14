@@ -152,6 +152,14 @@ from .googledrivesourceconnectorconfiginput import (
     GoogleDriveSourceConnectorConfigInput,
     GoogleDriveSourceConnectorConfigInputTypedDict,
 )
+from .ibmwatsonxs3destinationconnectorconfig import (
+    IBMWatsonxS3DestinationConnectorConfig,
+    IBMWatsonxS3DestinationConnectorConfigTypedDict,
+)
+from .ibmwatsonxs3destinationconnectorconfiginput import (
+    IBMWatsonxS3DestinationConnectorConfigInput,
+    IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
+)
 from .jirasourceconnectorconfig import (
     JiraSourceConnectorConfig,
     JiraSourceConnectorConfigTypedDict,
@@ -365,6 +373,7 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
 from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
+from .workflowjobtype import WorkflowJobType
 from .workflownode import WorkflowNode, WorkflowNodeTypedDict
 from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
 from .workflowstate import WorkflowState
@@ -464,6 +473,10 @@ __all__ = [
     "GoogleDriveSourceConnectorConfigInput",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
     "GoogleDriveSourceConnectorConfigTypedDict",
+    "IBMWatsonxS3DestinationConnectorConfig",
+    "IBMWatsonxS3DestinationConnectorConfigInput",
+    "IBMWatsonxS3DestinationConnectorConfigInputTypedDict",
+    "IBMWatsonxS3DestinationConnectorConfigTypedDict",
     "InputFiles",
     "InputFilesTypedDict",
     "JiraSourceConnectorConfig",
@@ -586,6 +599,7 @@ __all__ = [
     "WeaviateDestinationConnectorConfigTypedDict",
     "WorkflowInformation",
     "WorkflowInformationTypedDict",
+    "WorkflowJobType",
     "WorkflowNode",
     "WorkflowNodeTypedDict",
     "WorkflowSchedule",

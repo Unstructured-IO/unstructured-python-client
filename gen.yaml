@@ -8,11 +8,12 @@ generation:
     parameterOrderingFeb2024: false
     requestResponseComponentNamesFeb2024: false
     securityFeb2025: false
+    sharedErrorComponentsApr2025: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.34.0
+  version: 0.35.0
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'

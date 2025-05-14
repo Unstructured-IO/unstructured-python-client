@@ -175,6 +175,8 @@ class PartitionParametersTypedDict(TypedDict):
     r"""The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: hi_res"""
     table_ocr_agent: NotRequired[Nullable[str]]
     r"""The OCR agent to use for table ocr inference."""
+    tracking_enabled: NotRequired[Nullable[bool]]
+    r"""Tracking enabled"""
     unique_element_ids: NotRequired[bool]
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
     vlm_model: NotRequired[VLMModel]
@@ -346,6 +348,11 @@ class PartitionParameters(BaseModel):
     )
     r"""The OCR agent to use for table ocr inference."""
 
+    tracking_enabled: Annotated[
+        OptionalNullable[bool], FieldMetadata(multipart=True)
+    ] = None
+    r"""Tracking enabled"""
+
     unique_element_ids: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
 
@@ -404,6 +411,7 @@ class PartitionParameters(BaseModel):
             "starting_page_number",
             "strategy",
             "table_ocr_agent",
+            "tracking_enabled",
             "unique_element_ids",
             "vlm_model",
             "vlm_model_provider",
@@ -426,6 +434,7 @@ class PartitionParameters(BaseModel):
             "similarity_threshold",
             "starting_page_number",
             "table_ocr_agent",
+            "tracking_enabled",
         ]
         null_default_fields = [
             "chunking_strategy",
@@ -444,6 +453,7 @@ class PartitionParameters(BaseModel):
             "similarity_threshold",
             "starting_page_number",
             "table_ocr_agent",
+            "tracking_enabled",
         ]
 
         serialized = handler(self)

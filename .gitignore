@@ -1,3 +1,6 @@
+**/__pycache__/
+**/.speakeasy/temp/
+**/.speakeasy/logs/
 .speakeasy/temp/
 .speakeasy/reports
 .venv/
