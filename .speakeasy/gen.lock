@@ -230,10 +230,7 @@ generatedFiles:
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
-  - src/unstructured_client/destinations.py
-  - src/unstructured_client/general.py
   - src/unstructured_client/httpclient.py
-  - src/unstructured_client/jobs.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
@@ -371,12 +368,10 @@ generatedFiles:
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
-  - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/annotations.py
-  - src/unstructured_client/utils/datetimes.py
   - src/unstructured_client/utils/enums.py
   - src/unstructured_client/utils/eventstreaming.py
   - src/unstructured_client/utils/forms.py
@@ -390,7 +385,6 @@ generatedFiles:
   - src/unstructured_client/utils/serializers.py
   - src/unstructured_client/utils/url.py
   - src/unstructured_client/utils/values.py
-  - src/unstructured_client/workflows.py
 examples:
   create_destination:
     speakeasy-default-create-destination:
