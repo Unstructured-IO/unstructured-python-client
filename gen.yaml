@@ -21,6 +21,7 @@ python:
       pytest: '>=8.3.3'
       pytest-asyncio: '>=0.24.0'
       pytest-mock: '>=3.14.0'
+      pytest-xdist: ^3.5.0
       types-aiofiles: '>=24.1.0'
       uvloop: '>=0.20.0'
     main:

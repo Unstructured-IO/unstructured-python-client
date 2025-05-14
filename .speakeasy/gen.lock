@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 8a03012e00ce18dec91d5c279fc7bf11
+  docChecksum: f525a810cf1c08e0a1f75d631b085137
   docVersion: 1.1.13
   speakeasyVersion: 1.544.0
   generationVersion: 2.599.0
   releaseVersion: 0.35.0
-  configChecksum: ef86d41b711e481beabd4dc43218b21e
+  configChecksum: 4a04b453af70e9dafd8f5541d24840b5
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -372,6 +372,7 @@ generatedFiles:
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/annotations.py
+  - src/unstructured_client/utils/datetimes.py
   - src/unstructured_client/utils/enums.py
   - src/unstructured_client/utils/eventstreaming.py
   - src/unstructured_client/utils/forms.py
