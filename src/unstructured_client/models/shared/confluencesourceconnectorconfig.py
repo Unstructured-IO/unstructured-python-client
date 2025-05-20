@@ -59,14 +59,14 @@ class ConfluenceSourceConnectorConfig(BaseModel):
             "password",
             "token",
         ]
-        nullable_fields = ["api_token", "password", "spaces", "token"]
+        nullable_fields = ["spaces", "api_token", "password", "token"]
         null_default_fields = []
 
         serialized = handler(self)
 
         m = {}
 
-        for n, f in type(self).model_fields.items():
+        for n, f in self.model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

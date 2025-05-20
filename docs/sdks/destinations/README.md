@@ -71,14 +71,12 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "api_endpoint": "<value>",
-                "batch_size": 20,
-                "collection_name": "<value>",
-                "flatten_metadata": False,
-                "token": "<value>",
+                "endpoint": "<value>",
+                "index": "<value>",
+                "key": "<key>",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
+            "type": shared.DestinationConnectorType.ASTRADB,
         },
     })
 
@@ -289,16 +287,14 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.update_destination(request={
         "update_destination_connector": {
             "config": {
-                "batch_size": 7372,
-                "database": "<value>",
-                "host": "pushy-apparatus.net",
-                "password": "sxtPKvIMqbllzrd",
-                "port": 432315,
-                "table_name": "<value>",
-                "username": "Dulce38",
+                "host": "acidic-patroller.com",
+                "batch_size": 100,
+                "database": 0,
+                "port": 6379,
+                "ssl": True,
             },
         },
-        "destination_id": "6f9ea9d2-7c4e-42ec-8b5a-6971bd7ec9d2",
+        "destination_id": "ddfee087-e67d-4bcc-afdb-6451a6e6f9ea",
     })
 
     assert res.destination_connector_information is not None

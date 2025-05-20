@@ -71,13 +71,13 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
             "config": {
-                "authority_url": "https://login.microsoftonline.com",
                 "client_cred": "<value>",
                 "client_id": "<id>",
-                "recursive": False,
                 "site": "<value>",
                 "tenant": "<value>",
                 "user_pname": "<value>",
+                "authority_url": "https://login.microsoftonline.com",
+                "recursive": False,
             },
             "name": "<value>",
             "type": shared.SourceConnectorType.SNOWFLAKE,
@@ -294,11 +294,11 @@ with UnstructuredClient() as uc_client:
                 "batch_size": 69608,
                 "database": "<value>",
                 "host": "pleasing-hammock.org",
-                "id_column": "id",
                 "password": "Ns3L8K8WEZq1xvB",
                 "port": 834056,
                 "table_name": "<value>",
                 "username": "Justyn.Daugherty",
+                "id_column": "id",
             },
         },
         "source_id": "edec439e-8ef6-4c69-bc9e-3ba7a8418be7",
