@@ -13,7 +13,7 @@ Makefile
 #  - Comment out the ignore for the right file
 #  - Generate locally, watch the new endpoint appear
 #  - Bring back the ignore line and commit
-src/unstructured_client/destinations.py
+# src/unstructured_client/destinations.py
 src/unstructured_client/general.py
 src/unstructured_client/jobs.py
 src/unstructured_client/sources.py

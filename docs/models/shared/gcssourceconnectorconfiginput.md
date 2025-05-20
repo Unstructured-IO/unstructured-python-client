@@ -5,6 +5,6 @@
 
 | Field                 | Type                  | Required              | Description           |
 | --------------------- | --------------------- | --------------------- | --------------------- |
-| `recursive`           | *Optional[bool]*      | :heavy_minus_sign:    | N/A                   |
 | `remote_url`          | *str*                 | :heavy_check_mark:    | N/A                   |
 | `service_account_key` | *str*                 | :heavy_check_mark:    | N/A                   |
+| `recursive`           | *Optional[bool]*      | :heavy_minus_sign:    | N/A                   |

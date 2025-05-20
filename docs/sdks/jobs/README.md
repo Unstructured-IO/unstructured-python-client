@@ -67,7 +67,7 @@ with UnstructuredClient() as uc_client:
     res = uc_client.jobs.download_job_output(request={
         "file_id": "<id>",
         "job_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
-        "node_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
+        "node_id": "a949c7ba-31b1-4a2b-b7df-f144e8cc5768",
     })
 
     assert res.any is not None
