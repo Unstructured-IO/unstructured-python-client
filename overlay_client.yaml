@@ -4,11 +4,15 @@ info:
   version: 0.0.0
 actions:
   - target: $
+    description: Add a global servers list
     update:
       servers:
         - url: "https://platform.unstructuredapp.io/"
           description: "Unstructured Platform API"
           x-speakeasy-server-id: "platform-api"
+  - target: $.paths.*.*.servers
+    description: Remove the operation level servers list
+    remove: true
   - target: $["components"]["schemas"]["partition_parameters"]["properties"]
     update:
       "split_pdf_page":
