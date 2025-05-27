@@ -116,7 +116,7 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
@@ -138,7 +138,7 @@ with UnstructuredClient(
 ) as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
     assert res.dag_node_connection_check is not None
@@ -183,7 +183,7 @@ with UnstructuredClient() as uc_client:
     try:
 
         res = uc_client.destinations.create_connection_check_destinations(request={
-            "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
         assert res.dag_node_connection_check is not None
@@ -305,7 +305,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
     assert res.dag_node_connection_check is not None
@@ -327,7 +327,7 @@ async def main():
     async with UnstructuredClient() as uc_client:
 
         res = await uc_client.destinations.create_connection_check_destinations_async(request={
-            "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
         assert res.dag_node_connection_check is not None

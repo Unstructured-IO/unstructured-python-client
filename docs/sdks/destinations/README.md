@@ -26,7 +26,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
     assert res.dag_node_connection_check is not None
@@ -71,14 +71,12 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.create_destination(request={
         "create_destination_connector": {
             "config": {
-                "api_endpoint": "<value>",
-                "batch_size": 20,
-                "collection_name": "<value>",
-                "flatten_metadata": False,
-                "token": "<value>",
+                "collection": "<value>",
+                "database": "<value>",
+                "uri": "https://criminal-bowler.com",
             },
             "name": "<value>",
-            "type": shared.DestinationConnectorType.AZURE_AI_SEARCH,
+            "type": shared.DestinationConnectorType.ELASTICSEARCH,
         },
     })
 
@@ -121,7 +119,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.delete_destination(request={
-        "destination_id": "10a88d76-65fb-4c88-8488-9e7d272c6373",
+        "destination_id": "f50b6b0c-1177-4edb-ae10-68199cd00ba6",
     })
 
     assert res.any is not None
@@ -163,7 +161,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.get_connection_check_destinations(request={
-        "destination_id": "eb6a7890-5661-44a2-840b-bc59e9bb3318",
+        "destination_id": "c95687a3-239f-485c-946b-4c8fe314ef82",
     })
 
     assert res.dag_node_connection_check is not None
@@ -205,7 +203,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.get_destination(request={
-        "destination_id": "41ba03fb-faa3-4e9e-8cfb-27f133c4198a",
+        "destination_id": "6352107c-44bd-4a20-a286-de73a4d9c9bd",
     })
 
     assert res.destination_connector_information is not None
@@ -289,16 +287,15 @@ with UnstructuredClient() as uc_client:
     res = uc_client.destinations.update_destination(request={
         "update_destination_connector": {
             "config": {
-                "batch_size": 7372,
-                "database": "<value>",
-                "host": "pushy-apparatus.net",
-                "password": "sxtPKvIMqbllzrd",
-                "port": 432315,
-                "table_name": "<value>",
-                "username": "Dulce38",
+                "batch_size": 100,
+                "bootstrap_servers": "<value>",
+                "kafka_api_key": "<value>",
+                "port": 9092,
+                "secret": "<value>",
+                "topic": "<value>",
             },
         },
-        "destination_id": "6f9ea9d2-7c4e-42ec-8b5a-6971bd7ec9d2",
+        "destination_id": "9726962d-9d1e-4f84-8787-c7313d183927",
     })
 
     assert res.destination_connector_information is not None
