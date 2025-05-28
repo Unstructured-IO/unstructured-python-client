@@ -23,7 +23,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.cancel_job(request={
-        "job_id": "ec29bf67-0f30-4793-b5ee-8fc0da196032",
+        "job_id": "2fafd129-04f3-4201-a0e7-fe33e937b367",
     })
 
     assert res.any is not None
@@ -66,8 +66,8 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.download_job_output(request={
         "file_id": "<id>",
-        "job_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
-        "node_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
+        "job_id": "06d1b7b8-8642-4793-b37e-e45d97d53bc3",
+        "node_id": "7c8f2aa4-da13-4a04-a98d-0204ea55681e",
     })
 
     assert res.any is not None
@@ -109,7 +109,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.get_job(request={
-        "job_id": "6bb4cb72-a072-4398-9de3-194e59352a3c",
+        "job_id": "d95a05b3-3446-4f3d-806c-904b6a7ba40a",
     })
 
     assert res.job_information is not None
