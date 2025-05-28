@@ -24,7 +24,6 @@ python:
       pytest-mock: '>=3.14.0'
       pytest-xdist: ^3.5.0
       types-aiofiles: '>=24.1.0'
-      unstructured: '>= 0.17.2'
       uvloop: '>=0.20.0'
     main:
       aiofiles: '>=24.1.0'
