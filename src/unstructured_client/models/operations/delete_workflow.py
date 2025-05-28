@@ -15,13 +15,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-DELETE_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-DELETE_WORKFLOW_SERVERS = {
-    DELETE_WORKFLOW_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class DeleteWorkflowRequestTypedDict(TypedDict):
     workflow_id: str
