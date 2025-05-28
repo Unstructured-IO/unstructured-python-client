@@ -20,13 +20,6 @@ from unstructured_client.utils import (
     QueryParamMetadata,
 )
 
-DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-DOWNLOAD_JOB_OUTPUT_SERVERS = {
-    DOWNLOAD_JOB_OUTPUT_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class DownloadJobOutputRequestTypedDict(TypedDict):
     file_id: str

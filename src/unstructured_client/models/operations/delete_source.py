@@ -15,13 +15,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-DELETE_SOURCE_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-DELETE_SOURCE_SERVERS = {
-    DELETE_SOURCE_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class DeleteSourceRequestTypedDict(TypedDict):
     source_id: str

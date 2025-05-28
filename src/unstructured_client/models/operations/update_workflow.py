@@ -24,13 +24,6 @@ from unstructured_client.utils import (
     RequestMetadata,
 )
 
-UPDATE_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-UPDATE_WORKFLOW_SERVERS = {
-    UPDATE_WORKFLOW_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class UpdateWorkflowRequestTypedDict(TypedDict):
     update_workflow: shared_updateworkflow.UpdateWorkflowTypedDict

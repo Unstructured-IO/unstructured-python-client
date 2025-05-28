@@ -19,13 +19,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
 
-LIST_WORKFLOWS_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-LIST_WORKFLOWS_SERVERS = {
-    LIST_WORKFLOWS_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class ListWorkflowsRequestTypedDict(TypedDict):
     destination_id: NotRequired[Nullable[str]]

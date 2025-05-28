@@ -19,13 +19,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
 
-CREATE_SOURCE_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-CREATE_SOURCE_SERVERS = {
-    CREATE_SOURCE_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class CreateSourceRequestTypedDict(TypedDict):
     create_source_connector: shared_createsourceconnector.CreateSourceConnectorTypedDict
