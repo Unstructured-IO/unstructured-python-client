@@ -16,13 +16,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
 
-LIST_JOBS_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-LIST_JOBS_SERVERS = {
-    LIST_JOBS_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class ListJobsRequestTypedDict(TypedDict):
     status: NotRequired[Nullable[str]]

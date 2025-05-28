@@ -19,13 +19,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
 
-CREATE_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-CREATE_WORKFLOW_SERVERS = {
-    CREATE_WORKFLOW_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class CreateWorkflowRequestTypedDict(TypedDict):
     create_workflow: shared_createworkflow.CreateWorkflowTypedDict

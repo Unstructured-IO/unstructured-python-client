@@ -18,13 +18,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-GET_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-GET_WORKFLOW_SERVERS = {
-    GET_WORKFLOW_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class GetWorkflowRequestTypedDict(TypedDict):
     workflow_id: str

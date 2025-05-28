@@ -15,13 +15,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-CANCEL_JOB_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-CANCEL_JOB_SERVERS = {
-    CANCEL_JOB_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class CancelJobRequestTypedDict(TypedDict):
     job_id: str
