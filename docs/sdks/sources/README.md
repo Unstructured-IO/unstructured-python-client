@@ -26,7 +26,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.create_connection_check_sources(request={
-        "source_id": "e5658517-3282-4845-9c22-88de48549d21",
+        "source_id": "8d49e3f2-3e6d-4973-bc61-292af66829d7",
     })
 
     assert res.dag_node_connection_check is not None
@@ -71,16 +71,15 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
             "config": {
-                "authority_url": "https://login.microsoftonline.com",
-                "client_cred": "<value>",
+                "catalog": "<value>",
                 "client_id": "<id>",
-                "recursive": False,
-                "site": "<value>",
-                "tenant": "<value>",
-                "user_pname": "<value>",
+                "client_secret": "<value>",
+                "host": "athletic-nudge.org",
+                "volume": "<value>",
+                "volume_path": "<value>",
             },
             "name": "<value>",
-            "type": shared.SourceConnectorType.SNOWFLAKE,
+            "type": shared.SourceConnectorType.SALESFORCE,
         },
     })
 
@@ -123,7 +122,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.delete_source(request={
-        "source_id": "8a24d7ae-5524-45e9-83f9-b0adba5303d4",
+        "source_id": "296c4009-7b81-4144-9c7c-e058204aeb93",
     })
 
     assert res.any is not None
@@ -165,7 +164,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.get_connection_check_sources(request={
-        "source_id": "b3b6b67d-aca9-4b1c-89c0-5788869c1383",
+        "source_id": "4df23b66-dae2-44ea-8dd3-329184d5644a",
     })
 
     assert res.dag_node_connection_check is not None
@@ -207,7 +206,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.get_source(request={
-        "source_id": "e02d8147-b614-4e4c-9c6d-0cd9c4492ea0",
+        "source_id": "df7d5ab1-bb15-4f1a-8dc0-c92a9a28a585",
     })
 
     assert res.source_connector_information is not None
@@ -291,17 +290,15 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.update_source(request={
         "update_source_connector": {
             "config": {
-                "batch_size": 69608,
-                "database": "<value>",
-                "host": "pleasing-hammock.org",
-                "id_column": "id",
-                "password": "Ns3L8K8WEZq1xvB",
-                "port": 834056,
-                "table_name": "<value>",
-                "username": "Justyn.Daugherty",
+                "batch_size": 615322,
+                "bucket": "<value>",
+                "collection_id": "<id>",
+                "connection_string": "<value>",
+                "password": "sMt9qfyDYveMwvw",
+                "username": "Rene.Glover-Lakin",
             },
         },
-        "source_id": "edec439e-8ef6-4c69-bc9e-3ba7a8418be7",
+        "source_id": "ddfe2014-2c10-4972-9711-fc2801d19038",
     })
 
     assert res.source_connector_information is not None

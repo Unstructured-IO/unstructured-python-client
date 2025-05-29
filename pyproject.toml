@@ -1,6 +1,6 @@
 [project]
 name = "unstructured-client"
-version = "0.35.0"
+version = "0.36.0"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -40,7 +40,6 @@ pytest-httpx = ">=0.35.0"
 pytest-mock = ">=3.14.0"
 pytest-xdist = "^3.5.0"
 types-aiofiles = ">=24.1.0"
-unstructured = ">= 0.17.2"
 uvloop = ">=0.20.0"
 
 [build-system]
