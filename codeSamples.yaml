@@ -69,6 +69,12 @@ actions:
         - "lang": "python"
           "label": "download_job_output"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"06d1b7b8-8642-4793-b37e-e45d97d53bc3\",\n        \"file_id\": \"<id>\",\n        \"node_id\": \"7c8f2aa4-da13-4a04-a98d-0204ea55681e\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+  - target: $["paths"]["/api/v1/pemkeyauth/retrieve"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "retrieve"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.pemkeyauth.retrieve(request={})\n\n    assert res.pem_auth_response is not None\n\n    # Handle response\n    print(res.pem_auth_response)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
