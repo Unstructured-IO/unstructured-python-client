@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 1305a6771cbde39530fd78e1b8acb938
-  docVersion: 1.1.17
+  docChecksum: 9b8ace758ffb5206e9b317565872e656
+  docVersion: 1.1.24
   speakeasyVersion: 1.552.0
   generationVersion: 2.610.0
-  releaseVersion: 0.36.0
-  configChecksum: e1d52979607afacfb892d70fedc250fb
+  releaseVersion: 0.37.1
+  configChecksum: 995e2ded80d15617a1661ac4be288219
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -86,6 +86,8 @@ generatedFiles:
   - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
+  - docs/models/operations/retrieverequest.md
+  - docs/models/operations/retrieveresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
   - docs/models/operations/updatedestinationrequest.md
@@ -164,6 +166,7 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/pemauthresponse.md
   - docs/models/shared/pineconedestinationconnectorconfig.md
   - docs/models/shared/pineconedestinationconnectorconfiginput.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
@@ -215,6 +218,7 @@ generatedFiles:
   - docs/sdks/destinations/README.md
   - docs/sdks/general/README.md
   - docs/sdks/jobs/README.md
+  - docs/sdks/pemkeyauth/README.md
   - docs/sdks/sources/README.md
   - docs/sdks/unstructuredclient/README.md
   - docs/sdks/workflows/README.md
@@ -258,6 +262,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/list_sources.py
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/operations/retrieve.py
   - src/unstructured_client/models/operations/run_workflow.py
   - src/unstructured_client/models/operations/update_destination.py
   - src/unstructured_client/models/operations/update_source.py
@@ -326,6 +331,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/pemauthresponse.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
@@ -365,6 +371,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/workflowtype.py
   - src/unstructured_client/models/shared/zendesksourceconnectorconfig.py
   - src/unstructured_client/models/shared/zendesksourceconnectorconfiginput.py
+  - src/unstructured_client/pemkeyauth.py
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
@@ -633,5 +640,12 @@ examples:
           application/json: {"detail": "<value>"}
         5XX:
           application/json: {"detail": "An error occurred"}
+  retrieve:
+    speakeasy-default-retrieve:
+      responses:
+        "200":
+          application/json: {"pem_key": "<value>", "tenant_id": "<id>"}
+        "422":
+          application/json: {"detail": "<value>"}
 examplesVersion: 1.0.2
 generatedTests: {}
