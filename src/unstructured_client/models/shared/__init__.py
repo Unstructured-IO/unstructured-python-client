@@ -249,6 +249,7 @@ if TYPE_CHECKING:
         VLMModel,
         VLMModelProvider,
     )
+    from .pemauthresponse import PemAuthResponse, PemAuthResponseTypedDict
     from .pineconedestinationconnectorconfig import (
         PineconeDestinationConnectorConfig,
         PineconeDestinationConnectorConfigTypedDict,
@@ -528,6 +529,8 @@ __all__ = [
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
+    "PemAuthResponse",
+    "PemAuthResponseTypedDict",
     "PineconeDestinationConnectorConfig",
     "PineconeDestinationConnectorConfigInput",
     "PineconeDestinationConnectorConfigInputTypedDict",
@@ -754,6 +757,8 @@ _dynamic_imports: dict[str, str] = {
     "Strategy": ".partition_parameters",
     "VLMModel": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
+    "PemAuthResponse": ".pemauthresponse",
+    "PemAuthResponseTypedDict": ".pemauthresponse",
     "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigInput": ".pineconedestinationconnectorconfiginput",
