@@ -15,9 +15,8 @@ from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, Bina
 
 import aiofiles
 import httpx
-from httpx import RequestError
 import nest_asyncio  # type: ignore
-from httpx import AsyncClient
+from httpx import AsyncClient, RequestError
 from pypdf import PdfReader, PdfWriter
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils

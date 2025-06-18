@@ -56,10 +56,10 @@ def check_pdf(pdf: PdfReader) -> PdfReader:
     """
     try:
         # This will raise if the file is encrypted
-        pdf.metadata
+        pdf.metadata  # pylint: disable=pointless-statement
 
         # This will raise if the file's root object is corrupted
-        pdf.root_object
+        pdf.root_object  # pylint: disable=pointless-statement
 
         # This will raise if the file's pages are corrupted
         list(pdf.pages)
