@@ -16,7 +16,7 @@ from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, Bina
 import aiofiles
 import httpx
 import nest_asyncio  # type: ignore
-from httpx import AsyncClient
+from httpx import AsyncClient, RequestError
 from pypdf import PdfReader, PdfWriter
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
@@ -302,6 +302,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         pdf = pdf_utils.read_pdf(pdf_file)
         if pdf is None:
             return request
+
+        try:
+            pdf = pdf_utils.check_pdf(pdf)
+        except pdf_utils.PDFValidationError as e:
+            raise RequestError(
+                message=e.message,
+                request=request,
+            ) from e
 
         starting_page_number = form_utils.get_starting_page_number(
             form_data,

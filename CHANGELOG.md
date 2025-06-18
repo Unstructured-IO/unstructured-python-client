@@ -1,3 +1,12 @@
+## 0.37.0
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Throws appropriate error message in case the given PDF file is invalid (corrupted or encrypted).
+
 ## 0.30.0
 
 ### Enhancements
