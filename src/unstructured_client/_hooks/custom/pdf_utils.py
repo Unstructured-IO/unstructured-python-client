@@ -52,7 +52,7 @@ def check_pdf(pdf: PdfReader) -> PdfReader:
     - Has corrupted root object
 
     Throws:
-    - RequestError if file is encrypted or corrupted
+    - PDFValidationError if file is encrypted or corrupted
     """
     try:
         # This will raise if the file is encrypted
