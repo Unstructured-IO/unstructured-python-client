@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 from deepdiff import DeepDiff
+from httpx import RequestError
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
@@ -348,3 +349,77 @@ def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provid
     assert response.status_code == 200
     assert len(response.elements) > 0
     assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
+
+
+@pytest.mark.parametrize(
+    ("pdf_name", "expected_error_message"),
+    [
+        (
+            "failing-encrypted.pdf",
+            "File is encrypted. Please decrypt it with password.",
+        ),
+        (
+            "failing-missing-root.pdf",
+            "File does not appear to be a valid PDF. Error: Cannot find Root object in pdf",
+        ),
+        (
+            "failing-missing-pages.pdf",
+            "File does not appear to be a valid PDF. Error: Invalid object in /Pages",
+        ),
+    ],
+)
+def test_returns_request_error_for_invalid_pdf(
+    caplog: pytest.LogCaptureFixture,
+    doc_path: Path,
+    client: UnstructuredClient,
+    pdf_name: str,
+    expected_error_message: str,
+):
+    """Test that we get a RequestError with the correct error message for invalid PDF files."""
+    with open(doc_path / pdf_name, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=pdf_name,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            split_pdf_page=True,
+        )
+    )
+
+    with pytest.raises(RequestError) as exc_info:
+        client.general.partition(request=req)
+
+    assert exc_info.value.request is not None
+    assert expected_error_message in caplog.text
+
+
+def test_returns_422_for_invalid_pdf(
+    caplog: pytest.LogCaptureFixture,
+    doc_path: Path,
+    client: UnstructuredClient,
+):
+    """Test that we get a RequestError with the correct error message for invalid PDF files."""
+    pdf_name = "failing-invalid.pdf"
+    with open(doc_path / pdf_name, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=pdf_name,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            split_pdf_page=True,
+        )
+    )
+
+    with pytest.raises(HTTPValidationError):
+        client.general.partition(request=req)
+
+    assert "File does not appear to be a valid PDF" in caplog.text
+    assert "422" in caplog.text
