@@ -144,7 +144,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_workflows
 
-Retrieve a list of workflows, optionally filtered by source, destination, or state.
+Retrieve a list of workflows, optionally filtered by source, destination, state, name, date range, and supports pagination and sorting.
 
 ### Example Usage
 

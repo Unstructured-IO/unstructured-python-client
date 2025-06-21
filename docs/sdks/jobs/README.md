@@ -8,6 +8,8 @@
 * [cancel_job](#cancel_job) - Cancel Job
 * [download_job_output](#download_job_output) - Download Job output
 * [get_job](#get_job) - Get Job
+* [get_job_details](#get_job_details) - Get Job processing details
+* [get_job_failed_files](#get_job_failed_files) - Get Job Failed Files
 * [list_jobs](#list_jobs) - List Jobs
 
 ## cancel_job
@@ -130,6 +132,90 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.GetJobResponse](../../models/operations/getjobresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_job_details
+
+Retrieve processing details for a specific job by its ID.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.get_job_details(request={
+        "job_id": "14cc95f9-4174-46b3-81f5-7089b87a4787",
+    })
+
+    assert res.job_details is not None
+
+    # Handle response
+    print(res.job_details)
+
+```
+
+### Parameters
+
+| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `request`                                                                          | [operations.GetJobDetailsRequest](../../models/operations/getjobdetailsrequest.md) | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
+| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
+| `server_url`                                                                       | *Optional[str]*                                                                    | :heavy_minus_sign:                                                                 | An optional server URL to use.                                                     |
+
+### Response
+
+**[operations.GetJobDetailsResponse](../../models/operations/getjobdetailsresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_job_failed_files
+
+Retrieve failed files for a specific job by its ID.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.get_job_failed_files(request={
+        "job_id": "ad262041-3530-40a9-9f83-b004e947a203",
+    })
+
+    assert res.job_failed_files is not None
+
+    # Handle response
+    print(res.job_failed_files)
+
+```
+
+### Parameters
+
+| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `request`                                                                                  | [operations.GetJobFailedFilesRequest](../../models/operations/getjobfailedfilesrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
+| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| `server_url`                                                                               | *Optional[str]*                                                                            | :heavy_minus_sign:                                                                         | An optional server URL to use.                                                             |
+
+### Response
+
+**[operations.GetJobFailedFilesResponse](../../models/operations/getjobfailedfilesresponse.md)**
 
 ### Errors
 
