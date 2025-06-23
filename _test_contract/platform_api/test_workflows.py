@@ -8,7 +8,7 @@ from unstructured_client.models.errors import SDKError
 
 
 def test_list_workflows(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
-    url = f"{platform_api_url}/api/v1/workflows/"
+    url = f"{platform_api_url}/api/v1/workflows/?sort_by=id"
 
     httpx_mock.add_response(
         method="GET",
@@ -69,7 +69,7 @@ def test_list_workflows(httpx_mock, platform_client: UnstructuredClient, platfor
 def test_list_workflows_empty(
     httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
 ):
-    url = f"{platform_api_url}/api/v1/workflows/"
+    url = f"{platform_api_url}/api/v1/workflows/?sort_by=id"
 
     httpx_mock.add_response(
         method="GET",
@@ -100,7 +100,7 @@ def test_list_workflows_error(
     platform_api_url: str,
     error_status_code: int,
 ):
-    url = f"{platform_api_url}/api/v1/workflows/"
+    url = f"{platform_api_url}/api/v1/workflows/?sort_by=id"
 
     httpx_mock.add_response(
         method="GET",

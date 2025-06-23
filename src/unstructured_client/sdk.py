@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from unstructured_client.general import General
     from unstructured_client.jobs import Jobs
     from unstructured_client.sources import Sources
+    from unstructured_client.users import Users
     from unstructured_client.workflows import Workflows
 
 
@@ -26,12 +27,14 @@ class UnstructuredClient(BaseSDK):
     destinations: "Destinations"
     jobs: "Jobs"
     sources: "Sources"
+    users: "Users"
     workflows: "Workflows"
     general: "General"
     _sub_sdk_map = {
         "destinations": ("unstructured_client.destinations", "Destinations"),
         "jobs": ("unstructured_client.jobs", "Jobs"),
         "sources": ("unstructured_client.sources", "Sources"),
+        "users": ("unstructured_client.users", "Users"),
         "workflows": ("unstructured_client.workflows", "Workflows"),
         "general": ("unstructured_client.general", "General"),
     }
