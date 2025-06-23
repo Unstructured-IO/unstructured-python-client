@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 1305a6771cbde39530fd78e1b8acb938
-  docVersion: 1.1.17
+  docChecksum: bac3524113e4b9ed02bfae0e65ccb42b
+  docVersion: 1.1.25
   speakeasyVersion: 1.552.0
   generationVersion: 2.610.0
-  releaseVersion: 0.36.0
-  configChecksum: e1d52979607afacfb892d70fedc250fb
+  releaseVersion: 0.37.1
+  configChecksum: 995e2ded80d15617a1661ac4be288219
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -70,6 +70,10 @@ generatedFiles:
   - docs/models/operations/getconnectionchecksourcesresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
+  - docs/models/operations/getjobdetailsrequest.md
+  - docs/models/operations/getjobdetailsresponse.md
+  - docs/models/operations/getjobfailedfilesrequest.md
+  - docs/models/operations/getjobfailedfilesresponse.md
   - docs/models/operations/getjobrequest.md
   - docs/models/operations/getjobresponse.md
   - docs/models/operations/getsourcerequest.md
@@ -86,8 +90,12 @@ generatedFiles:
   - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
+  - docs/models/operations/retrieverequest.md
+  - docs/models/operations/retrieveresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
+  - docs/models/operations/storesecretrequest.md
+  - docs/models/operations/storesecretresponse.md
   - docs/models/operations/updatedestinationrequest.md
   - docs/models/operations/updatedestinationresponse.md
   - docs/models/operations/updatesourcerequest.md
@@ -130,6 +138,9 @@ generatedFiles:
   - docs/models/shared/dropboxsourceconnectorconfiginput.md
   - docs/models/shared/elasticsearchconnectorconfig.md
   - docs/models/shared/elasticsearchconnectorconfiginput.md
+  - docs/models/shared/encryptedsecret.md
+  - docs/models/shared/encryptiontype.md
+  - docs/models/shared/failedfile.md
   - docs/models/shared/files.md
   - docs/models/shared/gcsdestinationconnectorconfig.md
   - docs/models/shared/gcsdestinationconnectorconfiginput.md
@@ -137,12 +148,17 @@ generatedFiles:
   - docs/models/shared/gcssourceconnectorconfiginput.md
   - docs/models/shared/googledrivesourceconnectorconfig.md
   - docs/models/shared/googledrivesourceconnectorconfiginput.md
+  - docs/models/shared/googledrivesourceconnectorconfiginputserviceaccountkey.md
   - docs/models/shared/ibmwatsonxs3destinationconnectorconfig.md
   - docs/models/shared/ibmwatsonxs3destinationconnectorconfiginput.md
   - docs/models/shared/inputfiles.md
   - docs/models/shared/jirasourceconnectorconfig.md
   - docs/models/shared/jirasourceconnectorconfiginput.md
+  - docs/models/shared/jobdetails.md
+  - docs/models/shared/jobfailedfiles.md
   - docs/models/shared/jobinformation.md
+  - docs/models/shared/jobnodedetails.md
+  - docs/models/shared/jobprocessingstatus.md
   - docs/models/shared/jobstatus.md
   - docs/models/shared/kafkaclouddestinationconnectorconfig.md
   - docs/models/shared/kafkaclouddestinationconnectorconfiginput.md
@@ -164,6 +180,7 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
+  - docs/models/shared/pemauthresponse.md
   - docs/models/shared/pineconedestinationconnectorconfig.md
   - docs/models/shared/pineconedestinationconnectorconfiginput.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
@@ -181,13 +198,16 @@ generatedFiles:
   - docs/models/shared/salesforcesourceconnectorconfig.md
   - docs/models/shared/salesforcesourceconnectorconfiginput.md
   - docs/models/shared/schedule.md
+  - docs/models/shared/secretreference.md
   - docs/models/shared/security.md
+  - docs/models/shared/serviceaccountkey.md
   - docs/models/shared/sharepointsourceconnectorconfig.md
   - docs/models/shared/sharepointsourceconnectorconfiginput.md
   - docs/models/shared/snowflakedestinationconnectorconfig.md
   - docs/models/shared/snowflakedestinationconnectorconfiginput.md
   - docs/models/shared/snowflakesourceconnectorconfig.md
   - docs/models/shared/snowflakesourceconnectorconfiginput.md
+  - docs/models/shared/sortdirection.md
   - docs/models/shared/sourceconnectorinformation.md
   - docs/models/shared/sourceconnectorinformationconfig.md
   - docs/models/shared/sourceconnectortype.md
@@ -217,6 +237,7 @@ generatedFiles:
   - docs/sdks/jobs/README.md
   - docs/sdks/sources/README.md
   - docs/sdks/unstructuredclient/README.md
+  - docs/sdks/users/README.md
   - docs/sdks/workflows/README.md
   - poetry.toml
   - py.typed
@@ -251,6 +272,8 @@ generatedFiles:
   - src/unstructured_client/models/operations/get_connection_check_sources.py
   - src/unstructured_client/models/operations/get_destination.py
   - src/unstructured_client/models/operations/get_job.py
+  - src/unstructured_client/models/operations/get_job_details.py
+  - src/unstructured_client/models/operations/get_job_failed_files.py
   - src/unstructured_client/models/operations/get_source.py
   - src/unstructured_client/models/operations/get_workflow.py
   - src/unstructured_client/models/operations/list_destinations.py
@@ -258,7 +281,9 @@ generatedFiles:
   - src/unstructured_client/models/operations/list_sources.py
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
+  - src/unstructured_client/models/operations/retrieve.py
   - src/unstructured_client/models/operations/run_workflow.py
+  - src/unstructured_client/models/operations/store_secret.py
   - src/unstructured_client/models/operations/update_destination.py
   - src/unstructured_client/models/operations/update_source.py
   - src/unstructured_client/models/operations/update_workflow.py
@@ -296,6 +321,9 @@ generatedFiles:
   - src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
+  - src/unstructured_client/models/shared/encryptedsecret.py
+  - src/unstructured_client/models/shared/encryptiontype.py
+  - src/unstructured_client/models/shared/failedfile.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/gcssourceconnectorconfig.py
@@ -306,7 +334,11 @@ generatedFiles:
   - src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/jirasourceconnectorconfig.py
   - src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/jobdetails.py
+  - src/unstructured_client/models/shared/jobfailedfiles.py
   - src/unstructured_client/models/shared/jobinformation.py
+  - src/unstructured_client/models/shared/jobnodedetails.py
+  - src/unstructured_client/models/shared/jobprocessingstatus.py
   - src/unstructured_client/models/shared/jobstatus.py
   - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py
   - src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py
@@ -326,6 +358,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
+  - src/unstructured_client/models/shared/pemauthresponse.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
@@ -342,6 +375,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/s3sourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/salesforcesourceconnectorconfig.py
   - src/unstructured_client/models/shared/salesforcesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/secretreference.py
   - src/unstructured_client/models/shared/security.py
   - src/unstructured_client/models/shared/sharepointsourceconnectorconfig.py
   - src/unstructured_client/models/shared/sharepointsourceconnectorconfiginput.py
@@ -349,6 +383,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/snowflakedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/snowflakesourceconnectorconfig.py
   - src/unstructured_client/models/shared/snowflakesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/sortdirection.py
   - src/unstructured_client/models/shared/sourceconnectorinformation.py
   - src/unstructured_client/models/shared/sourceconnectortype.py
   - src/unstructured_client/models/shared/updatedestinationconnector.py
@@ -370,6 +405,7 @@ generatedFiles:
   - src/unstructured_client/sdkconfiguration.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
+  - src/unstructured_client/users.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/annotations.py
   - src/unstructured_client/utils/datetimes.py
@@ -594,6 +630,9 @@ examples:
           application/json: {"detail": "<value>"}
   list_workflows:
     speakeasy-default-list-workflows:
+      parameters:
+        query:
+          sort_by: "id"
       responses:
         "200":
           application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
@@ -633,5 +672,41 @@ examples:
           application/json: {"detail": "<value>"}
         5XX:
           application/json: {"detail": "An error occurred"}
+  get_job_details:
+    speakeasy-default-get-job-details:
+      parameters:
+        path:
+          job_id: "14cc95f9-4174-46b3-81f5-7089b87a4787"
+      responses:
+        "200":
+          application/json: {"id": "39a8d74e-66d2-40a4-a9b0-25ee4f08f855", "node_stats": [], "processing_status": "STOPPED"}
+        "422":
+          application/json: {"detail": "<value>"}
+  get_job_failed_files:
+    speakeasy-default-get-job-failed-files:
+      parameters:
+        path:
+          job_id: "ad262041-3530-40a9-9f83-b004e947a203"
+      responses:
+        "200":
+          application/json: {"failed_files": []}
+        "422":
+          application/json: {"detail": "<value>"}
+  retrieve:
+    speakeasy-default-retrieve:
+      responses:
+        "200":
+          application/json: {"pem_key": "<value>", "tenant_id": "<id>"}
+        "422":
+          application/json: {"detail": "<value>"}
+  store_secret:
+    speakeasy-default-store-secret:
+      requestBody:
+        application/json: {"encrypted_value": "<value>"}
+      responses:
+        "200":
+          application/json: {"id": "<id>"}
+        "422":
+          application/json: {"detail": []}
 examplesVersion: 1.0.2
 generatedTests: {}

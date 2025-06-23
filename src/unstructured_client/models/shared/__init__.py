@@ -132,6 +132,9 @@ if TYPE_CHECKING:
         ElasticsearchConnectorConfigInput,
         ElasticsearchConnectorConfigInputTypedDict,
     )
+    from .encryptedsecret import EncryptedSecret, EncryptedSecretTypedDict
+    from .encryptiontype import EncryptionType
+    from .failedfile import FailedFile, FailedFileTypedDict
     from .gcsdestinationconnectorconfig import (
         GCSDestinationConnectorConfig,
         GCSDestinationConnectorConfigTypedDict,
@@ -151,9 +154,13 @@ if TYPE_CHECKING:
     from .googledrivesourceconnectorconfig import (
         GoogleDriveSourceConnectorConfig,
         GoogleDriveSourceConnectorConfigTypedDict,
+        ServiceAccountKey,
+        ServiceAccountKeyTypedDict,
     )
     from .googledrivesourceconnectorconfiginput import (
         GoogleDriveSourceConnectorConfigInput,
+        GoogleDriveSourceConnectorConfigInputServiceAccountKey,
+        GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict,
         GoogleDriveSourceConnectorConfigInputTypedDict,
     )
     from .ibmwatsonxs3destinationconnectorconfig import (
@@ -172,7 +179,11 @@ if TYPE_CHECKING:
         JiraSourceConnectorConfigInput,
         JiraSourceConnectorConfigInputTypedDict,
     )
+    from .jobdetails import JobDetails, JobDetailsTypedDict
+    from .jobfailedfiles import JobFailedFiles, JobFailedFilesTypedDict
     from .jobinformation import JobInformation, JobInformationTypedDict
+    from .jobnodedetails import JobNodeDetails, JobNodeDetailsTypedDict
+    from .jobprocessingstatus import JobProcessingStatus
     from .jobstatus import JobStatus
     from .kafkaclouddestinationconnectorconfig import (
         KafkaCloudDestinationConnectorConfig,
@@ -249,6 +260,7 @@ if TYPE_CHECKING:
         VLMModel,
         VLMModelProvider,
     )
+    from .pemauthresponse import PemAuthResponse, PemAuthResponseTypedDict
     from .pineconedestinationconnectorconfig import (
         PineconeDestinationConnectorConfig,
         PineconeDestinationConnectorConfigTypedDict,
@@ -313,6 +325,7 @@ if TYPE_CHECKING:
         SalesforceSourceConnectorConfigInput,
         SalesforceSourceConnectorConfigInputTypedDict,
     )
+    from .secretreference import SecretReference, SecretReferenceTypedDict
     from .security import Security, SecurityTypedDict
     from .sharepointsourceconnectorconfig import (
         SharePointSourceConnectorConfig,
@@ -338,6 +351,7 @@ if TYPE_CHECKING:
         SnowflakeSourceConnectorConfigInput,
         SnowflakeSourceConnectorConfigInputTypedDict,
     )
+    from .sortdirection import SortDirection
     from .sourceconnectorinformation import (
         SourceConnectorInformation,
         SourceConnectorInformationConfig,
@@ -462,6 +476,11 @@ __all__ = [
     "ElasticsearchConnectorConfigInput",
     "ElasticsearchConnectorConfigInputTypedDict",
     "ElasticsearchConnectorConfigTypedDict",
+    "EncryptedSecret",
+    "EncryptedSecretTypedDict",
+    "EncryptionType",
+    "FailedFile",
+    "FailedFileTypedDict",
     "Files",
     "FilesTypedDict",
     "GCSDestinationConnectorConfig",
@@ -474,6 +493,8 @@ __all__ = [
     "GCSSourceConnectorConfigTypedDict",
     "GoogleDriveSourceConnectorConfig",
     "GoogleDriveSourceConnectorConfigInput",
+    "GoogleDriveSourceConnectorConfigInputServiceAccountKey",
+    "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
     "GoogleDriveSourceConnectorConfigTypedDict",
     "IBMWatsonxS3DestinationConnectorConfig",
@@ -486,8 +507,15 @@ __all__ = [
     "JiraSourceConnectorConfigInput",
     "JiraSourceConnectorConfigInputTypedDict",
     "JiraSourceConnectorConfigTypedDict",
+    "JobDetails",
+    "JobDetailsTypedDict",
+    "JobFailedFiles",
+    "JobFailedFilesTypedDict",
     "JobInformation",
     "JobInformationTypedDict",
+    "JobNodeDetails",
+    "JobNodeDetailsTypedDict",
+    "JobProcessingStatus",
     "JobStatus",
     "KafkaCloudDestinationConnectorConfig",
     "KafkaCloudDestinationConnectorConfigInput",
@@ -528,6 +556,8 @@ __all__ = [
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
+    "PemAuthResponse",
+    "PemAuthResponseTypedDict",
     "PineconeDestinationConnectorConfig",
     "PineconeDestinationConnectorConfigInput",
     "PineconeDestinationConnectorConfigInputTypedDict",
@@ -561,8 +591,12 @@ __all__ = [
     "SalesforceSourceConnectorConfigInputTypedDict",
     "SalesforceSourceConnectorConfigTypedDict",
     "Schedule",
+    "SecretReference",
+    "SecretReferenceTypedDict",
     "Security",
     "SecurityTypedDict",
+    "ServiceAccountKey",
+    "ServiceAccountKeyTypedDict",
     "SharePointSourceConnectorConfig",
     "SharePointSourceConnectorConfigInput",
     "SharePointSourceConnectorConfigInputTypedDict",
@@ -575,6 +609,7 @@ __all__ = [
     "SnowflakeSourceConnectorConfigInput",
     "SnowflakeSourceConnectorConfigInputTypedDict",
     "SnowflakeSourceConnectorConfigTypedDict",
+    "SortDirection",
     "SourceConnectorInformation",
     "SourceConnectorInformationConfig",
     "SourceConnectorInformationConfigTypedDict",
@@ -689,6 +724,11 @@ _dynamic_imports: dict[str, str] = {
     "ElasticsearchConnectorConfigTypedDict": ".elasticsearchconnectorconfig",
     "ElasticsearchConnectorConfigInput": ".elasticsearchconnectorconfiginput",
     "ElasticsearchConnectorConfigInputTypedDict": ".elasticsearchconnectorconfiginput",
+    "EncryptedSecret": ".encryptedsecret",
+    "EncryptedSecretTypedDict": ".encryptedsecret",
+    "EncryptionType": ".encryptiontype",
+    "FailedFile": ".failedfile",
+    "FailedFileTypedDict": ".failedfile",
     "GCSDestinationConnectorConfig": ".gcsdestinationconnectorconfig",
     "GCSDestinationConnectorConfigTypedDict": ".gcsdestinationconnectorconfig",
     "GCSDestinationConnectorConfigInput": ".gcsdestinationconnectorconfiginput",
@@ -699,7 +739,11 @@ _dynamic_imports: dict[str, str] = {
     "GCSSourceConnectorConfigInputTypedDict": ".gcssourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfig": ".googledrivesourceconnectorconfig",
     "GoogleDriveSourceConnectorConfigTypedDict": ".googledrivesourceconnectorconfig",
+    "ServiceAccountKey": ".googledrivesourceconnectorconfig",
+    "ServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfig",
     "GoogleDriveSourceConnectorConfigInput": ".googledrivesourceconnectorconfiginput",
+    "GoogleDriveSourceConnectorConfigInputServiceAccountKey": ".googledrivesourceconnectorconfiginput",
+    "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfigInputTypedDict": ".googledrivesourceconnectorconfiginput",
     "IBMWatsonxS3DestinationConnectorConfig": ".ibmwatsonxs3destinationconnectorconfig",
     "IBMWatsonxS3DestinationConnectorConfigTypedDict": ".ibmwatsonxs3destinationconnectorconfig",
@@ -709,8 +753,15 @@ _dynamic_imports: dict[str, str] = {
     "JiraSourceConnectorConfigTypedDict": ".jirasourceconnectorconfig",
     "JiraSourceConnectorConfigInput": ".jirasourceconnectorconfiginput",
     "JiraSourceConnectorConfigInputTypedDict": ".jirasourceconnectorconfiginput",
+    "JobDetails": ".jobdetails",
+    "JobDetailsTypedDict": ".jobdetails",
+    "JobFailedFiles": ".jobfailedfiles",
+    "JobFailedFilesTypedDict": ".jobfailedfiles",
     "JobInformation": ".jobinformation",
     "JobInformationTypedDict": ".jobinformation",
+    "JobNodeDetails": ".jobnodedetails",
+    "JobNodeDetailsTypedDict": ".jobnodedetails",
+    "JobProcessingStatus": ".jobprocessingstatus",
     "JobStatus": ".jobstatus",
     "KafkaCloudDestinationConnectorConfig": ".kafkaclouddestinationconnectorconfig",
     "KafkaCloudDestinationConnectorConfigTypedDict": ".kafkaclouddestinationconnectorconfig",
@@ -754,6 +805,8 @@ _dynamic_imports: dict[str, str] = {
     "Strategy": ".partition_parameters",
     "VLMModel": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
+    "PemAuthResponse": ".pemauthresponse",
+    "PemAuthResponseTypedDict": ".pemauthresponse",
     "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigInput": ".pineconedestinationconnectorconfiginput",
@@ -786,6 +839,8 @@ _dynamic_imports: dict[str, str] = {
     "SalesforceSourceConnectorConfigTypedDict": ".salesforcesourceconnectorconfig",
     "SalesforceSourceConnectorConfigInput": ".salesforcesourceconnectorconfiginput",
     "SalesforceSourceConnectorConfigInputTypedDict": ".salesforcesourceconnectorconfiginput",
+    "SecretReference": ".secretreference",
+    "SecretReferenceTypedDict": ".secretreference",
     "Security": ".security",
     "SecurityTypedDict": ".security",
     "SharePointSourceConnectorConfig": ".sharepointsourceconnectorconfig",
@@ -800,6 +855,7 @@ _dynamic_imports: dict[str, str] = {
     "SnowflakeSourceConnectorConfigTypedDict": ".snowflakesourceconnectorconfig",
     "SnowflakeSourceConnectorConfigInput": ".snowflakesourceconnectorconfiginput",
     "SnowflakeSourceConnectorConfigInputTypedDict": ".snowflakesourceconnectorconfiginput",
+    "SortDirection": ".sortdirection",
     "SourceConnectorInformation": ".sourceconnectorinformation",
     "SourceConnectorInformationConfig": ".sourceconnectorinformation",
     "SourceConnectorInformationConfigTypedDict": ".sourceconnectorinformation",

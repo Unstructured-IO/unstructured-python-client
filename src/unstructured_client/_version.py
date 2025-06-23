@@ -3,10 +3,10 @@
 import importlib.metadata
 
 __title__: str = "unstructured-client"
-__version__: str = "0.36.0"
-__openapi_doc_version__: str = "1.1.17"
+__version__: str = "0.37.1"
+__openapi_doc_version__: str = "1.1.25"
 __gen_version__: str = "2.610.0"
-__user_agent__: str = "speakeasy-sdk/python 0.36.0 2.610.0 1.1.17 unstructured-client"
+__user_agent__: str = "speakeasy-sdk/python 0.37.1 2.610.0 1.1.25 unstructured-client"
 
 try:
     if __package__ is not None:

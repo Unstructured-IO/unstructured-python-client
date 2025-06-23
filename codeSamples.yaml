@@ -63,12 +63,24 @@ actions:
         - "lang": "python"
           "label": "cancel_job"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.cancel_job(request={\n        \"job_id\": \"2fafd129-04f3-4201-a0e7-fe33e937b367\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+  - target: $["paths"]["/api/v1/jobs/{job_id}/details"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_job_details"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job_details(request={\n        \"job_id\": \"14cc95f9-4174-46b3-81f5-7089b87a4787\",\n    })\n\n    assert res.job_details is not None\n\n    # Handle response\n    print(res.job_details)"
   - target: $["paths"]["/api/v1/jobs/{job_id}/download"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "download_job_output"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"06d1b7b8-8642-4793-b37e-e45d97d53bc3\",\n        \"file_id\": \"<id>\",\n        \"node_id\": \"7c8f2aa4-da13-4a04-a98d-0204ea55681e\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+  - target: $["paths"]["/api/v1/jobs/{job_id}/failed-files"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_job_failed_files"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job_failed_files(request={\n        \"job_id\": \"ad262041-3530-40a9-9f83-b004e947a203\",\n    })\n\n    assert res.job_failed_files is not None\n\n    # Handle response\n    print(res.job_failed_files)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
@@ -80,7 +92,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_source"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.DATABRICKS_VOLUMES,\n            \"config\": {\n                \"remote_url\": \"https://ugly-ribbon.info\",\n                \"recursive\": True,\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.DROPBOX,\n            \"config\": {\n                \"remote_url\": \"https://ugly-ribbon.info\",\n                \"recursive\": True,\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -111,6 +123,18 @@ actions:
         - "lang": "python"
           "label": "create_connection_check_sources"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"8d49e3f2-3e6d-4973-bc61-292af66829d7\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+  - target: $["paths"]["/api/v1/users/retrieve"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "retrieve"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.retrieve(request={})\n\n    assert res.pem_auth_response is not None\n\n    # Handle response\n    print(res.pem_auth_response)"
+  - target: $["paths"]["/api/v1/users/secrets"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "store_secret"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.store_secret(request={\n        \"encrypted_secret\": {\n            \"encrypted_value\": \"<value>\",\n        },\n    })\n\n    assert res.secret_reference is not None\n\n    # Handle response\n    print(res.secret_reference)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
