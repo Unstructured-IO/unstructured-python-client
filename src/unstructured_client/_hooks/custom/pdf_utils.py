@@ -8,6 +8,7 @@ from pypdf import PdfReader
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
+from unstructured_client._hooks.custom.validation_errors import FileValidationError
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
@@ -17,12 +18,11 @@ pdf_logger = logging.getLogger("pypdf")
 pdf_logger.setLevel(logging.ERROR)
 
 
-class PDFValidationError(Exception):
-    """Base exception for PDF validation errors."""
+class PDFValidationError(FileValidationError):
+    """Exception for PDF validation errors."""
 
     def __init__(self, message: str):
-        self.message = message
-        super().__init__(self.message)
+        super().__init__(message, file_type="PDF")
 
 
 def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
