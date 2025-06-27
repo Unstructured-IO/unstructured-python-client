@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import httpx
-from httpx import RequestError
 import pytest
 import requests
 from requests_toolbelt import MultipartDecoder
@@ -467,8 +466,8 @@ def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path
     assert result == str(Path(mock_dir).resolve())
 
 
-def test_before_request_raises_request_error_when_pdf_check_fails():
-    """Test that before_request raises RequestError when pdf_utils.check_pdf throws PDFValidationError."""
+def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
+    """Test that before_request raises PDFValidationError when pdf_utils.check_pdf throws PDFValidationError."""
     hook = SplitPdfHook()
     
     # Initialize the hook with a mock client
@@ -514,13 +513,12 @@ def test_before_request_raises_request_error_when_pdf_check_fails():
         mock_check_pdf.side_effect = pdf_utils.PDFValidationError(error_message)
         mock_get_base_url.return_value = "http://localhost:8888"
         
-        # Call the method under test and verify it raises RequestError
-        with pytest.raises(RequestError) as exc_info:
+        # Call the method under test and verify it raises PDFValidationError
+        with pytest.raises(pdf_utils.PDFValidationError) as exc_info:
             hook.before_request(mock_hook_ctx, mock_request)
         
-        # Verify the exception has the correct message and request object
+        # Verify the exception has the correct message
         assert str(exc_info.value) == error_message
-        assert exc_info.value.request == mock_request
         
         # Verify that the mocked functions were called as expected
         mock_get_fields.assert_called_once_with(mock_request)
