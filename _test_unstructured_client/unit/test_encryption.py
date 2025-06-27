@@ -101,8 +101,6 @@ def test_encrypt_rsa(rsa_key_pair):
     )
     assert decrypted_text == plaintext
 
-    assert True
-
 
 def test_encrypt_rsa_aes(rsa_key_pair):
     private_key_pem, public_key_pem = rsa_key_pair
@@ -124,5 +122,3 @@ def test_encrypt_rsa_aes(rsa_key_pair):
         secret_obj["aes_iv"],
     )
     assert decrypted_text == plaintext
-
-    assert True
