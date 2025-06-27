@@ -548,7 +548,7 @@ class Users(BaseSDK):
             self,
             encryption_cert_or_key_pem: str,
             plaintext: str,
-            type: Optional[str] = None,
+            encryption_type: Optional[str] = None,
     ) -> dict:
         """
         Encrypts a plaintext string for securely sending to the Unstructured API.
@@ -581,11 +581,11 @@ class Users(BaseSDK):
         # If the plaintext is short, use RSA directly
         # Otherwise, use a RSA_AES envelope hybrid
         # The length of the public key is a good hueristic
-        if not type:
-            type = "rsa" if len(plaintext) <= len(public_key_pem) else "rsa_aes"
+        if not encryption_type:
+            encryption_type = "rsa" if len(plaintext) <= len(public_key_pem) else "rsa_aes"
 
-        if type == "rsa":
+        if encryption_type == "rsa":
             return self._encrypt_rsa(public_key_pem, plaintext)
-        else:
-            return self._encrypt_rsa_aes(public_key_pem, plaintext)
+
+        return self._encrypt_rsa_aes(public_key_pem, plaintext)
         # endregion sdk-class-body
