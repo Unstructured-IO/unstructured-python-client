@@ -39,7 +39,7 @@ python:
   clientServerStatusCodesAsErrors: true
   defaultErrorName: SDKError
   description: Python Client SDK for Unstructured API
-  enableCustomCodeRegions: false
+  enableCustomCodeRegions: true
   enumFormat: enum
   fixFlags:
     responseRequiredSep2024: false
