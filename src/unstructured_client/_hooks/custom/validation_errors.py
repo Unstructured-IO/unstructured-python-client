@@ -1,5 +1,7 @@
 """File validation error classes for the Unstructured client."""
 
+from typing import Optional
+
 
 class FileValidationError(Exception):
     """Base exception for file validation errors.
@@ -8,7 +10,7 @@ class FileValidationError(Exception):
     checks before being processed by the API.
     """
 
-    def __init__(self, message: str, file_type: str = None):
-        self.message = message
-        self.file_type = file_type
+    def __init__(self, message: str, file_type: Optional[str] = None):
+        self.message: str = message
+        self.file_type: Optional[str] = file_type
         super().__init__(self.message)
