@@ -526,6 +526,55 @@ class Users(BaseSDK):
             'aes_iv': "",
         }
 
+    def decrypt_secret(
+        self,
+        private_key_pem: str,
+        encrypted_value: str,
+        secret_type: str,
+        encrypted_aes_key: str,
+        aes_iv: str,
+    ) -> str:
+        private_key = serialization.load_pem_private_key(
+            private_key_pem.encode('utf-8'),
+            password=None,
+            backend=default_backend()
+        )
+
+        if not isinstance(private_key, rsa.RSAPrivateKey):
+            raise TypeError("Private key must be a RSA private key for decryption.")
+
+        if secret_type == 'rsa':
+            ciphertext = base64.b64decode(encrypted_value)
+            plaintext = private_key.decrypt(
+                ciphertext,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
+            return plaintext.decode('utf-8')
+
+        # aes_rsa
+        encrypted_aes_key_decoded = base64.b64decode(encrypted_aes_key)
+        iv = base64.b64decode(aes_iv)
+        ciphertext = base64.b64decode(encrypted_value)
+
+        aes_key = private_key.decrypt(
+            encrypted_aes_key_decoded,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        cipher = Cipher(
+            algorithms.AES(aes_key),
+            modes.CFB(iv),
+        )
+        decryptor = cipher.decryptor()
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        return plaintext.decode('utf-8')
 
     def encrypt_secret(
             self,

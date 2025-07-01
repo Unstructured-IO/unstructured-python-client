@@ -33,53 +33,6 @@ def rsa_key_pair():
 
     return private_key_pem, public_key_pem
 
-
-def decrypt_secret(
-    private_key_pem: str,
-    encrypted_value: str,
-    type: str,
-    encrypted_aes_key: str,
-    aes_iv: str,
-) -> str:
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode('utf-8'),
-        password=None,
-        backend=default_backend()
-    )
-
-    if type == 'rsa':
-        ciphertext = base64.b64decode(encrypted_value)
-        plaintext = private_key.decrypt(
-            ciphertext,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        return plaintext.decode('utf-8')
-    else:
-        encrypted_aes_key = base64.b64decode(encrypted_aes_key)
-        iv = base64.b64decode(aes_iv)
-        ciphertext = base64.b64decode(encrypted_value)
-
-        aes_key = private_key.decrypt(
-            encrypted_aes_key,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        cipher = Cipher(
-            algorithms.AES(aes_key),
-            modes.CFB(iv),
-        )
-        decryptor = cipher.decryptor()
-        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-        return plaintext.decode('utf-8')
-
-
 def test_encrypt_rsa(rsa_key_pair):
     private_key_pem, public_key_pem = rsa_key_pair
 
@@ -92,7 +45,7 @@ def test_encrypt_rsa(rsa_key_pair):
     # A short payload should use direct RSA encryption
     assert secret_obj["type"] == 'rsa'
 
-    decrypted_text = decrypt_secret(
+    decrypted_text = client.users.decrypt_secret(
         private_key_pem,
         secret_obj["encrypted_value"],
         secret_obj["type"],
@@ -114,7 +67,7 @@ def test_encrypt_rsa_aes(rsa_key_pair):
     # A longer payload uses hybrid RSA-AES encryption
     assert secret_obj["type"] == 'rsa_aes'
 
-    decrypted_text = decrypt_secret(
+    decrypted_text = client.users.decrypt_secret(
         private_key_pem,
         secret_obj["encrypted_value"],
         secret_obj["type"],
