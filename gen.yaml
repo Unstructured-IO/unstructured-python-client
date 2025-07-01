@@ -14,7 +14,7 @@ generation:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.37.3
+  version: 0.37.4
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'

@@ -410,18 +410,30 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.workflows.run_workflow(request={
-        "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
+    res = uc_client.general.partition(request={
+        "partition_parameters": {
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "vlm_model": shared.VLMModel.GPT_4O,
+            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
+        },
     })
 
-    assert res.job_information is not None
+    assert res.elements is not None
 
     # Handle response
-    print(res.job_information)
+    print(res.elements)
 
 ```
 <!-- End File uploads [file-upload] -->
