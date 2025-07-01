@@ -22,17 +22,14 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
-            "chunking_strategy": "by_title",
             "files": {
                 "content": open("example.file", "rb"),
                 "file_name": "example.file",
             },
-            "split_pdf_cache_tmp_data_dir": "<value>",
             "split_pdf_page_range": [
                 1,
                 10,
             ],
-            "strategy": shared.Strategy.AUTO,
             "vlm_model": shared.VLMModel.GPT_4O,
             "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
