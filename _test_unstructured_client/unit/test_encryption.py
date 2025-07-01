@@ -151,6 +151,5 @@ def test_encrypt_around_rsa_size_limit(rsa_key_pair, plaintext, secret_type):
 
     secret_obj = client.users.encrypt_secret(public_key_pem, plaintext)
 
-    # Should still use direct RSA encryption
     assert secret_obj["type"] == secret_type
     assert secret_obj["encrypted_value"] is not None
