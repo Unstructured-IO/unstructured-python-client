@@ -550,12 +550,12 @@ class Users(BaseSDK):
                 encryption_cert_or_key_pem.encode('utf-8'),
             )
 
-            public_key = cert.public_key()
+            public_key = cert.public_key()  # type: ignore[assignment]
         else:
             public_key = serialization.load_pem_public_key(
                 encryption_cert_or_key_pem.encode('utf-8'),
                 backend=default_backend()
-            ) 
+            )  # type: ignore[assignment]
 
         if not isinstance(public_key, rsa.RSAPublicKey):
             raise TypeError("Public key must be a RSA public key for encryption.")
