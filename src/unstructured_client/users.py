@@ -471,18 +471,9 @@ class Users(BaseSDK):
     # region sdk-class-body
     def _encrypt_rsa_aes(
             self,
-            encryption_key_pem: str,
+            public_key: rsa.RSAPublicKey,
             plaintext: str,
     ) -> dict:
-        # Load public RSA key
-        public_key = serialization.load_pem_public_key(
-            encryption_key_pem.encode('utf-8'),
-            backend=default_backend()
-        )
-
-        if not isinstance(public_key, rsa.RSAPublicKey):
-            raise TypeError("Public key must be an RSA public key for envelope encryption.")
-
         # Generate a random AES key
         aes_key = os.urandom(32)  # 256-bit AES key
 
@@ -516,18 +507,10 @@ class Users(BaseSDK):
 
     def _encrypt_rsa(
             self,
-            encryption_key_pem: str,
+            public_key: rsa.RSAPublicKey,
             plaintext: str,
     ) -> dict:
         # Load public RSA key
-        public_key = serialization.load_pem_public_key(
-            encryption_key_pem.encode('utf-8'),
-            backend=default_backend()
-        )
-
-        if not isinstance(public_key, rsa.RSAPublicKey):
-            raise TypeError("Public key must be an RSA public key for encryption.")
-
         ciphertext = public_key.encrypt(
             plaintext.encode(),
             padding.OAEP(
@@ -567,25 +550,28 @@ class Users(BaseSDK):
                 encryption_cert_or_key_pem.encode('utf-8'),
             )
 
-            loaded_key = cert.public_key()
-
-            # Serialize back to PEM format for consistency
-            public_key_pem = loaded_key.public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
-            ).decode('utf-8')
-
+            public_key = cert.public_key()
         else:
-            public_key_pem = encryption_cert_or_key_pem
+            public_key = serialization.load_pem_public_key(
+                encryption_cert_or_key_pem.encode('utf-8'),
+                backend=default_backend()
+            ) 
+
+        if not isinstance(public_key, rsa.RSAPublicKey):
+            raise TypeError("Public key must be a RSA public key for encryption.")
 
         # If the plaintext is short, use RSA directly
         # Otherwise, use a RSA_AES envelope hybrid
-        # The length of the public key is a good hueristic
+        # Use the length of the public key to determine the encryption type
+        key_size_bytes = public_key.key_size // 8
+        max_rsa_length = key_size_bytes - 66  # OAEP SHA256 overhead
+        print(max_rsa_length)
+
         if not encryption_type:
-            encryption_type = "rsa" if len(plaintext) <= len(public_key_pem) else "rsa_aes"
+            encryption_type = "rsa" if len(plaintext) <= max_rsa_length else "rsa_aes"
 
         if encryption_type == "rsa":
-            return self._encrypt_rsa(public_key_pem, plaintext)
+            return self._encrypt_rsa(public_key, plaintext)
 
-        return self._encrypt_rsa_aes(public_key_pem, plaintext)
+        return self._encrypt_rsa_aes(public_key, plaintext)
         # endregion sdk-class-body

@@ -122,3 +122,35 @@ def test_encrypt_rsa_aes(rsa_key_pair):
         secret_obj["aes_iv"],
     )
     assert decrypted_text == plaintext
+
+
+rsa_key_size_bytes = 2048 // 8
+max_payload_size = rsa_key_size_bytes - 66  # OAEP SHA256 overhead
+
+@pytest.mark.parametrize(("plaintext", "secret_type"), [
+    ("Short message", "rsa"),
+    ("A" * (max_payload_size), "rsa"),  # Just at the RSA limit
+    ("A" * (max_payload_size + 1), "rsa_aes"),  # Just over the RSA limit
+    ("A" * 500, "rsa_aes"),  # Well over the RSA limit
+])
+def test_encrypt_around_rsa_size_limit(rsa_key_pair, plaintext, secret_type):
+    """
+    Test that payloads around the RSA size limit choose the correct algorithm.
+    """
+    _, public_key_pem = rsa_key_pair
+
+    print(f"Testing plaintext of length {len(plaintext)} with expected type {secret_type}")
+
+    # Load the public key
+    public_key = serialization.load_pem_public_key(
+        public_key_pem.encode('utf-8'),
+        backend=default_backend()
+    )
+
+    client = UnstructuredClient()
+
+    secret_obj = client.users.encrypt_secret(public_key_pem, plaintext)
+
+    # Should still use direct RSA encryption
+    assert secret_obj["type"] == secret_type
+    assert secret_obj["encrypted_value"] is not None
