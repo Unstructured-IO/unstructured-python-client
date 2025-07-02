@@ -92,8 +92,6 @@ def test_encrypt_around_rsa_size_limit(rsa_key_pair, plaintext, secret_type):
     """
     _, public_key_pem = rsa_key_pair
 
-    print(f"Testing plaintext of length {len(plaintext)} with expected type {secret_type}")
-
     # Load the public key
     public_key = serialization.load_pem_public_key(
         public_key_pem.encode('utf-8'),

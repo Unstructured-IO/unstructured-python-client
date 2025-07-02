@@ -614,7 +614,6 @@ class Users(BaseSDK):
         # Use the length of the public key to determine the encryption type
         key_size_bytes = public_key.key_size // 8
         max_rsa_length = key_size_bytes - 66  # OAEP SHA256 overhead
-        print(max_rsa_length)
 
         if not encryption_type:
             encryption_type = "rsa" if len(plaintext) <= max_rsa_length else "rsa_aes"
