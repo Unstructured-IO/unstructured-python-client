@@ -182,7 +182,7 @@ async def call_api_async(
             )
             return response
         except Exception as e:
-            print(e)
+            logger.error("Request failed with error", exc_info=e)
             raise e
         finally:
             if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
