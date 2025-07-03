@@ -17,7 +17,162 @@ import os
 import base64
 # endregion imports
 
+
 class Users(BaseSDK):
+    # region sdk-class-body
+    def _encrypt_rsa_aes(
+        self,
+        public_key: rsa.RSAPublicKey,
+        plaintext: str,
+    ) -> dict:
+        # Generate a random AES key
+        aes_key = os.urandom(32)  # 256-bit AES key
+
+        # Generate a random IV
+        iv = os.urandom(16)
+
+        # Encrypt using AES-CFB
+        cipher = Cipher(
+            algorithms.AES(aes_key),
+            modes.CFB(iv),
+        )
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(plaintext.encode("utf-8")) + encryptor.finalize()
+
+        # Encrypt the AES key using the RSA public key
+        encrypted_key = public_key.encrypt(
+            aes_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+
+        return {
+            "encrypted_aes_key": base64.b64encode(encrypted_key).decode("utf-8"),
+            "aes_iv": base64.b64encode(iv).decode("utf-8"),
+            "encrypted_value": base64.b64encode(ciphertext).decode("utf-8"),
+            "type": "rsa_aes",
+        }
+
+    def _encrypt_rsa(
+        self,
+        public_key: rsa.RSAPublicKey,
+        plaintext: str,
+    ) -> dict:
+        # Load public RSA key
+        ciphertext = public_key.encrypt(
+            plaintext.encode(),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+        return {
+            "encrypted_value": base64.b64encode(ciphertext).decode("utf-8"),
+            "type": "rsa",
+            "encrypted_aes_key": "",
+            "aes_iv": "",
+        }
+
+    def decrypt_secret(
+        self,
+        private_key_pem: str,
+        encrypted_value: str,
+        secret_type: str,
+        encrypted_aes_key: str,
+        aes_iv: str,
+    ) -> str:
+        private_key = serialization.load_pem_private_key(
+            private_key_pem.encode("utf-8"), password=None, backend=default_backend()
+        )
+
+        if not isinstance(private_key, rsa.RSAPrivateKey):
+            raise TypeError("Private key must be a RSA private key for decryption.")
+
+        if secret_type == "rsa":
+            ciphertext = base64.b64decode(encrypted_value)
+            plaintext = private_key.decrypt(
+                ciphertext,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None,
+                ),
+            )
+            return plaintext.decode("utf-8")
+
+        # aes_rsa
+        encrypted_aes_key_decoded = base64.b64decode(encrypted_aes_key)
+        iv = base64.b64decode(aes_iv)
+        ciphertext = base64.b64decode(encrypted_value)
+
+        aes_key = private_key.decrypt(
+            encrypted_aes_key_decoded,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+        cipher = Cipher(
+            algorithms.AES(aes_key),
+            modes.CFB(iv),
+        )
+        decryptor = cipher.decryptor()
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        return plaintext.decode("utf-8")
+
+    def encrypt_secret(
+        self,
+        encryption_cert_or_key_pem: str,
+        plaintext: str,
+        encryption_type: Optional[str] = None,
+    ) -> dict:
+        """
+        Encrypts a plaintext string for securely sending to the Unstructured API.
+
+        Args:
+            encryption_cert_or_key_pem (str): A PEM-encoded RSA public key or certificate.
+            plaintext (str): The string to encrypt.
+            type (str, optional): Encryption type, either "rsa" or "rsa_aes".
+
+        Returns:
+            dict: A dictionary with encrypted AES key, iv, and ciphertext (all base64-encoded).
+        """
+        # If a cert is provided, extract the public key
+        if "BEGIN CERTIFICATE" in encryption_cert_or_key_pem:
+            cert = x509.load_pem_x509_certificate(
+                encryption_cert_or_key_pem.encode("utf-8"),
+            )
+
+            public_key = cert.public_key()  # type: ignore[assignment]
+        else:
+            public_key = serialization.load_pem_public_key(
+                encryption_cert_or_key_pem.encode("utf-8"), backend=default_backend()
+            )  # type: ignore[assignment]
+
+        if not isinstance(public_key, rsa.RSAPublicKey):
+            raise TypeError("Public key must be a RSA public key for encryption.")
+
+        # If the plaintext is short, use RSA directly
+        # Otherwise, use a RSA_AES envelope hybrid
+        # Use the length of the public key to determine the encryption type
+        key_size_bytes = public_key.key_size // 8
+        max_rsa_length = key_size_bytes - 66  # OAEP SHA256 overhead
+
+        if not encryption_type:
+            encryption_type = "rsa" if len(plaintext) <= max_rsa_length else "rsa_aes"
+
+        if encryption_type == "rsa":
+            return self._encrypt_rsa(public_key, plaintext)
+
+        return self._encrypt_rsa_aes(public_key, plaintext)
+
+    # endregion sdk-class-body
+
     def retrieve(
         self,
         *,
@@ -467,159 +622,3 @@ class Users(BaseSDK):
             http_res_text,
             http_res,
         )
-
-    # region sdk-class-body
-    def _encrypt_rsa_aes(
-            self,
-            public_key: rsa.RSAPublicKey,
-            plaintext: str,
-    ) -> dict:
-        # Generate a random AES key
-        aes_key = os.urandom(32)  # 256-bit AES key
-
-        # Generate a random IV
-        iv = os.urandom(16)
-
-        # Encrypt using AES-CFB
-        cipher = Cipher(
-            algorithms.AES(aes_key),
-            modes.CFB(iv),
-        )
-        encryptor = cipher.encryptor()
-        ciphertext = encryptor.update(plaintext.encode('utf-8')) + encryptor.finalize()
-        
-        # Encrypt the AES key using the RSA public key
-        encrypted_key = public_key.encrypt(
-            aes_key,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-
-        return {
-            'encrypted_aes_key': base64.b64encode(encrypted_key).decode('utf-8'),
-            'aes_iv': base64.b64encode(iv).decode('utf-8'),
-            'encrypted_value': base64.b64encode(ciphertext).decode('utf-8'),
-            'type': 'rsa_aes',
-        }
-
-    def _encrypt_rsa(
-            self,
-            public_key: rsa.RSAPublicKey,
-            plaintext: str,
-    ) -> dict:
-        # Load public RSA key
-        ciphertext = public_key.encrypt(
-            plaintext.encode(),
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            ),
-        )
-        return {
-            'encrypted_value': base64.b64encode(ciphertext).decode('utf-8'),
-            'type': 'rsa',
-            'encrypted_aes_key': "",
-            'aes_iv': "",
-        }
-
-    def decrypt_secret(
-        self,
-        private_key_pem: str,
-        encrypted_value: str,
-        secret_type: str,
-        encrypted_aes_key: str,
-        aes_iv: str,
-    ) -> str:
-        private_key = serialization.load_pem_private_key(
-            private_key_pem.encode('utf-8'),
-            password=None,
-            backend=default_backend()
-        )
-
-        if not isinstance(private_key, rsa.RSAPrivateKey):
-            raise TypeError("Private key must be a RSA private key for decryption.")
-
-        if secret_type == 'rsa':
-            ciphertext = base64.b64decode(encrypted_value)
-            plaintext = private_key.decrypt(
-                ciphertext,
-                padding.OAEP(
-                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                    algorithm=hashes.SHA256(),
-                    label=None
-                )
-            )
-            return plaintext.decode('utf-8')
-
-        # aes_rsa
-        encrypted_aes_key_decoded = base64.b64decode(encrypted_aes_key)
-        iv = base64.b64decode(aes_iv)
-        ciphertext = base64.b64decode(encrypted_value)
-
-        aes_key = private_key.decrypt(
-            encrypted_aes_key_decoded,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        cipher = Cipher(
-            algorithms.AES(aes_key),
-            modes.CFB(iv),
-        )
-        decryptor = cipher.decryptor()
-        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-        return plaintext.decode('utf-8')
-
-    def encrypt_secret(
-            self,
-            encryption_cert_or_key_pem: str,
-            plaintext: str,
-            encryption_type: Optional[str] = None,
-    ) -> dict:
-        """
-        Encrypts a plaintext string for securely sending to the Unstructured API.
-        
-        Args:
-            encryption_cert_or_key_pem (str): A PEM-encoded RSA public key or certificate.
-            plaintext (str): The string to encrypt.
-            type (str, optional): Encryption type, either "rsa" or "rsa_aes".
-
-        Returns:
-            dict: A dictionary with encrypted AES key, iv, and ciphertext (all base64-encoded).
-        """
-        # If a cert is provided, extract the public key
-        if "BEGIN CERTIFICATE" in encryption_cert_or_key_pem:
-            cert = x509.load_pem_x509_certificate(
-                encryption_cert_or_key_pem.encode('utf-8'),
-            )
-
-            public_key = cert.public_key()  # type: ignore[assignment]
-        else:
-            public_key = serialization.load_pem_public_key(
-                encryption_cert_or_key_pem.encode('utf-8'),
-                backend=default_backend()
-            )  # type: ignore[assignment]
-
-        if not isinstance(public_key, rsa.RSAPublicKey):
-            raise TypeError("Public key must be a RSA public key for encryption.")
-
-        # If the plaintext is short, use RSA directly
-        # Otherwise, use a RSA_AES envelope hybrid
-        # Use the length of the public key to determine the encryption type
-        key_size_bytes = public_key.key_size // 8
-        max_rsa_length = key_size_bytes - 66  # OAEP SHA256 overhead
-
-        if not encryption_type:
-            encryption_type = "rsa" if len(plaintext) <= max_rsa_length else "rsa_aes"
-
-        if encryption_type == "rsa":
-            return self._encrypt_rsa(public_key, plaintext)
-
-        return self._encrypt_rsa_aes(public_key, plaintext)
-        # endregion sdk-class-body
