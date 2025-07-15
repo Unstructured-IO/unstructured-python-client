@@ -4,6 +4,8 @@ import io
 import logging
 from typing import cast, Optional, BinaryIO, Union
 
+from email.parser import BytesParser
+from email.policy import default
 from pypdf import PdfReader
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 
@@ -26,6 +28,51 @@ class PDFValidationError(FileValidationError):
 
 
 def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
+    reader = read_pdf_raw(pdf_file=pdf_file)
+    if reader:
+        return reader
+
+    # TODO(klaijan) - remove once debugged
+    print("reader is None")
+
+    # load raw bytes
+    # case bytes
+    if isinstance(pdf_file, bytes):
+        raw = pdf_file
+    # case BinaryIO
+    elif hasattr(pdf_file, "read"):
+        try:
+            pdf_file.seek(0)
+            raw = pdf_file.read()
+        except Exception as e:
+            raise IOError(f"Failed to read file stream: {e}")
+    else:
+        raise TypeError("Expected bytes or a file-like object with 'read()' method")
+
+    # multipart extraction
+    try:
+        msg = BytesParser(policy=default).parsebytes(raw)
+        for part in msg.walk():
+            if part.get_content_type() == "application/pdf":
+                pdf_bytes = part.get_payload(decode=True)
+                _check_pdf_bytes(pdf_bytes)
+    except Exception:
+        # TODO(klaijan)
+        pass
+
+    # look for %PDF-
+    try:
+        start = raw.find(b"%PDF-")
+        if start != -1:
+            sliced = raw[start:]
+            _check_pdf_bytes(sliced)
+            return PdfReader(io.BytesIO(sliced), strict=False)
+    except Exception:
+        # TODO(klaijan)
+        pass
+
+
+def read_pdf_raw(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     """Reads the given PDF file.
 
     Args:
@@ -73,3 +120,14 @@ def check_pdf(pdf: PdfReader) -> PdfReader:
         raise PDFValidationError(
             f"File does not appear to be a valid PDF. Error: {e}",
         ) from e
+
+
+def _check_pdf_bytes(pdf_bytes) -> PdfReader:
+    try:
+        pdf = PdfReader(io.BytesIO(pdf_bytes), strict=True)
+        pdf.root_object
+        list(pdf.pages)
+        return pdf
+    except:
+        # TODO(klaijan) exception
+        pass
