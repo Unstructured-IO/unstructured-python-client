@@ -33,9 +33,9 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
         return reader
 
     # TODO(klaijan) - remove once debugged
-    pdf_logger.debug("Initial PdfReader parsing failed, attempting fallbacks.")
+    pdf_logger.debug("Primary PdfReader parse failed, attempting multipart and raw extraction fallbacks.")
 
-    # load raw bytes
+    # Load raw bytes
     # case bytes
     if isinstance(pdf_file, bytes):
         raw = pdf_file
@@ -49,7 +49,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     else:
         raise TypeError("Expected bytes or a file-like object with 'read()' method")
 
-    # multipart extraction
+    # This looks for multipart extraction
     try:
         msg = BytesParser(policy=default).parsebytes(raw)
         for part in msg.walk():
@@ -63,7 +63,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     except Exception as e:
         pdf_logger.debug(f"Multipart extraction failed: {e}")
 
-    # look for %PDF-
+    # This looks for %PDF-
     try:
         start = raw.find(b"%PDF-")
         if start != -1:
