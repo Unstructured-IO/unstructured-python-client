@@ -33,7 +33,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
         return reader
 
     # TODO(klaijan) - remove once debugged
-    print("reader is None")
+    pdf_logger.debug("Initial PdfReader parsing failed, attempting fallbacks.")
 
     # load raw bytes
     # case bytes
@@ -55,21 +55,27 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
         for part in msg.walk():
             if part.get_content_type() == "application/pdf":
                 pdf_bytes = part.get_payload(decode=True)
-                _check_pdf_bytes(pdf_bytes)
-    except Exception:
-        # TODO(klaijan)
-        pass
+                if not isinstance(pdf_bytes, bytes):
+                    continue
+                pdf_bytes = cast(bytes, pdf_bytes)
+                pdf = PdfReader(io.BytesIO(pdf_bytes), strict=False)
+                return check_pdf(pdf)
+    except Exception as e:
+        pdf_logger.debug(f"Multipart extraction failed: {e}")
 
     # look for %PDF-
     try:
         start = raw.find(b"%PDF-")
         if start != -1:
             sliced = raw[start:]
-            _check_pdf_bytes(sliced)
-            return PdfReader(io.BytesIO(sliced), strict=False)
-    except Exception:
-        # TODO(klaijan)
-        pass
+            pdf = PdfReader(io.BytesIO(sliced), strict=False)
+            return check_pdf(pdf)
+    except Exception as e:
+        pdf_logger.debug(f"%PDF- slicing fallback failed: {e}")
+
+    raise PDFValidationError(
+        "File does not appear to be a valid PDF after all fallback attempts."
+    )
 
 
 def read_pdf_raw(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
@@ -120,14 +126,3 @@ def check_pdf(pdf: PdfReader) -> PdfReader:
         raise PDFValidationError(
             f"File does not appear to be a valid PDF. Error: {e}",
         ) from e
-
-
-def _check_pdf_bytes(pdf_bytes) -> PdfReader:
-    try:
-        pdf = PdfReader(io.BytesIO(pdf_bytes), strict=True)
-        pdf.root_object
-        list(pdf.pages)
-        return pdf
-    except:
-        # TODO(klaijan) exception
-        pass
