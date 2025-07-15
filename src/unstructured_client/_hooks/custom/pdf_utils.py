@@ -73,9 +73,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     except Exception as e:
         pdf_logger.debug(f"%PDF- slicing fallback failed: {e}")
 
-    raise PDFValidationError(
-        "File does not appear to be a valid PDF after all fallback attempts."
-    )
+    return None
 
 
 def read_pdf_raw(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
