@@ -4,8 +4,9 @@ import io
 import logging
 from typing import cast, Optional, BinaryIO, Union
 
+from email.message import Message
 from email.parser import BytesParser
-from email.policy import default
+from email.policy import (default, Policy)
 from pypdf import PdfReader
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 
@@ -45,23 +46,22 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
             pdf_file.seek(0)
             raw = pdf_file.read()
         except Exception as e:
-            raise IOError(f"Failed to read file stream: {e}")
+            raise IOError(f"Failed to read file stream: {e}") from e
     else:
-        raise TypeError("Expected bytes or a file-like object with 'read()' method")
+        raise IOError("Expected bytes or a file-like object with 'read()' method")
 
     # This looks for multipart extraction
     try:
-        msg = BytesParser(policy=default).parsebytes(raw)
+        msg = BytesParser(policy=cast(Policy[Message], default)).parsebytes(raw)
         for part in msg.walk():
             if part.get_content_type() == "application/pdf":
                 pdf_bytes = part.get_payload(decode=True)
                 if not isinstance(pdf_bytes, bytes):
                     continue
-                pdf_bytes = cast(bytes, pdf_bytes)
                 pdf = PdfReader(io.BytesIO(pdf_bytes), strict=False)
                 return check_pdf(pdf)
     except Exception as e:
-        pdf_logger.debug(f"Multipart extraction failed: {e}")
+        pdf_logger.debug("Multipart extraction failed: %s", e)
 
     # This looks for %PDF-
     try:
@@ -71,7 +71,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
             pdf = PdfReader(io.BytesIO(sliced), strict=False)
             return check_pdf(pdf)
     except Exception as e:
-        pdf_logger.debug(f"%PDF- slicing fallback failed: {e}")
+        pdf_logger.debug("%%PDF- slicing fallback failed: %s", e)
 
     return None
 
