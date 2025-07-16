@@ -49,24 +49,13 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     else:
         raise IOError("Expected bytes or a file-like object with 'read()' method")
 
-    # This looks for multipart extraction
-    try:
-        msg = BytesParser(policy=cast(Policy, default)).parsebytes(raw)
-        for part in msg.walk():
-            if part.get_content_type() == "application/pdf":
-                pdf_bytes = part.get_payload(decode=True)
-                if not isinstance(pdf_bytes, bytes):
-                    continue
-                pdf = PdfReader(io.BytesIO(pdf_bytes), strict=False)
-                return check_pdf(pdf)
-    except Exception as e:
-        pdf_logger.debug("Multipart extraction failed: %s", e)
-
+    # breakpoint()
     # This looks for %PDF-
     try:
         start = raw.find(b"%PDF-")
+        end = raw.find(b"%%EOF") + len(b"%%EOF")
         if start != -1:
-            sliced = raw[start:]
+            sliced = raw[start:end]
             pdf = PdfReader(io.BytesIO(sliced), strict=False)
             return check_pdf(pdf)
     except Exception as e:
@@ -84,13 +73,20 @@ def read_pdf_raw(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
     Returns:
         The PdfReader object if the file is a PDF, None otherwise.
     """
-
     try:
         if isinstance(pdf_file, bytes):
             content = cast(bytes, pdf_file)
             pdf_file = io.BytesIO(content)
-        return PdfReader(pdf_file, strict=False)
-    except (PdfReadError, UnicodeDecodeError):
+        reader = PdfReader(pdf_file, strict=False)
+        return check_pdf(reader)
+    except (PdfReadError, UnicodeDecodeError) as e:
+        pdf_logger.debug("Read pdf failed: %s", e)
+        return None
+    except PDFValidationError as e:
+        pdf_logger.debug("Check pdf failed: %s", e)
+        return None 
+    except Exception as e:
+        pdf_logger.debug("An unexpected error occurred: %s", e)
         return None
 
 

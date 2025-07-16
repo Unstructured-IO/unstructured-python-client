@@ -23,6 +23,15 @@ def test_check_pdf_with_valid_pdf():
     assert isinstance(result, PdfReader)
 
 
+# TODO(klaijan)
+def test_check_pdf_with_valid_pdf_multipart():
+    pdf_path = sample_docs_path("valid-multipart-wrapped.pdf")
+    pdf = _open_pdf(pdf_path)
+
+    result = check_pdf(pdf)
+    assert isinstance(result, PdfReader)
+
+
 @pytest.mark.parametrize(
     ("pdf_name", "expected_error_message"),
     [
