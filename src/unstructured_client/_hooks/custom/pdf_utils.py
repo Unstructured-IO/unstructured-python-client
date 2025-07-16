@@ -4,7 +4,6 @@ import io
 import logging
 from typing import cast, Optional, BinaryIO, Union
 
-from email.message import Message
 from email.parser import BytesParser
 from email.policy import (default, Policy)
 from pypdf import PdfReader
@@ -52,7 +51,7 @@ def read_pdf(pdf_file: Union[BinaryIO, bytes]) -> Optional[PdfReader]:
 
     # This looks for multipart extraction
     try:
-        msg = BytesParser(policy=cast(Policy[Message], default)).parsebytes(raw)
+        msg = BytesParser(policy=cast(Policy, default)).parsebytes(raw)
         for part in msg.walk():
             if part.get_content_type() == "application/pdf":
                 pdf_bytes = part.get_payload(decode=True)
