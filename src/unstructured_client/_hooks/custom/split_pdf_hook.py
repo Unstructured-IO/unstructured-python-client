@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import io
 import json
 import logging
@@ -12,6 +13,8 @@ from collections.abc import Awaitable
 from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
+
+from PIL import Image
 
 import aiofiles
 import httpx
@@ -55,6 +58,7 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
+TALL_PAGE_ASPECT_RATIO_THRESHOLD = 1.5
 
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
@@ -304,6 +308,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return request
 
         pdf = pdf_utils.check_pdf(pdf)
+        
+        original_page_count = len(pdf.pages)
+        pdf = self._split_tall_pages(pdf)
+        image_processing_performed = (len(pdf.pages) != original_page_count)
 
         starting_page_number = form_utils.get_starting_page_number(
             form_data,
@@ -349,10 +357,30 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             num_pages=page_count, concurrency_level=concurrency_level
         )
 
-        # If the doc is small enough, and we aren't slicing it with a page range:
+        # If the doc is small enough, 
+        # and we aren't slicing it with a page range,
+        # and no image processing (horizontal slicing) was performed: 
         # do not split, just continue with the original request
-        if split_size >= page_count and page_count == len(pdf.pages):
+        if split_size >= page_count and page_count == len(pdf.pages) and not image_processing_performed:
             return request
+        
+        # If image processing was performed, we need to send the processed PDF even for single pages
+        if image_processing_performed and len(pdf.pages) == 1:
+            # Create a single chunk with the processed PDF
+            processed_pdf_data = io.BytesIO()
+            pdf_writer = PdfWriter()
+            pdf_writer.add_page(pdf.pages[0])
+            pdf_writer.write(processed_pdf_data)
+            processed_pdf_data.seek(0)
+            
+            # Create new request with processed PDF
+            processed_request = request_utils.create_pdf_chunk_request(
+                form_data=form_data,
+                pdf_chunk=(processed_pdf_data, 1),
+                filename=pdf_file_meta["filename"],
+                original_request=request,
+            )
+            return processed_request
 
         pdf = self._trim_large_pages(pdf, form_data)
 
@@ -444,6 +472,184 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 response._content = temp_file_name.encode()  # pylint: disable=protected-access
 
         return response
+
+    def _split_tall_pages(self, pdf: PdfReader) -> PdfReader:
+        """Checks for and splits pages that are disproportionately tall."""
+        # Initial analysis of the PDF structure
+        writer = PdfWriter()
+        any_page_split = False
+
+        for page in pdf.pages:
+            height = float(page.mediabox.height)
+            width = float(page.mediabox.width)
+
+            if width == 0:  # Avoid division by zero for invalid pages
+                writer.add_page(page)
+                continue
+
+            aspect_ratio = height / width
+            logger.info(f"Page aspect ratio: {aspect_ratio:.2f} (threshold: {TALL_PAGE_ASPECT_RATIO_THRESHOLD})")
+
+            if aspect_ratio <= TALL_PAGE_ASPECT_RATIO_THRESHOLD:
+                writer.add_page(page)
+                continue
+
+            any_page_split = True
+            num_splits = math.ceil(aspect_ratio / TALL_PAGE_ASPECT_RATIO_THRESHOLD)
+            logger.info(f"Target splits: {num_splits} parts")
+            
+            try:
+                split_pages = self._split_page_with_image_processing(page, num_splits)
+                if split_pages and len(split_pages) > 1:
+                    logger.info(f"Image processing succeeded: {len(split_pages)} parts")
+                    for split_page in split_pages:
+                        writer.add_page(split_page)
+                else:
+                    logger.warning("Image processing failed - no valid splits returned")
+                    self._add_media_box_split_pages(writer, page, num_splits, height)
+            except Exception as e:
+                logger.error(f"Image processing exception: {e}")
+                self._add_media_box_split_pages(writer, page, num_splits, height)
+
+        if not any_page_split:
+            return pdf
+
+        # If we split any pages, return a new PdfReader from the modified content
+        buffer = io.BytesIO()
+        writer.write(buffer)
+        buffer.seek(0)
+        return PdfReader(buffer)
+
+    def _split_page_with_image_processing(self, page, num_splits):
+        """Split a page by extracting and processing its images."""
+        if "/Resources" not in page or "/XObject" not in page["/Resources"]:
+            return None
+            
+        xobjects = page["/Resources"]["/XObject"]
+        
+        for obj_name, obj in xobjects.items():
+            if hasattr(obj, 'get_object'):
+                obj = obj.get_object()
+                
+            if obj.get("/Subtype") == "/Image":
+                width = int(obj.get("/Width", 0))
+                height = int(obj.get("/Height", 0))
+                original_pixels = width * height
+                
+                image_data = self._extract_image_data(obj)
+                if not image_data:
+                    continue
+                
+                try:
+                    pil_image = Image.open(io.BytesIO(image_data))
+                except Exception as e:
+                    continue
+                
+                # Calculate target resolution to stay under API limits
+                # API limit is ~179M pixels, let's target 80M pixels total for safety margin
+                target_pixels_total = 80_000_000
+                target_pixels_per_split = target_pixels_total // num_splits
+                
+                # Calculate scale factor if we need to reduce resolution
+                scale_factor = 1.0
+                if original_pixels > target_pixels_per_split:
+                    scale_factor = (target_pixels_per_split / original_pixels) ** 0.5
+                    
+                    # Apply scaling
+                    new_width = int(pil_image.width * scale_factor)
+                    new_height = int(pil_image.height * scale_factor)
+                    pil_image = pil_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                
+                strip_height = pil_image.height // num_splits
+                total_split_pixels = 0
+                split_pages = []
+                
+                for i in range(num_splits):
+                    top = i * strip_height
+                    bottom = min((i + 1) * strip_height, pil_image.height)
+                    
+                    cropped_image = pil_image.crop((0, top, pil_image.width, bottom))
+                    strip_pixels = cropped_image.width * cropped_image.height
+                    total_split_pixels += strip_pixels
+                    
+                    new_page = self._create_page_with_image(cropped_image, page)
+                    if new_page:
+                        split_pages.append(new_page)
+                    else:
+                        return None
+                
+                if split_pages and len(split_pages) == num_splits:
+                    return split_pages
+                    
+        return None
+
+    def _extract_image_data(self, image_obj):
+        """Extract raw image data from a PDF image object."""
+        try:
+            if "/Filter" in image_obj:
+                filter_type = image_obj["/Filter"]
+                
+                if filter_type in ["/DCTDecode", "/JPXDecode"]:
+                    # JPEG or JPEG2000 - data is already compressed
+                    data = image_obj._data
+                    return data
+                elif filter_type == "/FlateDecode":
+                    # PNG-like compression
+                    import zlib
+                    compressed_data = image_obj._data
+                    data = zlib.decompress(compressed_data)
+                    return data
+            
+            # Fallback to raw data
+            data = image_obj._data
+            return data
+            
+        except Exception as e:
+            return None
+
+    def _create_page_with_image(self, pil_image, original_page):
+        """Create a new PDF page containing the given PIL image."""
+        try:
+            img_buffer = io.BytesIO()
+            
+            # Convert to RGB if necessary
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+                
+            # Save the image as PDF
+            pil_image.save(img_buffer, format='PDF')
+            img_buffer.seek(0)
+            
+            # Create a new PDF reader from the image
+            img_pdf = PdfReader(img_buffer)
+            if not img_pdf.pages:
+                return None
+                
+            new_page = img_pdf.pages[0]
+            return new_page
+            
+        except Exception as e:
+            return None
+
+    def _add_media_box_split_pages(self, writer, page, num_splits, page_height):
+        """Fallback method to add pages with media box splitting (original approach)."""
+        split_height = page_height / num_splits
+        
+        for i in range(num_splits):
+            # Create a deep copy to modify the media box independently
+            new_page = copy.deepcopy(page)
+            
+            # Calculate new coordinates for the crop
+            top_coord = page.mediabox.top - (i * split_height)
+            bottom_coord = page.mediabox.top - ((i + 1) * split_height)
+            
+            # Set the new media box to crop the page
+            new_page.mediabox.lower_left = (page.mediabox.left, bottom_coord)
+            new_page.mediabox.lower_right = (page.mediabox.right, bottom_coord)
+            new_page.mediabox.upper_left = (page.mediabox.left, top_coord)
+            new_page.mediabox.upper_right = (page.mediabox.right, top_coord)
+            
+            writer.add_page(new_page)
 
     def _trim_large_pages(self, pdf: PdfReader, form_data: dict[str, Any]) -> PdfReader:
         if form_data['strategy'] != HI_RES_STRATEGY:
