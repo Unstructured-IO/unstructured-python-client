@@ -23,6 +23,7 @@ def test_check_pdf_with_valid_pdf():
     assert isinstance(result, PdfReader)
 
 
+# TODO(klaijan) - add pdf file when file is ready
 @pytest.mark.parametrize(
     ("pdf_name", "expected_error_message"),
     [
@@ -38,13 +39,6 @@ def test_check_pdf_with_valid_pdf():
             "failing-missing-pages.pdf",
             "File does not appear to be a valid PDF. Error: Invalid object in /Pages",
         ),
-        # TODO(klaijan) - add pdf file when file is ready
-        """
-        (
-            ".pdf",
-            "File does not appear to be a valid PDF. Error: Cannot find Root object in pdf"
-        )
-        """
     ],
 )
 def test_check_pdf_raises_pdf_validation_error(
