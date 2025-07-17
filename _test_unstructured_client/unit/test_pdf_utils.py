@@ -5,7 +5,7 @@ import io
 import pytest
 from pypdf import PdfReader
 
-from unstructured_client._hooks.custom.pdf_utils import check_pdf, PDFValidationError
+from unstructured_client._hooks.custom.pdf_utils import check_pdf, read_pdf, PDFValidationError
 from _test_unstructured_client.unit_utils import sample_docs_path
 
 
@@ -17,15 +17,6 @@ def _open_pdf(pdf_path: str) -> PdfReader:
 
 def test_check_pdf_with_valid_pdf():
     pdf_path = sample_docs_path("list-item-example-1.pdf")
-    pdf = _open_pdf(pdf_path)
-
-    result = check_pdf(pdf)
-    assert isinstance(result, PdfReader)
-
-
-# TODO(klaijan)
-def test_check_pdf_with_valid_pdf_multipart():
-    pdf_path = sample_docs_path("valid-multipart-wrapped.pdf")
     pdf = _open_pdf(pdf_path)
 
     result = check_pdf(pdf)
@@ -47,6 +38,13 @@ def test_check_pdf_with_valid_pdf_multipart():
             "failing-missing-pages.pdf",
             "File does not appear to be a valid PDF. Error: Invalid object in /Pages",
         ),
+        # TODO(klaijan) - add pdf file when file is ready
+        """
+        (
+            ".pdf",
+            "File does not appear to be a valid PDF. Error: Cannot find Root object in pdf"
+        )
+        """
     ],
 )
 def test_check_pdf_raises_pdf_validation_error(
@@ -60,3 +58,15 @@ def test_check_pdf_raises_pdf_validation_error(
         check_pdf(pdf)
 
     assert exc_info.value.message == expected_error_message
+
+
+# TODO(klaijan) - uncomment when file is ready
+"""
+def test_check_read_pdf():
+    pdf_path = sample_docs_path(".pdf")
+    with open(pdf_path, "rb") as f:
+        pdf_content = f.read()
+    pdf = read_pdf(pdf_content)
+    result = check_pdf(pdf)
+    assert isinstance(result, PdfReader)
+"""
