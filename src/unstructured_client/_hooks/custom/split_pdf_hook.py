@@ -542,7 +542,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 
                 try:
                     pil_image = Image.open(io.BytesIO(image_data))
-                except Exception as e:
+                except Exception:
                     continue
                 
                 # Calculate target resolution to stay under API limits
@@ -604,7 +604,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             data = image_obj._data
             return data
             
-        except Exception as e:
+        except Exception:
             return None
 
     def _create_page_with_image(self, pil_image, original_page):
@@ -628,7 +628,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             new_page = img_pdf.pages[0]
             return new_page
             
-        except Exception as e:
+        except Exception:
             return None
 
     def _add_media_box_split_pages(self, writer, page, num_splits, page_height):
