@@ -4,8 +4,6 @@ import io
 import logging
 from typing import cast, Optional, BinaryIO, Union
 
-from email.parser import BytesParser
-from email.policy import (default, Policy)
 from pypdf import PdfReader
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 
