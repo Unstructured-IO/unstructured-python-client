@@ -23,9 +23,16 @@ from unstructured_client._hooks.custom.form_utils import (
     FormData,
 )
 from unstructured_client.models import shared
-from unstructured_client.utils import BackoffStrategy, Retries, RetryConfig, retry_async, serialize_request_body
+from unstructured_client.utils import (
+    BackoffStrategy,
+    Retries,
+    RetryConfig,
+    retry_async,
+    serialize_request_body,
+)
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
+
 
 def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
     """Extracts the multipart fields from the request.
@@ -65,9 +72,9 @@ def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
             }
     return mapped_fields
 
+
 def create_pdf_chunk_request_params(
-        form_data: FormData,
-        page_number: int
+    form_data: FormData, page_number: int
 ) -> dict[str, Any]:
     """Creates the request body for the partition API."
 
@@ -88,10 +95,13 @@ def create_pdf_chunk_request_params(
         PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
         PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
     ]
-    chunk_payload = {key: form_data[key] for key in form_data if key not in fields_to_drop}
+    chunk_payload = {
+        key: form_data[key] for key in form_data if key not in fields_to_drop
+    }
     chunk_payload[PARTITION_FORM_SPLIT_PDF_PAGE_KEY] = "false"
     chunk_payload[PARTITION_FORM_STARTING_PAGE_NUMBER_KEY] = str(page_number)
     return chunk_payload
+
 
 def create_pdf_chunk_request(
     form_data: FormData,
@@ -148,7 +158,6 @@ def create_pdf_chunk_request(
     )
 
 
-
 async def call_api_async(
     client: httpx.AsyncClient,
     pdf_chunk_request: httpx.Request,
@@ -161,12 +170,12 @@ async def call_api_async(
     retry_config = RetryConfig(
         "backoff",
         BackoffStrategy(
-            initial_interval = one_second * 3,
-            max_interval = one_minute * 12,
-            max_elapsed_time = one_minute * 30,
-            exponent = 1.88,
+            initial_interval=one_second * 3,
+            max_interval=one_minute * 12,
+            max_elapsed_time=one_minute * 30,
+            exponent=1.88,
         ),
-        retry_connection_errors=True
+        retry_connection_errors=True,
     )
 
     retryable_codes = ["5xx"]
@@ -177,12 +186,11 @@ async def call_api_async(
     async with limiter:
         try:
             response = await retry_async(
-                do_request,
-                Retries(retry_config, retryable_codes)
+                do_request, Retries(retry_config, retryable_codes)
             )
             return response
         except Exception as e:
-            logger.error("Request failed with error", exc_info=e)
+            logger.error(f"Request failed with error: {e}", exc_info=e)
             raise e
         finally:
             if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
@@ -205,6 +213,7 @@ def prepare_request_headers(
     new_headers.pop("Content-Length", None)
     return new_headers
 
+
 def create_response(elements: list) -> httpx.Response:
     """
     Creates a modified response object with updated content.
@@ -216,12 +225,15 @@ def create_response(elements: list) -> httpx.Response:
     Returns:
         The modified response object with updated content.
     """
-    response = httpx.Response(status_code=200, headers={"Content-Type": "application/json"})
+    response = httpx.Response(
+        status_code=200, headers={"Content-Type": "application/json"}
+    )
     content = json.dumps(elements).encode()
     content_length = str(len(content))
     response.headers.update({"Content-Length": content_length})
     setattr(response, "_content", content)
     return response
+
 
 def get_base_url(url: str | URL) -> str:
     """Extracts the base URL from the given URL.
