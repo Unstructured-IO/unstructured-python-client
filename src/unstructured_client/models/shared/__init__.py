@@ -133,6 +133,10 @@ if TYPE_CHECKING:
         ElasticsearchConnectorConfigInputTypedDict,
     )
     from .encryptedsecret import EncryptedSecret, EncryptedSecretTypedDict
+    from .encryptioncertificateresponse import (
+        EncryptionCertificateResponse,
+        EncryptionCertificateResponseTypedDict,
+    )
     from .encryptiontype import EncryptionType
     from .failedfile import FailedFile, FailedFileTypedDict
     from .gcsdestinationconnectorconfig import (
@@ -260,7 +264,6 @@ if TYPE_CHECKING:
         VLMModel,
         VLMModelProvider,
     )
-    from .pemauthresponse import PemAuthResponse, PemAuthResponseTypedDict
     from .pineconedestinationconnectorconfig import (
         PineconeDestinationConnectorConfig,
         PineconeDestinationConnectorConfigTypedDict,
@@ -478,6 +481,8 @@ __all__ = [
     "ElasticsearchConnectorConfigTypedDict",
     "EncryptedSecret",
     "EncryptedSecretTypedDict",
+    "EncryptionCertificateResponse",
+    "EncryptionCertificateResponseTypedDict",
     "EncryptionType",
     "FailedFile",
     "FailedFileTypedDict",
@@ -556,8 +561,6 @@ __all__ = [
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
-    "PemAuthResponse",
-    "PemAuthResponseTypedDict",
     "PineconeDestinationConnectorConfig",
     "PineconeDestinationConnectorConfigInput",
     "PineconeDestinationConnectorConfigInputTypedDict",
@@ -726,6 +729,8 @@ _dynamic_imports: dict[str, str] = {
     "ElasticsearchConnectorConfigInputTypedDict": ".elasticsearchconnectorconfiginput",
     "EncryptedSecret": ".encryptedsecret",
     "EncryptedSecretTypedDict": ".encryptedsecret",
+    "EncryptionCertificateResponse": ".encryptioncertificateresponse",
+    "EncryptionCertificateResponseTypedDict": ".encryptioncertificateresponse",
     "EncryptionType": ".encryptiontype",
     "FailedFile": ".failedfile",
     "FailedFileTypedDict": ".failedfile",
@@ -805,8 +810,6 @@ _dynamic_imports: dict[str, str] = {
     "Strategy": ".partition_parameters",
     "VLMModel": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
-    "PemAuthResponse": ".pemauthresponse",
-    "PemAuthResponseTypedDict": ".pemauthresponse",
     "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigInput": ".pineconedestinationconnectorconfiginput",
