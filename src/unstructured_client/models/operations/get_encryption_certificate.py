@@ -6,7 +6,9 @@ import pydantic
 from pydantic import model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
-from unstructured_client.models.shared import pemauthresponse as shared_pemauthresponse
+from unstructured_client.models.shared import (
+    encryptioncertificateresponse as shared_encryptioncertificateresponse,
+)
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -16,19 +18,19 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata
 
-RETRIEVE_SERVER_PLATFORM_API = "platform-api"
+GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API = "platform-api"
 r"""Unstructured Platform API"""
 
-RETRIEVE_SERVERS = {
-    RETRIEVE_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
+GET_ENCRYPTION_CERTIFICATE_SERVERS = {
+    GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
 }
 
 
-class RetrieveRequestTypedDict(TypedDict):
+class GetEncryptionCertificateRequestTypedDict(TypedDict):
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
-class RetrieveRequest(BaseModel):
+class GetEncryptionCertificateRequest(BaseModel):
     unstructured_api_key: Annotated[
         OptionalNullable[str],
         pydantic.Field(alias="unstructured-api-key"),
@@ -66,18 +68,20 @@ class RetrieveRequest(BaseModel):
         return m
 
 
-class RetrieveResponseTypedDict(TypedDict):
+class GetEncryptionCertificateResponseTypedDict(TypedDict):
     content_type: str
     r"""HTTP response content type for this operation"""
     status_code: int
     r"""HTTP response status code for this operation"""
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
-    pem_auth_response: NotRequired[shared_pemauthresponse.PemAuthResponseTypedDict]
+    encryption_certificate_response: NotRequired[
+        shared_encryptioncertificateresponse.EncryptionCertificateResponseTypedDict
+    ]
     r"""Successful Response"""
 
 
-class RetrieveResponse(BaseModel):
+class GetEncryptionCertificateResponse(BaseModel):
     content_type: str
     r"""HTTP response content type for this operation"""
 
@@ -87,5 +91,7 @@ class RetrieveResponse(BaseModel):
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
 
-    pem_auth_response: Optional[shared_pemauthresponse.PemAuthResponse] = None
+    encryption_certificate_response: Optional[
+        shared_encryptioncertificateresponse.EncryptionCertificateResponse
+    ] = None
     r"""Successful Response"""

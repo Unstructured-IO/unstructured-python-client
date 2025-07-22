@@ -1,4 +1,4 @@
-# RetrieveRequest
+# GetEncryptionCertificateRequest
 
 
 ## Fields

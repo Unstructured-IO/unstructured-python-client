@@ -173,18 +173,21 @@ class Users(BaseSDK):
 
     # endregion sdk-class-body
 
-    def retrieve(
+    def get_encryption_certificate(
         self,
         *,
-        request: Union[operations.RetrieveRequest, operations.RetrieveRequestTypedDict],
+        request: Union[
+            operations.GetEncryptionCertificateRequest,
+            operations.GetEncryptionCertificateRequestTypedDict,
+        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> operations.RetrieveResponse:
-        r"""Retrieve PEM Key
+    ) -> operations.GetEncryptionCertificateResponse:
+        r"""Retrieve the user's public key for encryption.
 
-        Given a UNSTRUCTURED_API_KEY in the post-payload, retrieve the associated PEM key
+        Retrieve a short lived certificate with the public key for encrypting secrets.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -200,17 +203,19 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.RETRIEVE_SERVERS[
-                operations.RETRIEVE_SERVER_PLATFORM_API
+            base_url = operations.GET_ENCRYPTION_CERTIFICATE_SERVERS[
+                operations.GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API
             ]
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, operations.RetrieveRequest)
-        request = cast(operations.RetrieveRequest, request)
+            request = utils.unmarshal(
+                request, operations.GetEncryptionCertificateRequest
+            )
+        request = cast(operations.GetEncryptionCertificateRequest, request)
 
         req = self._build_request(
-            method="POST",
-            path="/api/v1/users/retrieve",
+            method="GET",
+            path="/api/v1/users/secrets/encryption-certificate",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -238,8 +243,9 @@ class Users(BaseSDK):
 
         http_res = self.do_request(
             hook_ctx=HookContext(
+                config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="retrieve",
+                operation_id="get_encryption_certificate",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
@@ -250,9 +256,9 @@ class Users(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return operations.RetrieveResponse(
-                pem_auth_response=utils.unmarshal_json(
-                    http_res.text, Optional[shared.PemAuthResponse]
+            return operations.GetEncryptionCertificateResponse(
+                encryption_certificate_response=utils.unmarshal_json(
+                    http_res.text, Optional[shared.EncryptionCertificateResponse]
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -283,18 +289,21 @@ class Users(BaseSDK):
             http_res,
         )
 
-    async def retrieve_async(
+    async def get_encryption_certificate_async(
         self,
         *,
-        request: Union[operations.RetrieveRequest, operations.RetrieveRequestTypedDict],
+        request: Union[
+            operations.GetEncryptionCertificateRequest,
+            operations.GetEncryptionCertificateRequestTypedDict,
+        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> operations.RetrieveResponse:
-        r"""Retrieve PEM Key
+    ) -> operations.GetEncryptionCertificateResponse:
+        r"""Retrieve the user's public key for encryption.
 
-        Given a UNSTRUCTURED_API_KEY in the post-payload, retrieve the associated PEM key
+        Retrieve a short lived certificate with the public key for encrypting secrets.
 
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
@@ -310,17 +319,19 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.RETRIEVE_SERVERS[
-                operations.RETRIEVE_SERVER_PLATFORM_API
+            base_url = operations.GET_ENCRYPTION_CERTIFICATE_SERVERS[
+                operations.GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API
             ]
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, operations.RetrieveRequest)
-        request = cast(operations.RetrieveRequest, request)
+            request = utils.unmarshal(
+                request, operations.GetEncryptionCertificateRequest
+            )
+        request = cast(operations.GetEncryptionCertificateRequest, request)
 
         req = self._build_request_async(
-            method="POST",
-            path="/api/v1/users/retrieve",
+            method="GET",
+            path="/api/v1/users/secrets/encryption-certificate",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -348,8 +359,9 @@ class Users(BaseSDK):
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
+                config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="retrieve",
+                operation_id="get_encryption_certificate",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
@@ -360,9 +372,9 @@ class Users(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return operations.RetrieveResponse(
-                pem_auth_response=utils.unmarshal_json(
-                    http_res.text, Optional[shared.PemAuthResponse]
+            return operations.GetEncryptionCertificateResponse(
+                encryption_certificate_response=utils.unmarshal_json(
+                    http_res.text, Optional[shared.EncryptionCertificateResponse]
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -463,6 +475,7 @@ class Users(BaseSDK):
 
         http_res = self.do_request(
             hook_ctx=HookContext(
+                config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="store_secret",
                 oauth2_scopes=[],
@@ -578,6 +591,7 @@ class Users(BaseSDK):
 
         http_res = await self.do_request_async(
             hook_ctx=HookContext(
+                config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="store_secret",
                 oauth2_scopes=[],

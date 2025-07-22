@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 3e52fdac3e417f8e48fcb920b829025c
-  docVersion: 1.1.34
-  speakeasyVersion: 1.552.0
-  generationVersion: 2.610.0
-  releaseVersion: 0.39.1
-  configChecksum: 2b0094ee827eb2deb71ef0ff9e572192
+  docChecksum: 0593f5359a35b34f3dc1b346490deff2
+  docVersion: 1.1.39
+  speakeasyVersion: 1.568.0
+  generationVersion: 2.632.2
+  releaseVersion: 0.40.0
+  configChecksum: 70954879fd1a6da62295461541e8680c
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.19.0
+    core: 5.19.3
     customCodeRegions: 0.1.1
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
@@ -33,7 +33,7 @@ features:
     openEnums: 1.0.1
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.1
+    sdkHooks: 1.1.0
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
@@ -71,6 +71,8 @@ generatedFiles:
   - docs/models/operations/getconnectionchecksourcesresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
+  - docs/models/operations/getencryptioncertificaterequest.md
+  - docs/models/operations/getencryptioncertificateresponse.md
   - docs/models/operations/getjobdetailsrequest.md
   - docs/models/operations/getjobdetailsresponse.md
   - docs/models/operations/getjobfailedfilesrequest.md
@@ -91,8 +93,6 @@ generatedFiles:
   - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
-  - docs/models/operations/retrieverequest.md
-  - docs/models/operations/retrieveresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
   - docs/models/operations/storesecretrequest.md
@@ -140,6 +140,7 @@ generatedFiles:
   - docs/models/shared/elasticsearchconnectorconfig.md
   - docs/models/shared/elasticsearchconnectorconfiginput.md
   - docs/models/shared/encryptedsecret.md
+  - docs/models/shared/encryptioncertificateresponse.md
   - docs/models/shared/encryptiontype.md
   - docs/models/shared/failedfile.md
   - docs/models/shared/files.md
@@ -181,7 +182,6 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
-  - docs/models/shared/pemauthresponse.md
   - docs/models/shared/pineconedestinationconnectorconfig.md
   - docs/models/shared/pineconedestinationconnectorconfiginput.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
@@ -272,6 +272,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/get_connection_check_destinations.py
   - src/unstructured_client/models/operations/get_connection_check_sources.py
   - src/unstructured_client/models/operations/get_destination.py
+  - src/unstructured_client/models/operations/get_encryption_certificate.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_job_details.py
   - src/unstructured_client/models/operations/get_job_failed_files.py
@@ -282,7 +283,6 @@ generatedFiles:
   - src/unstructured_client/models/operations/list_sources.py
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
-  - src/unstructured_client/models/operations/retrieve.py
   - src/unstructured_client/models/operations/run_workflow.py
   - src/unstructured_client/models/operations/store_secret.py
   - src/unstructured_client/models/operations/update_destination.py
@@ -323,6 +323,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
   - src/unstructured_client/models/shared/encryptedsecret.py
+  - src/unstructured_client/models/shared/encryptioncertificateresponse.py
   - src/unstructured_client/models/shared/encryptiontype.py
   - src/unstructured_client/models/shared/failedfile.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
@@ -359,7 +360,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
-  - src/unstructured_client/models/shared/pemauthresponse.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
@@ -707,6 +707,13 @@ examples:
       responses:
         "200":
           application/json: {"id": "<id>"}
+        "422":
+          application/json: {"detail": []}
+  get_encryption_certificate:
+    speakeasy-default-get-encryption-certificate:
+      responses:
+        "200":
+          application/json: {"ca_chain": "<value>", "encryption_certificate": "<value>"}
         "422":
           application/json: {"detail": []}
 examplesVersion: 1.0.2
