@@ -34,6 +34,10 @@ from .gcsdestinationconnectorconfig import (
     GCSDestinationConnectorConfig,
     GCSDestinationConnectorConfigTypedDict,
 )
+from .ibmwatsonxs3destinationconnectorconfig import (
+    IBMWatsonxS3DestinationConnectorConfig,
+    IBMWatsonxS3DestinationConnectorConfigTypedDict,
+)
 from .kafkaclouddestinationconnectorconfig import (
     KafkaCloudDestinationConnectorConfig,
     KafkaCloudDestinationConnectorConfigTypedDict,
@@ -53,6 +57,10 @@ from .neo4jdestinationconnectorconfig import (
 from .onedrivedestinationconnectorconfig import (
     OneDriveDestinationConnectorConfig,
     OneDriveDestinationConnectorConfigTypedDict,
+)
+from .pineconedestinationconnectorconfig import (
+    PineconeDestinationConnectorConfig,
+    PineconeDestinationConnectorConfigTypedDict,
 )
 from .postgresdestinationconnectorconfig import (
     PostgresDestinationConnectorConfig,
@@ -95,24 +103,26 @@ DestinationConnectorInformationConfigTypedDict = TypeAliasType(
     "DestinationConnectorInformationConfigTypedDict",
     Union[
         GCSDestinationConnectorConfigTypedDict,
-        MongoDBConnectorConfigTypedDict,
+        ElasticsearchConnectorConfigTypedDict,
         AzureAISearchConnectorConfigTypedDict,
         WeaviateDestinationConnectorConfigTypedDict,
-        ElasticsearchConnectorConfigTypedDict,
-        QdrantCloudDestinationConnectorConfigTypedDict,
+        MongoDBConnectorConfigTypedDict,
         DeltaTableConnectorConfigTypedDict,
+        QdrantCloudDestinationConnectorConfigTypedDict,
+        PineconeDestinationConnectorConfigTypedDict,
         AstraDBConnectorConfigTypedDict,
         Neo4jDestinationConnectorConfigTypedDict,
         OneDriveDestinationConnectorConfigTypedDict,
-        DatabricksVDTDestinationConnectorConfigTypedDict,
         S3DestinationConnectorConfigTypedDict,
         MilvusDestinationConnectorConfigTypedDict,
-        KafkaCloudDestinationConnectorConfigTypedDict,
-        PostgresDestinationConnectorConfigTypedDict,
         DatabricksVolumesConnectorConfigTypedDict,
+        PostgresDestinationConnectorConfigTypedDict,
+        KafkaCloudDestinationConnectorConfigTypedDict,
         CouchbaseDestinationConnectorConfigTypedDict,
         RedisDestinationConnectorConfigTypedDict,
+        DatabricksVDTDestinationConnectorConfigTypedDict,
         SnowflakeDestinationConnectorConfigTypedDict,
+        IBMWatsonxS3DestinationConnectorConfigTypedDict,
     ],
 )
 
@@ -121,24 +131,26 @@ DestinationConnectorInformationConfig = TypeAliasType(
     "DestinationConnectorInformationConfig",
     Union[
         GCSDestinationConnectorConfig,
-        MongoDBConnectorConfig,
+        ElasticsearchConnectorConfig,
         AzureAISearchConnectorConfig,
         WeaviateDestinationConnectorConfig,
-        ElasticsearchConnectorConfig,
-        QdrantCloudDestinationConnectorConfig,
+        MongoDBConnectorConfig,
         DeltaTableConnectorConfig,
+        QdrantCloudDestinationConnectorConfig,
+        PineconeDestinationConnectorConfig,
         AstraDBConnectorConfig,
         Neo4jDestinationConnectorConfig,
         OneDriveDestinationConnectorConfig,
-        DatabricksVDTDestinationConnectorConfig,
         S3DestinationConnectorConfig,
         MilvusDestinationConnectorConfig,
-        KafkaCloudDestinationConnectorConfig,
-        PostgresDestinationConnectorConfig,
         DatabricksVolumesConnectorConfig,
+        PostgresDestinationConnectorConfig,
+        KafkaCloudDestinationConnectorConfig,
         CouchbaseDestinationConnectorConfig,
         RedisDestinationConnectorConfig,
+        DatabricksVDTDestinationConnectorConfig,
         SnowflakeDestinationConnectorConfig,
+        IBMWatsonxS3DestinationConnectorConfig,
     ],
 )
 
@@ -175,7 +187,7 @@ class DestinationConnectorInformation(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

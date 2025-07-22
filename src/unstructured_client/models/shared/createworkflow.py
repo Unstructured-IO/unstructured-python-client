@@ -31,38 +31,53 @@ class Schedule(str, Enum):
 
 
 class CreateWorkflowTypedDict(TypedDict):
-    destination_id: str
     name: str
-    source_id: str
     workflow_type: WorkflowType
+    destination_id: NotRequired[Nullable[str]]
+    reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[Schedule]]
+    source_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
 
 
 class CreateWorkflow(BaseModel):
-    destination_id: str
-
     name: str
-
-    source_id: str
 
     workflow_type: WorkflowType
 
+    destination_id: OptionalNullable[str] = UNSET
+
+    reprocess_all: OptionalNullable[bool] = UNSET
+
     schedule: OptionalNullable[Schedule] = UNSET
+
+    source_id: OptionalNullable[str] = UNSET
 
     workflow_nodes: OptionalNullable[List[WorkflowNode]] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["schedule", "workflow_nodes"]
-        nullable_fields = ["schedule", "workflow_nodes"]
+        optional_fields = [
+            "destination_id",
+            "reprocess_all",
+            "schedule",
+            "source_id",
+            "workflow_nodes",
+        ]
+        nullable_fields = [
+            "destination_id",
+            "reprocess_all",
+            "schedule",
+            "source_id",
+            "workflow_nodes",
+        ]
         null_default_fields = []
 
         serialized = handler(self)
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

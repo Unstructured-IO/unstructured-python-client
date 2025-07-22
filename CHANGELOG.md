@@ -1,3 +1,22 @@
+## 0.37.3
+
+### Enhancements
+* Improve PDF validation error handling by introducing FileValidationError base class for better error abstraction
+
+### Features
+
+### Fixes
+* Replace RequestError with PDFValidationError for invalid PDF files to provide more accurate error context
+
+## 0.37.0
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Throws appropriate error message in case the given PDF file is invalid (corrupted or encrypted).
+
 ## 0.30.0
 
 ### Enhancements

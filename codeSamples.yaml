@@ -14,25 +14,37 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.AZURE_AI_SEARCH,\n            \"config\": {\n                \"collection_name\": \"<value>\",\n                \"batch_size\": 20,\n                \"api_endpoint\": \"<value>\",\n                \"token\": \"<value>\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.MOTHERDUCK,\n            \"config\": {\n                \"client_id\": \"<id>\",\n                \"user_pname\": \"<value>\",\n                \"tenant\": \"<value>\",\n                \"authority_url\": \"https://burdensome-bathhouse.biz/\",\n                \"client_cred\": \"<value>\",\n                \"remote_url\": \"https://cheerful-cheetah.com/\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.delete_destination(request={\n        \"destination_id\": \"10a88d76-65fb-4c88-8488-9e7d272c6373\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.delete_destination(request={\n        \"destination_id\": \"f50b6b0c-1177-4edb-ae10-68199cd00ba6\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_destination(request={\n        \"destination_id\": \"41ba03fb-faa3-4e9e-8cfb-27f133c4198a\",\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_destination(request={\n        \"destination_id\": \"6352107c-44bd-4a20-a286-de73a4d9c9bd\",\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9ea9d27c-4e2e-4cb5-9a69-71bd7ec9d226\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"host\": \"acidic-patroller.com\",\n                \"database\": \"<value>\",\n                \"port\": 832931,\n                \"username\": \"Salvador.Walsh-Thiel\",\n                \"password\": \"vIMqbllzrdJBExE\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 977983,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9726962d-9d1e-4f84-8787-c7313d183927\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"bootstrap_servers\": \"<value>\",\n                \"port\": 9092,\n                \"topic\": \"<value>\",\n                \"kafka_api_key\": \"<value>\",\n                \"secret\": \"<value>\",\n                \"batch_size\": 100,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+  - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_connection_check_destinations"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.get_connection_check_destinations(request={\n        \"destination_id\": \"c95687a3-239f-485c-946b-4c8fe314ef82\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+  - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "create_connection_check_destinations"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_connection_check_destinations(request={\n        \"destination_id\": \"cb9e35c1-0b04-4d98-83fa-fa6241323f96\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
   - target: $["paths"]["/api/v1/jobs/"]["get"]
     update:
       "x-codeSamples":
@@ -44,13 +56,31 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_job"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job(request={\n        \"job_id\": \"6bb4cb72-a072-4398-9de3-194e59352a3c\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job(request={\n        \"job_id\": \"d95a05b3-3446-4f3d-806c-904b6a7ba40a\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
   - target: $["paths"]["/api/v1/jobs/{job_id}/cancel"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "cancel_job"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.cancel_job(request={\n        \"job_id\": \"ec29bf67-0f30-4793-b5ee-8fc0da196032\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.cancel_job(request={\n        \"job_id\": \"2fafd129-04f3-4201-a0e7-fe33e937b367\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+  - target: $["paths"]["/api/v1/jobs/{job_id}/details"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_job_details"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job_details(request={\n        \"job_id\": \"14cc95f9-4174-46b3-81f5-7089b87a4787\",\n    })\n\n    assert res.job_details is not None\n\n    # Handle response\n    print(res.job_details)"
+  - target: $["paths"]["/api/v1/jobs/{job_id}/download"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "download_job_output"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"06d1b7b8-8642-4793-b37e-e45d97d53bc3\",\n        \"file_id\": \"<id>\",\n        \"node_id\": \"7c8f2aa4-da13-4a04-a98d-0204ea55681e\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+  - target: $["paths"]["/api/v1/jobs/{job_id}/failed-files"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_job_failed_files"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job_failed_files(request={\n        \"job_id\": \"ad262041-3530-40a9-9f83-b004e947a203\",\n    })\n\n    assert res.job_failed_files is not None\n\n    # Handle response\n    print(res.job_failed_files)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
@@ -62,25 +92,49 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_source"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.S3,\n            \"config\": {\n                \"username\": \"Eldora_Casper\",\n                \"consumer_key\": \"<value>\",\n                \"private_key\": \"<value>\",\n                \"categories\": [\n                    \"<value>\",\n                ],\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.DROPBOX,\n            \"config\": {\n                \"remote_url\": \"https://ugly-ribbon.info\",\n                \"recursive\": True,\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_source"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.delete_source(request={\n        \"source_id\": \"8a24d7ae-5524-45e9-83f9-b0adba5303d4\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.delete_source(request={\n        \"source_id\": \"296c4009-7b81-4144-9c7c-e058204aeb93\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_source"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_source(request={\n        \"source_id\": \"e02d8147-b614-4e4c-9c6d-0cd9c4492ea0\",\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_source(request={\n        \"source_id\": \"df7d5ab1-bb15-4f1a-8dc0-c92a9a28a585\",\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_source"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"7d031737-4969-4d2e-ae5d-8e2396edec43\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"client_id\": \"<id>\",\n                \"tenant\": \"<value>\",\n                \"authority_url\": \"https://pleasing-hammock.org/\",\n                \"user_pname\": \"<value>\",\n                \"client_cred\": \"<value>\",\n                \"recursive\": False,\n                \"path\": \"/etc/namedb\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"6ddfe201-42c1-4097-a271-1fc2801d1903\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"bucket\": \"<value>\",\n                \"connection_string\": \"<value>\",\n                \"batch_size\": 615322,\n                \"username\": \"Lue.Murphy87\",\n                \"password\": \"qfyDYveMwvwoQEV\",\n                \"collection_id\": \"<id>\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+  - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_connection_check_sources"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.get_connection_check_sources(request={\n        \"source_id\": \"4df23b66-dae2-44ea-8dd3-329184d5644a\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+  - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "create_connection_check_sources"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"8d49e3f2-3e6d-4973-bc61-292af66829d7\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+  - target: $["paths"]["/api/v1/users/retrieve"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "retrieve"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.retrieve(request={})\n\n    assert res.pem_auth_response is not None\n\n    # Handle response\n    print(res.pem_auth_response)"
+  - target: $["paths"]["/api/v1/users/secrets"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "store_secret"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.store_secret(request={\n        \"encrypted_secret\": {\n            \"encrypted_value\": \"<value>\",\n        },\n    })\n\n    assert res.secret_reference is not None\n\n    # Handle response\n    print(res.secret_reference)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
@@ -92,34 +146,34 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_workflow"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"source_id\": \"b5baba90-bc88-4ea4-b45f-e894788e3f38\",\n            \"destination_id\": \"0efa0612-4dfe-411e-b84d-d7cfa1e3fe9e\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow(request={\n        \"create_workflow\": {\n            \"name\": \"<value>\",\n            \"workflow_type\": shared.WorkflowType.ADVANCED,\n        },\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["delete"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "delete_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.delete_workflow(request={\n        \"workflow_id\": \"26c0bd77-269e-4239-86b8-71541359440c\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.delete_workflow(request={\n        \"workflow_id\": \"3e61b8a6-32b6-47cf-bce7-6d13357b30eb\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["get"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "get_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.get_workflow(request={\n        \"workflow_id\": \"270d9bb5-13f1-4e4d-bb84-4bcc30c93967\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.get_workflow(request={\n        \"workflow_id\": \"d031b0e5-7ca7-4a2b-b3cc-d869d2df3e76\",\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}"]["put"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.update_workflow(request={\n        \"workflow_id\": \"b63b90df-08ba-41e1-b15b-bc744e5781fa\",\n        \"update_workflow\": {},\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.update_workflow(request={\n        \"workflow_id\": \"b9b7e688-353f-4ff2-bcd7-a49b5fa5f6c7\",\n        \"update_workflow\": {},\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}/run"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "run_workflow"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"6b67be6d-98e9-440c-88fd-721e5d2d0036\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.run_workflow(request={\n        \"workflow_id\": \"e7054f23-ce92-4bf1-a1d7-7cf9cb14d013\",\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
   - target: $["paths"]["/general/v0/general"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "partition"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"vlm_model_provider\": shared.PartitionParametersStrategy.OPENAI,\n            \"vlm_model\": shared.PartitionParametersSchemasStrategy.GPT_4O,\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"vlm_model_provider\": shared.VLMModelProvider.OPENAI,\n            \"vlm_model\": shared.VLMModel.GPT_4O,\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"

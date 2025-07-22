@@ -22,4 +22,7 @@
 | `S3`                 | s3                   |
 | `SALESFORCE`         | salesforce           |
 | `SHAREPOINT`         | sharepoint           |
+| `SLACK`              | slack                |
 | `SNOWFLAKE`          | snowflake            |
+| `JIRA`               | jira                 |
+| `ZENDESK`            | zendesk              |

@@ -5,11 +5,55 @@
 
 ### Available Operations
 
+* [create_connection_check_sources](#create_connection_check_sources) - Create source connection check
 * [create_source](#create_source) - Create source connector
 * [delete_source](#delete_source) - Delete source connector
+* [get_connection_check_sources](#get_connection_check_sources) - Get the latest source connector connection check
 * [get_source](#get_source) - Get source connector
 * [list_sources](#list_sources) - List available source connectors
 * [update_source](#update_source) - Update source connector
+
+## create_connection_check_sources
+
+Initiates a connection check for the specified source connector.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.sources.create_connection_check_sources(request={
+        "source_id": "8d49e3f2-3e6d-4973-bc61-292af66829d7",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                        | Type                                                                                                             | Required                                                                                                         | Description                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                        | [operations.CreateConnectionCheckSourcesRequest](../../models/operations/createconnectionchecksourcesrequest.md) | :heavy_check_mark:                                                                                               | The request object to use for the request.                                                                       |
+| `retries`                                                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                 | :heavy_minus_sign:                                                                                               | Configuration to override the default retry behavior of the client.                                              |
+| `server_url`                                                                                                     | *Optional[str]*                                                                                                  | :heavy_minus_sign:                                                                                               | An optional server URL to use.                                                                                   |
+
+### Response
+
+**[operations.CreateConnectionCheckSourcesResponse](../../models/operations/createconnectionchecksourcesresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
 
 ## create_source
 
@@ -27,14 +71,12 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.create_source(request={
         "create_source_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "username": "username",
-                "collection": "collection_name",
-                "scope": "scope_name",
+                "catalog": "<value>",
+                "client_id": "<id>",
+                "client_secret": "<value>",
+                "host": "athletic-nudge.org",
+                "volume": "<value>",
+                "volume_path": "<value>",
             },
             "name": "<value>",
             "type": shared.SourceConnectorType.SALESFORCE,
@@ -80,7 +122,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.delete_source(request={
-        "source_id": "8a24d7ae-5524-45e9-83f9-b0adba5303d4",
+        "source_id": "296c4009-7b81-4144-9c7c-e058204aeb93",
     })
 
     assert res.any is not None
@@ -109,6 +151,48 @@ with UnstructuredClient() as uc_client:
 | errors.HTTPValidationError | 422                        | application/json           |
 | errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
 
+## get_connection_check_sources
+
+Retrieves the most recent connection check for the specified source connector.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.sources.get_connection_check_sources(request={
+        "source_id": "4df23b66-dae2-44ea-8dd3-329184d5644a",
+    })
+
+    assert res.dag_node_connection_check is not None
+
+    # Handle response
+    print(res.dag_node_connection_check)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                  | Type                                                                                                       | Required                                                                                                   | Description                                                                                                |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                  | [operations.GetConnectionCheckSourcesRequest](../../models/operations/getconnectionchecksourcesrequest.md) | :heavy_check_mark:                                                                                         | The request object to use for the request.                                                                 |
+| `retries`                                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                           | :heavy_minus_sign:                                                                                         | Configuration to override the default retry behavior of the client.                                        |
+| `server_url`                                                                                               | *Optional[str]*                                                                                            | :heavy_minus_sign:                                                                                         | An optional server URL to use.                                                                             |
+
+### Response
+
+**[operations.GetConnectionCheckSourcesResponse](../../models/operations/getconnectionchecksourcesresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
 ## get_source
 
 Retrieve detailed information for a specific source connector by its ID.
@@ -122,7 +206,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.sources.get_source(request={
-        "source_id": "e02d8147-b614-4e4c-9c6d-0cd9c4492ea0",
+        "source_id": "df7d5ab1-bb15-4f1a-8dc0-c92a9a28a585",
     })
 
     assert res.source_connector_information is not None
@@ -206,17 +290,15 @@ with UnstructuredClient() as uc_client:
     res = uc_client.sources.update_source(request={
         "update_source_connector": {
             "config": {
-                "batch_size": 100,
-                "bucket": "bucket-name",
-                "collection_id": "type",
-                "connection_string": "couchbases://cb.abcdefg.cloud.couchbase.com",
-                "password": "password",
-                "username": "username",
-                "collection": "collection_name",
-                "scope": "scope_name",
+                "batch_size": 615322,
+                "bucket": "<value>",
+                "collection_id": "<id>",
+                "connection_string": "<value>",
+                "password": "sMt9qfyDYveMwvw",
+                "username": "Rene.Glover-Lakin",
             },
         },
-        "source_id": "196d27d0-3173-4749-b69d-2ee5d8e2396e",
+        "source_id": "ddfe2014-2c10-4972-9711-fc2801d19038",
     })
 
     assert res.source_connector_information is not None

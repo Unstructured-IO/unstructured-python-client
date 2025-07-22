@@ -110,36 +110,26 @@ Some of the endpoints in this SDK support retries. If you use the SDK without an
 To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
-        },
+    res = uc_client.destinations.create_connection_check_destinations(request={
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 
 ```
 
 If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
@@ -147,22 +137,14 @@ with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
 ) as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
-        },
+    res = uc_client.destinations.create_connection_check_destinations(request={
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 
 ```
 <!-- End Retries [retries] -->
@@ -182,7 +164,7 @@ By default, an API error will raise a errors.SDKError exception, which has the f
 | `.raw_response` | *httpx.Response* | The raw HTTP response |
 | `.body`         | *str*            | The response content  |
 
-When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `create_destination_async` method may raise the following exceptions:
+When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `create_connection_check_destinations_async` method may raise the following exceptions:
 
 | Error Type                 | Status Code | Content Type     |
 | -------------------------- | ----------- | ---------------- |
@@ -193,29 +175,21 @@ When custom error responses are specified for an operation, the SDK may also rai
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import errors, shared
+from unstructured_client.models import errors
 
 
 with UnstructuredClient() as uc_client:
     res = None
     try:
 
-        res = uc_client.destinations.create_destination(request={
-            "create_destination_connector": {
-                "config": {
-                    "endpoint": "<value>",
-                    "index": "<value>",
-                    "key": "<key>",
-                },
-                "name": "<value>",
-                "type": shared.DestinationConnectorType.ASTRADB,
-            },
+        res = uc_client.destinations.create_connection_check_destinations(request={
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
-        assert res.destination_connector_information is not None
+        assert res.dag_node_connection_check is not None
 
         # Handle response
-        print(res.destination_connector_information)
+        print(res.dag_node_connection_check)
 
     except errors.HTTPValidationError as e:
         # handle e.data: errors.HTTPValidationErrorData
@@ -326,58 +300,40 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 ```python
 # Synchronous Example
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
-        },
+    res = uc_client.destinations.create_connection_check_destinations(request={
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 ```
 
 </br>
 
-The same SDK client can also be used to make asychronous requests by importing asyncio.
+The same SDK client can also be used to make asynchronous requests by importing asyncio.
 ```python
 # Asynchronous Example
 import asyncio
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 async def main():
 
     async with UnstructuredClient() as uc_client:
 
-        res = await uc_client.destinations.create_destination_async(request={
-            "create_destination_connector": {
-                "config": {
-                    "endpoint": "<value>",
-                    "index": "<value>",
-                    "key": "<key>",
-                },
-                "name": "<value>",
-                "type": shared.DestinationConnectorType.ASTRADB,
-            },
+        res = await uc_client.destinations.create_connection_check_destinations_async(request={
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
-        assert res.destination_connector_information is not None
+        assert res.dag_node_connection_check is not None
 
         # Handle response
-        print(res.destination_connector_information)
+        print(res.dag_node_connection_check)
 
 asyncio.run(main())
 ```
@@ -395,7 +351,7 @@ See [page splitting](https://docs.unstructured.io/api-reference/api-services/sdk
 In order to speed up processing of large PDF files, the client splits up PDFs into smaller files, sends these to the API concurrently, and recombines the results. `split_pdf_page` can be set to `False` to disable this.
 
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encounter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
 
 Example:
 ```python
@@ -469,8 +425,8 @@ with UnstructuredClient() as uc_client:
                 1,
                 10,
             ],
-            "vlm_model": shared.PartitionParametersStrategy.GPT_4O,
-            "vlm_model_provider": shared.PartitionParametersSchemasStrategy.OPENAI,
+            "vlm_model": shared.VLMModel.GPT_4O,
+            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
     })
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
-from typing import Optional
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -16,11 +16,14 @@ from unstructured_client.types import (
 class ConfluenceSourceConnectorConfigInputTypedDict(TypedDict):
     url: str
     username: str
+    api_token: NotRequired[Nullable[str]]
     cloud: NotRequired[bool]
+    extract_files: NotRequired[bool]
+    extract_images: NotRequired[bool]
     max_num_of_docs_from_each_space: NotRequired[int]
     max_num_of_spaces: NotRequired[int]
     password: NotRequired[Nullable[str]]
-    spaces: NotRequired[Nullable[str]]
+    spaces: NotRequired[Nullable[List[str]]]
     token: NotRequired[Nullable[str]]
 
 
@@ -29,7 +32,13 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
 
     username: str
 
+    api_token: OptionalNullable[str] = UNSET
+
     cloud: Optional[bool] = False
+
+    extract_files: Optional[bool] = False
+
+    extract_images: Optional[bool] = False
 
     max_num_of_docs_from_each_space: Optional[int] = 150
 
@@ -37,28 +46,31 @@ class ConfluenceSourceConnectorConfigInput(BaseModel):
 
     password: OptionalNullable[str] = UNSET
 
-    spaces: OptionalNullable[str] = UNSET
+    spaces: OptionalNullable[List[str]] = UNSET
 
     token: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = [
+            "api_token",
             "cloud",
+            "extract_files",
+            "extract_images",
             "max_num_of_docs_from_each_space",
             "max_num_of_spaces",
             "password",
             "spaces",
             "token",
         ]
-        nullable_fields = ["password", "spaces", "token"]
+        nullable_fields = ["api_token", "password", "spaces", "token"]
         null_default_fields = []
 
         serialized = handler(self)
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

@@ -94,13 +94,18 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
 @pytest.mark.parametrize(
     ("status_code", "expect_retry"),
     [
-        [500, False],
+        [400, False],
+        [401, False],
+        [403, False],
+        [404, False],
+        [422, False],
+        [500, True],
         [502, True],
         [503, True],
         [504, True],
     ]
 )
-def test_unit_number_of_retries_in_5xx(status_code: int, expect_retry: bool):
+def test_unit_number_of_retries_in_failed_requests(status_code: int, expect_retry: bool):
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
         initial_interval=1, max_interval=10, exponent=1.5, max_elapsed_time=300
@@ -164,7 +169,7 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     with pytest.raises(Exception):
         session.general.partition(request=req, retries=retries)
 
-    pattern = re.compile(f"Failed to process a request due to connection error .*? "
+    pattern = re.compile("Failed to process a request due to connection error .*? "
                          "Attempting retry number 1 after sleep.")
     assert bool(pattern.search(caplog.text))
 
@@ -193,23 +198,20 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
 
 
 @pytest.mark.parametrize(
-    "server_url",
+    "server_url,expected_url",
     [
-        # -- well-formed url --
-        "http://localhost:8000",
-        # -- common malformed urls --
-        "localhost:8000",
-        "localhost:8000/general/v0/general",
-        "http://localhost:8000/general/v0/general",
+        ("http://localhost:8000", "http://localhost:8000"),
+        ("localhost:8000", "http://localhost:8000"),
+        ("localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
+        ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
     ],
 )
-def test_unit_clean_server_url_fixes_malformed_localhost_url(server_url: str):
+def test_unit_clean_server_url_fixes_non_unst_domain_url(server_url: str, expected_url: str):
     client = UnstructuredClient(
         server_url=server_url,
         api_key_auth=FAKE_KEY,
     )
-    assert client.general.sdk_configuration.server_url == "http://localhost:8000"
-
+    assert client.general.sdk_configuration.server_url == expected_url
 
 @pytest.mark.parametrize(
     "server_url",
@@ -228,7 +230,7 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(se
     )
 
 
-def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: requests.Session):
+def test_after_error_hook_logs(caplog, session_: Mock, response_: requests.Session):
     def mock_post(request):
         return Response(401, request=request)
 
@@ -243,15 +245,13 @@ def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: request
     req = operations.PartitionRequest(
         partition_parameters=shared.PartitionParameters(files=files)
     )
-
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
-        with caplog.at_level(logging.WARNING):
-            session.general.partition(request=req)
-
-        assert any(
-            "This API key is invalid against the paid API. If intending to use the free API, please initialize UnstructuredClient with `server='free-api'`."
-            in message for message in caplog.messages
-        )
+        session.general.partition(request=req)
+    
+    assert any(
+        "Server responded with 401"
+        in message for message in caplog.messages
+    )
 
 
 # -- fixtures --------------------------------------------------------------------------------

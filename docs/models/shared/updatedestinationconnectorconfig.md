@@ -81,6 +81,12 @@ value: shared.Neo4jDestinationConnectorConfigInput = /* values here */
 value: shared.OneDriveDestinationConnectorConfigInput = /* values here */
 ```
 
+### `shared.PineconeDestinationConnectorConfigInput`
+
+```python
+value: shared.PineconeDestinationConnectorConfigInput = /* values here */
+```
+
 ### `shared.PostgresDestinationConnectorConfigInput`
 
 ```python
@@ -115,5 +121,11 @@ value: shared.SnowflakeDestinationConnectorConfigInput = /* values here */
 
 ```python
 value: shared.WeaviateDestinationConnectorConfigInput = /* values here */
+```
+
+### `shared.IBMWatsonxS3DestinationConnectorConfigInput`
+
+```python
+value: shared.IBMWatsonxS3DestinationConnectorConfigInput = /* values here */
 ```
 

@@ -20,7 +20,7 @@ jobs:
   test_unit:
     strategy:
       matrix:
-        python-version: ["3.9","3.10","3.11"]
+        python-version: [ "3.9","3.10","3.11", "3.12" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
       run: make install
     - name: Run unit tests
       run: |
-        poetry run make test-unit
+        make test-unit
 
   lint:
     runs-on: ubuntu-latest
@@ -42,12 +42,12 @@ jobs:
       run: make install
     - name: Lint
       run: |
-        poetry run make lint
+        make lint
 
   test_integration:
     strategy:
       matrix:
-        python-version: ["3.9","3.10","3.11"]
+        python-version: [ "3.9","3.10","3.11", "3.12" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -57,9 +57,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: make install
-    - name: Run all tests
+    - name: Run integration tests
       run: |
-        poetry run make test
+        make test-integration-docker
       env:
         UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 
@@ -79,8 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           make install
-          source .venv/bin/activate && make install-test-contract
-      - name: Run unit tests
+      - name: Run contract tests
         run: |
-          poetry run make test-contract
+          make test-contract
 

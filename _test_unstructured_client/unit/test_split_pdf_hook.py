@@ -12,6 +12,7 @@ import pytest
 import requests
 from requests_toolbelt import MultipartDecoder
 
+from _test_unstructured_client.unit_utils import sample_docs_path
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
     FormData,
@@ -29,6 +30,7 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     SplitPdfHook,
     get_optimal_split_size, run_tasks,
 )
+from unstructured_client._hooks.types import BeforeRequestContext
 from unstructured_client.models import shared
 
 
@@ -464,3 +466,63 @@ def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path
     mock_path.assert_called_once_with(mock_dir)
     mock_path_instance.exists.assert_called_once()
     assert result == str(Path(mock_dir).resolve())
+
+
+def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
+    """Test that before_request raises PDFValidationError when pdf_utils.check_pdf throws PDFValidationError."""
+    hook = SplitPdfHook()
+    
+    # Initialize the hook with a mock client
+    mock_client = MagicMock()
+    hook.sdk_init(base_url="http://localhost:8888", client=mock_client)
+    
+    # Create a mock request context
+    mock_hook_ctx = MagicMock()
+    mock_hook_ctx.operation_id = "partition"
+    
+    # Create a mock request with proper headers and content
+    mock_request = MagicMock()
+    mock_request.headers = {"Content-Type": "multipart/form-data"}
+    mock_request.url.host = "localhost"
+    
+    # Mock the form data to include the necessary fields for PDF splitting
+    mock_pdf_file = MagicMock()
+    mock_pdf_file.read.return_value = b"mock_pdf_content"
+    
+    mock_form_data = {
+        "split_pdf_page": "true",
+        "files": {
+            "filename": "test.pdf",
+            "content_type": "application/pdf",
+            "file": mock_pdf_file
+        }
+    }
+    
+    # Mock the PDF reader object
+    mock_pdf_reader = MagicMock()
+    
+    # Define the error message that will be raised
+    error_message = "File does not appear to be a valid PDF."
+    
+    with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
+         patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
+         patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
+         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url:
+        
+        # Set up the mocks
+        mock_get_fields.return_value = mock_form_data
+        mock_read_pdf.return_value = mock_pdf_reader
+        mock_check_pdf.side_effect = pdf_utils.PDFValidationError(error_message)
+        mock_get_base_url.return_value = "http://localhost:8888"
+        
+        # Call the method under test and verify it raises PDFValidationError
+        with pytest.raises(pdf_utils.PDFValidationError) as exc_info:
+            hook.before_request(mock_hook_ctx, mock_request)
+        
+        # Verify the exception has the correct message
+        assert str(exc_info.value) == error_message
+        
+        # Verify that the mocked functions were called as expected
+        mock_get_fields.assert_called_once_with(mock_request)
+        mock_read_pdf.assert_called_once_with(mock_pdf_file)
+        mock_check_pdf.assert_called_once_with(mock_pdf_reader)

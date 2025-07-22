@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,6 +18,9 @@ class SharePointSourceConnectorConfigTypedDict(TypedDict):
     client_id: str
     recursive: bool
     site: str
+    tenant: str
+    user_pname: str
+    authority_url: NotRequired[str]
     path: NotRequired[Nullable[str]]
 
 
@@ -29,11 +33,17 @@ class SharePointSourceConnectorConfig(BaseModel):
 
     site: str
 
+    tenant: str
+
+    user_pname: str
+
+    authority_url: Optional[str] = "https://login.microsoftonline.com"
+
     path: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["path"]
+        optional_fields = ["authority_url", "path"]
         nullable_fields = ["path"]
         null_default_fields = []
 
@@ -41,7 +51,7 @@ class SharePointSourceConnectorConfig(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

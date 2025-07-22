@@ -81,6 +81,12 @@ value: shared.OneDriveSourceConnectorConfig = /* values here */
 value: shared.OutlookSourceConnectorConfig = /* values here */
 ```
 
+### `shared.PostgresSourceConnectorConfig`
+
+```python
+value: shared.PostgresSourceConnectorConfig = /* values here */
+```
+
 ### `shared.S3SourceConnectorConfig`
 
 ```python
@@ -103,5 +109,17 @@ value: shared.SharePointSourceConnectorConfig = /* values here */
 
 ```python
 value: shared.SnowflakeSourceConnectorConfig = /* values here */
+```
+
+### `shared.JiraSourceConnectorConfig`
+
+```python
+value: shared.JiraSourceConnectorConfig = /* values here */
+```
+
+### `shared.ZendeskSourceConnectorConfig`
+
+```python
+value: shared.ZendeskSourceConnectorConfig = /* values here */
 ```
 

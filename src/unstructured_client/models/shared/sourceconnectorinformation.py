@@ -37,6 +37,10 @@ from .googledrivesourceconnectorconfig import (
     GoogleDriveSourceConnectorConfig,
     GoogleDriveSourceConnectorConfigTypedDict,
 )
+from .jirasourceconnectorconfig import (
+    JiraSourceConnectorConfig,
+    JiraSourceConnectorConfigTypedDict,
+)
 from .kafkacloudsourceconnectorconfig import (
     KafkaCloudSourceConnectorConfig,
     KafkaCloudSourceConnectorConfigTypedDict,
@@ -52,6 +56,10 @@ from .onedrivesourceconnectorconfig import (
 from .outlooksourceconnectorconfig import (
     OutlookSourceConnectorConfig,
     OutlookSourceConnectorConfigTypedDict,
+)
+from .postgressourceconnectorconfig import (
+    PostgresSourceConnectorConfig,
+    PostgresSourceConnectorConfigTypedDict,
 )
 from .s3sourceconnectorconfig import (
     S3SourceConnectorConfig,
@@ -70,6 +78,10 @@ from .snowflakesourceconnectorconfig import (
     SnowflakeSourceConnectorConfigTypedDict,
 )
 from .sourceconnectortype import SourceConnectorType
+from .zendesksourceconnectorconfig import (
+    ZendeskSourceConnectorConfig,
+    ZendeskSourceConnectorConfigTypedDict,
+)
 from datetime import datetime
 from pydantic import model_serializer
 from typing import Union
@@ -93,14 +105,17 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
         GCSSourceConnectorConfigTypedDict,
         SalesforceSourceConnectorConfigTypedDict,
         GoogleDriveSourceConnectorConfigTypedDict,
-        SharePointSourceConnectorConfigTypedDict,
+        ZendeskSourceConnectorConfigTypedDict,
         AzureSourceConnectorConfigTypedDict,
-        DatabricksVolumesConnectorConfigTypedDict,
-        KafkaCloudSourceConnectorConfigTypedDict,
         OneDriveSourceConnectorConfigTypedDict,
+        KafkaCloudSourceConnectorConfigTypedDict,
+        DatabricksVolumesConnectorConfigTypedDict,
         OutlookSourceConnectorConfigTypedDict,
         S3SourceConnectorConfigTypedDict,
+        SharePointSourceConnectorConfigTypedDict,
         CouchbaseSourceConnectorConfigTypedDict,
+        PostgresSourceConnectorConfigTypedDict,
+        JiraSourceConnectorConfigTypedDict,
         ConfluenceSourceConnectorConfigTypedDict,
         SnowflakeSourceConnectorConfigTypedDict,
     ],
@@ -117,14 +132,17 @@ SourceConnectorInformationConfig = TypeAliasType(
         GCSSourceConnectorConfig,
         SalesforceSourceConnectorConfig,
         GoogleDriveSourceConnectorConfig,
-        SharePointSourceConnectorConfig,
+        ZendeskSourceConnectorConfig,
         AzureSourceConnectorConfig,
-        DatabricksVolumesConnectorConfig,
-        KafkaCloudSourceConnectorConfig,
         OneDriveSourceConnectorConfig,
+        KafkaCloudSourceConnectorConfig,
+        DatabricksVolumesConnectorConfig,
         OutlookSourceConnectorConfig,
         S3SourceConnectorConfig,
+        SharePointSourceConnectorConfig,
         CouchbaseSourceConnectorConfig,
+        PostgresSourceConnectorConfig,
+        JiraSourceConnectorConfig,
         ConfluenceSourceConnectorConfig,
         SnowflakeSourceConnectorConfig,
     ],
@@ -163,7 +181,7 @@ class SourceConnectorInformation(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)

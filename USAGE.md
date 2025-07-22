@@ -2,27 +2,18 @@
 ```python
 # Synchronous Example
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "endpoint": "<value>",
-                "index": "<value>",
-                "key": "<key>",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.ASTRADB,
-        },
+    res = uc_client.destinations.create_connection_check_destinations(request={
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
-    assert res.destination_connector_information is not None
+    assert res.dag_node_connection_check is not None
 
     # Handle response
-    print(res.destination_connector_information)
+    print(res.dag_node_connection_check)
 ```
 
 </br>
@@ -32,28 +23,19 @@ The same SDK client can also be used to make asychronous requests by importing a
 # Asynchronous Example
 import asyncio
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 async def main():
 
     async with UnstructuredClient() as uc_client:
 
-        res = await uc_client.destinations.create_destination_async(request={
-            "create_destination_connector": {
-                "config": {
-                    "endpoint": "<value>",
-                    "index": "<value>",
-                    "key": "<key>",
-                },
-                "name": "<value>",
-                "type": shared.DestinationConnectorType.ASTRADB,
-            },
+        res = await uc_client.destinations.create_connection_check_destinations_async(request={
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
-        assert res.destination_connector_information is not None
+        assert res.dag_node_connection_check is not None
 
         # Handle response
-        print(res.destination_connector_information)
+        print(res.dag_node_connection_check)
 
 asyncio.run(main())
 ```

@@ -2,43 +2,87 @@
 
 from __future__ import annotations
 import pydantic
-from typing_extensions import Annotated, TypedDict
-from unstructured_client.types import BaseModel
+from pydantic import model_serializer
+from typing import Optional
+from typing_extensions import Annotated, NotRequired, TypedDict
+from unstructured_client.types import (
+    BaseModel,
+    Nullable,
+    OptionalNullable,
+    UNSET,
+    UNSET_SENTINEL,
+)
 
 
 class SnowflakeDestinationConnectorConfigTypedDict(TypedDict):
     account: str
-    batch_size: int
     database: str
     host: str
     password: str
-    port: int
-    record_id_key: str
     role: str
-    schema_: str
-    table_name: str
     user: str
+    batch_size: NotRequired[int]
+    port: NotRequired[int]
+    record_id_key: NotRequired[Nullable[str]]
+    schema_: NotRequired[str]
+    table_name: NotRequired[str]
 
 
 class SnowflakeDestinationConnectorConfig(BaseModel):
     account: str
 
-    batch_size: int
-
     database: str
 
     host: str
 
     password: str
 
-    port: int
-
-    record_id_key: str
-
     role: str
 
-    schema_: Annotated[str, pydantic.Field(alias="schema")]
-
-    table_name: str
-
     user: str
+
+    batch_size: Optional[int] = 50
+
+    port: Optional[int] = 443
+
+    record_id_key: OptionalNullable[str] = UNSET
+
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
+
+    table_name: Optional[str] = "elements"
+
+    @model_serializer(mode="wrap")
+    def serialize_model(self, handler):
+        optional_fields = [
+            "batch_size",
+            "port",
+            "record_id_key",
+            "schema",
+            "table_name",
+        ]
+        nullable_fields = ["record_id_key"]
+        null_default_fields = []
+
+        serialized = handler(self)
+
+        m = {}
+
+        for n, f in type(self).model_fields.items():
+            k = f.alias or n
+            val = serialized.get(k)
+            serialized.pop(k, None)
+
+            optional_nullable = k in optional_fields and k in nullable_fields
+            is_set = (
+                self.__pydantic_fields_set__.intersection({n})
+                or k in null_default_fields
+            )  # pylint: disable=no-member
+
+            if val is not None and val != UNSET_SENTINEL:
+                m[k] = val
+            elif val != UNSET_SENTINEL and (
+                not k in optional_fields or (optional_nullable and is_set)
+            ):
+                m[k] = val
+
+        return m

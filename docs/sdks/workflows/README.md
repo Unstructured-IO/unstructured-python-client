@@ -27,11 +27,8 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.create_workflow(request={
         "create_workflow": {
-            "destination_id": "b5baba90-bc88-4ea4-b45f-e894788e3f38",
             "name": "<value>",
-            "source_id": "efa06124-dfe1-41e8-94dd-7cfa1e3fe9ec",
-            "workflow_type": shared.WorkflowType.PLATINUM,
-            "schedule": shared.Schedule.EVERY_15_MINUTES,
+            "workflow_type": shared.WorkflowType.ADVANCED,
         },
     })
 
@@ -74,7 +71,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.delete_workflow(request={
-        "workflow_id": "26c0bd77-269e-4239-86b8-71541359440c",
+        "workflow_id": "3e61b8a6-32b6-47cf-bce7-6d13357b30eb",
     })
 
     assert res.any is not None
@@ -116,7 +113,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.get_workflow(request={
-        "workflow_id": "270d9bb5-13f1-4e4d-bb84-4bcc30c93967",
+        "workflow_id": "d031b0e5-7ca7-4a2b-b3cc-d869d2df3e76",
     })
 
     assert res.workflow_information is not None
@@ -147,7 +144,7 @@ with UnstructuredClient() as uc_client:
 
 ## list_workflows
 
-Retrieve a list of workflows, optionally filtered by source, destination, or state.
+Retrieve a list of workflows, optionally filtered by source, destination, state, name, date range, and supports pagination and sorting.
 
 ### Example Usage
 
@@ -198,7 +195,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.run_workflow(request={
-        "workflow_id": "6b67be6d-98e9-440c-88fd-721e5d2d0036",
+        "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
     })
 
     assert res.job_information is not None
@@ -241,7 +238,7 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.workflows.update_workflow(request={
         "update_workflow": {},
-        "workflow_id": "b63b90df-08ba-41e1-b15b-bc744e5781fa",
+        "workflow_id": "b9b7e688-353f-4ff2-bcd7-a49b5fa5f6c7",
     })
 
     assert res.workflow_information is not None

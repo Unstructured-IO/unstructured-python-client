@@ -33,6 +33,7 @@ class UpdateWorkflowSchedule(str, Enum):
 class UpdateWorkflowTypedDict(TypedDict):
     destination_id: NotRequired[Nullable[str]]
     name: NotRequired[Nullable[str]]
+    reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[UpdateWorkflowSchedule]]
     source_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
@@ -43,6 +44,8 @@ class UpdateWorkflow(BaseModel):
     destination_id: OptionalNullable[str] = UNSET
 
     name: OptionalNullable[str] = UNSET
+
+    reprocess_all: OptionalNullable[bool] = UNSET
 
     schedule: OptionalNullable[UpdateWorkflowSchedule] = UNSET
 
@@ -57,6 +60,7 @@ class UpdateWorkflow(BaseModel):
         optional_fields = [
             "destination_id",
             "name",
+            "reprocess_all",
             "schedule",
             "source_id",
             "workflow_nodes",
@@ -65,6 +69,7 @@ class UpdateWorkflow(BaseModel):
         nullable_fields = [
             "destination_id",
             "name",
+            "reprocess_all",
             "schedule",
             "source_id",
             "workflow_nodes",
@@ -76,7 +81,7 @@ class UpdateWorkflow(BaseModel):
 
         m = {}
 
-        for n, f in self.model_fields.items():
+        for n, f in type(self).model_fields.items():
             k = f.alias or n
             val = serialized.get(k)
             serialized.pop(k, None)
