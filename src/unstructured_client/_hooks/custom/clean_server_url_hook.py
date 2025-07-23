@@ -7,7 +7,7 @@ from unstructured_client._hooks.types import SDKInitHook
 from unstructured_client.httpclient import HttpClient
 
 
-def clean_server_url(base_url: str) -> str:
+def clean_server_url(base_url: str | None) -> str:
     """Fix url scheme and remove subpath for URLs under Unstructured domains."""
 
     if not base_url:
