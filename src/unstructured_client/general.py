@@ -7,6 +7,7 @@ from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
+from unstructured_client._hooks.custom.clean_server_url_hook import clean_server_url
 
 
 class PartitionAcceptEnum(str, Enum):
@@ -51,7 +52,8 @@ class General(BaseSDK):
         # Note(austin): Add a custom check to handle the default server URL
         # The SDK globally defaults to the platform URL.
         # If that hasn't changed, we need to switch to the partition url here.
-        if "https://platform.unstructuredapp.io" in base_url:
+        base_url = clean_server_url(base_url)
+        if base_url == "https://platform.unstructuredapp.io":
             base_url = "https://api.unstructuredapp.io"
 
         if not isinstance(request, BaseModel):
@@ -184,7 +186,8 @@ class General(BaseSDK):
         # Note(austin): Add a custom check to handle the default server URL
         # The SDK globally defaults to the platform URL.
         # If that hasn't changed, we need to switch to the partition url here.
-        if "https://platform.unstructuredapp.io" in base_url:
+        base_url = clean_server_url(base_url)
+        if base_url == "https://platform.unstructuredapp.io":
             base_url = "https://api.unstructuredapp.io"
 
         if not isinstance(request, BaseModel):
