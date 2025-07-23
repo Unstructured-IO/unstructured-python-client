@@ -1060,7 +1060,7 @@ Based on:
 ### Releases
 - [PyPI v0.39.1] https://pypi.org/project/unstructured-client/0.39.1 - .
 
-- ## 2025-07-23 19:20:27
+## 2025-07-23 19:20:27
 ### Changes
 Based on:
 - OpenAPI Doc  
