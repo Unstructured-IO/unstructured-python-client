@@ -8,13 +8,10 @@ _test_unstructured_client
 # ignore Makefile
 Makefile
 
-# Ignore the base resource classes while we're patching in our own server url logic
-# If we add a new endpoint, we need to:
-#  - Comment out the ignore for the right file
+# Ignore general.py so we can patch in our partitioning url
+# If we ever have a new endpoint under /general, we need to:
+#  - Comment out this ignore line
 #  - Generate locally, watch the new endpoint appear
+#  - Adjust the custom url snippets in the file
 #  - Bring back the ignore line and commit
-src/unstructured_client/destinations.py
 src/unstructured_client/general.py
-src/unstructured_client/jobs.py
-src/unstructured_client/sources.py
-src/unstructured_client/workflows.py

@@ -16,13 +16,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-GET_JOB_DETAILS_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-GET_JOB_DETAILS_SERVERS = {
-    GET_JOB_DETAILS_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class GetJobDetailsRequestTypedDict(TypedDict):
     job_id: str

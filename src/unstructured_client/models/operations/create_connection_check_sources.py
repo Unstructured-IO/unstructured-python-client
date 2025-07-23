@@ -18,13 +18,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-CREATE_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-CREATE_CONNECTION_CHECK_SOURCES_SERVERS = {
-    CREATE_CONNECTION_CHECK_SOURCES_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class CreateConnectionCheckSourcesRequestTypedDict(TypedDict):
     source_id: str
