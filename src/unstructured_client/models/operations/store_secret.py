@@ -19,13 +19,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
 
-STORE_SECRET_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-STORE_SECRET_SERVERS = {
-    STORE_SECRET_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class StoreSecretRequestTypedDict(TypedDict):
     encrypted_secret: shared_encryptedsecret.EncryptedSecretTypedDict

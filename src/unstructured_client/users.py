@@ -203,9 +203,7 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.GET_ENCRYPTION_CERTIFICATE_SERVERS[
-                operations.GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API
-            ]
+            base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(
@@ -319,9 +317,7 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.GET_ENCRYPTION_CERTIFICATE_SERVERS[
-                operations.GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API
-            ]
+            base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(
@@ -434,9 +430,7 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.STORE_SECRET_SERVERS[
-                operations.STORE_SECRET_SERVER_PLATFORM_API
-            ]
+            base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.StoreSecretRequest)
@@ -550,9 +544,7 @@ class Users(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = operations.STORE_SECRET_SERVERS[
-                operations.STORE_SECRET_SERVER_PLATFORM_API
-            ]
+            base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.StoreSecretRequest)

@@ -18,13 +18,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata
 
-GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-GET_ENCRYPTION_CERTIFICATE_SERVERS = {
-    GET_ENCRYPTION_CERTIFICATE_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class GetEncryptionCertificateRequestTypedDict(TypedDict):
     unstructured_api_key: NotRequired[Nullable[str]]
