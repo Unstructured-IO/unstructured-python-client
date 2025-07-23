@@ -1,6 +1,6 @@
 [project]
 name = "unstructured-client"
-version = "0.35.0"
+version = "0.40.0"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -8,6 +8,7 @@ requires-python = ">=3.9.2"
 dependencies = [
     "aiofiles >=24.1.0",
     "cryptography >=3.1",
+    "httpcore >=1.0.9",
     "httpx >=0.27.0",
     "nest-asyncio >=1.6.0",
     "pydantic >=2.11.2",
@@ -40,7 +41,6 @@ pytest-httpx = ">=0.35.0"
 pytest-mock = ">=3.14.0"
 pytest-xdist = "^3.5.0"
 types-aiofiles = ">=24.1.0"
-unstructured = ">= 0.17.2"
 uvloop = ">=0.20.0"
 
 [build-system]
@@ -53,6 +53,8 @@ pythonpath = ["src"]
 
 [tool.mypy]
 disable_error_code = "misc"
+explicit_package_bases = true
+mypy_path = "src"
 
 [[tool.mypy.overrides]]
 module = "typing_inspect"

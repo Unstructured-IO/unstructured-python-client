@@ -8,6 +8,8 @@
 * [cancel_job](#cancel_job) - Cancel Job
 * [download_job_output](#download_job_output) - Download Job output
 * [get_job](#get_job) - Get Job
+* [get_job_details](#get_job_details) - Get Job processing details
+* [get_job_failed_files](#get_job_failed_files) - Get Job Failed Files
 * [list_jobs](#list_jobs) - List Jobs
 
 ## cancel_job
@@ -23,7 +25,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.cancel_job(request={
-        "job_id": "ec29bf67-0f30-4793-b5ee-8fc0da196032",
+        "job_id": "2fafd129-04f3-4201-a0e7-fe33e937b367",
     })
 
     assert res.any is not None
@@ -65,8 +67,8 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.download_job_output(request={
         "file_id": "<id>",
-        "job_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
-        "node_id": "bddbb621-2124-4cc2-9fa7-c6cdc21dac44",
+        "job_id": "06d1b7b8-8642-4793-b37e-e45d97d53bc3",
+        "node_id": "7c8f2aa4-da13-4a04-a98d-0204ea55681e",
     })
 
     assert res.any is not None
@@ -107,7 +109,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.jobs.get_job(request={
-        "job_id": "6bb4cb72-a072-4398-9de3-194e59352a3c",
+        "job_id": "d95a05b3-3446-4f3d-806c-904b6a7ba40a",
     })
 
     assert res.job_information is not None
@@ -127,6 +129,90 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.GetJobResponse](../../models/operations/getjobresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_job_details
+
+Retrieve processing details for a specific job by its ID.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.get_job_details(request={
+        "job_id": "14cc95f9-4174-46b3-81f5-7089b87a4787",
+    })
+
+    assert res.job_details is not None
+
+    # Handle response
+    print(res.job_details)
+
+```
+
+### Parameters
+
+| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `request`                                                                          | [operations.GetJobDetailsRequest](../../models/operations/getjobdetailsrequest.md) | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
+| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
+| `server_url`                                                                       | *Optional[str]*                                                                    | :heavy_minus_sign:                                                                 | An optional server URL to use.                                                     |
+
+### Response
+
+**[operations.GetJobDetailsResponse](../../models/operations/getjobdetailsresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## get_job_failed_files
+
+Retrieve failed files for a specific job by its ID.
+
+### Example Usage
+
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.get_job_failed_files(request={
+        "job_id": "ad262041-3530-40a9-9f83-b004e947a203",
+    })
+
+    assert res.job_failed_files is not None
+
+    # Handle response
+    print(res.job_failed_files)
+
+```
+
+### Parameters
+
+| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `request`                                                                                  | [operations.GetJobFailedFilesRequest](../../models/operations/getjobfailedfilesrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
+| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| `server_url`                                                                               | *Optional[str]*                                                                            | :heavy_minus_sign:                                                                         | An optional server URL to use.                                                             |
+
+### Response
+
+**[operations.GetJobFailedFilesResponse](../../models/operations/getjobfailedfilesresponse.md)**
 
 ### Errors
 

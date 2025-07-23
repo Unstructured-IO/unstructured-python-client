@@ -6,25 +6,38 @@ from .sdkconfiguration import SDKConfiguration
 from .utils.logger import Logger, get_default_logger
 from .utils.retries import RetryConfig
 import httpx
-from typing import Any, Callable, Dict, Optional, Union, cast
+import importlib
+from typing import Any, Callable, Dict, Optional, TYPE_CHECKING, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import SDKHooks
-from unstructured_client.destinations import Destinations
-from unstructured_client.general import General
-from unstructured_client.jobs import Jobs
 from unstructured_client.models import shared
-from unstructured_client.sources import Sources
 from unstructured_client.types import OptionalNullable, UNSET
-from unstructured_client.workflows import Workflows
 import weakref
+
+if TYPE_CHECKING:
+    from unstructured_client.destinations import Destinations
+    from unstructured_client.general import General
+    from unstructured_client.jobs import Jobs
+    from unstructured_client.sources import Sources
+    from unstructured_client.users import Users
+    from unstructured_client.workflows import Workflows
 
 
 class UnstructuredClient(BaseSDK):
-    destinations: Destinations
-    jobs: Jobs
-    sources: Sources
-    workflows: Workflows
-    general: General
+    destinations: "Destinations"
+    jobs: "Jobs"
+    sources: "Sources"
+    users: "Users"
+    workflows: "Workflows"
+    general: "General"
+    _sub_sdk_map = {
+        "destinations": ("unstructured_client.destinations", "Destinations"),
+        "jobs": ("unstructured_client.jobs", "Jobs"),
+        "sources": ("unstructured_client.sources", "Sources"),
+        "users": ("unstructured_client.users", "Users"),
+        "workflows": ("unstructured_client.workflows", "Workflows"),
+        "general": ("unstructured_client.general", "General"),
+    }
 
     def __init__(
         self,
@@ -101,15 +114,15 @@ class UnstructuredClient(BaseSDK):
 
         hooks = SDKHooks()
 
+        # pylint: disable=protected-access
+        self.sdk_configuration.__dict__["_hooks"] = hooks
+
         current_server_url, *_ = self.sdk_configuration.get_server_details()
         server_url, self.sdk_configuration.client = hooks.sdk_init(
             current_server_url, client
         )
         if current_server_url != server_url:
             self.sdk_configuration.server_url = server_url
-
-        # pylint: disable=protected-access
-        self.sdk_configuration.__dict__["_hooks"] = hooks
 
         weakref.finalize(
             self,
@@ -121,14 +134,32 @@ class UnstructuredClient(BaseSDK):
             self.sdk_configuration.async_client_supplied,
         )
 
-        self._init_sdks()
+    def __getattr__(self, name: str):
+        if name in self._sub_sdk_map:
+            module_path, class_name = self._sub_sdk_map[name]
+            try:
+                module = importlib.import_module(module_path)
+                klass = getattr(module, class_name)
+                instance = klass(self.sdk_configuration)
+                setattr(self, name, instance)
+                return instance
+            except ImportError as e:
+                raise AttributeError(
+                    f"Failed to import module {module_path} for attribute {name}: {e}"
+                ) from e
+            except AttributeError as e:
+                raise AttributeError(
+                    f"Failed to find class {class_name} in module {module_path} for attribute {name}: {e}"
+                ) from e
 
-    def _init_sdks(self):
-        self.destinations = Destinations(self.sdk_configuration)
-        self.jobs = Jobs(self.sdk_configuration)
-        self.sources = Sources(self.sdk_configuration)
-        self.workflows = Workflows(self.sdk_configuration)
-        self.general = General(self.sdk_configuration)
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
+
+    def __dir__(self):
+        default_attrs = list(super().__dir__())
+        lazy_attrs = list(self._sub_sdk_map.keys())
+        return sorted(list(set(default_attrs + lazy_attrs)))
 
     def __enter__(self):
         return self

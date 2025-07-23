@@ -13,6 +13,7 @@ The VLM Model to use.
 | `GEMINI_1_5_PRO`                               | gemini-1.5-pro                                 |
 | `US_AMAZON_NOVA_PRO_V1_0`                      | us.amazon.nova-pro-v1:0                        |
 | `US_AMAZON_NOVA_LITE_V1_0`                     | us.amazon.nova-lite-v1:0                       |
+| `US_ANTHROPIC_CLAUDE_3_7_SONNET_20250219_V1_0` | us.anthropic.claude-3-7-sonnet-20250219-v1:0   |
 | `US_ANTHROPIC_CLAUDE_3_5_SONNET_20241022_V2_0` | us.anthropic.claude-3-5-sonnet-20241022-v2:0   |
 | `US_ANTHROPIC_CLAUDE_3_OPUS_20240229_V1_0`     | us.anthropic.claude-3-opus-20240229-v1:0       |
 | `US_ANTHROPIC_CLAUDE_3_HAIKU_20240307_V1_0`    | us.anthropic.claude-3-haiku-20240307-v1:0      |

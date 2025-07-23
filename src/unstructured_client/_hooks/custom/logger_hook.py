@@ -81,5 +81,5 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
         if response:
             logger.error("Server responded with %d - %s", response.status_code, response.text)
         if error is not None:
-            logger.error("Following error occurred - %s", error)
+            logger.error("Following error occurred - %s", error, exc_info=error)
         return response, error

@@ -303,6 +303,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if pdf is None:
             return request
 
+        pdf = pdf_utils.check_pdf(pdf)
+
         starting_page_number = form_utils.get_starting_page_number(
             form_data,
             key=PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
@@ -667,11 +669,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         elements = self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
-        # Note(austin): Stick a 500 status code in here so the SDK
-        # does not trigger its own retry logic
         if not self.allow_failed and self.api_failed_responses.get(operation_id):
             failure_response = self.api_failed_responses[operation_id][0]
-            failure_response.status_code = 500
 
             self._clear_operation(operation_id)
             return failure_response

@@ -223,12 +223,12 @@ class BaseSDK:
         client = self.sdk_configuration.client
         logger = self.sdk_configuration.debug_logger
 
+        hooks = self.sdk_configuration.__dict__["_hooks"]
+
         def do():
             http_res = None
             try:
-                req = self.sdk_configuration.get_hooks().before_request(
-                    BeforeRequestContext(hook_ctx), request
-                )
+                req = hooks.before_request(BeforeRequestContext(hook_ctx), request)
                 logger.debug(
                     "Request:\nMethod: %s\nURL: %s\nHeaders: %s\nBody: %s",
                     req.method,
@@ -242,9 +242,7 @@ class BaseSDK:
 
                 http_res = client.send(req, stream=stream)
             except Exception as e:
-                _, e = self.sdk_configuration.get_hooks().after_error(
-                    AfterErrorContext(hook_ctx), None, e
-                )
+                _, e = hooks.after_error(AfterErrorContext(hook_ctx), None, e)
                 if e is not None:
                     logger.debug("Request Exception", exc_info=True)
                     raise e
@@ -262,7 +260,7 @@ class BaseSDK:
             )
 
             if utils.match_status_codes(error_status_codes, http_res.status_code):
-                result, err = self.sdk_configuration.get_hooks().after_error(
+                result, err = hooks.after_error(
                     AfterErrorContext(hook_ctx), http_res, None
                 )
                 if err is not None:
@@ -282,9 +280,7 @@ class BaseSDK:
             http_res = do()
 
         if not utils.match_status_codes(error_status_codes, http_res.status_code):
-            http_res = self.sdk_configuration.get_hooks().after_success(
-                AfterSuccessContext(hook_ctx), http_res
-            )
+            http_res = hooks.after_success(AfterSuccessContext(hook_ctx), http_res)
 
         return http_res
 
@@ -299,12 +295,12 @@ class BaseSDK:
         client = self.sdk_configuration.async_client
         logger = self.sdk_configuration.debug_logger
 
+        hooks = self.sdk_configuration.__dict__["_hooks"]
+
         async def do():
             http_res = None
             try:
-                req = self.sdk_configuration.get_hooks().before_request(
-                    BeforeRequestContext(hook_ctx), request
-                )
+                req = hooks.before_request(BeforeRequestContext(hook_ctx), request)
                 logger.debug(
                     "Request:\nMethod: %s\nURL: %s\nHeaders: %s\nBody: %s",
                     req.method,
@@ -318,9 +314,7 @@ class BaseSDK:
 
                 http_res = await client.send(req, stream=stream)
             except Exception as e:
-                _, e = self.sdk_configuration.get_hooks().after_error(
-                    AfterErrorContext(hook_ctx), None, e
-                )
+                _, e = hooks.after_error(AfterErrorContext(hook_ctx), None, e)
                 if e is not None:
                     logger.debug("Request Exception", exc_info=True)
                     raise e
@@ -338,7 +332,7 @@ class BaseSDK:
             )
 
             if utils.match_status_codes(error_status_codes, http_res.status_code):
-                result, err = self.sdk_configuration.get_hooks().after_error(
+                result, err = hooks.after_error(
                     AfterErrorContext(hook_ctx), http_res, None
                 )
                 if err is not None:
@@ -360,8 +354,6 @@ class BaseSDK:
             http_res = await do()
 
         if not utils.match_status_codes(error_status_codes, http_res.status_code):
-            http_res = self.sdk_configuration.get_hooks().after_success(
-                AfterSuccessContext(hook_ctx), http_res
-            )
+            http_res = hooks.after_success(AfterSuccessContext(hook_ctx), http_res)
 
         return http_res

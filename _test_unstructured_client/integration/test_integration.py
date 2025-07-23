@@ -348,3 +348,31 @@ def test_partition_strategy_vlm_anthropic(split_pdf, vlm_model, vlm_model_provid
     assert response.status_code == 200
     assert len(response.elements) > 0
     assert response.elements[0]["metadata"]["partitioner_type"] == "vlm_partition"
+
+
+def test_returns_422_for_invalid_pdf(
+    caplog: pytest.LogCaptureFixture,
+    doc_path: Path,
+    client: UnstructuredClient,
+):
+    """Test that we get a RequestError with the correct error message for invalid PDF files."""
+    pdf_name = "failing-invalid.pdf"
+    with open(doc_path / pdf_name, "rb") as f:
+        files = shared.Files(
+            content=f.read(),
+            file_name=pdf_name,
+        )
+
+    req = operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=files,
+            strategy="fast",
+            split_pdf_page=True,
+        )
+    )
+
+    with pytest.raises(HTTPValidationError):
+        client.general.partition(request=req)
+
+    assert "File does not appear to be a valid PDF" in caplog.text
+    assert "422" in caplog.text

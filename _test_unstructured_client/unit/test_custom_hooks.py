@@ -230,7 +230,7 @@ def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(se
     )
 
 
-def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: requests.Session):
+def test_after_error_hook_logs(caplog, session_: Mock, response_: requests.Session):
     def mock_post(request):
         return Response(401, request=request)
 
@@ -245,15 +245,13 @@ def test_unit_issues_warning_on_a_401(caplog, session_: Mock, response_: request
     req = operations.PartitionRequest(
         partition_parameters=shared.PartitionParameters(files=files)
     )
-
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
-        with caplog.at_level(logging.WARNING):
-            session.general.partition(request=req)
-
-        assert any(
-            "This API key is invalid against the paid API. If intending to use the free API, please initialize UnstructuredClient with `server='free-api'`."
-            in message for message in caplog.messages
-        )
+        session.general.partition(request=req)
+    
+    assert any(
+        "Server responded with 401"
+        in message for message in caplog.messages
+    )
 
 
 # -- fixtures --------------------------------------------------------------------------------

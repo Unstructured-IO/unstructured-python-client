@@ -116,7 +116,7 @@ from unstructured_client.utils import BackoffStrategy, RetryConfig
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
@@ -138,7 +138,7 @@ with UnstructuredClient(
 ) as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
     assert res.dag_node_connection_check is not None
@@ -183,7 +183,7 @@ with UnstructuredClient() as uc_client:
     try:
 
         res = uc_client.destinations.create_connection_check_destinations(request={
-            "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
         assert res.dag_node_connection_check is not None
@@ -305,7 +305,7 @@ from unstructured_client import UnstructuredClient
 with UnstructuredClient() as uc_client:
 
     res = uc_client.destinations.create_connection_check_destinations(request={
-        "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+        "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
     assert res.dag_node_connection_check is not None
@@ -327,7 +327,7 @@ async def main():
     async with UnstructuredClient() as uc_client:
 
         res = await uc_client.destinations.create_connection_check_destinations_async(request={
-            "destination_id": "d9795fb7-2135-4e48-a51d-009dd6ca38a1",
+            "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
         assert res.dag_node_connection_check is not None
@@ -351,7 +351,7 @@ See [page splitting](https://docs.unstructured.io/api-reference/api-services/sdk
 In order to speed up processing of large PDF files, the client splits up PDFs into smaller files, sends these to the API concurrently, and recombines the results. `split_pdf_page` can be set to `False` to disable this.
 
 The amount of workers utilized for splitting PDFs is dictated by the `split_pdf_concurrency_level` parameter, with a default of 5 and a maximum of 15 to keep resource usage and costs in check. The splitting process leverages `asyncio` to manage concurrency effectively.
-The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encouter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
+The size of each batch of pages (ranging from 2 to 20) is internally determined based on the concurrency level and the total number of pages in the document. Because the splitting process uses `asyncio` the client can encounter event loop issues if it is nested in another async runner, like running in a `gevent` spawned task. Instead, this is safe to run in multiprocessing workers (e.g., using `multiprocessing.Pool` with `fork` context).
 
 Example:
 ```python
@@ -410,30 +410,18 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
-            },
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "vlm_model": shared.VLMModel.GPT_4O,
-            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
-        },
+    res = uc_client.workflows.run_workflow(request={
+        "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
     })
 
-    assert res.elements is not None
+    assert res.job_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.job_information)
 
 ```
 <!-- End File uploads [file-upload] -->

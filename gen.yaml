@@ -3,6 +3,7 @@ generation:
   sdkClassName: unstructured_client
   usageSnippets:
     optionalPropertyRendering: withExample
+    sdkInitStyle: constructor
   fixes:
     nameResolutionFeb2025: false
     parameterOrderingFeb2024: false
@@ -13,7 +14,7 @@ generation:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 python:
-  version: 0.35.0
+  version: 0.40.0
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -24,7 +25,6 @@ python:
       pytest-mock: '>=3.14.0'
       pytest-xdist: ^3.5.0
       types-aiofiles: '>=24.1.0'
-      unstructured: '>= 0.17.2'
       uvloop: '>=0.20.0'
     main:
       aiofiles: '>=24.1.0'
@@ -35,10 +35,11 @@ python:
       requests-toolbelt: '>=1.0.0'
   authors:
     - Unstructured
+  baseErrorName: UnstructuredClientError
   clientServerStatusCodesAsErrors: true
   defaultErrorName: SDKError
   description: Python Client SDK for Unstructured API
-  enableCustomCodeRegions: false
+  enableCustomCodeRegions: true
   enumFormat: enum
   fixFlags:
     responseRequiredSep2024: false
@@ -57,9 +58,11 @@ python:
   license: MIT
   maxMethodParams: 0
   methodArguments: require-security-and-request
+  moduleName: ""
   outputModelSuffix: output
   packageName: unstructured-client
   projectUrls: {}
+  pytestFilterWarnings: []
   pytestTimeout: 0
   responseFormat: envelope
   templateVersion: v2
