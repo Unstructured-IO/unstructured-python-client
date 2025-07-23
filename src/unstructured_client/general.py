@@ -48,6 +48,12 @@ class General(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
+        # Note(austin): Add a custom check to handle the default server URL
+        # The SDK globally defaults to the platform URL.
+        # If that hasn't changed, we need to switch to the partition url here.
+        if base_url == "https://platform.unstructuredapp.io":
+            base_url = "https://api.unstructuredapp.io"
+
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.PartitionRequest)
         request = cast(operations.PartitionRequest, request)
@@ -174,6 +180,12 @@ class General(BaseSDK):
             base_url = server_url
         else:
             base_url = self._get_url(base_url, url_variables)
+
+        # Note(austin): Add a custom check to handle the default server URL
+        # The SDK globally defaults to the platform URL.
+        # If that hasn't changed, we need to switch to the partition url here.
+        if base_url == "https://platform.unstructuredapp.io":
+            base_url = "https://api.unstructuredapp.io"
 
         if not isinstance(request, BaseModel):
             request = utils.unmarshal(request, operations.PartitionRequest)
