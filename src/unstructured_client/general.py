@@ -7,6 +7,7 @@ from unstructured_client import utils
 from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
+from unstructured_client._hooks.custom.clean_server_url_hook import clean_server_url
 from unstructured_client.utils.unmarshal_json_response import unmarshal_json_response
 
 
