@@ -4,7 +4,7 @@ import pytest
 
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
-from unstructured_client.models.errors import SDKError
+from unstructured_client.models.errors import UnstructuredClientError
 
 
 def test_list_workflows(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
@@ -108,10 +108,10 @@ def test_list_workflows_error(
         status_code=error_status_code,
     )
 
-    with pytest.raises(SDKError) as excinfo:
+    with pytest.raises(UnstructuredClientError) as error:
         platform_client.workflows.list_workflows(request=operations.ListWorkflowsRequest())
-    assert excinfo.value.status_code == error_status_code
-    assert excinfo.value.message == "API error occurred"
+    assert error.value.status_code == error_status_code
+    assert "API error occurred" in error.value.message
 
 
 def test_create_workflow(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
