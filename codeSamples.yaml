@@ -123,18 +123,18 @@ actions:
         - "lang": "python"
           "label": "create_connection_check_sources"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"8d49e3f2-3e6d-4973-bc61-292af66829d7\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
-  - target: $["paths"]["/api/v1/users/retrieve"]["post"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "retrieve"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.retrieve(request={})\n\n    assert res.pem_auth_response is not None\n\n    # Handle response\n    print(res.pem_auth_response)"
   - target: $["paths"]["/api/v1/users/secrets"]["post"]
     update:
       "x-codeSamples":
         - "lang": "python"
           "label": "store_secret"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.store_secret(request={\n        \"encrypted_secret\": {\n            \"encrypted_value\": \"<value>\",\n        },\n    })\n\n    assert res.secret_reference is not None\n\n    # Handle response\n    print(res.secret_reference)"
+  - target: $["paths"]["/api/v1/users/secrets/encryption-certificate"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_encryption_certificate"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.get_encryption_certificate(request={})\n\n    assert res.encryption_certificate_response is not None\n\n    # Handle response\n    print(res.encryption_certificate_response)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
@@ -176,4 +176,4 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "partition"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"vlm_model_provider\": shared.VLMModelProvider.OPENAI,\n            \"vlm_model\": shared.VLMModel.GPT_4O,\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"strategy\": shared.Strategy.AUTO,\n            \"vlm_model_provider\": shared.VLMModelProvider.OPENAI,\n            \"vlm_model\": shared.VLMModel.GPT_4O,\n            \"chunking_strategy\": \"by_title\",\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n            \"split_pdf_cache_tmp_data_dir\": \"<value>\",\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
