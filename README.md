@@ -153,26 +153,18 @@ with UnstructuredClient(
 <!-- Start Error Handling [errors] -->
 ## Error Handling
 
-Handling errors in this SDK should largely match your expectations. All operations return a response object or raise an exception.
+[`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py) is the base class for all HTTP error responses. It has the following properties:
 
-By default, an API error will raise a errors.SDKError exception, which has the following properties:
-
-| Property        | Type             | Description           |
-|-----------------|------------------|-----------------------|
-| `.status_code`  | *int*            | The HTTP status code  |
-| `.message`      | *str*            | The error message     |
-| `.raw_response` | *httpx.Response* | The raw HTTP response |
-| `.body`         | *str*            | The response content  |
-
-When custom error responses are specified for an operation, the SDK may also raise their associated exceptions. You can refer to respective *Errors* tables in SDK docs for more details on possible exception types for each operation. For example, the `create_connection_check_destinations_async` method may raise the following exceptions:
-
-| Error Type                 | Status Code | Content Type     |
-| -------------------------- | ----------- | ---------------- |
-| errors.HTTPValidationError | 422         | application/json |
-| errors.SDKError            | 4XX, 5XX    | \*/\*            |
+| Property           | Type             | Description                                                                             |
+| ------------------ | ---------------- | --------------------------------------------------------------------------------------- |
+| `err.message`      | `str`            | Error message                                                                           |
+| `err.status_code`  | `int`            | HTTP response status code eg `404`                                                      |
+| `err.headers`      | `httpx.Headers`  | HTTP response headers                                                                   |
+| `err.body`         | `str`            | HTTP body. Can be empty string if no body is returned.                                  |
+| `err.raw_response` | `httpx.Response` | Raw HTTP response                                                                       |
+| `err.data`         |                  | Optional. Some errors may contain structured data. [See Error Classes](#error-classes). |
 
 ### Example
-
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import errors
@@ -191,13 +183,42 @@ with UnstructuredClient() as uc_client:
         # Handle response
         print(res.dag_node_connection_check)
 
-    except errors.HTTPValidationError as e:
-        # handle e.data: errors.HTTPValidationErrorData
-        raise(e)
-    except errors.SDKError as e:
-        # handle exception
-        raise(e)
+
+    except errors.UnstructuredClientError as e:
+        # The base class for HTTP error responses
+        print(e.message)
+        print(e.status_code)
+        print(e.body)
+        print(e.headers)
+        print(e.raw_response)
+
+        # Depending on the method different errors may be thrown
+        if isinstance(e, errors.HTTPValidationError):
+            print(e.data.detail)  # Optional[errors.Detail]
 ```
+
+### Error Classes
+**Primary errors:**
+* [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py): The base class for HTTP error responses.
+  * [`HTTPValidationError`](./src/unstructured_client/models/errors/httpvalidationerror.py): Validation Error. Status code `422`.
+
+<details><summary>Less common errors (6)</summary>
+
+<br />
+
+**Network errors:**
+* [`httpx.RequestError`](https://www.python-httpx.org/exceptions/#httpx.RequestError): Base class for request errors.
+    * [`httpx.ConnectError`](https://www.python-httpx.org/exceptions/#httpx.ConnectError): HTTP client was unable to make a request to a server.
+    * [`httpx.TimeoutException`](https://www.python-httpx.org/exceptions/#httpx.TimeoutException): HTTP request timed out.
+
+
+**Inherit from [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py)**:
+* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 29 methods.*
+* [`ResponseValidationError`](./src/unstructured_client/models/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
+
+</details>
+
+\* Check [the method documentation](#available-resources-and-operations) to see if the error is applicable.
 <!-- End Error Handling [errors] -->
 
 <!-- Start Custom HTTP Client [http-client] -->
@@ -316,7 +337,7 @@ with UnstructuredClient() as uc_client:
 
 </br>
 
-The same SDK client can also be used to make asynchronous requests by importing asyncio.
+The same SDK client can also be used to make asychronous requests by importing asyncio.
 ```python
 # Asynchronous Example
 import asyncio
@@ -410,30 +431,18 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.general.partition(request={
-        "partition_parameters": {
-            "files": {
-                "content": open("example.file", "rb"),
-                "file_name": "example.file",
-            },
-            "split_pdf_page_range": [
-                1,
-                10,
-            ],
-            "vlm_model": shared.VLMModel.GPT_4O,
-            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
-        },
+    res = uc_client.workflows.run_workflow(request={
+        "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
     })
 
-    assert res.elements is not None
+    assert res.job_information is not None
 
     # Handle response
-    print(res.elements)
+    print(res.job_information)
 
 ```
 <!-- End File uploads [file-upload] -->

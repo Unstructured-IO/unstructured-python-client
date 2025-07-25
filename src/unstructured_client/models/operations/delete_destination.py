@@ -15,13 +15,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-DELETE_DESTINATION_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-DELETE_DESTINATION_SERVERS = {
-    DELETE_DESTINATION_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class DeleteDestinationRequestTypedDict(TypedDict):
     destination_id: str

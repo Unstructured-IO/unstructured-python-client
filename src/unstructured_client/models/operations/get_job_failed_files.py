@@ -16,13 +16,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-GET_JOB_FAILED_FILES_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-GET_JOB_FAILED_FILES_SERVERS = {
-    GET_JOB_FAILED_FILES_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class GetJobFailedFilesRequestTypedDict(TypedDict):
     job_id: str

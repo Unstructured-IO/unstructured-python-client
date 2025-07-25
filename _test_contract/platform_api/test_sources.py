@@ -110,7 +110,7 @@ def test_list_sources_5xx_code(
         platform_client.sources.list_sources(request=operations.ListSourcesRequest())
     requests = httpx_mock.get_requests()
     assert len(requests) >= 1
-    assert excinfo.value.message == "API error occurred"
+    assert "API error occurred" in excinfo.value.message
     assert excinfo.value.status_code == error_status_code
 
 
@@ -176,7 +176,7 @@ def test_get_source_not_found(
 
     requests = httpx_mock.get_requests()
     assert len(requests) == 1
-    assert excinfo.value.message == "API error occurred"
+    assert "API error occurred" in excinfo.value.message
     assert excinfo.value.status_code == 404
 
 

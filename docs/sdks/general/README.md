@@ -22,14 +22,17 @@ with UnstructuredClient() as uc_client:
 
     res = uc_client.general.partition(request={
         "partition_parameters": {
+            "chunking_strategy": "by_title",
             "files": {
                 "content": open("example.file", "rb"),
                 "file_name": "example.file",
             },
+            "split_pdf_cache_tmp_data_dir": "<value>",
             "split_pdf_page_range": [
                 1,
                 10,
             ],
+            "strategy": shared.Strategy.AUTO,
             "vlm_model": shared.VLMModel.GPT_4O,
             "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
@@ -48,7 +51,6 @@ with UnstructuredClient() as uc_client:
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `request`                                                                  | [operations.PartitionRequest](../../models/operations/partitionrequest.md) | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
 | `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
-| `server_url`                                                               | *Optional[str]*                                                            | :heavy_minus_sign:                                                         | An optional server URL to use.                                             |
 
 ### Response
 

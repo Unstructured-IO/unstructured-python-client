@@ -5,12 +5,12 @@
 
 ### Available Operations
 
-* [retrieve](#retrieve) - Retrieve PEM Key
+* [get_encryption_certificate](#get_encryption_certificate) - Retrieve the user's public key for encryption.
 * [store_secret](#store_secret) - Store an encrypted secret
 
-## retrieve
+## get_encryption_certificate
 
-Given a UNSTRUCTURED_API_KEY in the post-payload, retrieve the associated PEM key
+Retrieve a short lived certificate with the public key for encrypting secrets.
 
 ### Example Usage
 
@@ -20,26 +20,25 @@ from unstructured_client import UnstructuredClient
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.users.retrieve(request={})
+    res = uc_client.users.get_encryption_certificate(request={})
 
-    assert res.pem_auth_response is not None
+    assert res.encryption_certificate_response is not None
 
     # Handle response
-    print(res.pem_auth_response)
+    print(res.encryption_certificate_response)
 
 ```
 
 ### Parameters
 
-| Parameter                                                                | Type                                                                     | Required                                                                 | Description                                                              |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `request`                                                                | [operations.RetrieveRequest](../../models/operations/retrieverequest.md) | :heavy_check_mark:                                                       | The request object to use for the request.                               |
-| `retries`                                                                | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)         | :heavy_minus_sign:                                                       | Configuration to override the default retry behavior of the client.      |
-| `server_url`                                                             | *Optional[str]*                                                          | :heavy_minus_sign:                                                       | An optional server URL to use.                                           |
+| Parameter                                                                                                | Type                                                                                                     | Required                                                                                                 | Description                                                                                              |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                | [operations.GetEncryptionCertificateRequest](../../models/operations/getencryptioncertificaterequest.md) | :heavy_check_mark:                                                                                       | The request object to use for the request.                                                               |
+| `retries`                                                                                                | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                         | :heavy_minus_sign:                                                                                       | Configuration to override the default retry behavior of the client.                                      |
 
 ### Response
 
-**[operations.RetrieveResponse](../../models/operations/retrieveresponse.md)**
+**[operations.GetEncryptionCertificateResponse](../../models/operations/getencryptioncertificateresponse.md)**
 
 ### Errors
 
@@ -79,7 +78,6 @@ with UnstructuredClient() as uc_client:
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | `request`                                                                      | [operations.StoreSecretRequest](../../models/operations/storesecretrequest.md) | :heavy_check_mark:                                                             | The request object to use for the request.                                     |
 | `retries`                                                                      | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)               | :heavy_minus_sign:                                                             | Configuration to override the default retry behavior of the client.            |
-| `server_url`                                                                   | *Optional[str]*                                                                | :heavy_minus_sign:                                                             | An optional server URL to use.                                                 |
 
 ### Response
 

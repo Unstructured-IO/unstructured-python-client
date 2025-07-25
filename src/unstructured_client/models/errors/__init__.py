@@ -9,25 +9,34 @@ if TYPE_CHECKING:
         HTTPValidationError,
         HTTPValidationErrorData,
     )
+    from .no_response_error import NoResponseError
+    from .responsevalidationerror import ResponseValidationError
     from .sdkerror import SDKError
     from .servererror import ServerError, ServerErrorData
+    from .unstructuredclienterror import UnstructuredClientError
 
 __all__ = [
     "Detail",
     "HTTPValidationError",
     "HTTPValidationErrorData",
+    "NoResponseError",
+    "ResponseValidationError",
     "SDKError",
     "ServerError",
     "ServerErrorData",
+    "UnstructuredClientError",
 ]
 
 _dynamic_imports: dict[str, str] = {
     "Detail": ".httpvalidationerror",
     "HTTPValidationError": ".httpvalidationerror",
     "HTTPValidationErrorData": ".httpvalidationerror",
+    "NoResponseError": ".no_response_error",
+    "ResponseValidationError": ".responsevalidationerror",
     "SDKError": ".sdkerror",
     "ServerError": ".servererror",
     "ServerErrorData": ".servererror",
+    "UnstructuredClientError": ".unstructuredclienterror",
 }
 
 

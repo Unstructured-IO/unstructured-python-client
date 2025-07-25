@@ -13,8 +13,12 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
+  tests:
+    generateTests: true
+    generateNewTests: false
+    skipResponseBodyAssertions: false
 python:
-  version: 0.39.1
+  version: 0.41.0
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'

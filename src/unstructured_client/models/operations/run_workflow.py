@@ -24,13 +24,6 @@ from unstructured_client.utils import (
     RequestMetadata,
 )
 
-RUN_WORKFLOW_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-RUN_WORKFLOW_SERVERS = {
-    RUN_WORKFLOW_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class RunWorkflowRequestTypedDict(TypedDict):
     workflow_id: str

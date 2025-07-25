@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 3e52fdac3e417f8e48fcb920b829025c
-  docVersion: 1.1.34
-  speakeasyVersion: 1.552.0
-  generationVersion: 2.610.0
-  releaseVersion: 0.39.1
-  configChecksum: 2b0094ee827eb2deb71ef0ff9e572192
+  docChecksum: ae9cd2cec2edbde7b002c0a127c7aa84
+  docVersion: 1.1.42
+  speakeasyVersion: 1.589.0
+  generationVersion: 2.664.0
+  releaseVersion: 0.41.0
+  configChecksum: b2d39b13446f595978a73e31a796dbe7
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,30 +16,28 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.19.0
+    core: 5.19.4
     customCodeRegions: 0.1.1
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
-    examples: 3.0.1
+    examples: 3.0.2
     globalSecurity: 3.0.3
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
     globalServerURLs: 3.1.1
-    methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
     nullables: 1.0.1
     openEnums: 1.0.1
     responseFormat: 1.0.1
     retries: 3.0.2
-    sdkHooks: 1.0.1
+    sdkHooks: 1.1.0
     serverIDs: 3.0.0
     unions: 3.0.4
     uploadStreams: 1.0.0
 generatedFiles:
   - .gitattributes
-  - .python-version
   - .vscode/settings.json
   - USAGE.md
   - docs/models/errors/detail.md
@@ -71,6 +69,8 @@ generatedFiles:
   - docs/models/operations/getconnectionchecksourcesresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
+  - docs/models/operations/getencryptioncertificaterequest.md
+  - docs/models/operations/getencryptioncertificateresponse.md
   - docs/models/operations/getjobdetailsrequest.md
   - docs/models/operations/getjobdetailsresponse.md
   - docs/models/operations/getjobfailedfilesrequest.md
@@ -91,8 +91,6 @@ generatedFiles:
   - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
-  - docs/models/operations/retrieverequest.md
-  - docs/models/operations/retrieveresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
   - docs/models/operations/storesecretrequest.md
@@ -140,6 +138,7 @@ generatedFiles:
   - docs/models/shared/elasticsearchconnectorconfig.md
   - docs/models/shared/elasticsearchconnectorconfiginput.md
   - docs/models/shared/encryptedsecret.md
+  - docs/models/shared/encryptioncertificateresponse.md
   - docs/models/shared/encryptiontype.md
   - docs/models/shared/failedfile.md
   - docs/models/shared/files.md
@@ -181,7 +180,6 @@ generatedFiles:
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
   - docs/models/shared/partitionparameters.md
-  - docs/models/shared/pemauthresponse.md
   - docs/models/shared/pineconedestinationconnectorconfig.md
   - docs/models/shared/pineconedestinationconnectorconfiginput.md
   - docs/models/shared/postgresdestinationconnectorconfig.md
@@ -252,12 +250,17 @@ generatedFiles:
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
+  - src/unstructured_client/destinations.py
   - src/unstructured_client/httpclient.py
+  - src/unstructured_client/jobs.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
+  - src/unstructured_client/models/errors/no_response_error.py
+  - src/unstructured_client/models/errors/responsevalidationerror.py
   - src/unstructured_client/models/errors/sdkerror.py
   - src/unstructured_client/models/errors/servererror.py
+  - src/unstructured_client/models/errors/unstructuredclienterror.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/operations/cancel_job.py
   - src/unstructured_client/models/operations/create_connection_check_destinations.py
@@ -272,6 +275,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/get_connection_check_destinations.py
   - src/unstructured_client/models/operations/get_connection_check_sources.py
   - src/unstructured_client/models/operations/get_destination.py
+  - src/unstructured_client/models/operations/get_encryption_certificate.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_job_details.py
   - src/unstructured_client/models/operations/get_job_failed_files.py
@@ -282,7 +286,6 @@ generatedFiles:
   - src/unstructured_client/models/operations/list_sources.py
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
-  - src/unstructured_client/models/operations/retrieve.py
   - src/unstructured_client/models/operations/run_workflow.py
   - src/unstructured_client/models/operations/store_secret.py
   - src/unstructured_client/models/operations/update_destination.py
@@ -323,6 +326,7 @@ generatedFiles:
   - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
   - src/unstructured_client/models/shared/encryptedsecret.py
+  - src/unstructured_client/models/shared/encryptioncertificateresponse.py
   - src/unstructured_client/models/shared/encryptiontype.py
   - src/unstructured_client/models/shared/failedfile.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
@@ -359,7 +363,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
-  - src/unstructured_client/models/shared/pemauthresponse.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py
   - src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py
@@ -404,6 +407,7 @@ generatedFiles:
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
+  - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/users.py
@@ -421,8 +425,10 @@ generatedFiles:
   - src/unstructured_client/utils/retries.py
   - src/unstructured_client/utils/security.py
   - src/unstructured_client/utils/serializers.py
+  - src/unstructured_client/utils/unmarshal_json_response.py
   - src/unstructured_client/utils/url.py
   - src/unstructured_client/utils/values.py
+  - src/unstructured_client/workflows.py
 examples:
   create_connection_check_destinations:
     speakeasy-default-create-connection-check-destinations:
@@ -707,6 +713,13 @@ examples:
       responses:
         "200":
           application/json: {"id": "<id>"}
+        "422":
+          application/json: {"detail": []}
+  get_encryption_certificate:
+    speakeasy-default-get-encryption-certificate:
+      responses:
+        "200":
+          application/json: {"ca_chain": "<value>", "encryption_certificate": "<value>"}
         "422":
           application/json: {"detail": []}
 examplesVersion: 1.0.2

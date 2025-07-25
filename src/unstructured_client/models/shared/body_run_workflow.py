@@ -46,7 +46,8 @@ class BodyRunWorkflowTypedDict(TypedDict):
 
 class BodyRunWorkflow(BaseModel):
     input_files: Annotated[
-        OptionalNullable[List[InputFiles]], FieldMetadata(multipart=True)
+        OptionalNullable[List[InputFiles]],
+        FieldMetadata(multipart=MultipartFormMetadata(file=True)),
     ] = UNSET
 
     @model_serializer(mode="wrap")

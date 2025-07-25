@@ -18,13 +18,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
-GET_DESTINATION_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-GET_DESTINATION_SERVERS = {
-    GET_DESTINATION_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class GetDestinationRequestTypedDict(TypedDict):
     destination_id: str

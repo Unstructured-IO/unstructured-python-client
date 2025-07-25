@@ -19,13 +19,6 @@ from unstructured_client.types import (
 )
 from unstructured_client.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
 
-LIST_SOURCES_SERVER_PLATFORM_API = "platform-api"
-r"""Unstructured Platform API"""
-
-LIST_SOURCES_SERVERS = {
-    LIST_SOURCES_SERVER_PLATFORM_API: "https://platform.unstructuredapp.io/",
-}
-
 
 class ListSourcesRequestTypedDict(TypedDict):
     source_type: NotRequired[Nullable[shared_sourceconnectortype.SourceConnectorType]]
