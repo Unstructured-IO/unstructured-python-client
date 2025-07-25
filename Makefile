@@ -45,7 +45,7 @@ test-integration-docker:
 	-docker stop unstructured-api && docker kill unstructured-api
 	docker run --name unstructured-api -p 8000:8000 -d --rm ${DOCKER_IMAGE} --host 0.0.0.0 && \
 	curl -s -o /dev/null --retry 10 --retry-delay 5 --retry-all-errors http://localhost:8000/general/docs && \
-	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "integration" && \
+	PYTHONASYNCIODEBUG=1 PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client/integration/test_integration.py && \
 	docker kill unstructured-api
 
 .PHONY: lint
