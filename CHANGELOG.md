@@ -1,3 +1,12 @@
+## 0.41.0
+
+### Enhancements
+
+### Features
+* Provide a base `UnstructuredClientError` to capture every error raised by the SDK. Note that some exceptions such as `SDKError` now have more information in the `message` field. This will impact any users who rely on string matching in their error handling.
+
+### Fixes
+
 ## 0.37.3
 
 ### Enhancements

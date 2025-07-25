@@ -108,7 +108,7 @@ def test_list_destinations_5xx_code(
         )
     requests = httpx_mock.get_requests()
     assert len(requests) >= 1
-    assert excinfo.value.message == "API error occurred"
+    assert "API error occurred" in excinfo.value.message
     assert excinfo.value.status_code == error_status_code
 
 
@@ -177,7 +177,7 @@ def test_get_destination_not_found(
 
     requests = httpx_mock.get_requests()
     assert len(requests) == 1
-    assert excinfo.value.message == "API error occurred"
+    assert "API error occurred" in excinfo.value.message
     assert excinfo.value.status_code == 404
 
 

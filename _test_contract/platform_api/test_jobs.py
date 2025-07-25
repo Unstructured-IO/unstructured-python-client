@@ -101,7 +101,7 @@ def test_get_job_not_found(
         )
 
     assert e.value.status_code == 404
-    assert e.value.message == "API error occurred"
+    assert "API error occurred" in e.value.message
 
     requests = httpx_mock.get_requests()
     assert len(requests) == 1
@@ -130,7 +130,7 @@ def test_get_job_error(httpx_mock, platform_client: UnstructuredClient, platform
         )
 
     assert e.value.status_code == 500
-    assert e.value.message == "API error occurred"
+    assert "API error occurred" in e.value.message
 
     requests = httpx_mock.get_requests()
     assert len(requests) == 4

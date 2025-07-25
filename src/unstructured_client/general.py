@@ -8,6 +8,7 @@ from unstructured_client._hooks import HookContext
 from unstructured_client.models import errors, operations, shared
 from unstructured_client.types import BaseModel, OptionalNullable, UNSET
 from unstructured_client._hooks.custom.clean_server_url_hook import clean_server_url
+from unstructured_client.utils.unmarshal_json_response import unmarshal_json_response
 
 
 class PartitionAcceptEnum(str, Enum):
@@ -113,8 +114,8 @@ class General(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return operations.PartitionResponse(
-                elements=utils.unmarshal_json(
-                    http_res.text, Optional[List[Dict[str, Any]]]
+                elements=unmarshal_json_response(
+                    Optional[List[Dict[str, Any]]], http_res
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -128,27 +129,18 @@ class General(BaseSDK):
                 raw_response=http_res,
             )
         if utils.match_response(http_res, "422", "application/json"):
-            response_data = utils.unmarshal_json(
-                http_res.text, errors.HTTPValidationErrorData
+            response_data = unmarshal_json_response(
+                errors.HTTPValidationErrorData, http_res
             )
-            raise errors.HTTPValidationError(data=response_data)
+            raise errors.HTTPValidationError(response_data, http_res)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError(
-                "API error occurred", http_res.status_code, http_res_text, http_res
-            )
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
         if utils.match_response(http_res, "5XX", "application/json"):
-            response_data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
-            raise errors.ServerError(data=response_data)
+            response_data = unmarshal_json_response(errors.ServerErrorData, http_res)
+            raise errors.ServerError(response_data, http_res)
 
-        content_type = http_res.headers.get("Content-Type")
-        http_res_text = utils.stream_to_text(http_res)
-        raise errors.SDKError(
-            f"Unexpected response received (code: {http_res.status_code}, type: {content_type})",
-            http_res.status_code,
-            http_res_text,
-            http_res,
-        )
+        raise errors.SDKError("Unexpected response received", http_res)
 
     async def partition_async(
         self,
@@ -247,8 +239,8 @@ class General(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return operations.PartitionResponse(
-                elements=utils.unmarshal_json(
-                    http_res.text, Optional[List[Dict[str, Any]]]
+                elements=unmarshal_json_response(
+                    Optional[List[Dict[str, Any]]], http_res
                 ),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
@@ -262,24 +254,15 @@ class General(BaseSDK):
                 raw_response=http_res,
             )
         if utils.match_response(http_res, "422", "application/json"):
-            response_data = utils.unmarshal_json(
-                http_res.text, errors.HTTPValidationErrorData
+            response_data = unmarshal_json_response(
+                errors.HTTPValidationErrorData, http_res
             )
-            raise errors.HTTPValidationError(data=response_data)
+            raise errors.HTTPValidationError(response_data, http_res)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError(
-                "API error occurred", http_res.status_code, http_res_text, http_res
-            )
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
         if utils.match_response(http_res, "5XX", "application/json"):
-            response_data = utils.unmarshal_json(http_res.text, errors.ServerErrorData)
-            raise errors.ServerError(data=response_data)
+            response_data = unmarshal_json_response(errors.ServerErrorData, http_res)
+            raise errors.ServerError(response_data, http_res)
 
-        content_type = http_res.headers.get("Content-Type")
-        http_res_text = await utils.stream_to_text_async(http_res)
-        raise errors.SDKError(
-            f"Unexpected response received (code: {http_res.status_code}, type: {content_type})",
-            http_res.status_code,
-            http_res_text,
-            http_res,
-        )
+        raise errors.SDKError("Unexpected response received", http_res)
