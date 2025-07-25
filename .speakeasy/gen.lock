@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 0593f5359a35b34f3dc1b346490deff2
-  docVersion: 1.1.39
-  speakeasyVersion: 1.568.0
-  generationVersion: 2.632.2
-  releaseVersion: 0.40.0
-  configChecksum: 70954879fd1a6da62295461541e8680c
+  docChecksum: ae9cd2cec2edbde7b002c0a127c7aa84
+  docVersion: 1.1.42
+  speakeasyVersion: 1.589.0
+  generationVersion: 2.664.0
+  releaseVersion: 0.41.0
+  configChecksum: b2d39b13446f595978a73e31a796dbe7
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,17 +16,16 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.19.3
+    core: 5.19.4
     customCodeRegions: 0.1.1
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
-    examples: 3.0.1
+    examples: 3.0.2
     globalSecurity: 3.0.3
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
     globalServerURLs: 3.1.1
-    methodServerURLs: 3.1.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
     nullables: 1.0.1
@@ -39,7 +38,6 @@ features:
     uploadStreams: 1.0.0
 generatedFiles:
   - .gitattributes
-  - .python-version
   - .vscode/settings.json
   - USAGE.md
   - docs/models/errors/detail.md
@@ -252,12 +250,17 @@ generatedFiles:
   - src/unstructured_client/_hooks/types.py
   - src/unstructured_client/_version.py
   - src/unstructured_client/basesdk.py
+  - src/unstructured_client/destinations.py
   - src/unstructured_client/httpclient.py
+  - src/unstructured_client/jobs.py
   - src/unstructured_client/models/__init__.py
   - src/unstructured_client/models/errors/__init__.py
   - src/unstructured_client/models/errors/httpvalidationerror.py
+  - src/unstructured_client/models/errors/no_response_error.py
+  - src/unstructured_client/models/errors/responsevalidationerror.py
   - src/unstructured_client/models/errors/sdkerror.py
   - src/unstructured_client/models/errors/servererror.py
+  - src/unstructured_client/models/errors/unstructuredclienterror.py
   - src/unstructured_client/models/operations/__init__.py
   - src/unstructured_client/models/operations/cancel_job.py
   - src/unstructured_client/models/operations/create_connection_check_destinations.py
@@ -404,6 +407,7 @@ generatedFiles:
   - src/unstructured_client/py.typed
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
+  - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/users.py
@@ -421,8 +425,10 @@ generatedFiles:
   - src/unstructured_client/utils/retries.py
   - src/unstructured_client/utils/security.py
   - src/unstructured_client/utils/serializers.py
+  - src/unstructured_client/utils/unmarshal_json_response.py
   - src/unstructured_client/utils/url.py
   - src/unstructured_client/utils/values.py
+  - src/unstructured_client/workflows.py
 examples:
   create_connection_check_destinations:
     speakeasy-default-create-connection-check-destinations:
