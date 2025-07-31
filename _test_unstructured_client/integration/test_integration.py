@@ -13,7 +13,7 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client() -> UnstructuredClient:
     _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
     yield _client
