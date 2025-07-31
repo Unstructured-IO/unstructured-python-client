@@ -13,7 +13,7 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client() -> UnstructuredClient:
     _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
     yield _client
@@ -50,18 +50,9 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
     assert len(response.elements)
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Make the loop session scope to use session async fixtures."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest.mark.parametrize("split_pdf", [True, False])
 @pytest.mark.parametrize("error", [(500, ServerError), (403, SDKError), (422, HTTPValidationError)])
-def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path, event_loop):
+def test_partition_handling_server_error(error, split_pdf, monkeypatch, doc_path):
     """
     Mock different error responses, assert that the client throws the correct error
     """
@@ -197,6 +188,7 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
+    """Test that we can use pdf splitting within another asyncio loop."""
     async def call_api():
         filename = "layout-parser-paper-fast.pdf"
         with open(doc_path / filename, "rb") as f:
