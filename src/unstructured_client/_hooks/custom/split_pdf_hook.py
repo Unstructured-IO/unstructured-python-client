@@ -117,16 +117,6 @@ async def run_tasks(
         return sorted(results, key=lambda x: x[0])
 
 
-def context_is_uvloop():
-    """Return true if uvloop is installed and we're currently in a uvloop context. Our asyncio splitting code currently doesn't work under uvloop."""
-    try:
-        import uvloop  # type: ignore[import]  # pylint: disable=import-outside-toplevel
-        loop = asyncio.get_event_loop()
-        return isinstance(loop, uvloop.Loop)
-    except (ImportError, RuntimeError):
-        return False
-
-
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
     """Distributes pages to workers evenly based on the number of pages and desired concurrency level."""
     if num_pages < MAX_PAGES_PER_SPLIT * concurrency_level:
@@ -271,10 +261,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         if self.client is None:
             logger.warning("HTTP client not accessible! Continuing without splitting.")
-            return request
-
-        if context_is_uvloop():
-            logger.warning("Splitting is currently incompatible with uvloop. Continuing without splitting.")
             return request
 
         # This is our key into coroutines_to_execute

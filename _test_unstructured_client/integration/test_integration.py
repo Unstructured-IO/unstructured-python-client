@@ -188,6 +188,7 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
+    """Test that we can use pdf splitting within another asyncio loop."""
     async def call_api():
         filename = "layout-parser-paper-fast.pdf"
         with open(doc_path / filename, "rb") as f:
