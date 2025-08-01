@@ -1,6 +1,6 @@
 [project]
 name = "unstructured-client"
-version = "0.41.0"
+version = "0.42.0"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -10,8 +10,7 @@ dependencies = [
     "cryptography >=3.1",
     "httpcore >=1.0.9",
     "httpx >=0.27.0",
-    "pydantic >=2.10.3",
-    "nest-asyncio >=1.6.0",
+    "pydantic >=2.11.2",
     "pypdf >=4.0",
     "requests-toolbelt >=1.0.0",
 ]
@@ -48,7 +47,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 pythonpath = ["src"]
 

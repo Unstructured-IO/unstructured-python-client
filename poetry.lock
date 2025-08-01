@@ -612,18 +612,6 @@ files = [
 ]
 
 [[package]]
-name = "nest-asyncio"
-version = "1.6.0"
-description = "Patch asyncio to allow nested event loops"
-optional = false
-python-versions = ">=3.5"
-groups = ["main"]
-files = [
-    {file = "nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"},
-    {file = "nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe"},
-]
-
-[[package]]
 name = "orderly-set"
 version = "5.5.0"
 description = "Orderly set"
@@ -1249,4 +1237,4 @@ test = ["aiohttp (>=3.10.5)", "flake8 (>=5.0,<6.0)", "mypy (>=0.800)", "psutil",
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.2"
-content-hash = "f1ed0b2c01f3e8201fb3c491269c2736725ba2bb1eea5fab13d7b8520a6ab3d9"
+content-hash = "bc7eb54bd2eb68bd39aedc2f6da6b4faf217363f542fd493ee94766edf743cf3"

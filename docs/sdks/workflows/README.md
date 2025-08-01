@@ -18,6 +18,7 @@ Create a new workflow, either custom or auto, and configure its settings.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create_workflow" method="post" path="/api/v1/workflows/" -->
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
@@ -63,6 +64,7 @@ Delete a workflow by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="delete_workflow" method="delete" path="/api/v1/workflows/{workflow_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -104,6 +106,7 @@ Retrieve detailed information for a specific workflow by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_workflow" method="get" path="/api/v1/workflows/{workflow_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -145,6 +148,7 @@ Retrieve a list of workflows, optionally filtered by source, destination, state,
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="list_workflows" method="get" path="/api/v1/workflows/" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -184,6 +188,7 @@ Run a workflow by triggering a new job if none is currently active.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="run_workflow" method="post" path="/api/v1/workflows/{workflow_id}/run" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -225,6 +230,7 @@ Update an existing workflow's name, connectors, schedule, or workflow type.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="update_workflow" method="put" path="/api/v1/workflows/{workflow_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 

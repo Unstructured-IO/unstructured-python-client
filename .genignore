@@ -8,6 +8,10 @@ _test_unstructured_client
 # ignore Makefile
 Makefile
 
+# No active endpoints in here, but we don't want to delete it
+# Hold onto the custom regions until these endpoints come back
+src/unstructured_client/users.py
+
 # Ignore general.py so we can patch in our partitioning url
 # If we ever have a new endpoint under /general, we need to:
 #  - Comment out this ignore line

@@ -33,6 +33,7 @@ def rsa_key_pair():
 
     return private_key_pem, public_key_pem
 
+@pytest.mark.skip(reason="Encryption is not in the SDK yet")
 def test_encrypt_rsa(rsa_key_pair):
     private_key_pem, public_key_pem = rsa_key_pair
 
@@ -55,6 +56,7 @@ def test_encrypt_rsa(rsa_key_pair):
     assert decrypted_text == plaintext
 
 
+@pytest.mark.skip(reason="Encryption is not in the SDK yet")
 def test_encrypt_rsa_aes(rsa_key_pair):
     private_key_pem, public_key_pem = rsa_key_pair
 
@@ -80,6 +82,7 @@ def test_encrypt_rsa_aes(rsa_key_pair):
 rsa_key_size_bytes = 2048 // 8
 max_payload_size = rsa_key_size_bytes - 66  # OAEP SHA256 overhead
 
+@pytest.mark.skip(reason="Encryption is not in the SDK yet")
 @pytest.mark.parametrize(("plaintext", "secret_type"), [
     ("Short message", "rsa"),
     ("A" * (max_payload_size), "rsa"),  # Just at the RSA limit

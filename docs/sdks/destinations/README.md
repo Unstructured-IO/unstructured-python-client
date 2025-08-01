@@ -19,6 +19,7 @@ Initiate a connection check for the destination connector
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create_connection_check_destinations" method="post" path="/api/v1/destinations/{destination_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -60,6 +61,7 @@ Create a new destination connector using the provided configuration and name.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create_destination" method="post" path="/api/v1/destinations/" -->
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
@@ -110,6 +112,7 @@ Delete a specific destination connector by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="delete_destination" method="delete" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -151,6 +154,7 @@ Retrieves the most recent connection check for the specified destination connect
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_connection_check_destinations" method="get" path="/api/v1/destinations/{destination_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -192,6 +196,7 @@ Retrieve detailed information for a specific destination connector by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_destination" method="get" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -233,6 +238,7 @@ Retrieve a list of available destination connectors.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="list_destinations" method="get" path="/api/v1/destinations/" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -272,6 +278,7 @@ Update the configuration of an existing destination connector.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="update_destination" method="put" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
