@@ -5,7 +5,7 @@ import io
 import pytest
 from pypdf import PdfReader
 
-from unstructured_client._hooks.custom.pdf_utils import check_pdf, PDFValidationError
+from unstructured_client._hooks.custom.pdf_utils import check_pdf, read_pdf, PDFValidationError
 from _test_unstructured_client.unit_utils import sample_docs_path
 
 
@@ -23,6 +23,7 @@ def test_check_pdf_with_valid_pdf():
     assert isinstance(result, PdfReader)
 
 
+# TODO(klaijan) - add pdf file when file is ready
 @pytest.mark.parametrize(
     ("pdf_name", "expected_error_message"),
     [
@@ -51,3 +52,15 @@ def test_check_pdf_raises_pdf_validation_error(
         check_pdf(pdf)
 
     assert exc_info.value.message == expected_error_message
+
+
+# TODO(klaijan) - uncomment when file is ready
+"""
+def test_check_read_pdf():
+    pdf_path = sample_docs_path(".pdf")
+    with open(pdf_path, "rb") as f:
+        pdf_content = f.read()
+    pdf = read_pdf(pdf_content)
+    result = check_pdf(pdf)
+    assert isinstance(result, PdfReader)
+"""
