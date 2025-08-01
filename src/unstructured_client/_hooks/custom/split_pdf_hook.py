@@ -9,13 +9,13 @@ import os
 import tempfile
 import uuid
 from collections.abc import Awaitable
+from concurrent import futures
 from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
 import aiofiles
 import httpx
-import nest_asyncio  # type: ignore
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 
@@ -56,6 +56,11 @@ MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
 
+def _run_coroutines_in_separate_thread(
+        coroutines_task: Coroutine[Any, Any, list[tuple[int, httpx.Response]]],
+) -> list[tuple[int, httpx.Response]]:
+    return asyncio.run(coroutines_task)
+
 
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
     response = await coro
@@ -64,7 +69,8 @@ async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Respons
 
 async def run_tasks(
     coroutines: list[partial[Coroutine[Any, Any, httpx.Response]]],
-    allow_failed: bool = False
+    allow_failed: bool = False,
+    concurrency_level: int = 10,
 ) -> list[tuple[int, httpx.Response]]:
     """Run a list of coroutines in parallel and return the results in order.
 
@@ -80,13 +86,14 @@ async def run_tasks(
     # Use a variable to adjust the httpx client timeout, or default to 30 minutes
     # When we're able to reuse the SDK to make these calls, we can remove this var
     # The SDK timeout will be controlled by parameter
+    limiter = asyncio.Semaphore(concurrency_level)
     client_timeout_minutes = 60
     if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
         client_timeout_minutes = int(timeout_var)
     client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
     async with httpx.AsyncClient(timeout=client_timeout) as client:
-        armed_coroutines = [coro(async_client=client) for coro in coroutines] # type: ignore
+        armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
         if allow_failed:
             responses = await asyncio.gather(*armed_coroutines, return_exceptions=False)
             return list(enumerate(responses, 1))
@@ -108,16 +115,6 @@ async def run_tasks(
             del remaining_tasks[index]
         # return results in the original order
         return sorted(results, key=lambda x: x[0])
-
-
-def context_is_uvloop():
-    """Return true if uvloop is installed and we're currently in a uvloop context. Our asyncio splitting code currently doesn't work under uvloop."""
-    try:
-        import uvloop  # type: ignore[import]  # pylint: disable=import-outside-toplevel
-        loop = asyncio.get_event_loop()
-        return isinstance(loop, uvloop.Loop)
-    except (ImportError, RuntimeError):
-        return False
 
 
 def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
@@ -163,8 +160,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.coroutines_to_execute: dict[
             str, list[partial[Coroutine[Any, Any, httpx.Response]]]
         ] = {}
+        self.concurrency_level: dict[str, int] = {}
         self.api_successful_responses: dict[str, list[httpx.Response]] = {}
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
+        self.executors: dict[str, futures.ThreadPoolExecutor] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
         self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
@@ -264,14 +263,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.warning("HTTP client not accessible! Continuing without splitting.")
             return request
 
-        if context_is_uvloop():
-            logger.warning("Splitting is currently incompatible with uvloop. Continuing without splitting.")
-            return request
-
-        # This allows us to use an event loop in an env with an existing loop
-        # Temporary fix until we can improve the async splitting behavior
-        nest_asyncio.apply()
-
         # This is our key into coroutines_to_execute
         # We need to pass it on to after_success so
         # we know which results are ours
@@ -317,13 +308,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_ALLOW_FAILED,
         )
 
-        concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
+        self.concurrency_level[operation_id] = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
             key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-        limiter = asyncio.Semaphore(concurrency_level)
+
+        executor = futures.ThreadPoolExecutor(max_workers=1)
+        self.executors[operation_id] = executor
 
         self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
@@ -346,7 +339,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         page_count = page_range_end - page_range_start + 1
 
         split_size = get_optimal_split_size(
-            num_pages=page_count, concurrency_level=concurrency_level
+            num_pages=page_count, concurrency_level=self.concurrency_level[operation_id]
         )
 
         # If the doc is small enough, and we aren't slicing it with a page range:
@@ -389,7 +382,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             # in `after_success`.
             coroutine = partial(
                 self.call_api_partial,
-                limiter=limiter,
                 operation_id=operation_id,
                 pdf_chunk_request=pdf_chunk_request,
                 pdf_chunk_file=pdf_chunk_file,
@@ -607,10 +599,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if tasks is None:
             return None
 
-        ioloop = asyncio.get_event_loop()
-        task_responses: list[tuple[int, httpx.Response]] = ioloop.run_until_complete(
-            run_tasks(tasks, allow_failed=self.allow_failed)
-        )
+        concurrency_level = self.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL)
+        coroutines = run_tasks(tasks, allow_failed=self.allow_failed, concurrency_level=concurrency_level)
+
+        # sending the coroutines to a separate thread to avoid blocking the current event loop
+        # this operation should be removed when the SDK is updated to support async hooks
+        executor = self.executors.get(operation_id)
+        if executor is None:
+            raise RuntimeError("Executor not found for operation_id")
+        task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
+        task_responses = task_responses_future.result()
 
         if task_responses is None:
             return None
@@ -714,6 +712,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.coroutines_to_execute.pop(operation_id, None)
         self.api_successful_responses.pop(operation_id, None)
+        self.concurrency_level.pop(operation_id, None)
+        executor = self.executors.pop(operation_id, None)
+        if executor is not None:
+            executor.shutdown(wait=True)
         tempdir = self.tempdirs.pop(operation_id, None)
         if tempdir:
             tempdir.cleanup()

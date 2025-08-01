@@ -1,3 +1,12 @@
+## 0.42.0
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Fix some environments failing to split pdfs with `Can't patch loop of type <class 'uvloop.Loop'>`, remove usage of `nest-asyncio`
+
 ## 0.41.0
 
 ### Enhancements
