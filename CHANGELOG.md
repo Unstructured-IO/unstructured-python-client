@@ -6,6 +6,7 @@
 
 ### Fixes
 * Fix some environments failing to split pdfs with `Can't patch loop of type <class 'uvloop.Loop'>`, remove usage of `nest-asyncio`
+* Remove some operations under `client.users` that are not fully ready yet
 
 ## 0.41.0
 
