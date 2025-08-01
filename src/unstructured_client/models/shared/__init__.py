@@ -132,11 +132,6 @@ if TYPE_CHECKING:
         ElasticsearchConnectorConfigInput,
         ElasticsearchConnectorConfigInputTypedDict,
     )
-    from .encryptedsecret import EncryptedSecret, EncryptedSecretTypedDict
-    from .encryptioncertificateresponse import (
-        EncryptionCertificateResponse,
-        EncryptionCertificateResponseTypedDict,
-    )
     from .encryptiontype import EncryptionType
     from .failedfile import FailedFile, FailedFileTypedDict
     from .gcsdestinationconnectorconfig import (
@@ -479,10 +474,6 @@ __all__ = [
     "ElasticsearchConnectorConfigInput",
     "ElasticsearchConnectorConfigInputTypedDict",
     "ElasticsearchConnectorConfigTypedDict",
-    "EncryptedSecret",
-    "EncryptedSecretTypedDict",
-    "EncryptionCertificateResponse",
-    "EncryptionCertificateResponseTypedDict",
     "EncryptionType",
     "FailedFile",
     "FailedFileTypedDict",
@@ -727,10 +718,6 @@ _dynamic_imports: dict[str, str] = {
     "ElasticsearchConnectorConfigTypedDict": ".elasticsearchconnectorconfig",
     "ElasticsearchConnectorConfigInput": ".elasticsearchconnectorconfiginput",
     "ElasticsearchConnectorConfigInputTypedDict": ".elasticsearchconnectorconfiginput",
-    "EncryptedSecret": ".encryptedsecret",
-    "EncryptedSecretTypedDict": ".encryptedsecret",
-    "EncryptionCertificateResponse": ".encryptioncertificateresponse",
-    "EncryptionCertificateResponseTypedDict": ".encryptioncertificateresponse",
     "EncryptionType": ".encryptiontype",
     "FailedFile": ".failedfile",
     "FailedFileTypedDict": ".failedfile",

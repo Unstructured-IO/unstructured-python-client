@@ -13,6 +13,7 @@ Description
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="partition" method="post" path="/general/v0/general" -->
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared

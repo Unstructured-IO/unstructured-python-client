@@ -213,7 +213,7 @@ with UnstructuredClient() as uc_client:
 
 
 **Inherit from [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py)**:
-* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 29 methods.*
+* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 27 methods.*
 * [`ResponseValidationError`](./src/unstructured_client/models/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
 
 </details>

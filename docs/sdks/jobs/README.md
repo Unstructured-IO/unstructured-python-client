@@ -18,6 +18,7 @@ Cancel the specified job.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="cancel_job" method="post" path="/api/v1/jobs/{job_id}/cancel" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -59,6 +60,7 @@ Download the output of a job from a workflow where the input file was provided a
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="download_job_output" method="get" path="/api/v1/jobs/{job_id}/download" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -102,6 +104,7 @@ Retrieve detailed information for a specific job by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_job" method="get" path="/api/v1/jobs/{job_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -143,6 +146,7 @@ Retrieve processing details for a specific job by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_job_details" method="get" path="/api/v1/jobs/{job_id}/details" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -184,6 +188,7 @@ Retrieve failed files for a specific job by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_job_failed_files" method="get" path="/api/v1/jobs/{job_id}/failed-files" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -225,6 +230,7 @@ Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="list_jobs" method="get" path="/api/v1/jobs/" -->
 ```python
 from unstructured_client import UnstructuredClient
 

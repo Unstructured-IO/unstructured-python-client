@@ -19,6 +19,7 @@ Initiates a connection check for the specified source connector.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create_connection_check_sources" method="post" path="/api/v1/sources/{source_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -60,6 +61,7 @@ Create a new source connector using the provided configuration and name.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create_source" method="post" path="/api/v1/sources/" -->
 ```python
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared
@@ -113,6 +115,7 @@ Delete a specific source connector identified by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="delete_source" method="delete" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -154,6 +157,7 @@ Retrieves the most recent connection check for the specified source connector.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_connection_check_sources" method="get" path="/api/v1/sources/{source_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -195,6 +199,7 @@ Retrieve detailed information for a specific source connector by its ID.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="get_source" method="get" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -236,6 +241,7 @@ Retrieve a list of available source connectors.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="list_sources" method="get" path="/api/v1/sources/" -->
 ```python
 from unstructured_client import UnstructuredClient
 
@@ -275,6 +281,7 @@ Update the configuration of an existing source connector.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="update_source" method="put" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
 

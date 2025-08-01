@@ -123,18 +123,6 @@ actions:
         - "lang": "python"
           "label": "create_connection_check_sources"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"8d49e3f2-3e6d-4973-bc61-292af66829d7\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
-  - target: $["paths"]["/api/v1/users/secrets"]["post"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "store_secret"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.store_secret(request={\n        \"encrypted_secret\": {\n            \"encrypted_value\": \"<value>\",\n        },\n    })\n\n    assert res.secret_reference is not None\n\n    # Handle response\n    print(res.secret_reference)"
-  - target: $["paths"]["/api/v1/users/secrets/encryption-certificate"]["get"]
-    update:
-      "x-codeSamples":
-        - "lang": "python"
-          "label": "get_encryption_certificate"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.users.get_encryption_certificate(request={})\n\n    assert res.encryption_certificate_response is not None\n\n    # Handle response\n    print(res.encryption_certificate_response)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":

@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: ae9cd2cec2edbde7b002c0a127c7aa84
-  docVersion: 1.1.42
-  speakeasyVersion: 1.589.0
-  generationVersion: 2.664.0
-  releaseVersion: 0.41.0
-  configChecksum: b2d39b13446f595978a73e31a796dbe7
+  docChecksum: 1e625384a184f21d27f5afa31f705ada
+  docVersion: 1.1.45
+  speakeasyVersion: 1.595.0
+  generationVersion: 2.670.1
+  releaseVersion: 0.42.0
+  configChecksum: cd0ffde4496a99df26b7766acfe9c43d
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -16,7 +16,7 @@ features:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
     constsAndDefaults: 1.0.5
-    core: 5.19.4
+    core: 5.19.5
     customCodeRegions: 0.1.1
     defaultEnabledRetries: 0.2.0
     enumUnions: 0.1.0
@@ -69,8 +69,6 @@ generatedFiles:
   - docs/models/operations/getconnectionchecksourcesresponse.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
-  - docs/models/operations/getencryptioncertificaterequest.md
-  - docs/models/operations/getencryptioncertificateresponse.md
   - docs/models/operations/getjobdetailsrequest.md
   - docs/models/operations/getjobdetailsresponse.md
   - docs/models/operations/getjobfailedfilesrequest.md
@@ -93,8 +91,6 @@ generatedFiles:
   - docs/models/operations/partitionresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
-  - docs/models/operations/storesecretrequest.md
-  - docs/models/operations/storesecretresponse.md
   - docs/models/operations/updatedestinationrequest.md
   - docs/models/operations/updatedestinationresponse.md
   - docs/models/operations/updatesourcerequest.md
@@ -137,8 +133,6 @@ generatedFiles:
   - docs/models/shared/dropboxsourceconnectorconfiginput.md
   - docs/models/shared/elasticsearchconnectorconfig.md
   - docs/models/shared/elasticsearchconnectorconfiginput.md
-  - docs/models/shared/encryptedsecret.md
-  - docs/models/shared/encryptioncertificateresponse.md
   - docs/models/shared/encryptiontype.md
   - docs/models/shared/failedfile.md
   - docs/models/shared/files.md
@@ -236,7 +230,6 @@ generatedFiles:
   - docs/sdks/jobs/README.md
   - docs/sdks/sources/README.md
   - docs/sdks/unstructuredclient/README.md
-  - docs/sdks/users/README.md
   - docs/sdks/workflows/README.md
   - poetry.toml
   - py.typed
@@ -275,7 +268,6 @@ generatedFiles:
   - src/unstructured_client/models/operations/get_connection_check_destinations.py
   - src/unstructured_client/models/operations/get_connection_check_sources.py
   - src/unstructured_client/models/operations/get_destination.py
-  - src/unstructured_client/models/operations/get_encryption_certificate.py
   - src/unstructured_client/models/operations/get_job.py
   - src/unstructured_client/models/operations/get_job_details.py
   - src/unstructured_client/models/operations/get_job_failed_files.py
@@ -287,7 +279,6 @@ generatedFiles:
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
   - src/unstructured_client/models/operations/run_workflow.py
-  - src/unstructured_client/models/operations/store_secret.py
   - src/unstructured_client/models/operations/update_destination.py
   - src/unstructured_client/models/operations/update_source.py
   - src/unstructured_client/models/operations/update_workflow.py
@@ -325,8 +316,6 @@ generatedFiles:
   - src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfig.py
   - src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py
-  - src/unstructured_client/models/shared/encryptedsecret.py
-  - src/unstructured_client/models/shared/encryptioncertificateresponse.py
   - src/unstructured_client/models/shared/encryptiontype.py
   - src/unstructured_client/models/shared/failedfile.py
   - src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py
@@ -410,7 +399,6 @@ generatedFiles:
   - src/unstructured_client/sources.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
-  - src/unstructured_client/users.py
   - src/unstructured_client/utils/__init__.py
   - src/unstructured_client/utils/annotations.py
   - src/unstructured_client/utils/datetimes.py
