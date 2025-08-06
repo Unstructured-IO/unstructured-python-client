@@ -1,6 +1,6 @@
 [project]
 name = "unstructured-client"
-version = "0.42.0"
+version = "0.42.1"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
