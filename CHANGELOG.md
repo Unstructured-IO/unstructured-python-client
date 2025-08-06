@@ -1,3 +1,21 @@
+## 0.42.2
+
+### Enhancements
+
+### Features
+* Enable arbitrary inputs for `SourceConnectorType` and `DestinationConnectorType`. This lets the client support new connector types without having to upgrade.
+
+### Fixes
+
+## 0.42.1
+
+### Enhancements
+
+### Features
+
+### Fixes
+* potential issue referencing models before declaration (commit by @mfbx9da4)
+
 ## 0.42.0
 
 ### Enhancements

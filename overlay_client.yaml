@@ -77,3 +77,9 @@ actions:
   - target: $["components"]["schemas"]["partition_parameters"]["properties"]["tracking_enabled"]
     description: Remove tracking_enabled from partition_parameters
     remove: true
+  - target: $["components"]["schemas"]["SourceConnectorType"]
+    update:
+      "x-speakeasy-unknown-values": "allow"
+  - target: $["components"]["schemas"]["DestinationConnectorType"]
+    update:
+      "x-speakeasy-unknown-values": "allow"
