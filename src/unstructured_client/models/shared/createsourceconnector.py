@@ -82,9 +82,11 @@ from .zendesksourceconnectorconfiginput import (
     ZendeskSourceConnectorConfigInput,
     ZendeskSourceConnectorConfigInputTypedDict,
 )
+from pydantic.functional_validators import PlainValidator
 from typing import Union
-from typing_extensions import TypeAliasType, TypedDict
+from typing_extensions import Annotated, TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
+from unstructured_client.utils import validate_open_enum
 
 
 CreateSourceConnectorConfigTypedDict = TypeAliasType(
@@ -152,4 +154,4 @@ class CreateSourceConnector(BaseModel):
 
     name: str
 
-    type: SourceConnectorType
+    type: Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))]
