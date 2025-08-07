@@ -88,8 +88,9 @@ from .weaviatedestinationconnectorconfig import (
 )
 from datetime import datetime
 from pydantic import model_serializer
+from pydantic.functional_validators import PlainValidator
 from typing import Union
-from typing_extensions import NotRequired, TypeAliasType, TypedDict
+from typing_extensions import Annotated, NotRequired, TypeAliasType, TypedDict
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -97,6 +98,7 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
+from unstructured_client.utils import validate_open_enum
 
 
 DestinationConnectorInformationConfigTypedDict = TypeAliasType(
@@ -173,7 +175,7 @@ class DestinationConnectorInformation(BaseModel):
 
     name: str
 
-    type: DestinationConnectorType
+    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
 
     updated_at: OptionalNullable[datetime] = UNSET
 

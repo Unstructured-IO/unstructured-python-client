@@ -4,6 +4,7 @@ from __future__ import annotations
 import httpx
 import pydantic
 from pydantic import model_serializer
+from pydantic.functional_validators import PlainValidator
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.models.shared import (
@@ -17,7 +18,12 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
+from unstructured_client.utils import (
+    FieldMetadata,
+    HeaderMetadata,
+    QueryParamMetadata,
+    validate_open_enum,
+)
 
 
 class ListDestinationsRequestTypedDict(TypedDict):
@@ -29,7 +35,10 @@ class ListDestinationsRequestTypedDict(TypedDict):
 
 class ListDestinationsRequest(BaseModel):
     destination_type: Annotated[
-        OptionalNullable[shared_destinationconnectortype.DestinationConnectorType],
+        Annotated[
+            OptionalNullable[shared_destinationconnectortype.DestinationConnectorType],
+            PlainValidator(validate_open_enum(False)),
+        ],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = UNSET
 

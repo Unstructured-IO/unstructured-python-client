@@ -84,8 +84,9 @@ from .zendesksourceconnectorconfig import (
 )
 from datetime import datetime
 from pydantic import model_serializer
+from pydantic.functional_validators import PlainValidator
 from typing import Union
-from typing_extensions import NotRequired, TypeAliasType, TypedDict
+from typing_extensions import Annotated, NotRequired, TypeAliasType, TypedDict
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -93,6 +94,7 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
+from unstructured_client.utils import validate_open_enum
 
 
 SourceConnectorInformationConfigTypedDict = TypeAliasType(
@@ -167,7 +169,7 @@ class SourceConnectorInformation(BaseModel):
 
     name: str
 
-    type: SourceConnectorType
+    type: Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))]
 
     updated_at: OptionalNullable[datetime] = UNSET
 

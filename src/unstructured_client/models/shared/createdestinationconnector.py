@@ -86,9 +86,11 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
+from pydantic.functional_validators import PlainValidator
 from typing import Union
-from typing_extensions import TypeAliasType, TypedDict
+from typing_extensions import Annotated, TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
+from unstructured_client.utils import validate_open_enum
 
 
 ConfigTypedDict = TypeAliasType(
@@ -158,4 +160,4 @@ class CreateDestinationConnector(BaseModel):
 
     name: str
 
-    type: DestinationConnectorType
+    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]

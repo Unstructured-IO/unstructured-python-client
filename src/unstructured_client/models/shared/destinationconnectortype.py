@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from unstructured_client import utils
 
 
-class DestinationConnectorType(str, Enum):
+class DestinationConnectorType(str, Enum, metaclass=utils.OpenEnumMeta):
     ASTRADB = "astradb"
     AZURE_AI_SEARCH = "azure_ai_search"
     COUCHBASE = "couchbase"

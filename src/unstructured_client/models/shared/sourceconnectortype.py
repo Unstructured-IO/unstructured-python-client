@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from unstructured_client import utils
 
 
-class SourceConnectorType(str, Enum):
+class SourceConnectorType(str, Enum, metaclass=utils.OpenEnumMeta):
     AZURE = "azure"
     BOX = "box"
     CONFLUENCE = "confluence"
