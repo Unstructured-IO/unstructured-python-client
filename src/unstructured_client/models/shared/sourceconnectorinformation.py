@@ -85,7 +85,7 @@ from .zendesksourceconnectorconfig import (
 from datetime import datetime
 from pydantic import model_serializer
 from pydantic.functional_validators import PlainValidator
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import Annotated, NotRequired, TypeAliasType, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -109,17 +109,18 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
         GoogleDriveSourceConnectorConfigTypedDict,
         ZendeskSourceConnectorConfigTypedDict,
         AzureSourceConnectorConfigTypedDict,
+        S3SourceConnectorConfigTypedDict,
+        OutlookSourceConnectorConfigTypedDict,
         OneDriveSourceConnectorConfigTypedDict,
         KafkaCloudSourceConnectorConfigTypedDict,
         DatabricksVolumesConnectorConfigTypedDict,
-        OutlookSourceConnectorConfigTypedDict,
-        S3SourceConnectorConfigTypedDict,
         SharePointSourceConnectorConfigTypedDict,
         CouchbaseSourceConnectorConfigTypedDict,
         PostgresSourceConnectorConfigTypedDict,
         JiraSourceConnectorConfigTypedDict,
         ConfluenceSourceConnectorConfigTypedDict,
         SnowflakeSourceConnectorConfigTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -136,17 +137,18 @@ SourceConnectorInformationConfig = TypeAliasType(
         GoogleDriveSourceConnectorConfig,
         ZendeskSourceConnectorConfig,
         AzureSourceConnectorConfig,
+        S3SourceConnectorConfig,
+        OutlookSourceConnectorConfig,
         OneDriveSourceConnectorConfig,
         KafkaCloudSourceConnectorConfig,
         DatabricksVolumesConnectorConfig,
-        OutlookSourceConnectorConfig,
-        S3SourceConnectorConfig,
         SharePointSourceConnectorConfig,
         CouchbaseSourceConnectorConfig,
         PostgresSourceConnectorConfig,
         JiraSourceConnectorConfig,
         ConfluenceSourceConnectorConfig,
         SnowflakeSourceConnectorConfig,
+        Dict[str, Any],
     ],
 )
 

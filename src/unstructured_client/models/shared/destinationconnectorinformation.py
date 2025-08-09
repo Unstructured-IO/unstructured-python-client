@@ -89,7 +89,7 @@ from .weaviatedestinationconnectorconfig import (
 from datetime import datetime
 from pydantic import model_serializer
 from pydantic.functional_validators import PlainValidator
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import Annotated, NotRequired, TypeAliasType, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -116,15 +116,16 @@ DestinationConnectorInformationConfigTypedDict = TypeAliasType(
         Neo4jDestinationConnectorConfigTypedDict,
         OneDriveDestinationConnectorConfigTypedDict,
         S3DestinationConnectorConfigTypedDict,
-        MilvusDestinationConnectorConfigTypedDict,
-        DatabricksVolumesConnectorConfigTypedDict,
         PostgresDestinationConnectorConfigTypedDict,
+        DatabricksVolumesConnectorConfigTypedDict,
+        MilvusDestinationConnectorConfigTypedDict,
         KafkaCloudDestinationConnectorConfigTypedDict,
         CouchbaseDestinationConnectorConfigTypedDict,
         RedisDestinationConnectorConfigTypedDict,
         DatabricksVDTDestinationConnectorConfigTypedDict,
         SnowflakeDestinationConnectorConfigTypedDict,
         IBMWatsonxS3DestinationConnectorConfigTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -144,15 +145,16 @@ DestinationConnectorInformationConfig = TypeAliasType(
         Neo4jDestinationConnectorConfig,
         OneDriveDestinationConnectorConfig,
         S3DestinationConnectorConfig,
-        MilvusDestinationConnectorConfig,
-        DatabricksVolumesConnectorConfig,
         PostgresDestinationConnectorConfig,
+        DatabricksVolumesConnectorConfig,
+        MilvusDestinationConnectorConfig,
         KafkaCloudDestinationConnectorConfig,
         CouchbaseDestinationConnectorConfig,
         RedisDestinationConnectorConfig,
         DatabricksVDTDestinationConnectorConfig,
         SnowflakeDestinationConnectorConfig,
         IBMWatsonxS3DestinationConnectorConfig,
+        Dict[str, Any],
     ],
 )
 
