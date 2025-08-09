@@ -83,7 +83,7 @@ from .zendesksourceconnectorconfiginput import (
     ZendeskSourceConnectorConfigInputTypedDict,
 )
 from pydantic.functional_validators import PlainValidator
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import Annotated, TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
 from unstructured_client.utils import validate_open_enum
@@ -94,24 +94,25 @@ CreateSourceConnectorConfigTypedDict = TypeAliasType(
     Union[
         MongoDBConnectorConfigInputTypedDict,
         BoxSourceConnectorConfigInputTypedDict,
-        GCSSourceConnectorConfigInputTypedDict,
-        ElasticsearchConnectorConfigInputTypedDict,
         DropboxSourceConnectorConfigInputTypedDict,
-        GoogleDriveSourceConnectorConfigInputTypedDict,
+        ElasticsearchConnectorConfigInputTypedDict,
+        GCSSourceConnectorConfigInputTypedDict,
         SalesforceSourceConnectorConfigInputTypedDict,
+        GoogleDriveSourceConnectorConfigInputTypedDict,
         ZendeskSourceConnectorConfigInputTypedDict,
         AzureSourceConnectorConfigInputTypedDict,
-        S3SourceConnectorConfigInputTypedDict,
-        DatabricksVolumesConnectorConfigInputTypedDict,
-        KafkaCloudSourceConnectorConfigInputTypedDict,
         OneDriveSourceConnectorConfigInputTypedDict,
+        KafkaCloudSourceConnectorConfigInputTypedDict,
         OutlookSourceConnectorConfigInputTypedDict,
-        SharePointSourceConnectorConfigInputTypedDict,
+        DatabricksVolumesConnectorConfigInputTypedDict,
+        S3SourceConnectorConfigInputTypedDict,
         CouchbaseSourceConnectorConfigInputTypedDict,
+        SharePointSourceConnectorConfigInputTypedDict,
         PostgresSourceConnectorConfigInputTypedDict,
         JiraSourceConnectorConfigInputTypedDict,
         ConfluenceSourceConnectorConfigInputTypedDict,
         SnowflakeSourceConnectorConfigInputTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -121,24 +122,25 @@ CreateSourceConnectorConfig = TypeAliasType(
     Union[
         MongoDBConnectorConfigInput,
         BoxSourceConnectorConfigInput,
-        GCSSourceConnectorConfigInput,
-        ElasticsearchConnectorConfigInput,
         DropboxSourceConnectorConfigInput,
-        GoogleDriveSourceConnectorConfigInput,
+        ElasticsearchConnectorConfigInput,
+        GCSSourceConnectorConfigInput,
         SalesforceSourceConnectorConfigInput,
+        GoogleDriveSourceConnectorConfigInput,
         ZendeskSourceConnectorConfigInput,
         AzureSourceConnectorConfigInput,
-        S3SourceConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInput,
-        KafkaCloudSourceConnectorConfigInput,
         OneDriveSourceConnectorConfigInput,
+        KafkaCloudSourceConnectorConfigInput,
         OutlookSourceConnectorConfigInput,
-        SharePointSourceConnectorConfigInput,
+        DatabricksVolumesConnectorConfigInput,
+        S3SourceConnectorConfigInput,
         CouchbaseSourceConnectorConfigInput,
+        SharePointSourceConnectorConfigInput,
         PostgresSourceConnectorConfigInput,
         JiraSourceConnectorConfigInput,
         ConfluenceSourceConnectorConfigInput,
         SnowflakeSourceConnectorConfigInput,
+        Dict[str, Any],
     ],
 )
 

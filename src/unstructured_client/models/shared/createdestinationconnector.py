@@ -87,7 +87,7 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
 from pydantic.functional_validators import PlainValidator
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import Annotated, TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
 from unstructured_client.utils import validate_open_enum
@@ -108,15 +108,16 @@ ConfigTypedDict = TypeAliasType(
         OneDriveDestinationConnectorConfigInputTypedDict,
         S3DestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
-        MilvusDestinationConnectorConfigInputTypedDict,
-        DatabricksVolumesConnectorConfigInputTypedDict,
         PostgresDestinationConnectorConfigInputTypedDict,
+        DatabricksVolumesConnectorConfigInputTypedDict,
+        MilvusDestinationConnectorConfigInputTypedDict,
         KafkaCloudDestinationConnectorConfigInputTypedDict,
         CouchbaseDestinationConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
         IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -136,15 +137,16 @@ Config = TypeAliasType(
         OneDriveDestinationConnectorConfigInput,
         S3DestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
-        MilvusDestinationConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInput,
         PostgresDestinationConnectorConfigInput,
+        DatabricksVolumesConnectorConfigInput,
+        MilvusDestinationConnectorConfigInput,
         KafkaCloudDestinationConnectorConfigInput,
         CouchbaseDestinationConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
         IBMWatsonxS3DestinationConnectorConfigInput,
+        Dict[str, Any],
     ],
 )
 
