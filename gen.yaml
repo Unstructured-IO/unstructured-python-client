@@ -18,7 +18,7 @@ generation:
     generateNewTests: false
     skipResponseBodyAssertions: false
 python:
-  version: 0.42.2
+  version: 0.42.3
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -63,6 +63,7 @@ python:
   methodArguments: require-security-and-request
   moduleName: ""
   outputModelSuffix: output
+  packageManager: poetry
   packageName: unstructured-client
   projectUrls: {}
   pytestFilterWarnings: []

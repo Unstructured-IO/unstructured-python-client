@@ -81,7 +81,7 @@ from .zendesksourceconnectorconfiginput import (
     ZendeskSourceConnectorConfigInput,
     ZendeskSourceConnectorConfigInputTypedDict,
 )
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
 
@@ -91,24 +91,25 @@ UpdateSourceConnectorConfigTypedDict = TypeAliasType(
     Union[
         MongoDBConnectorConfigInputTypedDict,
         BoxSourceConnectorConfigInputTypedDict,
-        GCSSourceConnectorConfigInputTypedDict,
-        ElasticsearchConnectorConfigInputTypedDict,
         DropboxSourceConnectorConfigInputTypedDict,
-        GoogleDriveSourceConnectorConfigInputTypedDict,
+        ElasticsearchConnectorConfigInputTypedDict,
+        GCSSourceConnectorConfigInputTypedDict,
         SalesforceSourceConnectorConfigInputTypedDict,
+        GoogleDriveSourceConnectorConfigInputTypedDict,
         ZendeskSourceConnectorConfigInputTypedDict,
         AzureSourceConnectorConfigInputTypedDict,
-        S3SourceConnectorConfigInputTypedDict,
-        DatabricksVolumesConnectorConfigInputTypedDict,
-        KafkaCloudSourceConnectorConfigInputTypedDict,
         OneDriveSourceConnectorConfigInputTypedDict,
+        KafkaCloudSourceConnectorConfigInputTypedDict,
         OutlookSourceConnectorConfigInputTypedDict,
-        SharePointSourceConnectorConfigInputTypedDict,
+        DatabricksVolumesConnectorConfigInputTypedDict,
+        S3SourceConnectorConfigInputTypedDict,
         CouchbaseSourceConnectorConfigInputTypedDict,
+        SharePointSourceConnectorConfigInputTypedDict,
         PostgresSourceConnectorConfigInputTypedDict,
         JiraSourceConnectorConfigInputTypedDict,
         ConfluenceSourceConnectorConfigInputTypedDict,
         SnowflakeSourceConnectorConfigInputTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -118,24 +119,25 @@ UpdateSourceConnectorConfig = TypeAliasType(
     Union[
         MongoDBConnectorConfigInput,
         BoxSourceConnectorConfigInput,
-        GCSSourceConnectorConfigInput,
-        ElasticsearchConnectorConfigInput,
         DropboxSourceConnectorConfigInput,
-        GoogleDriveSourceConnectorConfigInput,
+        ElasticsearchConnectorConfigInput,
+        GCSSourceConnectorConfigInput,
         SalesforceSourceConnectorConfigInput,
+        GoogleDriveSourceConnectorConfigInput,
         ZendeskSourceConnectorConfigInput,
         AzureSourceConnectorConfigInput,
-        S3SourceConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInput,
-        KafkaCloudSourceConnectorConfigInput,
         OneDriveSourceConnectorConfigInput,
+        KafkaCloudSourceConnectorConfigInput,
         OutlookSourceConnectorConfigInput,
-        SharePointSourceConnectorConfigInput,
+        DatabricksVolumesConnectorConfigInput,
+        S3SourceConnectorConfigInput,
         CouchbaseSourceConnectorConfigInput,
+        SharePointSourceConnectorConfigInput,
         PostgresSourceConnectorConfigInput,
         JiraSourceConnectorConfigInput,
         ConfluenceSourceConnectorConfigInput,
         SnowflakeSourceConnectorConfigInput,
+        Dict[str, Any],
     ],
 )
 

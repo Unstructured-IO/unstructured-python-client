@@ -85,7 +85,7 @@ from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
 )
-from typing import Union
+from typing import Any, Dict, Union
 from typing_extensions import TypeAliasType, TypedDict
 from unstructured_client.types import BaseModel
 
@@ -105,15 +105,16 @@ UpdateDestinationConnectorConfigTypedDict = TypeAliasType(
         OneDriveDestinationConnectorConfigInputTypedDict,
         S3DestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
-        MilvusDestinationConnectorConfigInputTypedDict,
-        DatabricksVolumesConnectorConfigInputTypedDict,
         PostgresDestinationConnectorConfigInputTypedDict,
+        DatabricksVolumesConnectorConfigInputTypedDict,
+        MilvusDestinationConnectorConfigInputTypedDict,
         KafkaCloudDestinationConnectorConfigInputTypedDict,
         CouchbaseDestinationConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
         IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
+        Dict[str, Any],
     ],
 )
 
@@ -133,15 +134,16 @@ UpdateDestinationConnectorConfig = TypeAliasType(
         OneDriveDestinationConnectorConfigInput,
         S3DestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
-        MilvusDestinationConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInput,
         PostgresDestinationConnectorConfigInput,
+        DatabricksVolumesConnectorConfigInput,
+        MilvusDestinationConnectorConfigInput,
         KafkaCloudDestinationConnectorConfigInput,
         CouchbaseDestinationConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
         IBMWatsonxS3DestinationConnectorConfigInput,
+        Dict[str, Any],
     ],
 )
 
