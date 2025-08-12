@@ -129,3 +129,9 @@ value: shared.WeaviateDestinationConnectorConfigInput = /* values here */
 value: shared.IBMWatsonxS3DestinationConnectorConfigInput = /* values here */
 ```
 
+### `Dict[str, Any]`
+
+```python
+value: Dict[str, Any] = /* values here */
+```
+

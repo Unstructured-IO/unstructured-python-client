@@ -123,3 +123,9 @@ value: shared.JiraSourceConnectorConfigInput = /* values here */
 value: shared.ZendeskSourceConnectorConfigInput = /* values here */
 ```
 
+### `Dict[str, Any]`
+
+```python
+value: Dict[str, Any] = /* values here */
+```
+

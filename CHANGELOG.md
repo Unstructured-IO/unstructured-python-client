@@ -1,3 +1,12 @@
+## 0.42.3
+
+### Enhancements
+
+### Features
+* Enable arbitrary dictionary inputs for `CreateSourceConnectorConfig` and `CreateDestinationConnectorConfig`. This decouples us from the backend schemas. Users can send new connector config fields without having to upgrade their client.
+
+### Fixes
+
 ## 0.42.2
 
 ### Enhancements
