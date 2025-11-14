@@ -1,7 +1,6 @@
-
 [project]
 name = "unstructured-client"
-version = "0.42.3"
+version = "0.42.4"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -12,7 +11,7 @@ dependencies = [
     "httpcore >=1.0.9",
     "httpx >=0.27.0",
     "pydantic >=2.11.2",
-    "pypdf >=4.0",
+    "pypdf >= 6.2.0",
     "requests-toolbelt >=1.0.0",
 ]
 
@@ -36,7 +35,7 @@ freezegun = ">=1.5.1"
 mypy = "==1.15.0"
 pylint = "==3.2.3"
 pytest = ">=8.3.3"
-pytest-asyncio = ">=0.24.0"
+pytest-asyncio = "=1.1.0"
 pytest-httpx = ">=0.35.0"
 pytest-mock = ">=3.14.0"
 pytest-xdist = "^3.5.0"
