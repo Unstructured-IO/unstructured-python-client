@@ -24,7 +24,7 @@ python:
       deepdiff: '>=6.0'
       freezegun: '>=1.5.1'
       pytest: '>=8.3.3'
-      pytest-asyncio: '>=0.24.0'
+      pytest-asyncio: =1.1.0
       pytest-httpx: '>=0.35.0'
       pytest-mock: '>=3.14.0'
       pytest-xdist: ^3.5.0
