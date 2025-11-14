@@ -13,6 +13,10 @@ class Workflows(BaseSDK):
     def create_workflow(
         self,
         *,
+        security: Union[
+            operations.CreateWorkflowSecurity,
+            operations.CreateWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateWorkflowRequest, operations.CreateWorkflowRequestTypedDict
         ],
@@ -25,6 +29,7 @@ class Workflows(BaseSDK):
 
         Create a new workflow, either custom or auto, and configure its settings.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -57,7 +62,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateWorkflowSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_workflow, False, False, "json", shared.CreateWorkflow
             ),
@@ -81,8 +88,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -116,6 +123,10 @@ class Workflows(BaseSDK):
     async def create_workflow_async(
         self,
         *,
+        security: Union[
+            operations.CreateWorkflowSecurity,
+            operations.CreateWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateWorkflowRequest, operations.CreateWorkflowRequestTypedDict
         ],
@@ -128,6 +139,7 @@ class Workflows(BaseSDK):
 
         Create a new workflow, either custom or auto, and configure its settings.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -160,7 +172,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateWorkflowSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_workflow, False, False, "json", shared.CreateWorkflow
             ),
@@ -184,8 +198,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -219,6 +233,10 @@ class Workflows(BaseSDK):
     def delete_workflow(
         self,
         *,
+        security: Union[
+            operations.DeleteWorkflowSecurity,
+            operations.DeleteWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.DeleteWorkflowRequest, operations.DeleteWorkflowRequestTypedDict
         ],
@@ -231,6 +249,7 @@ class Workflows(BaseSDK):
 
         Delete a workflow by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -263,7 +282,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteWorkflowSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -284,8 +305,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -317,6 +338,10 @@ class Workflows(BaseSDK):
     async def delete_workflow_async(
         self,
         *,
+        security: Union[
+            operations.DeleteWorkflowSecurity,
+            operations.DeleteWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.DeleteWorkflowRequest, operations.DeleteWorkflowRequestTypedDict
         ],
@@ -329,6 +354,7 @@ class Workflows(BaseSDK):
 
         Delete a workflow by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -361,7 +387,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteWorkflowSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -382,8 +410,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -415,6 +443,9 @@ class Workflows(BaseSDK):
     def get_workflow(
         self,
         *,
+        security: Union[
+            operations.GetWorkflowSecurity, operations.GetWorkflowSecurityTypedDict
+        ],
         request: Union[
             operations.GetWorkflowRequest, operations.GetWorkflowRequestTypedDict
         ],
@@ -427,6 +458,7 @@ class Workflows(BaseSDK):
 
         Retrieve detailed information for a specific workflow by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -459,7 +491,7 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetWorkflowSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -480,8 +512,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -515,6 +547,9 @@ class Workflows(BaseSDK):
     async def get_workflow_async(
         self,
         *,
+        security: Union[
+            operations.GetWorkflowSecurity, operations.GetWorkflowSecurityTypedDict
+        ],
         request: Union[
             operations.GetWorkflowRequest, operations.GetWorkflowRequestTypedDict
         ],
@@ -527,6 +562,7 @@ class Workflows(BaseSDK):
 
         Retrieve detailed information for a specific workflow by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -559,7 +595,7 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetWorkflowSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -580,8 +616,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -615,6 +651,9 @@ class Workflows(BaseSDK):
     def list_workflows(
         self,
         *,
+        security: Union[
+            operations.ListWorkflowsSecurity, operations.ListWorkflowsSecurityTypedDict
+        ],
         request: Union[
             operations.ListWorkflowsRequest, operations.ListWorkflowsRequestTypedDict
         ],
@@ -627,6 +666,7 @@ class Workflows(BaseSDK):
 
         Retrieve a list of workflows, optionally filtered by source, destination, state, name, date range, and supports pagination and sorting.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -659,7 +699,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.ListWorkflowsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -680,8 +722,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_workflows",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -715,6 +757,9 @@ class Workflows(BaseSDK):
     async def list_workflows_async(
         self,
         *,
+        security: Union[
+            operations.ListWorkflowsSecurity, operations.ListWorkflowsSecurityTypedDict
+        ],
         request: Union[
             operations.ListWorkflowsRequest, operations.ListWorkflowsRequestTypedDict
         ],
@@ -727,6 +772,7 @@ class Workflows(BaseSDK):
 
         Retrieve a list of workflows, optionally filtered by source, destination, state, name, date range, and supports pagination and sorting.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -759,7 +805,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.ListWorkflowsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -780,8 +828,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_workflows",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -815,6 +863,9 @@ class Workflows(BaseSDK):
     def run_workflow(
         self,
         *,
+        security: Union[
+            operations.RunWorkflowSecurity, operations.RunWorkflowSecurityTypedDict
+        ],
         request: Union[
             operations.RunWorkflowRequest, operations.RunWorkflowRequestTypedDict
         ],
@@ -827,6 +878,7 @@ class Workflows(BaseSDK):
 
         Run a workflow by triggering a new job if none is currently active.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -859,7 +911,7 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.RunWorkflowSecurity),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.body_run_workflow,
                 False,
@@ -887,8 +939,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="run_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -922,6 +974,9 @@ class Workflows(BaseSDK):
     async def run_workflow_async(
         self,
         *,
+        security: Union[
+            operations.RunWorkflowSecurity, operations.RunWorkflowSecurityTypedDict
+        ],
         request: Union[
             operations.RunWorkflowRequest, operations.RunWorkflowRequestTypedDict
         ],
@@ -934,6 +989,7 @@ class Workflows(BaseSDK):
 
         Run a workflow by triggering a new job if none is currently active.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -966,7 +1022,7 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.RunWorkflowSecurity),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.body_run_workflow,
                 False,
@@ -994,8 +1050,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="run_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1029,6 +1085,10 @@ class Workflows(BaseSDK):
     def update_workflow(
         self,
         *,
+        security: Union[
+            operations.UpdateWorkflowSecurity,
+            operations.UpdateWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.UpdateWorkflowRequest, operations.UpdateWorkflowRequestTypedDict
         ],
@@ -1041,6 +1101,7 @@ class Workflows(BaseSDK):
 
         Update an existing workflow's name, connectors, schedule, or workflow type.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1073,7 +1134,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateWorkflowSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_workflow, False, False, "json", shared.UpdateWorkflow
             ),
@@ -1097,8 +1160,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1132,6 +1195,10 @@ class Workflows(BaseSDK):
     async def update_workflow_async(
         self,
         *,
+        security: Union[
+            operations.UpdateWorkflowSecurity,
+            operations.UpdateWorkflowSecurityTypedDict,
+        ],
         request: Union[
             operations.UpdateWorkflowRequest, operations.UpdateWorkflowRequestTypedDict
         ],
@@ -1144,6 +1211,7 @@ class Workflows(BaseSDK):
 
         Update an existing workflow's name, connectors, schedule, or workflow type.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1176,7 +1244,9 @@ class Workflows(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateWorkflowSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_workflow, False, False, "json", shared.UpdateWorkflow
             ),
@@ -1200,8 +1270,8 @@ class Workflows(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_workflow",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
