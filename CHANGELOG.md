@@ -1,3 +1,12 @@
+## 0.42.4
+
+### Enhancements
+* Bump dependencies to account for vulnerabilities in pypdf < 6.1.3
+
+### Features
+
+### Fixes
+
 ## 0.42.3
 
 ### Enhancements
