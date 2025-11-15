@@ -257,7 +257,6 @@ if TYPE_CHECKING:
         PartitionParameters,
         PartitionParametersTypedDict,
         Strategy,
-        VLMModel,
         VLMModelProvider,
     )
     from .pineconedestinationconnectorconfig import (
@@ -622,7 +621,6 @@ __all__ = [
     "UpdateWorkflow",
     "UpdateWorkflowSchedule",
     "UpdateWorkflowTypedDict",
-    "VLMModel",
     "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
@@ -796,7 +794,6 @@ _dynamic_imports: dict[str, str] = {
     "PartitionParameters": ".partition_parameters",
     "PartitionParametersTypedDict": ".partition_parameters",
     "Strategy": ".partition_parameters",
-    "VLMModel": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
     "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",
