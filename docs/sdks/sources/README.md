@@ -22,11 +22,14 @@ Initiates a connection check for the specified source connector.
 <!-- UsageSnippet language="python" operationID="create_connection_check_sources" method="post" path="/api/v1/sources/{source_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.create_connection_check_sources(request={
+    res = uc_client.sources.create_connection_check_sources(security=operations.CreateConnectionCheckSourcesSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "source_id": "8d49e3f2-3e6d-4973-bc61-292af66829d7",
     })
 
@@ -39,10 +42,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                                        | Type                                                                                                             | Required                                                                                                         | Description                                                                                                      |
-| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `request`                                                                                                        | [operations.CreateConnectionCheckSourcesRequest](../../models/operations/createconnectionchecksourcesrequest.md) | :heavy_check_mark:                                                                                               | The request object to use for the request.                                                                       |
-| `retries`                                                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                 | :heavy_minus_sign:                                                                                               | Configuration to override the default retry behavior of the client.                                              |
+| Parameter                                                                                                          | Type                                                                                                               | Required                                                                                                           | Description                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                          | [operations.CreateConnectionCheckSourcesRequest](../../models/operations/createconnectionchecksourcesrequest.md)   | :heavy_check_mark:                                                                                                 | The request object to use for the request.                                                                         |
+| `security`                                                                                                         | [operations.CreateConnectionCheckSourcesSecurity](../../models/operations/createconnectionchecksourcessecurity.md) | :heavy_check_mark:                                                                                                 | The security requirements to use for the request.                                                                  |
+| `retries`                                                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                   | :heavy_minus_sign:                                                                                                 | Configuration to override the default retry behavior of the client.                                                |
 
 ### Response
 
@@ -64,12 +68,14 @@ Create a new source connector using the provided configuration and name.
 <!-- UsageSnippet language="python" operationID="create_source" method="post" path="/api/v1/sources/" -->
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.create_source(request={
+    res = uc_client.sources.create_source(security=operations.CreateSourceSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "create_source_connector": {
             "config": {
                 "catalog": "<value>",
@@ -93,10 +99,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                        | Type                                                                             | Required                                                                         | Description                                                                      |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `request`                                                                        | [operations.CreateSourceRequest](../../models/operations/createsourcerequest.md) | :heavy_check_mark:                                                               | The request object to use for the request.                                       |
-| `retries`                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                 | :heavy_minus_sign:                                                               | Configuration to override the default retry behavior of the client.              |
+| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `request`                                                                          | [operations.CreateSourceRequest](../../models/operations/createsourcerequest.md)   | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
+| `security`                                                                         | [operations.CreateSourceSecurity](../../models/operations/createsourcesecurity.md) | :heavy_check_mark:                                                                 | The security requirements to use for the request.                                  |
+| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
 
 ### Response
 
@@ -118,11 +125,14 @@ Delete a specific source connector identified by its ID.
 <!-- UsageSnippet language="python" operationID="delete_source" method="delete" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.delete_source(request={
+    res = uc_client.sources.delete_source(security=operations.DeleteSourceSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "source_id": "296c4009-7b81-4144-9c7c-e058204aeb93",
     })
 
@@ -135,10 +145,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                        | Type                                                                             | Required                                                                         | Description                                                                      |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `request`                                                                        | [operations.DeleteSourceRequest](../../models/operations/deletesourcerequest.md) | :heavy_check_mark:                                                               | The request object to use for the request.                                       |
-| `retries`                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                 | :heavy_minus_sign:                                                               | Configuration to override the default retry behavior of the client.              |
+| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `request`                                                                          | [operations.DeleteSourceRequest](../../models/operations/deletesourcerequest.md)   | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
+| `security`                                                                         | [operations.DeleteSourceSecurity](../../models/operations/deletesourcesecurity.md) | :heavy_check_mark:                                                                 | The security requirements to use for the request.                                  |
+| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
 
 ### Response
 
@@ -160,11 +171,14 @@ Retrieves the most recent connection check for the specified source connector.
 <!-- UsageSnippet language="python" operationID="get_connection_check_sources" method="get" path="/api/v1/sources/{source_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.get_connection_check_sources(request={
+    res = uc_client.sources.get_connection_check_sources(security=operations.GetConnectionCheckSourcesSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "source_id": "4df23b66-dae2-44ea-8dd3-329184d5644a",
     })
 
@@ -177,10 +191,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                                  | Type                                                                                                       | Required                                                                                                   | Description                                                                                                |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `request`                                                                                                  | [operations.GetConnectionCheckSourcesRequest](../../models/operations/getconnectionchecksourcesrequest.md) | :heavy_check_mark:                                                                                         | The request object to use for the request.                                                                 |
-| `retries`                                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                           | :heavy_minus_sign:                                                                                         | Configuration to override the default retry behavior of the client.                                        |
+| Parameter                                                                                                    | Type                                                                                                         | Required                                                                                                     | Description                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                    | [operations.GetConnectionCheckSourcesRequest](../../models/operations/getconnectionchecksourcesrequest.md)   | :heavy_check_mark:                                                                                           | The request object to use for the request.                                                                   |
+| `security`                                                                                                   | [operations.GetConnectionCheckSourcesSecurity](../../models/operations/getconnectionchecksourcessecurity.md) | :heavy_check_mark:                                                                                           | The security requirements to use for the request.                                                            |
+| `retries`                                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                             | :heavy_minus_sign:                                                                                           | Configuration to override the default retry behavior of the client.                                          |
 
 ### Response
 
@@ -202,11 +217,14 @@ Retrieve detailed information for a specific source connector by its ID.
 <!-- UsageSnippet language="python" operationID="get_source" method="get" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.get_source(request={
+    res = uc_client.sources.get_source(security=operations.GetSourceSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "source_id": "df7d5ab1-bb15-4f1a-8dc0-c92a9a28a585",
     })
 
@@ -219,10 +237,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                  | Type                                                                       | Required                                                                   | Description                                                                |
-| -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `request`                                                                  | [operations.GetSourceRequest](../../models/operations/getsourcerequest.md) | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
-| `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
+| Parameter                                                                    | Type                                                                         | Required                                                                     | Description                                                                  |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `request`                                                                    | [operations.GetSourceRequest](../../models/operations/getsourcerequest.md)   | :heavy_check_mark:                                                           | The request object to use for the request.                                   |
+| `security`                                                                   | [operations.GetSourceSecurity](../../models/operations/getsourcesecurity.md) | :heavy_check_mark:                                                           | The security requirements to use for the request.                            |
+| `retries`                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)             | :heavy_minus_sign:                                                           | Configuration to override the default retry behavior of the client.          |
 
 ### Response
 
@@ -244,11 +263,14 @@ Retrieve a list of available source connectors.
 <!-- UsageSnippet language="python" operationID="list_sources" method="get" path="/api/v1/sources/" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.list_sources(request={})
+    res = uc_client.sources.list_sources(security=operations.ListSourcesSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={})
 
     assert res.response_list_sources is not None
 
@@ -259,10 +281,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                      | Type                                                                           | Required                                                                       | Description                                                                    |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| `request`                                                                      | [operations.ListSourcesRequest](../../models/operations/listsourcesrequest.md) | :heavy_check_mark:                                                             | The request object to use for the request.                                     |
-| `retries`                                                                      | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)               | :heavy_minus_sign:                                                             | Configuration to override the default retry behavior of the client.            |
+| Parameter                                                                        | Type                                                                             | Required                                                                         | Description                                                                      |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `request`                                                                        | [operations.ListSourcesRequest](../../models/operations/listsourcesrequest.md)   | :heavy_check_mark:                                                               | The request object to use for the request.                                       |
+| `security`                                                                       | [operations.ListSourcesSecurity](../../models/operations/listsourcessecurity.md) | :heavy_check_mark:                                                               | The security requirements to use for the request.                                |
+| `retries`                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                 | :heavy_minus_sign:                                                               | Configuration to override the default retry behavior of the client.              |
 
 ### Response
 
@@ -284,11 +307,14 @@ Update the configuration of an existing source connector.
 <!-- UsageSnippet language="python" operationID="update_source" method="put" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.update_source(request={
+    res = uc_client.sources.update_source(security=operations.UpdateSourceSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "update_source_connector": {
             "config": {
                 "batch_size": 615322,
@@ -311,10 +337,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                        | Type                                                                             | Required                                                                         | Description                                                                      |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `request`                                                                        | [operations.UpdateSourceRequest](../../models/operations/updatesourcerequest.md) | :heavy_check_mark:                                                               | The request object to use for the request.                                       |
-| `retries`                                                                        | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                 | :heavy_minus_sign:                                                               | Configuration to override the default retry behavior of the client.              |
+| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `request`                                                                          | [operations.UpdateSourceRequest](../../models/operations/updatesourcerequest.md)   | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
+| `security`                                                                         | [operations.UpdateSourceSecurity](../../models/operations/updatesourcesecurity.md) | :heavy_check_mark:                                                                 | The security requirements to use for the request.                                  |
+| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
 
 ### Response
 

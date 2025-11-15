@@ -13,6 +13,9 @@ class Jobs(BaseSDK):
     def cancel_job(
         self,
         *,
+        security: Union[
+            operations.CancelJobSecurity, operations.CancelJobSecurityTypedDict
+        ],
         request: Union[
             operations.CancelJobRequest, operations.CancelJobRequestTypedDict
         ],
@@ -25,6 +28,7 @@ class Jobs(BaseSDK):
 
         Cancel the specified job.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -57,7 +61,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.CancelJobSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -78,8 +82,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="cancel_job",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -111,6 +115,9 @@ class Jobs(BaseSDK):
     async def cancel_job_async(
         self,
         *,
+        security: Union[
+            operations.CancelJobSecurity, operations.CancelJobSecurityTypedDict
+        ],
         request: Union[
             operations.CancelJobRequest, operations.CancelJobRequestTypedDict
         ],
@@ -123,6 +130,7 @@ class Jobs(BaseSDK):
 
         Cancel the specified job.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -155,7 +163,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.CancelJobSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -176,8 +184,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="cancel_job",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -209,6 +217,10 @@ class Jobs(BaseSDK):
     def download_job_output(
         self,
         *,
+        security: Union[
+            operations.DownloadJobOutputSecurity,
+            operations.DownloadJobOutputSecurityTypedDict,
+        ],
         request: Union[
             operations.DownloadJobOutputRequest,
             operations.DownloadJobOutputRequestTypedDict,
@@ -222,6 +234,7 @@ class Jobs(BaseSDK):
 
         Download the output of a job from a workflow where the input file was provided at runtime.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -254,7 +267,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DownloadJobOutputSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -275,8 +290,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="download_job_output",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -308,6 +323,10 @@ class Jobs(BaseSDK):
     async def download_job_output_async(
         self,
         *,
+        security: Union[
+            operations.DownloadJobOutputSecurity,
+            operations.DownloadJobOutputSecurityTypedDict,
+        ],
         request: Union[
             operations.DownloadJobOutputRequest,
             operations.DownloadJobOutputRequestTypedDict,
@@ -321,6 +340,7 @@ class Jobs(BaseSDK):
 
         Download the output of a job from a workflow where the input file was provided at runtime.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -353,7 +373,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DownloadJobOutputSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -374,8 +396,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="download_job_output",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -407,6 +429,7 @@ class Jobs(BaseSDK):
     def get_job(
         self,
         *,
+        security: Union[operations.GetJobSecurity, operations.GetJobSecurityTypedDict],
         request: Union[operations.GetJobRequest, operations.GetJobRequestTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -417,6 +440,7 @@ class Jobs(BaseSDK):
 
         Retrieve detailed information for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -449,7 +473,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetJobSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -470,8 +494,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -505,6 +529,7 @@ class Jobs(BaseSDK):
     async def get_job_async(
         self,
         *,
+        security: Union[operations.GetJobSecurity, operations.GetJobSecurityTypedDict],
         request: Union[operations.GetJobRequest, operations.GetJobRequestTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -515,6 +540,7 @@ class Jobs(BaseSDK):
 
         Retrieve detailed information for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -547,7 +573,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetJobSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -568,8 +594,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -603,6 +629,9 @@ class Jobs(BaseSDK):
     def get_job_details(
         self,
         *,
+        security: Union[
+            operations.GetJobDetailsSecurity, operations.GetJobDetailsSecurityTypedDict
+        ],
         request: Union[
             operations.GetJobDetailsRequest, operations.GetJobDetailsRequestTypedDict
         ],
@@ -615,6 +644,7 @@ class Jobs(BaseSDK):
 
         Retrieve processing details for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -647,7 +677,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetJobDetailsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -668,8 +700,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job_details",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -703,6 +735,9 @@ class Jobs(BaseSDK):
     async def get_job_details_async(
         self,
         *,
+        security: Union[
+            operations.GetJobDetailsSecurity, operations.GetJobDetailsSecurityTypedDict
+        ],
         request: Union[
             operations.GetJobDetailsRequest, operations.GetJobDetailsRequestTypedDict
         ],
@@ -715,6 +750,7 @@ class Jobs(BaseSDK):
 
         Retrieve processing details for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -747,7 +783,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetJobDetailsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -768,8 +806,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job_details",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -803,6 +841,10 @@ class Jobs(BaseSDK):
     def get_job_failed_files(
         self,
         *,
+        security: Union[
+            operations.GetJobFailedFilesSecurity,
+            operations.GetJobFailedFilesSecurityTypedDict,
+        ],
         request: Union[
             operations.GetJobFailedFilesRequest,
             operations.GetJobFailedFilesRequestTypedDict,
@@ -816,6 +858,7 @@ class Jobs(BaseSDK):
 
         Retrieve failed files for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -848,7 +891,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetJobFailedFilesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -869,8 +914,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job_failed_files",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -904,6 +949,10 @@ class Jobs(BaseSDK):
     async def get_job_failed_files_async(
         self,
         *,
+        security: Union[
+            operations.GetJobFailedFilesSecurity,
+            operations.GetJobFailedFilesSecurityTypedDict,
+        ],
         request: Union[
             operations.GetJobFailedFilesRequest,
             operations.GetJobFailedFilesRequestTypedDict,
@@ -917,6 +966,7 @@ class Jobs(BaseSDK):
 
         Retrieve failed files for a specific job by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -949,7 +999,9 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetJobFailedFilesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -970,8 +1022,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_job_failed_files",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1005,6 +1057,9 @@ class Jobs(BaseSDK):
     def list_jobs(
         self,
         *,
+        security: Union[
+            operations.ListJobsSecurity, operations.ListJobsSecurityTypedDict
+        ],
         request: Union[operations.ListJobsRequest, operations.ListJobsRequestTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -1015,6 +1070,7 @@ class Jobs(BaseSDK):
 
         Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1047,7 +1103,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.ListJobsSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -1068,8 +1124,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_jobs",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1103,6 +1159,9 @@ class Jobs(BaseSDK):
     async def list_jobs_async(
         self,
         *,
+        security: Union[
+            operations.ListJobsSecurity, operations.ListJobsSecurityTypedDict
+        ],
         request: Union[operations.ListJobsRequest, operations.ListJobsRequestTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -1113,6 +1172,7 @@ class Jobs(BaseSDK):
 
         Retrieve a list of jobs with optional filtering by workflow ID or job status.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1145,7 +1205,7 @@ class Jobs(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.ListJobsSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -1166,8 +1226,8 @@ class Jobs(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_jobs",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],

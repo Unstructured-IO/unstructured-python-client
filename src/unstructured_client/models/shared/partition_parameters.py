@@ -64,35 +64,6 @@ class Strategy(str, Enum, metaclass=utils.OpenEnumMeta):
     VLM = "vlm"
 
 
-class VLMModel(str, Enum, metaclass=utils.OpenEnumMeta):
-    r"""The VLM Model to use."""
-
-    CLAUDE_3_5_SONNET_20241022 = "claude-3-5-sonnet-20241022"
-    CLAUDE_3_7_SONNET_20250219 = "claude-3-7-sonnet-20250219"
-    GPT_4O = "gpt-4o"
-    GEMINI_1_5_PRO = "gemini-1.5-pro"
-    US_AMAZON_NOVA_PRO_V1_0 = "us.amazon.nova-pro-v1:0"
-    US_AMAZON_NOVA_LITE_V1_0 = "us.amazon.nova-lite-v1:0"
-    US_ANTHROPIC_CLAUDE_3_7_SONNET_20250219_V1_0 = (
-        "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
-    )
-    US_ANTHROPIC_CLAUDE_3_5_SONNET_20241022_V2_0 = (
-        "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
-    )
-    US_ANTHROPIC_CLAUDE_3_OPUS_20240229_V1_0 = (
-        "us.anthropic.claude-3-opus-20240229-v1:0"
-    )
-    US_ANTHROPIC_CLAUDE_3_HAIKU_20240307_V1_0 = (
-        "us.anthropic.claude-3-haiku-20240307-v1:0"
-    )
-    US_ANTHROPIC_CLAUDE_3_SONNET_20240229_V1_0 = (
-        "us.anthropic.claude-3-sonnet-20240229-v1:0"
-    )
-    US_META_LLAMA3_2_90B_INSTRUCT_V1_0 = "us.meta.llama3-2-90b-instruct-v1:0"
-    US_META_LLAMA3_2_11B_INSTRUCT_V1_0 = "us.meta.llama3-2-11b-instruct-v1:0"
-    GEMINI_2_0_FLASH_001 = "gemini-2.0-flash-001"
-
-
 class VLMModelProvider(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The VLM Model provider to use."""
 
@@ -116,6 +87,8 @@ class PartitionParametersTypedDict(TypedDict):
     r"""A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype."""
     coordinates: NotRequired[bool]
     r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
+    do_not_break_similarity_on_footer_header: NotRequired[bool]
+    r"""When `True`, footer, header, and page number are always considered similar to the text before them for chunk by similarity method. This allows chunk by similarity to connect contents across page better."""
     encoding: NotRequired[Nullable[str]]
     r"""The encoding method used to decode the text input. Default: utf-8"""
     extract_image_block_types: NotRequired[List[str]]
@@ -180,7 +153,7 @@ class PartitionParametersTypedDict(TypedDict):
     r"""The OCR agent to use for table ocr inference."""
     unique_element_ids: NotRequired[bool]
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
-    vlm_model: NotRequired[VLMModel]
+    vlm_model: NotRequired[str]
     r"""The VLM Model to use."""
     vlm_model_provider: NotRequired[VLMModelProvider]
     r"""The VLM Model provider to use."""
@@ -207,6 +180,11 @@ class PartitionParameters(BaseModel):
 
     coordinates: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
     r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
+
+    do_not_break_similarity_on_footer_header: Annotated[
+        Optional[bool], FieldMetadata(multipart=True)
+    ] = False
+    r"""When `True`, footer, header, and page number are always considered similar to the text before them for chunk by similarity method. This allows chunk by similarity to connect contents across page better."""
 
     encoding: Annotated[OptionalNullable[str], FieldMetadata(multipart=True)] = None
     r"""The encoding method used to decode the text input. Default: utf-8"""
@@ -352,10 +330,7 @@ class PartitionParameters(BaseModel):
     unique_element_ids: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
     r"""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: `False`"""
 
-    vlm_model: Annotated[
-        Annotated[Optional[VLMModel], PlainValidator(validate_open_enum(False))],
-        FieldMetadata(multipart=True),
-    ] = None
+    vlm_model: Annotated[Optional[str], FieldMetadata(multipart=True)] = None
     r"""The VLM Model to use."""
 
     vlm_model_provider: Annotated[
@@ -376,6 +351,7 @@ class PartitionParameters(BaseModel):
             "combine_under_n_chars",
             "content_type",
             "coordinates",
+            "do_not_break_similarity_on_footer_header",
             "encoding",
             "extract_image_block_types",
             "gz_uncompressed_content_type",

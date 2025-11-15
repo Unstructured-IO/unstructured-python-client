@@ -22,7 +22,26 @@ from unstructured_client.utils import (
     HeaderMetadata,
     PathParamMetadata,
     RequestMetadata,
+    SecurityMetadata,
 )
+
+
+class RunWorkflowSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class RunWorkflowSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class RunWorkflowRequestTypedDict(TypedDict):

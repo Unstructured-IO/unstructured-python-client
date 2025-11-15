@@ -17,7 +17,30 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
+from unstructured_client.utils import (
+    FieldMetadata,
+    HeaderMetadata,
+    RequestMetadata,
+    SecurityMetadata,
+)
+
+
+class CreateDestinationSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class CreateDestinationSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class CreateDestinationRequestTypedDict(TypedDict):
