@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 8038a5b9e376d44bad2fd4c117922954
-  docVersion: 1.1.45
+  docChecksum: 7a349f081ce7703ab46bee35b64feb32
+  docVersion: 1.2.10
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.3
-  configChecksum: 3d02dd7ca437781b3d721fab5d7b9adc
+  releaseVersion: 0.42.5
+  configChecksum: f65c47c497403c61234987cadd6fbbb9
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -26,6 +26,7 @@ features:
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
     globalServerURLs: 3.1.1
+    methodSecurity: 3.0.1
     multipartFileContentType: 1.0.0
     nameOverrides: 3.0.1
     nullables: 1.0.1
@@ -45,58 +46,84 @@ generatedFiles:
   - docs/models/errors/servererror.md
   - docs/models/operations/canceljobrequest.md
   - docs/models/operations/canceljobresponse.md
+  - docs/models/operations/canceljobsecurity.md
   - docs/models/operations/createconnectioncheckdestinationsrequest.md
   - docs/models/operations/createconnectioncheckdestinationsresponse.md
+  - docs/models/operations/createconnectioncheckdestinationssecurity.md
   - docs/models/operations/createconnectionchecksourcesrequest.md
   - docs/models/operations/createconnectionchecksourcesresponse.md
+  - docs/models/operations/createconnectionchecksourcessecurity.md
   - docs/models/operations/createdestinationrequest.md
   - docs/models/operations/createdestinationresponse.md
+  - docs/models/operations/createdestinationsecurity.md
   - docs/models/operations/createsourcerequest.md
   - docs/models/operations/createsourceresponse.md
+  - docs/models/operations/createsourcesecurity.md
   - docs/models/operations/createworkflowrequest.md
   - docs/models/operations/createworkflowresponse.md
+  - docs/models/operations/createworkflowsecurity.md
   - docs/models/operations/deletedestinationrequest.md
   - docs/models/operations/deletedestinationresponse.md
+  - docs/models/operations/deletedestinationsecurity.md
   - docs/models/operations/deletesourcerequest.md
   - docs/models/operations/deletesourceresponse.md
+  - docs/models/operations/deletesourcesecurity.md
   - docs/models/operations/deleteworkflowrequest.md
   - docs/models/operations/deleteworkflowresponse.md
+  - docs/models/operations/deleteworkflowsecurity.md
   - docs/models/operations/downloadjoboutputrequest.md
   - docs/models/operations/downloadjoboutputresponse.md
+  - docs/models/operations/downloadjoboutputsecurity.md
   - docs/models/operations/getconnectioncheckdestinationsrequest.md
   - docs/models/operations/getconnectioncheckdestinationsresponse.md
+  - docs/models/operations/getconnectioncheckdestinationssecurity.md
   - docs/models/operations/getconnectionchecksourcesrequest.md
   - docs/models/operations/getconnectionchecksourcesresponse.md
+  - docs/models/operations/getconnectionchecksourcessecurity.md
   - docs/models/operations/getdestinationrequest.md
   - docs/models/operations/getdestinationresponse.md
+  - docs/models/operations/getdestinationsecurity.md
   - docs/models/operations/getjobdetailsrequest.md
   - docs/models/operations/getjobdetailsresponse.md
+  - docs/models/operations/getjobdetailssecurity.md
   - docs/models/operations/getjobfailedfilesrequest.md
   - docs/models/operations/getjobfailedfilesresponse.md
+  - docs/models/operations/getjobfailedfilessecurity.md
   - docs/models/operations/getjobrequest.md
   - docs/models/operations/getjobresponse.md
+  - docs/models/operations/getjobsecurity.md
   - docs/models/operations/getsourcerequest.md
   - docs/models/operations/getsourceresponse.md
+  - docs/models/operations/getsourcesecurity.md
   - docs/models/operations/getworkflowrequest.md
   - docs/models/operations/getworkflowresponse.md
+  - docs/models/operations/getworkflowsecurity.md
   - docs/models/operations/listdestinationsrequest.md
   - docs/models/operations/listdestinationsresponse.md
+  - docs/models/operations/listdestinationssecurity.md
   - docs/models/operations/listjobsrequest.md
   - docs/models/operations/listjobsresponse.md
+  - docs/models/operations/listjobssecurity.md
   - docs/models/operations/listsourcesrequest.md
   - docs/models/operations/listsourcesresponse.md
+  - docs/models/operations/listsourcessecurity.md
   - docs/models/operations/listworkflowsrequest.md
   - docs/models/operations/listworkflowsresponse.md
+  - docs/models/operations/listworkflowssecurity.md
   - docs/models/operations/partitionrequest.md
   - docs/models/operations/partitionresponse.md
   - docs/models/operations/runworkflowrequest.md
   - docs/models/operations/runworkflowresponse.md
+  - docs/models/operations/runworkflowsecurity.md
   - docs/models/operations/updatedestinationrequest.md
   - docs/models/operations/updatedestinationresponse.md
+  - docs/models/operations/updatedestinationsecurity.md
   - docs/models/operations/updatesourcerequest.md
   - docs/models/operations/updatesourceresponse.md
+  - docs/models/operations/updatesourcesecurity.md
   - docs/models/operations/updateworkflowrequest.md
   - docs/models/operations/updateworkflowresponse.md
+  - docs/models/operations/updateworkflowsecurity.md
   - docs/models/shared/astradbconnectorconfig.md
   - docs/models/shared/astradbconnectorconfiginput.md
   - docs/models/shared/azureaisearchconnectorconfig.md
@@ -212,7 +239,6 @@ generatedFiles:
   - docs/models/shared/updateworkflow.md
   - docs/models/shared/updateworkflowschedule.md
   - docs/models/shared/validationerror.md
-  - docs/models/shared/vlmmodel.md
   - docs/models/shared/vlmmodelprovider.md
   - docs/models/shared/weaviatedestinationconnectorconfig.md
   - docs/models/shared/weaviatedestinationconnectorconfiginput.md
@@ -600,7 +626,7 @@ examples:
         application/json: {"name": "<value>", "workflow_type": "advanced"}
       responses:
         "200":
-          application/json: {"created_at": "2023-01-15T13:52:58.634Z", "destinations": [], "id": "80c8c72f-101a-4a39-974b-49aa299e80d3", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47678eb0-4958-4341-ad66-b1b822c1deb9"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2023-01-15T13:52:58.634Z", "destinations": [], "id": "80c8c72f-101a-4a39-974b-49aa299e80d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47678eb0-4958-4341-ad66-b1b822c1deb9"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   delete_workflow:
@@ -620,7 +646,7 @@ examples:
           workflow_id: "d031b0e5-7ca7-4a2b-b3cc-d869d2df3e76"
       responses:
         "200":
-          application/json: {"created_at": "2024-01-22T17:42:53.375Z", "destinations": ["624abbf1-dbce-4fe0-8d3f-0673956fc10e"], "id": "840c33c3-f30c-4908-9688-2682ed8eea3f", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["349ed27a-eeda-4851-866a-8ce3a65a2957", "9aa34544-3278-446f-a265-efcaa55f9c4a"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2024-01-22T17:42:53.375Z", "destinations": ["624abbf1-dbce-4fe0-8d3f-0673956fc10e"], "id": "840c33c3-f30c-4908-9688-2682ed8eea3f", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["349ed27a-eeda-4851-866a-8ce3a65a2957", "9aa34544-3278-446f-a265-efcaa55f9c4a"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   list_workflows:
@@ -630,7 +656,7 @@ examples:
           sort_by: "id"
       responses:
         "200":
-          application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
+          application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
         "422":
           application/json: {"detail": [{"loc": ["<value>", 864403], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
@@ -652,13 +678,13 @@ examples:
         application/json: {}
       responses:
         "200":
-          application/json: {"created_at": "2025-01-11T03:06:48.390Z", "destinations": [], "id": "88fd9cfe-ed29-4701-9d1f-8f26d4ea88d3", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["0957eb7f-57d3-4705-bc49-03de6ad3794d", "a8b88099-9065-4458-a824-b37da7a9bccf", "a024c482-10ba-433a-9100-e6471e9d3db0"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2025-01-11T03:06:48.390Z", "destinations": [], "id": "88fd9cfe-ed29-4701-9d1f-8f26d4ea88d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["0957eb7f-57d3-4705-bc49-03de6ad3794d", "a8b88099-9065-4458-a824-b37da7a9bccf", "a024c482-10ba-433a-9100-e6471e9d3db0"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   partition:
     speakeasy-default-partition:
       requestBody:
-        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "pdfminer_char_margin": null, "pdfminer_line_margin": null, "pdfminer_line_overlap": null, "pdfminer_word_margin": null, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "auto", "table_ocr_agent": null, "unique_element_ids": false, "vlm_model": "gpt-4o", "vlm_model_provider": "openai", "xml_keep_tags": false}
+        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "do_not_break_similarity_on_footer_header": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "pdfminer_char_margin": null, "pdfminer_line_margin": null, "pdfminer_line_overlap": null, "pdfminer_word_margin": null, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "auto", "table_ocr_agent": null, "unique_element_ids": false, "vlm_model": "gpt-4o", "vlm_model_provider": "openai", "xml_keep_tags": false}
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]

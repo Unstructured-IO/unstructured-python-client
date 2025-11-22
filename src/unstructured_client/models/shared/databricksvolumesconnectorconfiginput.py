@@ -30,4 +30,4 @@ class DatabricksVolumesConnectorConfigInput(BaseModel):
 
     volume_path: str
 
-    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = "default"

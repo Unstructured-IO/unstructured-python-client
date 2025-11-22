@@ -21,12 +21,12 @@ class SnowflakeSourceConnectorConfigTypedDict(TypedDict):
     id_column: str
     password: str
     role: str
+    schema_: str
     table_name: str
     user: str
     batch_size: NotRequired[int]
     fields: NotRequired[Nullable[List[str]]]
     port: NotRequired[int]
-    schema_: NotRequired[str]
 
 
 class SnowflakeSourceConnectorConfig(BaseModel):
@@ -42,6 +42,8 @@ class SnowflakeSourceConnectorConfig(BaseModel):
 
     role: str
 
+    schema_: Annotated[str, pydantic.Field(alias="schema")]
+
     table_name: str
 
     user: str
@@ -52,11 +54,9 @@ class SnowflakeSourceConnectorConfig(BaseModel):
 
     port: Optional[int] = 443
 
-    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["batch_size", "fields", "port", "schema"]
+        optional_fields = ["batch_size", "fields", "port"]
         nullable_fields = ["fields"]
         null_default_fields = []
 

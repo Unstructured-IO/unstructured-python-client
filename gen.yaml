@@ -17,8 +17,11 @@ generation:
     generateTests: true
     generateNewTests: false
     skipResponseBodyAssertions: false
+  requestBodyFieldName: ""
+  schemas:
+    allOfMergeStrategy: shallowMerge
 python:
-  version: 0.42.4
+  version: 0.42.5
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -36,6 +39,10 @@ python:
       httpx: '>=0.27.0'
       pypdf: '>= 6.2.0'
       requests-toolbelt: '>=1.0.0'
+  allowedRedefinedBuiltins:
+    - id
+    - object
+  asyncMode: both
   authors:
     - Unstructured
   baseErrorName: UnstructuredClientError
@@ -69,4 +76,5 @@ python:
   pytestFilterWarnings: []
   pytestTimeout: 0
   responseFormat: envelope
+  sseFlatResponse: false
   templateVersion: v2

@@ -22,8 +22,27 @@ from unstructured_client.utils import (
     FieldMetadata,
     HeaderMetadata,
     QueryParamMetadata,
+    SecurityMetadata,
     validate_open_enum,
 )
+
+
+class ListSourcesSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class ListSourcesSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class ListSourcesRequestTypedDict(TypedDict):
