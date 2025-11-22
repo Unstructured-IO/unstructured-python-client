@@ -13,6 +13,10 @@ class Sources(BaseSDK):
     def create_connection_check_sources(
         self,
         *,
+        security: Union[
+            operations.CreateConnectionCheckSourcesSecurity,
+            operations.CreateConnectionCheckSourcesSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateConnectionCheckSourcesRequest,
             operations.CreateConnectionCheckSourcesRequestTypedDict,
@@ -26,6 +30,7 @@ class Sources(BaseSDK):
 
         Initiates a connection check for the specified source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -60,7 +65,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateConnectionCheckSourcesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -81,8 +88,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_connection_check_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -116,6 +123,10 @@ class Sources(BaseSDK):
     async def create_connection_check_sources_async(
         self,
         *,
+        security: Union[
+            operations.CreateConnectionCheckSourcesSecurity,
+            operations.CreateConnectionCheckSourcesSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateConnectionCheckSourcesRequest,
             operations.CreateConnectionCheckSourcesRequestTypedDict,
@@ -129,6 +140,7 @@ class Sources(BaseSDK):
 
         Initiates a connection check for the specified source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -163,7 +175,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateConnectionCheckSourcesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -184,8 +198,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_connection_check_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -219,6 +233,9 @@ class Sources(BaseSDK):
     def create_source(
         self,
         *,
+        security: Union[
+            operations.CreateSourceSecurity, operations.CreateSourceSecurityTypedDict
+        ],
         request: Union[
             operations.CreateSourceRequest, operations.CreateSourceRequestTypedDict
         ],
@@ -231,6 +248,7 @@ class Sources(BaseSDK):
 
         Create a new source connector using the provided configuration and name.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -263,7 +281,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateSourceSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_source_connector,
                 False,
@@ -291,8 +311,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -326,6 +346,9 @@ class Sources(BaseSDK):
     async def create_source_async(
         self,
         *,
+        security: Union[
+            operations.CreateSourceSecurity, operations.CreateSourceSecurityTypedDict
+        ],
         request: Union[
             operations.CreateSourceRequest, operations.CreateSourceRequestTypedDict
         ],
@@ -338,6 +361,7 @@ class Sources(BaseSDK):
 
         Create a new source connector using the provided configuration and name.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -370,7 +394,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateSourceSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_source_connector,
                 False,
@@ -398,8 +424,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -433,6 +459,9 @@ class Sources(BaseSDK):
     def delete_source(
         self,
         *,
+        security: Union[
+            operations.DeleteSourceSecurity, operations.DeleteSourceSecurityTypedDict
+        ],
         request: Union[
             operations.DeleteSourceRequest, operations.DeleteSourceRequestTypedDict
         ],
@@ -445,6 +474,7 @@ class Sources(BaseSDK):
 
         Delete a specific source connector identified by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -477,7 +507,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteSourceSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -498,8 +530,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -531,6 +563,9 @@ class Sources(BaseSDK):
     async def delete_source_async(
         self,
         *,
+        security: Union[
+            operations.DeleteSourceSecurity, operations.DeleteSourceSecurityTypedDict
+        ],
         request: Union[
             operations.DeleteSourceRequest, operations.DeleteSourceRequestTypedDict
         ],
@@ -543,6 +578,7 @@ class Sources(BaseSDK):
 
         Delete a specific source connector identified by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -575,7 +611,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteSourceSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -596,8 +634,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -629,6 +667,10 @@ class Sources(BaseSDK):
     def get_connection_check_sources(
         self,
         *,
+        security: Union[
+            operations.GetConnectionCheckSourcesSecurity,
+            operations.GetConnectionCheckSourcesSecurityTypedDict,
+        ],
         request: Union[
             operations.GetConnectionCheckSourcesRequest,
             operations.GetConnectionCheckSourcesRequestTypedDict,
@@ -642,6 +684,7 @@ class Sources(BaseSDK):
 
         Retrieves the most recent connection check for the specified source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -676,7 +719,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetConnectionCheckSourcesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -697,8 +742,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_connection_check_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -732,6 +777,10 @@ class Sources(BaseSDK):
     async def get_connection_check_sources_async(
         self,
         *,
+        security: Union[
+            operations.GetConnectionCheckSourcesSecurity,
+            operations.GetConnectionCheckSourcesSecurityTypedDict,
+        ],
         request: Union[
             operations.GetConnectionCheckSourcesRequest,
             operations.GetConnectionCheckSourcesRequestTypedDict,
@@ -745,6 +794,7 @@ class Sources(BaseSDK):
 
         Retrieves the most recent connection check for the specified source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -779,7 +829,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetConnectionCheckSourcesSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -800,8 +852,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_connection_check_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -835,6 +887,9 @@ class Sources(BaseSDK):
     def get_source(
         self,
         *,
+        security: Union[
+            operations.GetSourceSecurity, operations.GetSourceSecurityTypedDict
+        ],
         request: Union[
             operations.GetSourceRequest, operations.GetSourceRequestTypedDict
         ],
@@ -847,6 +902,7 @@ class Sources(BaseSDK):
 
         Retrieve detailed information for a specific source connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -879,7 +935,7 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetSourceSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -900,8 +956,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -935,6 +991,9 @@ class Sources(BaseSDK):
     async def get_source_async(
         self,
         *,
+        security: Union[
+            operations.GetSourceSecurity, operations.GetSourceSecurityTypedDict
+        ],
         request: Union[
             operations.GetSourceRequest, operations.GetSourceRequestTypedDict
         ],
@@ -947,6 +1006,7 @@ class Sources(BaseSDK):
 
         Retrieve detailed information for a specific source connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -979,7 +1039,7 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.GetSourceSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -1000,8 +1060,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1035,6 +1095,9 @@ class Sources(BaseSDK):
     def list_sources(
         self,
         *,
+        security: Union[
+            operations.ListSourcesSecurity, operations.ListSourcesSecurityTypedDict
+        ],
         request: Union[
             operations.ListSourcesRequest, operations.ListSourcesRequestTypedDict
         ],
@@ -1047,6 +1110,7 @@ class Sources(BaseSDK):
 
         Retrieve a list of available source connectors.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1079,7 +1143,7 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.ListSourcesSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -1100,8 +1164,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1135,6 +1199,9 @@ class Sources(BaseSDK):
     async def list_sources_async(
         self,
         *,
+        security: Union[
+            operations.ListSourcesSecurity, operations.ListSourcesSecurityTypedDict
+        ],
         request: Union[
             operations.ListSourcesRequest, operations.ListSourcesRequestTypedDict
         ],
@@ -1147,6 +1214,7 @@ class Sources(BaseSDK):
 
         Retrieve a list of available source connectors.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1179,7 +1247,7 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(security, operations.ListSourcesSecurity),
             timeout_ms=timeout_ms,
         )
 
@@ -1200,8 +1268,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_sources",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1235,6 +1303,9 @@ class Sources(BaseSDK):
     def update_source(
         self,
         *,
+        security: Union[
+            operations.UpdateSourceSecurity, operations.UpdateSourceSecurityTypedDict
+        ],
         request: Union[
             operations.UpdateSourceRequest, operations.UpdateSourceRequestTypedDict
         ],
@@ -1247,6 +1318,7 @@ class Sources(BaseSDK):
 
         Update the configuration of an existing source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1279,7 +1351,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateSourceSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_source_connector,
                 False,
@@ -1307,8 +1381,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1342,6 +1416,9 @@ class Sources(BaseSDK):
     async def update_source_async(
         self,
         *,
+        security: Union[
+            operations.UpdateSourceSecurity, operations.UpdateSourceSecurityTypedDict
+        ],
         request: Union[
             operations.UpdateSourceRequest, operations.UpdateSourceRequestTypedDict
         ],
@@ -1354,6 +1431,7 @@ class Sources(BaseSDK):
 
         Update the configuration of an existing source connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1386,7 +1464,9 @@ class Sources(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateSourceSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_source_connector,
                 False,
@@ -1414,8 +1494,8 @@ class Sources(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_source",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],

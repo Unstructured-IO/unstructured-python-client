@@ -13,6 +13,10 @@ class Destinations(BaseSDK):
     def create_connection_check_destinations(
         self,
         *,
+        security: Union[
+            operations.CreateConnectionCheckDestinationsSecurity,
+            operations.CreateConnectionCheckDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateConnectionCheckDestinationsRequest,
             operations.CreateConnectionCheckDestinationsRequestTypedDict,
@@ -26,6 +30,7 @@ class Destinations(BaseSDK):
 
         Initiate a connection check for the destination connector
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -60,7 +65,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateConnectionCheckDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -81,8 +88,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_connection_check_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -116,6 +123,10 @@ class Destinations(BaseSDK):
     async def create_connection_check_destinations_async(
         self,
         *,
+        security: Union[
+            operations.CreateConnectionCheckDestinationsSecurity,
+            operations.CreateConnectionCheckDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateConnectionCheckDestinationsRequest,
             operations.CreateConnectionCheckDestinationsRequestTypedDict,
@@ -129,6 +140,7 @@ class Destinations(BaseSDK):
 
         Initiate a connection check for the destination connector
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -163,7 +175,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateConnectionCheckDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -184,8 +198,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_connection_check_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -219,6 +233,10 @@ class Destinations(BaseSDK):
     def create_destination(
         self,
         *,
+        security: Union[
+            operations.CreateDestinationSecurity,
+            operations.CreateDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateDestinationRequest,
             operations.CreateDestinationRequestTypedDict,
@@ -232,6 +250,7 @@ class Destinations(BaseSDK):
 
         Create a new destination connector using the provided configuration and name.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -264,7 +283,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateDestinationSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_destination_connector,
                 False,
@@ -292,8 +313,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -327,6 +348,10 @@ class Destinations(BaseSDK):
     async def create_destination_async(
         self,
         *,
+        security: Union[
+            operations.CreateDestinationSecurity,
+            operations.CreateDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.CreateDestinationRequest,
             operations.CreateDestinationRequestTypedDict,
@@ -340,6 +365,7 @@ class Destinations(BaseSDK):
 
         Create a new destination connector using the provided configuration and name.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -372,7 +398,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.CreateDestinationSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.create_destination_connector,
                 False,
@@ -400,8 +428,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="create_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -435,6 +463,10 @@ class Destinations(BaseSDK):
     def delete_destination(
         self,
         *,
+        security: Union[
+            operations.DeleteDestinationSecurity,
+            operations.DeleteDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.DeleteDestinationRequest,
             operations.DeleteDestinationRequestTypedDict,
@@ -448,6 +480,7 @@ class Destinations(BaseSDK):
 
         Delete a specific destination connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -480,7 +513,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteDestinationSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -501,8 +536,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -534,6 +569,10 @@ class Destinations(BaseSDK):
     async def delete_destination_async(
         self,
         *,
+        security: Union[
+            operations.DeleteDestinationSecurity,
+            operations.DeleteDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.DeleteDestinationRequest,
             operations.DeleteDestinationRequestTypedDict,
@@ -547,6 +586,7 @@ class Destinations(BaseSDK):
 
         Delete a specific destination connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -579,7 +619,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.DeleteDestinationSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -600,8 +642,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="delete_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -633,6 +675,10 @@ class Destinations(BaseSDK):
     def get_connection_check_destinations(
         self,
         *,
+        security: Union[
+            operations.GetConnectionCheckDestinationsSecurity,
+            operations.GetConnectionCheckDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.GetConnectionCheckDestinationsRequest,
             operations.GetConnectionCheckDestinationsRequestTypedDict,
@@ -646,6 +692,7 @@ class Destinations(BaseSDK):
 
         Retrieves the most recent connection check for the specified destination connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -680,7 +727,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetConnectionCheckDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -701,8 +750,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_connection_check_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -736,6 +785,10 @@ class Destinations(BaseSDK):
     async def get_connection_check_destinations_async(
         self,
         *,
+        security: Union[
+            operations.GetConnectionCheckDestinationsSecurity,
+            operations.GetConnectionCheckDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.GetConnectionCheckDestinationsRequest,
             operations.GetConnectionCheckDestinationsRequestTypedDict,
@@ -749,6 +802,7 @@ class Destinations(BaseSDK):
 
         Retrieves the most recent connection check for the specified destination connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -783,7 +837,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetConnectionCheckDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -804,8 +860,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_connection_check_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -839,6 +895,10 @@ class Destinations(BaseSDK):
     def get_destination(
         self,
         *,
+        security: Union[
+            operations.GetDestinationSecurity,
+            operations.GetDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.GetDestinationRequest, operations.GetDestinationRequestTypedDict
         ],
@@ -851,6 +911,7 @@ class Destinations(BaseSDK):
 
         Retrieve detailed information for a specific destination connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -883,7 +944,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetDestinationSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -904,8 +967,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -939,6 +1002,10 @@ class Destinations(BaseSDK):
     async def get_destination_async(
         self,
         *,
+        security: Union[
+            operations.GetDestinationSecurity,
+            operations.GetDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.GetDestinationRequest, operations.GetDestinationRequestTypedDict
         ],
@@ -951,6 +1018,7 @@ class Destinations(BaseSDK):
 
         Retrieve detailed information for a specific destination connector by its ID.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -983,7 +1051,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.GetDestinationSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -1004,8 +1074,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="get_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1039,6 +1109,10 @@ class Destinations(BaseSDK):
     def list_destinations(
         self,
         *,
+        security: Union[
+            operations.ListDestinationsSecurity,
+            operations.ListDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.ListDestinationsRequest,
             operations.ListDestinationsRequestTypedDict,
@@ -1052,6 +1126,7 @@ class Destinations(BaseSDK):
 
         Retrieve a list of available destination connectors.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1084,7 +1159,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.ListDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -1105,8 +1182,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1140,6 +1217,10 @@ class Destinations(BaseSDK):
     async def list_destinations_async(
         self,
         *,
+        security: Union[
+            operations.ListDestinationsSecurity,
+            operations.ListDestinationsSecurityTypedDict,
+        ],
         request: Union[
             operations.ListDestinationsRequest,
             operations.ListDestinationsRequestTypedDict,
@@ -1153,6 +1234,7 @@ class Destinations(BaseSDK):
 
         Retrieve a list of available destination connectors.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1185,7 +1267,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.ListDestinationsSecurity
+            ),
             timeout_ms=timeout_ms,
         )
 
@@ -1206,8 +1290,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="list_destinations",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1241,6 +1325,10 @@ class Destinations(BaseSDK):
     def update_destination(
         self,
         *,
+        security: Union[
+            operations.UpdateDestinationSecurity,
+            operations.UpdateDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.UpdateDestinationRequest,
             operations.UpdateDestinationRequestTypedDict,
@@ -1254,6 +1342,7 @@ class Destinations(BaseSDK):
 
         Update the configuration of an existing destination connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1286,7 +1375,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateDestinationSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_destination_connector,
                 False,
@@ -1314,8 +1405,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],
@@ -1349,6 +1440,10 @@ class Destinations(BaseSDK):
     async def update_destination_async(
         self,
         *,
+        security: Union[
+            operations.UpdateDestinationSecurity,
+            operations.UpdateDestinationSecurityTypedDict,
+        ],
         request: Union[
             operations.UpdateDestinationRequest,
             operations.UpdateDestinationRequestTypedDict,
@@ -1362,6 +1457,7 @@ class Destinations(BaseSDK):
 
         Update the configuration of an existing destination connector.
 
+        :param security:
         :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -1394,7 +1490,9 @@ class Destinations(BaseSDK):
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
+            security=utils.get_pydantic_model(
+                security, operations.UpdateDestinationSecurity
+            ),
             get_serialized_body=lambda: utils.serialize_request_body(
                 request.update_destination_connector,
                 False,
@@ -1422,8 +1520,8 @@ class Destinations(BaseSDK):
                 config=self.sdk_configuration,
                 base_url=base_url or "",
                 operation_id="update_destination",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
+                oauth2_scopes=None,
+                security_source=security,
             ),
             request=req,
             error_status_codes=["422", "4XX", "5XX"],

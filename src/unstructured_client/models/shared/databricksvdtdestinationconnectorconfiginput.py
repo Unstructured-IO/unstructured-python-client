@@ -43,7 +43,7 @@ class DatabricksVDTDestinationConnectorConfigInput(BaseModel):
 
     database: Optional[str] = "default"
 
-    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = None
+    schema_: Annotated[Optional[str], pydantic.Field(alias="schema")] = "default"
 
     table_name: OptionalNullable[str] = UNSET
 

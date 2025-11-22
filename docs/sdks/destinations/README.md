@@ -22,11 +22,14 @@ Initiate a connection check for the destination connector
 <!-- UsageSnippet language="python" operationID="create_connection_check_destinations" method="post" path="/api/v1/destinations/{destination_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_connection_check_destinations(request={
+    res = uc_client.destinations.create_connection_check_destinations(security=operations.CreateConnectionCheckDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
@@ -39,10 +42,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                                                  | Type                                                                                                                       | Required                                                                                                                   | Description                                                                                                                |
-| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `request`                                                                                                                  | [operations.CreateConnectionCheckDestinationsRequest](../../models/operations/createconnectioncheckdestinationsrequest.md) | :heavy_check_mark:                                                                                                         | The request object to use for the request.                                                                                 |
-| `retries`                                                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                           | :heavy_minus_sign:                                                                                                         | Configuration to override the default retry behavior of the client.                                                        |
+| Parameter                                                                                                                    | Type                                                                                                                         | Required                                                                                                                     | Description                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                                    | [operations.CreateConnectionCheckDestinationsRequest](../../models/operations/createconnectioncheckdestinationsrequest.md)   | :heavy_check_mark:                                                                                                           | The request object to use for the request.                                                                                   |
+| `security`                                                                                                                   | [operations.CreateConnectionCheckDestinationsSecurity](../../models/operations/createconnectioncheckdestinationssecurity.md) | :heavy_check_mark:                                                                                                           | The security requirements to use for the request.                                                                            |
+| `retries`                                                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                             | :heavy_minus_sign:                                                                                                           | Configuration to override the default retry behavior of the client.                                                          |
 
 ### Response
 
@@ -64,12 +68,14 @@ Create a new destination connector using the provided configuration and name.
 <!-- UsageSnippet language="python" operationID="create_destination" method="post" path="/api/v1/destinations/" -->
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
+    res = uc_client.destinations.create_destination(security=operations.CreateDestinationSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "create_destination_connector": {
             "config": {
                 "collection": "<value>",
@@ -90,10 +96,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `request`                                                                                  | [operations.CreateDestinationRequest](../../models/operations/createdestinationrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
-| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| Parameter                                                                                    | Type                                                                                         | Required                                                                                     | Description                                                                                  |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `request`                                                                                    | [operations.CreateDestinationRequest](../../models/operations/createdestinationrequest.md)   | :heavy_check_mark:                                                                           | The request object to use for the request.                                                   |
+| `security`                                                                                   | [operations.CreateDestinationSecurity](../../models/operations/createdestinationsecurity.md) | :heavy_check_mark:                                                                           | The security requirements to use for the request.                                            |
+| `retries`                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                             | :heavy_minus_sign:                                                                           | Configuration to override the default retry behavior of the client.                          |
 
 ### Response
 
@@ -115,11 +122,14 @@ Delete a specific destination connector by its ID.
 <!-- UsageSnippet language="python" operationID="delete_destination" method="delete" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.delete_destination(request={
+    res = uc_client.destinations.delete_destination(security=operations.DeleteDestinationSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "f50b6b0c-1177-4edb-ae10-68199cd00ba6",
     })
 
@@ -132,10 +142,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `request`                                                                                  | [operations.DeleteDestinationRequest](../../models/operations/deletedestinationrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
-| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| Parameter                                                                                    | Type                                                                                         | Required                                                                                     | Description                                                                                  |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `request`                                                                                    | [operations.DeleteDestinationRequest](../../models/operations/deletedestinationrequest.md)   | :heavy_check_mark:                                                                           | The request object to use for the request.                                                   |
+| `security`                                                                                   | [operations.DeleteDestinationSecurity](../../models/operations/deletedestinationsecurity.md) | :heavy_check_mark:                                                                           | The security requirements to use for the request.                                            |
+| `retries`                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                             | :heavy_minus_sign:                                                                           | Configuration to override the default retry behavior of the client.                          |
 
 ### Response
 
@@ -157,11 +168,14 @@ Retrieves the most recent connection check for the specified destination connect
 <!-- UsageSnippet language="python" operationID="get_connection_check_destinations" method="get" path="/api/v1/destinations/{destination_id}/connection-check" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.get_connection_check_destinations(request={
+    res = uc_client.destinations.get_connection_check_destinations(security=operations.GetConnectionCheckDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "c95687a3-239f-485c-946b-4c8fe314ef82",
     })
 
@@ -174,10 +188,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                                            | Type                                                                                                                 | Required                                                                                                             | Description                                                                                                          |
-| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `request`                                                                                                            | [operations.GetConnectionCheckDestinationsRequest](../../models/operations/getconnectioncheckdestinationsrequest.md) | :heavy_check_mark:                                                                                                   | The request object to use for the request.                                                                           |
-| `retries`                                                                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                     | :heavy_minus_sign:                                                                                                   | Configuration to override the default retry behavior of the client.                                                  |
+| Parameter                                                                                                              | Type                                                                                                                   | Required                                                                                                               | Description                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `request`                                                                                                              | [operations.GetConnectionCheckDestinationsRequest](../../models/operations/getconnectioncheckdestinationsrequest.md)   | :heavy_check_mark:                                                                                                     | The request object to use for the request.                                                                             |
+| `security`                                                                                                             | [operations.GetConnectionCheckDestinationsSecurity](../../models/operations/getconnectioncheckdestinationssecurity.md) | :heavy_check_mark:                                                                                                     | The security requirements to use for the request.                                                                      |
+| `retries`                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                       | :heavy_minus_sign:                                                                                                     | Configuration to override the default retry behavior of the client.                                                    |
 
 ### Response
 
@@ -199,11 +214,14 @@ Retrieve detailed information for a specific destination connector by its ID.
 <!-- UsageSnippet language="python" operationID="get_destination" method="get" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.get_destination(request={
+    res = uc_client.destinations.get_destination(security=operations.GetDestinationSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "6352107c-44bd-4a20-a286-de73a4d9c9bd",
     })
 
@@ -216,10 +234,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                            | Type                                                                                 | Required                                                                             | Description                                                                          |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `request`                                                                            | [operations.GetDestinationRequest](../../models/operations/getdestinationrequest.md) | :heavy_check_mark:                                                                   | The request object to use for the request.                                           |
-| `retries`                                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                     | :heavy_minus_sign:                                                                   | Configuration to override the default retry behavior of the client.                  |
+| Parameter                                                                              | Type                                                                                   | Required                                                                               | Description                                                                            |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `request`                                                                              | [operations.GetDestinationRequest](../../models/operations/getdestinationrequest.md)   | :heavy_check_mark:                                                                     | The request object to use for the request.                                             |
+| `security`                                                                             | [operations.GetDestinationSecurity](../../models/operations/getdestinationsecurity.md) | :heavy_check_mark:                                                                     | The security requirements to use for the request.                                      |
+| `retries`                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                       | :heavy_minus_sign:                                                                     | Configuration to override the default retry behavior of the client.                    |
 
 ### Response
 
@@ -241,11 +260,14 @@ Retrieve a list of available destination connectors.
 <!-- UsageSnippet language="python" operationID="list_destinations" method="get" path="/api/v1/destinations/" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.list_destinations(request={})
+    res = uc_client.destinations.list_destinations(security=operations.ListDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={})
 
     assert res.response_list_destinations is not None
 
@@ -256,10 +278,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                | Type                                                                                     | Required                                                                                 | Description                                                                              |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `request`                                                                                | [operations.ListDestinationsRequest](../../models/operations/listdestinationsrequest.md) | :heavy_check_mark:                                                                       | The request object to use for the request.                                               |
-| `retries`                                                                                | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                         | :heavy_minus_sign:                                                                       | Configuration to override the default retry behavior of the client.                      |
+| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `request`                                                                                  | [operations.ListDestinationsRequest](../../models/operations/listdestinationsrequest.md)   | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
+| `security`                                                                                 | [operations.ListDestinationsSecurity](../../models/operations/listdestinationssecurity.md) | :heavy_check_mark:                                                                         | The security requirements to use for the request.                                          |
+| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
 
 ### Response
 
@@ -281,11 +304,14 @@ Update the configuration of an existing destination connector.
 <!-- UsageSnippet language="python" operationID="update_destination" method="put" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.update_destination(request={
+    res = uc_client.destinations.update_destination(security=operations.UpdateDestinationSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "update_destination_connector": {
             "config": {
                 "batch_size": 100,
@@ -308,10 +334,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `request`                                                                                  | [operations.UpdateDestinationRequest](../../models/operations/updatedestinationrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
-| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| Parameter                                                                                    | Type                                                                                         | Required                                                                                     | Description                                                                                  |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `request`                                                                                    | [operations.UpdateDestinationRequest](../../models/operations/updatedestinationrequest.md)   | :heavy_check_mark:                                                                           | The request object to use for the request.                                                   |
+| `security`                                                                                   | [operations.UpdateDestinationSecurity](../../models/operations/updatedestinationsecurity.md) | :heavy_check_mark:                                                                           | The security requirements to use for the request.                                            |
+| `retries`                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                             | :heavy_minus_sign:                                                                           | Configuration to override the default retry behavior of the client.                          |
 
 ### Response
 
