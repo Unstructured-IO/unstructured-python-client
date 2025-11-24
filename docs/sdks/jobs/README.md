@@ -21,11 +21,14 @@ Cancel the specified job.
 <!-- UsageSnippet language="python" operationID="cancel_job" method="post" path="/api/v1/jobs/{job_id}/cancel" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.cancel_job(request={
+    res = uc_client.jobs.cancel_job(security=operations.CancelJobSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "job_id": "2fafd129-04f3-4201-a0e7-fe33e937b367",
     })
 
@@ -38,10 +41,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                  | Type                                                                       | Required                                                                   | Description                                                                |
-| -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `request`                                                                  | [operations.CancelJobRequest](../../models/operations/canceljobrequest.md) | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
-| `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
+| Parameter                                                                    | Type                                                                         | Required                                                                     | Description                                                                  |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `request`                                                                    | [operations.CancelJobRequest](../../models/operations/canceljobrequest.md)   | :heavy_check_mark:                                                           | The request object to use for the request.                                   |
+| `security`                                                                   | [operations.CancelJobSecurity](../../models/operations/canceljobsecurity.md) | :heavy_check_mark:                                                           | The security requirements to use for the request.                            |
+| `retries`                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)             | :heavy_minus_sign:                                                           | Configuration to override the default retry behavior of the client.          |
 
 ### Response
 
@@ -63,11 +67,14 @@ Download the output of a job from a workflow where the input file was provided a
 <!-- UsageSnippet language="python" operationID="download_job_output" method="get" path="/api/v1/jobs/{job_id}/download" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.download_job_output(request={
+    res = uc_client.jobs.download_job_output(security=operations.DownloadJobOutputSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "file_id": "<id>",
         "job_id": "06d1b7b8-8642-4793-b37e-e45d97d53bc3",
         "node_id": "7c8f2aa4-da13-4a04-a98d-0204ea55681e",
@@ -82,10 +89,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `request`                                                                                  | [operations.DownloadJobOutputRequest](../../models/operations/downloadjoboutputrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
-| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| Parameter                                                                                    | Type                                                                                         | Required                                                                                     | Description                                                                                  |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `request`                                                                                    | [operations.DownloadJobOutputRequest](../../models/operations/downloadjoboutputrequest.md)   | :heavy_check_mark:                                                                           | The request object to use for the request.                                                   |
+| `security`                                                                                   | [operations.DownloadJobOutputSecurity](../../models/operations/downloadjoboutputsecurity.md) | :heavy_check_mark:                                                                           | The security requirements to use for the request.                                            |
+| `retries`                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                             | :heavy_minus_sign:                                                                           | Configuration to override the default retry behavior of the client.                          |
 
 ### Response
 
@@ -107,11 +115,14 @@ Retrieve detailed information for a specific job by its ID.
 <!-- UsageSnippet language="python" operationID="get_job" method="get" path="/api/v1/jobs/{job_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.get_job(request={
+    res = uc_client.jobs.get_job(security=operations.GetJobSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "job_id": "d95a05b3-3446-4f3d-806c-904b6a7ba40a",
     })
 
@@ -124,10 +135,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                            | Type                                                                 | Required                                                             | Description                                                          |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `request`                                                            | [operations.GetJobRequest](../../models/operations/getjobrequest.md) | :heavy_check_mark:                                                   | The request object to use for the request.                           |
-| `retries`                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)     | :heavy_minus_sign:                                                   | Configuration to override the default retry behavior of the client.  |
+| Parameter                                                              | Type                                                                   | Required                                                               | Description                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `request`                                                              | [operations.GetJobRequest](../../models/operations/getjobrequest.md)   | :heavy_check_mark:                                                     | The request object to use for the request.                             |
+| `security`                                                             | [operations.GetJobSecurity](../../models/operations/getjobsecurity.md) | :heavy_check_mark:                                                     | The security requirements to use for the request.                      |
+| `retries`                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)       | :heavy_minus_sign:                                                     | Configuration to override the default retry behavior of the client.    |
 
 ### Response
 
@@ -149,11 +161,14 @@ Retrieve processing details for a specific job by its ID.
 <!-- UsageSnippet language="python" operationID="get_job_details" method="get" path="/api/v1/jobs/{job_id}/details" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.get_job_details(request={
+    res = uc_client.jobs.get_job_details(security=operations.GetJobDetailsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "job_id": "14cc95f9-4174-46b3-81f5-7089b87a4787",
     })
 
@@ -166,10 +181,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                          | Type                                                                               | Required                                                                           | Description                                                                        |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `request`                                                                          | [operations.GetJobDetailsRequest](../../models/operations/getjobdetailsrequest.md) | :heavy_check_mark:                                                                 | The request object to use for the request.                                         |
-| `retries`                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                   | :heavy_minus_sign:                                                                 | Configuration to override the default retry behavior of the client.                |
+| Parameter                                                                            | Type                                                                                 | Required                                                                             | Description                                                                          |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `request`                                                                            | [operations.GetJobDetailsRequest](../../models/operations/getjobdetailsrequest.md)   | :heavy_check_mark:                                                                   | The request object to use for the request.                                           |
+| `security`                                                                           | [operations.GetJobDetailsSecurity](../../models/operations/getjobdetailssecurity.md) | :heavy_check_mark:                                                                   | The security requirements to use for the request.                                    |
+| `retries`                                                                            | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                     | :heavy_minus_sign:                                                                   | Configuration to override the default retry behavior of the client.                  |
 
 ### Response
 
@@ -191,11 +207,14 @@ Retrieve failed files for a specific job by its ID.
 <!-- UsageSnippet language="python" operationID="get_job_failed_files" method="get" path="/api/v1/jobs/{job_id}/failed-files" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.get_job_failed_files(request={
+    res = uc_client.jobs.get_job_failed_files(security=operations.GetJobFailedFilesSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "job_id": "ad262041-3530-40a9-9f83-b004e947a203",
     })
 
@@ -208,10 +227,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                                  | Type                                                                                       | Required                                                                                   | Description                                                                                |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `request`                                                                                  | [operations.GetJobFailedFilesRequest](../../models/operations/getjobfailedfilesrequest.md) | :heavy_check_mark:                                                                         | The request object to use for the request.                                                 |
-| `retries`                                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                           | :heavy_minus_sign:                                                                         | Configuration to override the default retry behavior of the client.                        |
+| Parameter                                                                                    | Type                                                                                         | Required                                                                                     | Description                                                                                  |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `request`                                                                                    | [operations.GetJobFailedFilesRequest](../../models/operations/getjobfailedfilesrequest.md)   | :heavy_check_mark:                                                                           | The request object to use for the request.                                                   |
+| `security`                                                                                   | [operations.GetJobFailedFilesSecurity](../../models/operations/getjobfailedfilessecurity.md) | :heavy_check_mark:                                                                           | The security requirements to use for the request.                                            |
+| `retries`                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                             | :heavy_minus_sign:                                                                           | Configuration to override the default retry behavior of the client.                          |
 
 ### Response
 
@@ -233,11 +253,14 @@ Retrieve a list of jobs with optional filtering by workflow ID or job status.
 <!-- UsageSnippet language="python" operationID="list_jobs" method="get" path="/api/v1/jobs/" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.list_jobs(request={})
+    res = uc_client.jobs.list_jobs(security=operations.ListJobsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={})
 
     assert res.response_list_jobs is not None
 
@@ -248,10 +271,11 @@ with UnstructuredClient() as uc_client:
 
 ### Parameters
 
-| Parameter                                                                | Type                                                                     | Required                                                                 | Description                                                              |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `request`                                                                | [operations.ListJobsRequest](../../models/operations/listjobsrequest.md) | :heavy_check_mark:                                                       | The request object to use for the request.                               |
-| `retries`                                                                | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)         | :heavy_minus_sign:                                                       | Configuration to override the default retry behavior of the client.      |
+| Parameter                                                                  | Type                                                                       | Required                                                                   | Description                                                                |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `request`                                                                  | [operations.ListJobsRequest](../../models/operations/listjobsrequest.md)   | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
+| `security`                                                                 | [operations.ListJobsSecurity](../../models/operations/listjobssecurity.md) | :heavy_check_mark:                                                         | The security requirements to use for the request.                          |
+| `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
 
 ### Response
 

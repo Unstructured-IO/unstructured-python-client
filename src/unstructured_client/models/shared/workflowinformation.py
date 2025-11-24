@@ -7,7 +7,7 @@ from .workflowstate import WorkflowState
 from .workflowtype import WorkflowType
 from datetime import datetime
 from pydantic import model_serializer
-from typing import List
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -26,7 +26,7 @@ class WorkflowInformationTypedDict(TypedDict):
     sources: List[str]
     status: WorkflowState
     workflow_nodes: List[WorkflowNodeTypedDict]
-    reprocess_all: NotRequired[Nullable[bool]]
+    reprocess_all: NotRequired[bool]
     schedule: NotRequired[Nullable[WorkflowScheduleTypedDict]]
     updated_at: NotRequired[Nullable[datetime]]
     workflow_type: NotRequired[Nullable[WorkflowType]]
@@ -47,7 +47,7 @@ class WorkflowInformation(BaseModel):
 
     workflow_nodes: List[WorkflowNode]
 
-    reprocess_all: OptionalNullable[bool] = UNSET
+    reprocess_all: Optional[bool] = False
 
     schedule: OptionalNullable[WorkflowSchedule] = UNSET
 
@@ -58,7 +58,7 @@ class WorkflowInformation(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = ["reprocess_all", "schedule", "updated_at", "workflow_type"]
-        nullable_fields = ["reprocess_all", "schedule", "updated_at", "workflow_type"]
+        nullable_fields = ["schedule", "updated_at", "workflow_type"]
         null_default_fields = []
 
         serialized = handler(self)

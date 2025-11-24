@@ -18,7 +18,26 @@ from unstructured_client.utils import (
     HeaderMetadata,
     PathParamMetadata,
     QueryParamMetadata,
+    SecurityMetadata,
 )
+
+
+class DownloadJobOutputSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class DownloadJobOutputSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class DownloadJobOutputRequestTypedDict(TypedDict):

@@ -19,7 +19,30 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
+from unstructured_client.utils import (
+    FieldMetadata,
+    HeaderMetadata,
+    QueryParamMetadata,
+    SecurityMetadata,
+)
+
+
+class ListWorkflowsSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class ListWorkflowsSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class ListWorkflowsRequestTypedDict(TypedDict):

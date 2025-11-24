@@ -13,7 +13,30 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
+from unstructured_client.utils import (
+    FieldMetadata,
+    HeaderMetadata,
+    PathParamMetadata,
+    SecurityMetadata,
+)
+
+
+class DeleteDestinationSecurityTypedDict(TypedDict):
+    http_bearer: str
+
+
+class DeleteDestinationSecurity(BaseModel):
+    http_bearer: Annotated[
+        str,
+        FieldMetadata(
+            security=SecurityMetadata(
+                scheme=True,
+                scheme_type="http",
+                sub_type="bearer",
+                field_name="Authorization",
+            )
+        ),
+    ]
 
 
 class DeleteDestinationRequestTypedDict(TypedDict):

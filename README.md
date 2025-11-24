@@ -118,12 +118,15 @@ Some of the endpoints in this SDK support retries. If you use the SDK without an
 To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_connection_check_destinations(request={
+    res = uc_client.destinations.create_connection_check_destinations(security=operations.CreateConnectionCheckDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     },
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
@@ -138,6 +141,7 @@ with UnstructuredClient() as uc_client:
 If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
@@ -145,7 +149,9 @@ with UnstructuredClient(
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
 ) as uc_client:
 
-    res = uc_client.destinations.create_connection_check_destinations(request={
+    res = uc_client.destinations.create_connection_check_destinations(security=operations.CreateConnectionCheckDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
@@ -175,14 +181,16 @@ with UnstructuredClient(
 ### Example
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import errors
+from unstructured_client.models import errors, operations
 
 
 with UnstructuredClient() as uc_client:
     res = None
     try:
 
-        res = uc_client.destinations.create_connection_check_destinations(request={
+        res = uc_client.destinations.create_connection_check_destinations(security=operations.CreateConnectionCheckDestinationsSecurity(
+            http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+        ), request={
             "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
@@ -329,11 +337,14 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 ```python
 # Synchronous Example
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_connection_check_destinations(request={
+    res = uc_client.destinations.create_connection_check_destinations(security=operations.CreateConnectionCheckDestinationsSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
     })
 
@@ -350,12 +361,15 @@ The same SDK client can also be used to make asynchronous requests by importing 
 # Asynchronous Example
 import asyncio
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 async def main():
 
     async with UnstructuredClient() as uc_client:
 
-        res = await uc_client.destinations.create_connection_check_destinations_async(request={
+        res = await uc_client.destinations.create_connection_check_destinations_async(security=operations.CreateConnectionCheckDestinationsSecurity(
+            http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+        ), request={
             "destination_id": "cb9e35c1-0b04-4d98-83fa-fa6241323f96",
         })
 
@@ -439,11 +453,14 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.workflows.run_workflow(request={
+    res = uc_client.workflows.run_workflow(security=operations.RunWorkflowSecurity(
+        http_bearer="<YOUR_BEARER_TOKEN_HERE>",
+    ), request={
         "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
     })
 
