@@ -17,12 +17,19 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from typing import Optional
 
 import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError
+
+
+@pytest.fixture(scope="module")
+def doc_path() -> Path:
+    """Get the path to sample documents directory."""
+    return Path(__file__).resolve().parents[2] / "_sample_docs"
 
 
 @pytest.fixture(scope="function")
@@ -81,6 +88,7 @@ def created_workflow_id(platform_client: UnstructuredClient) -> Optional[str]:
 def test_workflow_lifecycle(
     platform_client: UnstructuredClient,
     created_workflow_id: Optional[str],
+    doc_path: Path,
 ):
     """
     Test the complete workflow lifecycle including workflows, jobs, and templates.
@@ -134,10 +142,28 @@ def test_workflow_lifecycle(
         "template_id": template_id,
     })
     
+    # Read a sample PDF file
+    pdf_filename = "layout-parser-paper-fast.pdf"
+    pdf_path = doc_path / pdf_filename
+    if not pdf_path.exists():
+        # Fallback to another common test file
+        pdf_filename = "list-item-example-1.pdf"
+        pdf_path = doc_path / pdf_filename
+    
+    with open(pdf_path, "rb") as f:
+        pdf_content = f.read()
+    
     create_job_response = platform_client.jobs.create_job(
         request=operations.CreateJobRequest(
             body_create_job=shared.BodyCreateJob(
                 request_data=request_data,
+                input_files=[
+                    shared.InputFiles(
+                        content=pdf_content,
+                        file_name=pdf_filename,
+                        content_type="application/pdf",
+                    )
+                ],
             )
         )
     )
