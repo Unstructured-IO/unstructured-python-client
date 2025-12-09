@@ -168,6 +168,8 @@ def test_cancel_job(httpx_mock, platform_client: UnstructuredClient, platform_ap
 
 
 def test_create_job(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
+    import json
+
     url = f"{platform_api_url}/api/v1/jobs/"
 
     httpx_mock.add_response(
@@ -195,11 +197,16 @@ def test_create_job(httpx_mock, platform_client: UnstructuredClient, platform_ap
         url=url,
     )
 
+    # request_data should be a JSON string containing the job creation data
+    request_data = json.dumps({
+        "job_type": "template",
+        "template_id": "hi_res_partition",
+    })
+
     create_job_response = platform_client.jobs.create_job(
         request=operations.CreateJobRequest(
             body_create_job=shared.BodyCreateJob(
-                job_type="template",
-                template_id="hi_res_partition",
+                request_data=request_data,
             )
         )
     )
