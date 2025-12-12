@@ -5,6 +5,7 @@
 
 | Name                             | Value                            |
 | -------------------------------- | -------------------------------- |
+| `AZURE`                          | azure                            |
 | `ASTRADB`                        | astradb                          |
 | `AZURE_AI_SEARCH`                | azure_ai_search                  |
 | `COUCHBASE`                      | couchbase                        |

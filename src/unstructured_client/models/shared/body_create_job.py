@@ -16,13 +16,13 @@ from unstructured_client.types import (
 from unstructured_client.utils import FieldMetadata, MultipartFormMetadata
 
 
-class BodyRunWorkflowInputFilesTypedDict(TypedDict):
+class InputFilesTypedDict(TypedDict):
     content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
     content_type: NotRequired[str]
 
 
-class BodyRunWorkflowInputFiles(BaseModel):
+class InputFiles(BaseModel):
     content: Annotated[
         Union[bytes, IO[bytes], io.BufferedReader],
         pydantic.Field(alias=""),
@@ -40,13 +40,16 @@ class BodyRunWorkflowInputFiles(BaseModel):
     ] = None
 
 
-class BodyRunWorkflowTypedDict(TypedDict):
-    input_files: NotRequired[Nullable[List[BodyRunWorkflowInputFilesTypedDict]]]
+class BodyCreateJobTypedDict(TypedDict):
+    request_data: str
+    input_files: NotRequired[Nullable[List[InputFilesTypedDict]]]
 
 
-class BodyRunWorkflow(BaseModel):
+class BodyCreateJob(BaseModel):
+    request_data: Annotated[str, FieldMetadata(multipart=True)]
+
     input_files: Annotated[
-        OptionalNullable[List[BodyRunWorkflowInputFiles]],
+        OptionalNullable[List[InputFiles]],
         FieldMetadata(multipart=MultipartFormMetadata(file=True)),
     ] = UNSET
 

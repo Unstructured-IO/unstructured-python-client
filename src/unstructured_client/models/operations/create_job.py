@@ -4,8 +4,12 @@ from __future__ import annotations
 import httpx
 import pydantic
 from pydantic import model_serializer
-from typing import Any, Optional
+from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from unstructured_client.models.shared import (
+    body_create_job as shared_body_create_job,
+    jobinformation as shared_jobinformation,
+)
 from unstructured_client.types import (
     BaseModel,
     Nullable,
@@ -13,38 +17,19 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import (
-    FieldMetadata,
-    HeaderMetadata,
-    PathParamMetadata,
-    QueryParamMetadata,
-)
+from unstructured_client.utils import FieldMetadata, HeaderMetadata, RequestMetadata
 
 
-class DownloadJobOutputRequestTypedDict(TypedDict):
-    file_id: str
-    r"""ID of the file to download"""
-    job_id: str
-    node_id: NotRequired[Nullable[str]]
-    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
+class CreateJobRequestTypedDict(TypedDict):
+    body_create_job: shared_body_create_job.BodyCreateJobTypedDict
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
-class DownloadJobOutputRequest(BaseModel):
-    file_id: Annotated[
-        str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
+class CreateJobRequest(BaseModel):
+    body_create_job: Annotated[
+        shared_body_create_job.BodyCreateJob,
+        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
     ]
-    r"""ID of the file to download"""
-
-    job_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
-    ]
-
-    node_id: Annotated[
-        OptionalNullable[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = UNSET
-    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
 
     unstructured_api_key: Annotated[
         OptionalNullable[str],
@@ -54,8 +39,8 @@ class DownloadJobOutputRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["node_id", "unstructured-api-key"]
-        nullable_fields = ["node_id", "unstructured-api-key"]
+        optional_fields = ["unstructured-api-key"]
+        nullable_fields = ["unstructured-api-key"]
         null_default_fields = []
 
         serialized = handler(self)
@@ -83,18 +68,18 @@ class DownloadJobOutputRequest(BaseModel):
         return m
 
 
-class DownloadJobOutputResponseTypedDict(TypedDict):
+class CreateJobResponseTypedDict(TypedDict):
     content_type: str
     r"""HTTP response content type for this operation"""
     status_code: int
     r"""HTTP response status code for this operation"""
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
-    any: NotRequired[Any]
+    job_information: NotRequired[shared_jobinformation.JobInformationTypedDict]
     r"""Successful Response"""
 
 
-class DownloadJobOutputResponse(BaseModel):
+class CreateJobResponse(BaseModel):
     content_type: str
     r"""HTTP response content type for this operation"""
 
@@ -104,5 +89,5 @@ class DownloadJobOutputResponse(BaseModel):
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
 
-    any: Optional[Any] = None
+    job_information: Optional[shared_jobinformation.JobInformation] = None
     r"""Successful Response"""

@@ -4,7 +4,7 @@ from __future__ import annotations
 import httpx
 import pydantic
 from pydantic import model_serializer
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -13,38 +13,18 @@ from unstructured_client.types import (
     UNSET,
     UNSET_SENTINEL,
 )
-from unstructured_client.utils import (
-    FieldMetadata,
-    HeaderMetadata,
-    PathParamMetadata,
-    QueryParamMetadata,
-)
+from unstructured_client.utils import FieldMetadata, HeaderMetadata, PathParamMetadata
 
 
-class DownloadJobOutputRequestTypedDict(TypedDict):
-    file_id: str
-    r"""ID of the file to download"""
-    job_id: str
-    node_id: NotRequired[Nullable[str]]
-    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
+class GetTemplateRequestTypedDict(TypedDict):
+    template_id: str
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
-class DownloadJobOutputRequest(BaseModel):
-    file_id: Annotated[
-        str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
-    ]
-    r"""ID of the file to download"""
-
-    job_id: Annotated[
+class GetTemplateRequest(BaseModel):
+    template_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
-
-    node_id: Annotated[
-        OptionalNullable[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = UNSET
-    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
 
     unstructured_api_key: Annotated[
         OptionalNullable[str],
@@ -54,8 +34,8 @@ class DownloadJobOutputRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["node_id", "unstructured-api-key"]
-        nullable_fields = ["node_id", "unstructured-api-key"]
+        optional_fields = ["unstructured-api-key"]
+        nullable_fields = ["unstructured-api-key"]
         null_default_fields = []
 
         serialized = handler(self)
@@ -83,18 +63,18 @@ class DownloadJobOutputRequest(BaseModel):
         return m
 
 
-class DownloadJobOutputResponseTypedDict(TypedDict):
+class GetTemplateResponseTypedDict(TypedDict):
     content_type: str
     r"""HTTP response content type for this operation"""
     status_code: int
     r"""HTTP response status code for this operation"""
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
-    any: NotRequired[Any]
+    response_get_template: NotRequired[Dict[str, Any]]
     r"""Successful Response"""
 
 
-class DownloadJobOutputResponse(BaseModel):
+class GetTemplateResponse(BaseModel):
     content_type: str
     r"""HTTP response content type for this operation"""
 
@@ -104,5 +84,5 @@ class DownloadJobOutputResponse(BaseModel):
     raw_response: httpx.Response
     r"""Raw HTTP response; suitable for custom response parsing"""
 
-    any: Optional[Any] = None
+    response_get_template: Optional[Dict[str, Any]] = None
     r"""Successful Response"""

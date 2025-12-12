@@ -7,3 +7,5 @@
 | ------------------ | ------------------ | ------------------ | ------------------ |
 | `file_id`          | *str*              | :heavy_check_mark: | N/A                |
 | `node_id`          | *str*              | :heavy_check_mark: | N/A                |
+| `node_subtype`     | *str*              | :heavy_check_mark: | N/A                |
+| `node_type`        | *str*              | :heavy_check_mark: | N/A                |

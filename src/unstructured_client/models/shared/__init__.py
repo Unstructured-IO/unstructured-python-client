@@ -21,6 +21,14 @@ if TYPE_CHECKING:
         AzureAISearchConnectorConfigInput,
         AzureAISearchConnectorConfigInputTypedDict,
     )
+    from .azuredestinationconnectorconfig import (
+        AzureDestinationConnectorConfig,
+        AzureDestinationConnectorConfigTypedDict,
+    )
+    from .azuredestinationconnectorconfiginput import (
+        AzureDestinationConnectorConfigInput,
+        AzureDestinationConnectorConfigInputTypedDict,
+    )
     from .azuresourceconnectorconfig import (
         AzureSourceConnectorConfig,
         AzureSourceConnectorConfigTypedDict,
@@ -29,11 +37,17 @@ if TYPE_CHECKING:
         AzureSourceConnectorConfigInput,
         AzureSourceConnectorConfigInputTypedDict,
     )
-    from .body_run_workflow import (
-        BodyRunWorkflow,
-        BodyRunWorkflowTypedDict,
+    from .body_create_job import (
+        BodyCreateJob,
+        BodyCreateJobTypedDict,
         InputFiles,
         InputFilesTypedDict,
+    )
+    from .body_run_workflow import (
+        BodyRunWorkflow,
+        BodyRunWorkflowInputFiles,
+        BodyRunWorkflowInputFilesTypedDict,
+        BodyRunWorkflowTypedDict,
     )
     from .boxsourceconnectorconfig import (
         BoxSourceConnectorConfig,
@@ -257,7 +271,6 @@ if TYPE_CHECKING:
         PartitionParameters,
         PartitionParametersTypedDict,
         Strategy,
-        VLMModel,
         VLMModelProvider,
     )
     from .pineconedestinationconnectorconfig import (
@@ -413,11 +426,19 @@ __all__ = [
     "AzureAISearchConnectorConfigInput",
     "AzureAISearchConnectorConfigInputTypedDict",
     "AzureAISearchConnectorConfigTypedDict",
+    "AzureDestinationConnectorConfig",
+    "AzureDestinationConnectorConfigInput",
+    "AzureDestinationConnectorConfigInputTypedDict",
+    "AzureDestinationConnectorConfigTypedDict",
     "AzureSourceConnectorConfig",
     "AzureSourceConnectorConfigInput",
     "AzureSourceConnectorConfigInputTypedDict",
     "AzureSourceConnectorConfigTypedDict",
+    "BodyCreateJob",
+    "BodyCreateJobTypedDict",
     "BodyRunWorkflow",
+    "BodyRunWorkflowInputFiles",
+    "BodyRunWorkflowInputFilesTypedDict",
     "BodyRunWorkflowTypedDict",
     "BoxSourceConnectorConfig",
     "BoxSourceConnectorConfigInput",
@@ -622,7 +643,6 @@ __all__ = [
     "UpdateWorkflow",
     "UpdateWorkflowSchedule",
     "UpdateWorkflowTypedDict",
-    "VLMModel",
     "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
@@ -654,14 +674,22 @@ _dynamic_imports: dict[str, str] = {
     "AzureAISearchConnectorConfigTypedDict": ".azureaisearchconnectorconfig",
     "AzureAISearchConnectorConfigInput": ".azureaisearchconnectorconfiginput",
     "AzureAISearchConnectorConfigInputTypedDict": ".azureaisearchconnectorconfiginput",
+    "AzureDestinationConnectorConfig": ".azuredestinationconnectorconfig",
+    "AzureDestinationConnectorConfigTypedDict": ".azuredestinationconnectorconfig",
+    "AzureDestinationConnectorConfigInput": ".azuredestinationconnectorconfiginput",
+    "AzureDestinationConnectorConfigInputTypedDict": ".azuredestinationconnectorconfiginput",
     "AzureSourceConnectorConfig": ".azuresourceconnectorconfig",
     "AzureSourceConnectorConfigTypedDict": ".azuresourceconnectorconfig",
     "AzureSourceConnectorConfigInput": ".azuresourceconnectorconfiginput",
     "AzureSourceConnectorConfigInputTypedDict": ".azuresourceconnectorconfiginput",
+    "BodyCreateJob": ".body_create_job",
+    "BodyCreateJobTypedDict": ".body_create_job",
+    "InputFiles": ".body_create_job",
+    "InputFilesTypedDict": ".body_create_job",
     "BodyRunWorkflow": ".body_run_workflow",
+    "BodyRunWorkflowInputFiles": ".body_run_workflow",
+    "BodyRunWorkflowInputFilesTypedDict": ".body_run_workflow",
     "BodyRunWorkflowTypedDict": ".body_run_workflow",
-    "InputFiles": ".body_run_workflow",
-    "InputFilesTypedDict": ".body_run_workflow",
     "BoxSourceConnectorConfig": ".boxsourceconnectorconfig",
     "BoxSourceConnectorConfigTypedDict": ".boxsourceconnectorconfig",
     "BoxSourceConnectorConfigInput": ".boxsourceconnectorconfiginput",
@@ -796,7 +824,6 @@ _dynamic_imports: dict[str, str] = {
     "PartitionParameters": ".partition_parameters",
     "PartitionParametersTypedDict": ".partition_parameters",
     "Strategy": ".partition_parameters",
-    "VLMModel": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
     "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
     "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",

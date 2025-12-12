@@ -14,7 +14,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.MOTHERDUCK,\n            \"config\": {\n                \"index_name\": \"<value>\",\n                \"api_key\": \"<value>\",\n                \"namespace\": \"<value>\",\n                \"batch_size\": 50,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request={\n        \"create_destination_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.DestinationConnectorType.MONGODB,\n            \"config\": {\n                \"index_name\": \"<value>\",\n                \"api_key\": \"<value>\",\n                \"namespace\": \"<value>\",\n                \"batch_size\": 50,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -32,7 +32,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_destination"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"9726962d-9d1e-4f84-8787-c7313d183927\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"bootstrap_servers\": \"<value>\",\n                \"port\": 9092,\n                \"topic\": \"<value>\",\n                \"kafka_api_key\": \"<value>\",\n                \"secret\": \"<value>\",\n                \"batch_size\": 100,\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.update_destination(request={\n        \"destination_id\": \"962d9d1e-f847-487c-a731-3d18392716fb\",\n        \"update_destination_connector\": {\n            \"config\": {\n                \"remote_url\": \"https://lined-clamp.info\",\n                \"service_account_key\": \"<value>\",\n            },\n        },\n    })\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}/connection-check"]["get"]
     update:
       "x-codeSamples":
@@ -51,6 +51,12 @@ actions:
         - "lang": "python"
           "label": "list_jobs"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.list_jobs(request={})\n\n    assert res.response_list_jobs is not None\n\n    # Handle response\n    print(res.response_list_jobs)"
+  - target: $["paths"]["/api/v1/jobs/"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "create_job"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.create_job(request={\n        \"body_create_job\": {\n            \"request_data\": \"<value>\",\n        },\n    })\n\n    assert res.job_information is not None\n\n    # Handle response\n    print(res.job_information)"
   - target: $["paths"]["/api/v1/jobs/{job_id}"]["get"]
     update:
       "x-codeSamples":
@@ -74,7 +80,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "download_job_output"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"06d1b7b8-8642-4793-b37e-e45d97d53bc3\",\n        \"file_id\": \"<id>\",\n        \"node_id\": \"7c8f2aa4-da13-4a04-a98d-0204ea55681e\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.download_job_output(request={\n        \"job_id\": \"06d1b7b8-8642-4793-b37e-e45d97d53bc3\",\n        \"file_id\": \"<id>\",\n    })\n\n    assert res.any is not None\n\n    # Handle response\n    print(res.any)"
   - target: $["paths"]["/api/v1/jobs/{job_id}/failed-files"]["get"]
     update:
       "x-codeSamples":
@@ -123,6 +129,18 @@ actions:
         - "lang": "python"
           "label": "create_connection_check_sources"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_connection_check_sources(request={\n        \"source_id\": \"8d49e3f2-3e6d-4973-bc61-292af66829d7\",\n    })\n\n    assert res.dag_node_connection_check is not None\n\n    # Handle response\n    print(res.dag_node_connection_check)"
+  - target: $["paths"]["/api/v1/templates/"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "list_templates"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.templates.list_templates(request={})\n\n    assert res.response_list_templates is not None\n\n    # Handle response\n    print(res.response_list_templates)"
+  - target: $["paths"]["/api/v1/templates/{template_id}"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_template"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.templates.get_template(request={\n        \"template_id\": \"<id>\",\n    })\n\n    assert res.response_get_template is not None\n\n    # Handle response\n    print(res.response_get_template)"
   - target: $["paths"]["/api/v1/workflows/"]["get"]
     update:
       "x-codeSamples":
@@ -164,4 +182,4 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "partition"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"strategy\": shared.Strategy.AUTO,\n            \"vlm_model_provider\": shared.VLMModelProvider.OPENAI,\n            \"vlm_model\": shared.VLMModel.GPT_4O,\n            \"chunking_strategy\": \"by_title\",\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n            \"split_pdf_cache_tmp_data_dir\": \"<value>\",\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.general.partition(request={\n        \"partition_parameters\": {\n            \"files\": {\n                \"file_name\": \"example.file\",\n                \"content\": open(\"example.file\", \"rb\"),\n            },\n            \"strategy\": shared.Strategy.AUTO,\n            \"vlm_model_provider\": shared.VLMModelProvider.OPENAI,\n            \"vlm_model\": \"gpt-4o\",\n            \"chunking_strategy\": \"by_title\",\n            \"split_pdf_page_range\": [\n                1,\n                10,\n            ],\n            \"split_pdf_cache_tmp_data_dir\": \"<value>\",\n        },\n    })\n\n    assert res.elements is not None\n\n    # Handle response\n    print(res.elements)"
