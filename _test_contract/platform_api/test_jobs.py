@@ -165,3 +165,60 @@ def test_cancel_job(httpx_mock, platform_client: UnstructuredClient, platform_ap
     request = requests[0]
     assert request.method == "POST"
     assert request.url == url
+
+
+def test_create_job(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
+    import json
+
+    url = f"{platform_api_url}/api/v1/jobs/"
+
+    httpx_mock.add_response(
+        method="POST",
+        status_code=200,
+        headers={"Content-Type": "application/json"},
+        json={
+            "created_at": "2025-06-22T11:37:21.648Z",
+            "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
+            "status": "SCHEDULED",
+            "runtime": None,
+            "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
+            "workflow_name": "job-fcdc4994",
+            "input_file_ids": ["upload-test-file-123"],
+            "output_node_files": [
+                {
+                    "node_id": "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d",
+                    "file_id": "upload-test-file-123",
+                    "node_type": "partition",
+                    "node_subtype": "unstructured_api",
+                }
+            ],
+            "job_type": "template",
+        },
+        url=url,
+    )
+
+    # request_data should be a JSON string containing the job creation data
+    request_data = json.dumps({
+        "template_id": "hi_res_partition",
+    })
+
+    create_job_response = platform_client.jobs.create_job(
+        request=operations.CreateJobRequest(
+            body_create_job=shared.BodyCreateJob(
+                request_data=request_data,
+            )
+        )
+    )
+    assert create_job_response.status_code == 200
+
+    requests = httpx_mock.get_requests()
+    assert len(requests) == 1
+    request = requests[0]
+    assert request.method == "POST"
+    assert request.url == url
+
+    job = create_job_response.job_information
+    assert job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
+    assert job.status == "SCHEDULED"
+    assert job.job_type == "template"
+    assert job.created_at == datetime.fromisoformat("2025-06-22T11:37:21.648+00:00")
