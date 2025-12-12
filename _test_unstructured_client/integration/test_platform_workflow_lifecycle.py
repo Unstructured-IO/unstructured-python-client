@@ -114,27 +114,27 @@ def test_workflow_lifecycle(
         request=operations.ListTemplatesRequest()
     )
     assert list_templates_response.status_code == 200
-    assert "templates" in list_templates_response.response_list_templates
-    templates = list_templates_response.response_list_templates["templates"]
+    assert list_templates_response.response_list_templates is not None
+    templates = list_templates_response.response_list_templates
     assert isinstance(templates, list)
     assert len(templates) > 0
     
     # Verify we have expected templates
-    template_ids = [t.get("id") for t in templates]
+    template_ids = [t.id for t in templates]
     assert "hi_res_partition" in template_ids or "hi_res_and_enrichment" in template_ids
     
     # 4. Get template
     template_id = "hi_res_partition"
     if template_id not in template_ids and len(templates) > 0:
-        template_id = templates[0].get("id")
+        template_id = templates[0].id
     
     get_template_response = platform_client.templates.get_template(
         request=operations.GetTemplateRequest(template_id=template_id)
     )
     assert get_template_response.status_code == 200
-    assert "template" in get_template_response.response_get_template
-    template = get_template_response.response_get_template["template"]
-    assert template.get("id") == template_id
+    assert get_template_response.template_detail is not None
+    template = get_template_response.template_detail
+    assert template.id == template_id
     
     # 5. Create job (on-demand using template)
     request_data = json.dumps({
