@@ -19,23 +19,14 @@ def test_list_templates(httpx_mock, platform_client: UnstructuredClient, platfor
                 "name": "High Resolution Partition",
                 "description": "Partition documents with high resolution strategy",
                 "version": "1.0.0",
-                "nodes": [
-                    {
-                        "id": "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d",
-                        "name": "partition step",
-                        "type": "partition",
-                        "subtype": "unstructured_api",
-                    }
-                ],
-                "edges": [],
+                "last_updated": "2024-01-01T00:00:00.000000",
             },
             {
                 "id": "hi_res_and_enrichment",
                 "name": "High Resolution and Enrichment",
                 "description": "Partition with enrichment",
                 "version": "1.0.0",
-                "nodes": [],
-                "edges": [],
+                "last_updated": "2024-01-01T00:00:00.000000",
             },
         ],
         url=url,
@@ -52,12 +43,12 @@ def test_list_templates(httpx_mock, platform_client: UnstructuredClient, platfor
     assert request.method == "GET"
     assert request.url == url
 
-    assert "templates" in templates_response.response_list_templates
     templates = templates_response.response_list_templates
+    assert templates is not None
     assert len(templates) == 2
-    assert templates[0]["id"] == "hi_res_partition"
-    assert templates[0]["name"] == "High Resolution Partition"
-    assert templates[1]["id"] == "hi_res_and_enrichment"
+    assert templates[0].id == "hi_res_partition"
+    assert templates[0].name == "High Resolution Partition"
+    assert templates[1].id == "hi_res_and_enrichment"
 
 
 def test_get_template(httpx_mock, platform_client: UnstructuredClient, platform_api_url: str):
@@ -71,6 +62,7 @@ def test_get_template(httpx_mock, platform_client: UnstructuredClient, platform_
             "name": "High Resolution Partition",
             "description": "Partition documents with high resolution strategy",
             "version": "1.0.0",
+            "last_updated": "2024-01-01T00:00:00.000000",
             "nodes": [
                 {
                     "id": "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d",
@@ -81,12 +73,6 @@ def test_get_template(httpx_mock, platform_client: UnstructuredClient, platform_
                         "strategy": "fast",
                         "include_page_breaks": False,
                     },
-                }
-            ],
-            "edges": [
-                {
-                    "source_id": "00000000-0000-0000-0000-000000000001-downloader",
-                    "destination_id": "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d",
                 }
             ],
         },
@@ -104,12 +90,12 @@ def test_get_template(httpx_mock, platform_client: UnstructuredClient, platform_
     assert request.method == "GET"
     assert request.url == url
 
-    assert "template" in template_response.response_get_template
-    template = template_response.response_get_template
-    assert template["id"] == "hi_res_partition"
-    assert template["name"] == "High Resolution Partition"
-    assert len(template["nodes"]) == 1
-    assert template["nodes"][0]["id"] == "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d"
+    template = template_response.template_detail
+    assert template is not None
+    assert template.id == "hi_res_partition"
+    assert template.name == "High Resolution Partition"
+    assert len(template.nodes) == 1
+    assert template.nodes[0].id == "93fc2ce8-e7c8-424f-a6aa-41460fc5d35d"
 
 
 def test_get_template_not_found(
