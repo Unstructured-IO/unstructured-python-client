@@ -36,6 +36,7 @@ class UpdateWorkflowTypedDict(TypedDict):
     reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[UpdateWorkflowSchedule]]
     source_id: NotRequired[Nullable[str]]
+    template_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
     workflow_type: NotRequired[Nullable[WorkflowType]]
 
@@ -51,6 +52,8 @@ class UpdateWorkflow(BaseModel):
 
     source_id: OptionalNullable[str] = UNSET
 
+    template_id: OptionalNullable[str] = UNSET
+
     workflow_nodes: OptionalNullable[List[WorkflowNode]] = UNSET
 
     workflow_type: OptionalNullable[WorkflowType] = UNSET
@@ -63,6 +66,7 @@ class UpdateWorkflow(BaseModel):
             "reprocess_all",
             "schedule",
             "source_id",
+            "template_id",
             "workflow_nodes",
             "workflow_type",
         ]
@@ -72,6 +76,7 @@ class UpdateWorkflow(BaseModel):
             "reprocess_all",
             "schedule",
             "source_id",
+            "template_id",
             "workflow_nodes",
             "workflow_type",
         ]

@@ -29,6 +29,12 @@ if TYPE_CHECKING:
         CreateDestinationResponse,
         CreateDestinationResponseTypedDict,
     )
+    from .create_job import (
+        CreateJobRequest,
+        CreateJobRequestTypedDict,
+        CreateJobResponse,
+        CreateJobResponseTypedDict,
+    )
     from .create_source import (
         CreateSourceRequest,
         CreateSourceRequestTypedDict,
@@ -107,6 +113,12 @@ if TYPE_CHECKING:
         GetSourceResponse,
         GetSourceResponseTypedDict,
     )
+    from .get_template import (
+        GetTemplateRequest,
+        GetTemplateRequestTypedDict,
+        GetTemplateResponse,
+        GetTemplateResponseTypedDict,
+    )
     from .get_workflow import (
         GetWorkflowRequest,
         GetWorkflowRequestTypedDict,
@@ -130,6 +142,12 @@ if TYPE_CHECKING:
         ListSourcesRequestTypedDict,
         ListSourcesResponse,
         ListSourcesResponseTypedDict,
+    )
+    from .list_templates import (
+        ListTemplatesRequest,
+        ListTemplatesRequestTypedDict,
+        ListTemplatesResponse,
+        ListTemplatesResponseTypedDict,
     )
     from .list_workflows import (
         ListWorkflowsRequest,
@@ -185,6 +203,10 @@ __all__ = [
     "CreateDestinationRequestTypedDict",
     "CreateDestinationResponse",
     "CreateDestinationResponseTypedDict",
+    "CreateJobRequest",
+    "CreateJobRequestTypedDict",
+    "CreateJobResponse",
+    "CreateJobResponseTypedDict",
     "CreateSourceRequest",
     "CreateSourceRequestTypedDict",
     "CreateSourceResponse",
@@ -237,6 +259,10 @@ __all__ = [
     "GetSourceRequestTypedDict",
     "GetSourceResponse",
     "GetSourceResponseTypedDict",
+    "GetTemplateRequest",
+    "GetTemplateRequestTypedDict",
+    "GetTemplateResponse",
+    "GetTemplateResponseTypedDict",
     "GetWorkflowRequest",
     "GetWorkflowRequestTypedDict",
     "GetWorkflowResponse",
@@ -253,6 +279,10 @@ __all__ = [
     "ListSourcesRequestTypedDict",
     "ListSourcesResponse",
     "ListSourcesResponseTypedDict",
+    "ListTemplatesRequest",
+    "ListTemplatesRequestTypedDict",
+    "ListTemplatesResponse",
+    "ListTemplatesResponseTypedDict",
     "ListWorkflowsRequest",
     "ListWorkflowsRequestTypedDict",
     "ListWorkflowsResponse",
@@ -296,6 +326,10 @@ _dynamic_imports: dict[str, str] = {
     "CreateDestinationRequestTypedDict": ".create_destination",
     "CreateDestinationResponse": ".create_destination",
     "CreateDestinationResponseTypedDict": ".create_destination",
+    "CreateJobRequest": ".create_job",
+    "CreateJobRequestTypedDict": ".create_job",
+    "CreateJobResponse": ".create_job",
+    "CreateJobResponseTypedDict": ".create_job",
     "CreateSourceRequest": ".create_source",
     "CreateSourceRequestTypedDict": ".create_source",
     "CreateSourceResponse": ".create_source",
@@ -348,6 +382,10 @@ _dynamic_imports: dict[str, str] = {
     "GetSourceRequestTypedDict": ".get_source",
     "GetSourceResponse": ".get_source",
     "GetSourceResponseTypedDict": ".get_source",
+    "GetTemplateRequest": ".get_template",
+    "GetTemplateRequestTypedDict": ".get_template",
+    "GetTemplateResponse": ".get_template",
+    "GetTemplateResponseTypedDict": ".get_template",
     "GetWorkflowRequest": ".get_workflow",
     "GetWorkflowRequestTypedDict": ".get_workflow",
     "GetWorkflowResponse": ".get_workflow",
@@ -364,6 +402,10 @@ _dynamic_imports: dict[str, str] = {
     "ListSourcesRequestTypedDict": ".list_sources",
     "ListSourcesResponse": ".list_sources",
     "ListSourcesResponseTypedDict": ".list_sources",
+    "ListTemplatesRequest": ".list_templates",
+    "ListTemplatesRequestTypedDict": ".list_templates",
+    "ListTemplatesResponse": ".list_templates",
+    "ListTemplatesResponseTypedDict": ".list_templates",
     "ListWorkflowsRequest": ".list_workflows",
     "ListWorkflowsRequestTypedDict": ".list_workflows",
     "ListWorkflowsResponse": ".list_workflows",

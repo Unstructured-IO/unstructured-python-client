@@ -34,7 +34,7 @@ with UnstructuredClient() as uc_client:
                 10,
             ],
             "strategy": shared.Strategy.AUTO,
-            "vlm_model": shared.VLMModel.GPT_4O,
+            "vlm_model": "gpt-4o",
             "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
     })
