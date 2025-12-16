@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: edc837c11b1a19b20f4f8e98bbf5c118
-  docVersion: 1.2.21
+  docChecksum: e741a96121ddff12793a36dd5e2258f4
+  docVersion: 1.2.23
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.4
-  configChecksum: 3db8ad876dc10cf3b033f710eb1411d3
+  releaseVersion: 0.42.5
+  configChecksum: 3b3b92259de5fc0033e3f01348631e31
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -1181,7 +1181,7 @@ trackedFiles:
   pylintrc:
     last_write_checksum: sha1:db2aebd83e553dd59d3965e79104a3fb780c403a
   pyproject.toml:
-    last_write_checksum: sha1:c8c5dd42f3990f787b8db57c625080e7b24ff1c7
+    last_write_checksum: sha1:6690c2c6cd0795582a8ee7ad5485df40ac64294c
   scripts/prepare_readme.py:
     last_write_checksum: sha1:ccdba5069fbb7997500b6ba22366e004394cdca2
   scripts/publish.sh:
@@ -1195,7 +1195,7 @@ trackedFiles:
   src/unstructured_client/_hooks/types.py:
     last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
   src/unstructured_client/_version.py:
-    last_write_checksum: sha1:04347a4921c6bf252eba5cb11c1ce385548a1c03
+    last_write_checksum: sha1:8df230bbe57fe1ed3def0d60fe15c23ef29eb8d2
   src/unstructured_client/basesdk.py:
     last_write_checksum: sha1:c630e3511b954676ab8b477fd7b11c4ce8f443a7
   src/unstructured_client/destinations.py:
