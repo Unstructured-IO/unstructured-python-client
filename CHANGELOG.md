@@ -1,3 +1,13 @@
+## 0.42.5
+
+### Enhancements
+* Support for on-demand jobs via CreateJob API
+* New Read-only APIs GetTemplate and ListTemplates
+
+### Features
+
+### Fixes
+
 ## 0.42.4
 
 ### Enhancements
