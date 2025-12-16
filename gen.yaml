@@ -17,6 +17,10 @@ generation:
     generateTests: true
     generateNewTests: false
     skipResponseBodyAssertions: false
+  persistentEdits: {}
+  requestBodyFieldName: ""
+  schemas:
+    allOfMergeStrategy: shallowMerge
 python:
   version: 0.42.4
   additionalDependencies:
@@ -36,10 +40,15 @@ python:
       httpx: '>=0.27.0'
       pypdf: '>= 6.2.0'
       requests-toolbelt: '>=1.0.0'
+  allowedRedefinedBuiltins:
+    - id
+    - object
+  asyncMode: both
   authors:
     - Unstructured
   baseErrorName: UnstructuredClientError
   clientServerStatusCodesAsErrors: true
+  constFieldCasing: upper
   defaultErrorName: SDKError
   description: Python Client SDK for Unstructured API
   enableCustomCodeRegions: true
@@ -57,16 +66,20 @@ python:
       operations: models/operations
       shared: models/shared
       webhooks: models/webhooks
+  inferUnionDiscriminators: true
   inputModelSuffix: input
   license: MIT
   maxMethodParams: 0
   methodArguments: require-security-and-request
   moduleName: ""
+  multipartArrayFormat: legacy
   outputModelSuffix: output
   packageManager: poetry
   packageName: unstructured-client
+  preApplyUnionDiscriminators: false
   projectUrls: {}
   pytestFilterWarnings: []
   pytestTimeout: 0
   responseFormat: envelope
+  sseFlatResponse: false
   templateVersion: v2

@@ -221,7 +221,7 @@ with UnstructuredClient() as uc_client:
 
 
 **Inherit from [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py)**:
-* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 27 methods.*
+* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 30 methods.*
 * [`ResponseValidationError`](./src/unstructured_client/models/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
 
 </details>
@@ -443,8 +443,10 @@ from unstructured_client import UnstructuredClient
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.workflows.run_workflow(request={
-        "workflow_id": "e7054f23-ce92-4bf1-a1d7-7cf9cb14d013",
+    res = uc_client.jobs.create_job(request={
+        "body_create_job": {
+            "request_data": "<value>",
+        },
     })
 
     assert res.job_information is not None

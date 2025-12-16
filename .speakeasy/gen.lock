@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 8038a5b9e376d44bad2fd4c117922954
-  docVersion: 1.1.45
+  docChecksum: edc837c11b1a19b20f4f8e98bbf5c118
+  docVersion: 1.2.21
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.3
-  configChecksum: 3d02dd7ca437781b3d721fab5d7b9adc
+  releaseVersion: 0.42.4
+  configChecksum: 3db8ad876dc10cf3b033f710eb1411d3
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -51,6 +51,8 @@ generatedFiles:
   - docs/models/operations/createconnectionchecksourcesresponse.md
   - docs/models/operations/createdestinationrequest.md
   - docs/models/operations/createdestinationresponse.md
+  - docs/models/operations/createjobrequest.md
+  - docs/models/operations/createjobresponse.md
   - docs/models/operations/createsourcerequest.md
   - docs/models/operations/createsourceresponse.md
   - docs/models/operations/createworkflowrequest.md
@@ -77,6 +79,8 @@ generatedFiles:
   - docs/models/operations/getjobresponse.md
   - docs/models/operations/getsourcerequest.md
   - docs/models/operations/getsourceresponse.md
+  - docs/models/operations/gettemplaterequest.md
+  - docs/models/operations/gettemplateresponse.md
   - docs/models/operations/getworkflowrequest.md
   - docs/models/operations/getworkflowresponse.md
   - docs/models/operations/listdestinationsrequest.md
@@ -85,6 +89,8 @@ generatedFiles:
   - docs/models/operations/listjobsresponse.md
   - docs/models/operations/listsourcesrequest.md
   - docs/models/operations/listsourcesresponse.md
+  - docs/models/operations/listtemplatesrequest.md
+  - docs/models/operations/listtemplatesresponse.md
   - docs/models/operations/listworkflowsrequest.md
   - docs/models/operations/listworkflowsresponse.md
   - docs/models/operations/partitionrequest.md
@@ -101,9 +107,13 @@ generatedFiles:
   - docs/models/shared/astradbconnectorconfiginput.md
   - docs/models/shared/azureaisearchconnectorconfig.md
   - docs/models/shared/azureaisearchconnectorconfiginput.md
+  - docs/models/shared/azuredestinationconnectorconfig.md
+  - docs/models/shared/azuredestinationconnectorconfiginput.md
   - docs/models/shared/azuresourceconnectorconfig.md
   - docs/models/shared/azuresourceconnectorconfiginput.md
+  - docs/models/shared/bodycreatejob.md
   - docs/models/shared/bodyrunworkflow.md
+  - docs/models/shared/bodyrunworkflowinputfiles.md
   - docs/models/shared/boxsourceconnectorconfig.md
   - docs/models/shared/boxsourceconnectorconfiginput.md
   - docs/models/shared/config.md
@@ -205,6 +215,9 @@ generatedFiles:
   - docs/models/shared/sourceconnectorinformationconfig.md
   - docs/models/shared/sourceconnectortype.md
   - docs/models/shared/strategy.md
+  - docs/models/shared/templatedetail.md
+  - docs/models/shared/templatelistitem.md
+  - docs/models/shared/templatenode.md
   - docs/models/shared/updatedestinationconnector.md
   - docs/models/shared/updatedestinationconnectorconfig.md
   - docs/models/shared/updatesourceconnector.md
@@ -212,7 +225,6 @@ generatedFiles:
   - docs/models/shared/updateworkflow.md
   - docs/models/shared/updateworkflowschedule.md
   - docs/models/shared/validationerror.md
-  - docs/models/shared/vlmmodel.md
   - docs/models/shared/vlmmodelprovider.md
   - docs/models/shared/weaviatedestinationconnectorconfig.md
   - docs/models/shared/weaviatedestinationconnectorconfiginput.md
@@ -229,6 +241,7 @@ generatedFiles:
   - docs/sdks/general/README.md
   - docs/sdks/jobs/README.md
   - docs/sdks/sources/README.md
+  - docs/sdks/templates/README.md
   - docs/sdks/unstructuredclient/README.md
   - docs/sdks/workflows/README.md
   - poetry.toml
@@ -259,6 +272,7 @@ generatedFiles:
   - src/unstructured_client/models/operations/create_connection_check_destinations.py
   - src/unstructured_client/models/operations/create_connection_check_sources.py
   - src/unstructured_client/models/operations/create_destination.py
+  - src/unstructured_client/models/operations/create_job.py
   - src/unstructured_client/models/operations/create_source.py
   - src/unstructured_client/models/operations/create_workflow.py
   - src/unstructured_client/models/operations/delete_destination.py
@@ -272,10 +286,12 @@ generatedFiles:
   - src/unstructured_client/models/operations/get_job_details.py
   - src/unstructured_client/models/operations/get_job_failed_files.py
   - src/unstructured_client/models/operations/get_source.py
+  - src/unstructured_client/models/operations/get_template.py
   - src/unstructured_client/models/operations/get_workflow.py
   - src/unstructured_client/models/operations/list_destinations.py
   - src/unstructured_client/models/operations/list_jobs.py
   - src/unstructured_client/models/operations/list_sources.py
+  - src/unstructured_client/models/operations/list_templates.py
   - src/unstructured_client/models/operations/list_workflows.py
   - src/unstructured_client/models/operations/partition.py
   - src/unstructured_client/models/operations/run_workflow.py
@@ -287,8 +303,11 @@ generatedFiles:
   - src/unstructured_client/models/shared/astradbconnectorconfiginput.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfig.py
   - src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py
+  - src/unstructured_client/models/shared/azuredestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfig.py
   - src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/body_create_job.py
   - src/unstructured_client/models/shared/body_run_workflow.py
   - src/unstructured_client/models/shared/boxsourceconnectorconfig.py
   - src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py
@@ -379,6 +398,9 @@ generatedFiles:
   - src/unstructured_client/models/shared/sortdirection.py
   - src/unstructured_client/models/shared/sourceconnectorinformation.py
   - src/unstructured_client/models/shared/sourceconnectortype.py
+  - src/unstructured_client/models/shared/templatedetail.py
+  - src/unstructured_client/models/shared/templatelistitem.py
+  - src/unstructured_client/models/shared/templatenode.py
   - src/unstructured_client/models/shared/updatedestinationconnector.py
   - src/unstructured_client/models/shared/updatesourceconnector.py
   - src/unstructured_client/models/shared/updateworkflow.py
@@ -397,6 +419,7 @@ generatedFiles:
   - src/unstructured_client/sdk.py
   - src/unstructured_client/sdkconfiguration.py
   - src/unstructured_client/sources.py
+  - src/unstructured_client/templates.py
   - src/unstructured_client/types/__init__.py
   - src/unstructured_client/types/basemodel.py
   - src/unstructured_client/utils/__init__.py
@@ -600,7 +623,7 @@ examples:
         application/json: {"name": "<value>", "workflow_type": "advanced"}
       responses:
         "200":
-          application/json: {"created_at": "2023-01-15T13:52:58.634Z", "destinations": [], "id": "80c8c72f-101a-4a39-974b-49aa299e80d3", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47678eb0-4958-4341-ad66-b1b822c1deb9"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2023-01-15T13:52:58.634Z", "destinations": [], "id": "80c8c72f-101a-4a39-974b-49aa299e80d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47678eb0-4958-4341-ad66-b1b822c1deb9"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   delete_workflow:
@@ -620,7 +643,7 @@ examples:
           workflow_id: "d031b0e5-7ca7-4a2b-b3cc-d869d2df3e76"
       responses:
         "200":
-          application/json: {"created_at": "2024-01-22T17:42:53.375Z", "destinations": ["624abbf1-dbce-4fe0-8d3f-0673956fc10e"], "id": "840c33c3-f30c-4908-9688-2682ed8eea3f", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["349ed27a-eeda-4851-866a-8ce3a65a2957", "9aa34544-3278-446f-a265-efcaa55f9c4a"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2024-01-22T17:42:53.375Z", "destinations": ["624abbf1-dbce-4fe0-8d3f-0673956fc10e"], "id": "840c33c3-f30c-4908-9688-2682ed8eea3f", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["349ed27a-eeda-4851-866a-8ce3a65a2957", "9aa34544-3278-446f-a265-efcaa55f9c4a"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   list_workflows:
@@ -630,7 +653,7 @@ examples:
           sort_by: "id"
       responses:
         "200":
-          application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
+          application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
         "422":
           application/json: {"detail": [{"loc": ["<value>", 864403], "msg": "<value>", "type": "<value>"}]}
   run_workflow:
@@ -652,13 +675,13 @@ examples:
         application/json: {}
       responses:
         "200":
-          application/json: {"created_at": "2025-01-11T03:06:48.390Z", "destinations": [], "id": "88fd9cfe-ed29-4701-9d1f-8f26d4ea88d3", "name": "<value>", "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["0957eb7f-57d3-4705-bc49-03de6ad3794d", "a8b88099-9065-4458-a824-b37da7a9bccf", "a024c482-10ba-433a-9100-e6471e9d3db0"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
+          application/json: {"created_at": "2025-01-11T03:06:48.390Z", "destinations": [], "id": "88fd9cfe-ed29-4701-9d1f-8f26d4ea88d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["0957eb7f-57d3-4705-bc49-03de6ad3794d", "a8b88099-9065-4458-a824-b37da7a9bccf", "a024c482-10ba-433a-9100-e6471e9d3db0"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
           application/json: {"detail": "<value>"}
   partition:
     speakeasy-default-partition:
       requestBody:
-        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "pdfminer_char_margin": null, "pdfminer_line_margin": null, "pdfminer_line_overlap": null, "pdfminer_word_margin": null, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "auto", "table_ocr_agent": null, "unique_element_ids": false, "vlm_model": "gpt-4o", "vlm_model_provider": "openai", "xml_keep_tags": false}
+        multipart/form-data: {"chunking_strategy": "by_title", "combine_under_n_chars": null, "content_type": null, "coordinates": false, "do_not_break_similarity_on_footer_header": false, "encoding": null, "files": {"": "{\"summary\":\"File to be partitioned\",\"externalValue\":\"https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf\"}"}, "gz_uncompressed_content_type": null, "hi_res_model_name": null, "include_orig_elements": null, "include_page_breaks": false, "include_slide_notes": true, "max_characters": null, "multipage_sections": true, "new_after_n_chars": null, "output_format": "application/json", "overlap": 0, "overlap_all": false, "pdf_infer_table_structure": true, "pdfminer_char_margin": null, "pdfminer_line_margin": null, "pdfminer_line_overlap": null, "pdfminer_word_margin": null, "similarity_threshold": null, "split_pdf_allow_failed": false, "split_pdf_cache_tmp_data": false, "split_pdf_cache_tmp_data_dir": "<value>", "split_pdf_concurrency_level": 5, "split_pdf_page": true, "split_pdf_page_range": [1, 10], "starting_page_number": null, "strategy": "auto", "table_ocr_agent": null, "unique_element_ids": false, "vlm_model": "gpt-4o", "vlm_model_provider": "openai", "xml_keep_tags": false}
       responses:
         "200":
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
@@ -710,5 +733,836 @@ examples:
           application/json: {"ca_chain": "<value>", "encryption_certificate": "<value>"}
         "422":
           application/json: {"detail": []}
+  create_job:
+    speakeasy-default-create-job:
+      requestBody:
+        multipart/form-data: {"request_data": "<value>"}
+      responses:
+        "200":
+          application/json: {"created_at": "2024-02-18T20:31:27.125Z", "id": "55723ca1-8ca8-4beb-bf8a-b2c41cc6649d", "status": "IN_PROGRESS", "workflow_id": "3f012d20-710b-43a2-8577-22a817a1352a", "workflow_name": "<value>"}
+        "422":
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+  get_template:
+    speakeasy-default-get-template:
+      parameters:
+        path:
+          template_id: "<id>"
+      responses:
+        "200":
+          application/json: {"description": "probate legging nor lest wrathful oddly importance metabolite to tricky", "id": "<id>", "last_updated": "<value>", "name": "<value>", "nodes": [], "version": "<value>"}
+        "422":
+          application/json: {"detail": "<value>"}
+  list_templates:
+    speakeasy-default-list-templates:
+      responses:
+        "200":
+          application/json: [{"description": "without license expostulate gloss specific through huzzah", "id": "<id>", "last_updated": "<value>", "name": "<value>", "version": "<value>"}]
+        "422":
+          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
 examplesVersion: 1.0.2
 generatedTests: {}
+trackedFiles:
+  .gitattributes:
+    last_write_checksum: sha1:53134de3ada576f37c22276901e1b5b6d85cd2da
+  .vscode/settings.json:
+    last_write_checksum: sha1:f84632c81029fcdda8c3b0c768d02b836fc80526
+  USAGE.md:
+    last_write_checksum: sha1:634dd7b8ad241a00d0c69649194b8149006a311f
+  docs/models/errors/detail.md:
+    last_write_checksum: sha1:9a864f8e5a23346f45054850eba4f02b4ddfa65e
+  docs/models/errors/httpvalidationerror.md:
+    last_write_checksum: sha1:1b74d78fb94bad6150ddd93c4cb937672c970cab
+  docs/models/errors/servererror.md:
+    last_write_checksum: sha1:ba10866750f76c3c6b3b1face75aa37a517a8647
+  docs/models/operations/canceljobrequest.md:
+    last_write_checksum: sha1:c68b3b85e0f5d40e4c3b89d2535f2fca286a9d0f
+  docs/models/operations/canceljobresponse.md:
+    last_write_checksum: sha1:ec0f1b7ab6075a10ea1dab44b6d3fa6b3872751c
+  docs/models/operations/createconnectioncheckdestinationsrequest.md:
+    last_write_checksum: sha1:01884e8ff647912b15633806207dd151c5ab607b
+  docs/models/operations/createconnectioncheckdestinationsresponse.md:
+    last_write_checksum: sha1:b64309e1d90d873a7ffc2ea2226848195144938a
+  docs/models/operations/createconnectionchecksourcesrequest.md:
+    last_write_checksum: sha1:fecf135c6381a78caf6f461fb55228350356860b
+  docs/models/operations/createconnectionchecksourcesresponse.md:
+    last_write_checksum: sha1:56e30e0c8459179cc3a31b01797006652c90bfc8
+  docs/models/operations/createdestinationrequest.md:
+    last_write_checksum: sha1:85e0a1d2aa09c5df3c53c1f1d7f3090270894a44
+  docs/models/operations/createdestinationresponse.md:
+    last_write_checksum: sha1:38f36c08f2331bcfbd84cdc48bf67f987ff92d3b
+  docs/models/operations/createjobrequest.md:
+    last_write_checksum: sha1:0e59082844b538644c4800826cfe4df866cd268c
+  docs/models/operations/createjobresponse.md:
+    last_write_checksum: sha1:02c375249682eeb195fe10456ad993d24689e878
+  docs/models/operations/createsourcerequest.md:
+    last_write_checksum: sha1:ffad0297c13b3296896555d0684897d1b703806f
+  docs/models/operations/createsourceresponse.md:
+    last_write_checksum: sha1:d2fb364df743675b0da662b11f0d905be464d240
+  docs/models/operations/createworkflowrequest.md:
+    last_write_checksum: sha1:b033be68bc9a54bfe5ba70e02f8ad2d6c0fe28fa
+  docs/models/operations/createworkflowresponse.md:
+    last_write_checksum: sha1:1e4a1313e118e8831682e28eebf38485b557575b
+  docs/models/operations/deletedestinationrequest.md:
+    last_write_checksum: sha1:6ec7ccc6902e45b3fc6408daa324dfb6d4e8cf46
+  docs/models/operations/deletedestinationresponse.md:
+    last_write_checksum: sha1:327ddf8e2d6b50d79d232ad715b3efb34e3f20ec
+  docs/models/operations/deletesourcerequest.md:
+    last_write_checksum: sha1:e95a8d22ad72eabcbdd0dbd69b11f819c401848e
+  docs/models/operations/deletesourceresponse.md:
+    last_write_checksum: sha1:36c02dde611385af13b4b0fb28e6852aa3dbd584
+  docs/models/operations/deleteworkflowrequest.md:
+    last_write_checksum: sha1:d1cd1549e20332931005cf47ec708ea8856884a5
+  docs/models/operations/deleteworkflowresponse.md:
+    last_write_checksum: sha1:3c48310a3847c7ebb11b26857e54dd2ee3588305
+  docs/models/operations/downloadjoboutputrequest.md:
+    last_write_checksum: sha1:06db3b4bb86be7ec09d580f7c9d2e104f6d50499
+  docs/models/operations/downloadjoboutputresponse.md:
+    last_write_checksum: sha1:ea5ba518eb952b0de1653e70c0f43f444f07a47c
+  docs/models/operations/getconnectioncheckdestinationsrequest.md:
+    last_write_checksum: sha1:6b014c77cf8c3341375726e4d3dce855e896b91d
+  docs/models/operations/getconnectioncheckdestinationsresponse.md:
+    last_write_checksum: sha1:40e396296a2cbd3be62a339f91b03ef085690d47
+  docs/models/operations/getconnectionchecksourcesrequest.md:
+    last_write_checksum: sha1:4049e5ba7003d344d47ecbca4f6b1f2728cca2b9
+  docs/models/operations/getconnectionchecksourcesresponse.md:
+    last_write_checksum: sha1:0ffceea34fd8ebce0af8a8e3161ed63b659beef4
+  docs/models/operations/getdestinationrequest.md:
+    last_write_checksum: sha1:389f39364c31628df5e602fdc575d78e645ff13d
+  docs/models/operations/getdestinationresponse.md:
+    last_write_checksum: sha1:0be5580dc7f3ac4c6ffac9e6cbaa1daf793d391f
+  docs/models/operations/getjobdetailsrequest.md:
+    last_write_checksum: sha1:2664e62ce031f0dc61b43f11e855a4e68d6612cc
+  docs/models/operations/getjobdetailsresponse.md:
+    last_write_checksum: sha1:e369dae7b58be400a7bdca788e8e024e4439e805
+  docs/models/operations/getjobfailedfilesrequest.md:
+    last_write_checksum: sha1:a6e065b000919f81529227573f5043e7af1a38e4
+  docs/models/operations/getjobfailedfilesresponse.md:
+    last_write_checksum: sha1:1809c62a4d1667857d2e909fe55e72fce25a1bfc
+  docs/models/operations/getjobrequest.md:
+    last_write_checksum: sha1:d6f9762d1974bba9ba385ed73c0e575c26f6a59a
+  docs/models/operations/getjobresponse.md:
+    last_write_checksum: sha1:a8ebec5c661f78deb38cd8800ab2a1b0fb38b567
+  docs/models/operations/getsourcerequest.md:
+    last_write_checksum: sha1:13f5a06f370562ce113a820a8df2ef8b3f97911e
+  docs/models/operations/getsourceresponse.md:
+    last_write_checksum: sha1:49f545d04b85e40a57491ccaaae28987361082f3
+  docs/models/operations/gettemplaterequest.md:
+    last_write_checksum: sha1:ad56d4ee7fd567e09114e2b2701c9da6b11d7476
+  docs/models/operations/gettemplateresponse.md:
+    last_write_checksum: sha1:d8bd2e7d255eaa1aba884a1083fa7867c59b19ee
+  docs/models/operations/getworkflowrequest.md:
+    last_write_checksum: sha1:dd6e1bb20c7e1f7ac2946c5bb8bb6efb1ec94bf7
+  docs/models/operations/getworkflowresponse.md:
+    last_write_checksum: sha1:f359eaa994b59e72a95cf6be87cd3379bcbfbeeb
+  docs/models/operations/listdestinationsrequest.md:
+    last_write_checksum: sha1:41447ab03579341643950e5836cd2a593679208d
+  docs/models/operations/listdestinationsresponse.md:
+    last_write_checksum: sha1:949a7da6768f75840b3cd77f358adf73e9d0399a
+  docs/models/operations/listjobsrequest.md:
+    last_write_checksum: sha1:5c6a7d959fecf0ff29cc82551d12de4faaf7c693
+  docs/models/operations/listjobsresponse.md:
+    last_write_checksum: sha1:03ecaf122b7b50667b47d18c77e319ded7637e49
+  docs/models/operations/listsourcesrequest.md:
+    last_write_checksum: sha1:d8b44188c43e7bdcc4b303f1d53396a65e0bb74c
+  docs/models/operations/listsourcesresponse.md:
+    last_write_checksum: sha1:6500b17470a02391741239e468b215cdd33a92c0
+  docs/models/operations/listtemplatesrequest.md:
+    last_write_checksum: sha1:ec8b34ed22a760c0c6d61324b177a92f406ca5f1
+  docs/models/operations/listtemplatesresponse.md:
+    last_write_checksum: sha1:08c1a441c1da8b72515eda1758eb2ac41a4ad3a8
+  docs/models/operations/listworkflowsrequest.md:
+    last_write_checksum: sha1:7ccc6cd6c196cbd799aaed2a6b0230e504944ee0
+  docs/models/operations/listworkflowsresponse.md:
+    last_write_checksum: sha1:e733995a841620e81a5f38697097d39d72ecb716
+  docs/models/operations/partitionrequest.md:
+    last_write_checksum: sha1:54014e6854cf8220086322d14cbd6d449d591ce4
+  docs/models/operations/partitionresponse.md:
+    last_write_checksum: sha1:1d0bde8a9fa4ec117ec698a533cc118c0ff0a796
+  docs/models/operations/runworkflowrequest.md:
+    last_write_checksum: sha1:89a954c721a0070cf45fe530edecc8c9bc3a1e36
+  docs/models/operations/runworkflowresponse.md:
+    last_write_checksum: sha1:87b2eb22401bab45a7e7a424adfe0f4dbb2c212e
+  docs/models/operations/updatedestinationrequest.md:
+    last_write_checksum: sha1:211264534040d2c9de960b0fe99532c52f6d70f5
+  docs/models/operations/updatedestinationresponse.md:
+    last_write_checksum: sha1:4902193056c6ef6189d13d35ea62524a8216598f
+  docs/models/operations/updatesourcerequest.md:
+    last_write_checksum: sha1:61c75282f5df6151587ea2c3b0358056bcd6f39b
+  docs/models/operations/updatesourceresponse.md:
+    last_write_checksum: sha1:2b26c5966a7627625a25e57cab0dbaa5af2f47b2
+  docs/models/operations/updateworkflowrequest.md:
+    last_write_checksum: sha1:177a57e200d961ccd8dcf3d1cd21ad9f35d4ec64
+  docs/models/operations/updateworkflowresponse.md:
+    last_write_checksum: sha1:1336948ebad20ffe8e11a836cf0b9faf1d2c0fb4
+  docs/models/shared/astradbconnectorconfig.md:
+    last_write_checksum: sha1:4a8f8de642ce6e995d5cb80b95a87acc57754732
+  docs/models/shared/astradbconnectorconfiginput.md:
+    last_write_checksum: sha1:4e7282d2f5522f401ae02c55ffc7b0a24ca22c95
+  docs/models/shared/azureaisearchconnectorconfig.md:
+    last_write_checksum: sha1:ed41a88fb6bddcc2094f9d8b5660dedba9921969
+  docs/models/shared/azureaisearchconnectorconfiginput.md:
+    last_write_checksum: sha1:1d2f3f886e12e87cb5c46110e871be3e12b4061b
+  docs/models/shared/azuredestinationconnectorconfig.md:
+    last_write_checksum: sha1:b5d8532ce7f18b39181f20640385668587253077
+  docs/models/shared/azuredestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:49e9b15d109256f679de41975a7f0e5a0eb9b242
+  docs/models/shared/azuresourceconnectorconfig.md:
+    last_write_checksum: sha1:32b34b7b09d4577be2ddc9324eebee18d80f6fc1
+  docs/models/shared/azuresourceconnectorconfiginput.md:
+    last_write_checksum: sha1:b8c68a56bef1a7e09bf1c55953a1f26a23c3da7e
+  docs/models/shared/bodycreatejob.md:
+    last_write_checksum: sha1:f335b69b4915d22989edbbcbe96d5549b389d678
+  docs/models/shared/bodyrunworkflow.md:
+    last_write_checksum: sha1:961071391ef67ad866f6cb4acca4d43d0d939c45
+  docs/models/shared/bodyrunworkflowinputfiles.md:
+    last_write_checksum: sha1:578c4d054cfb283e3e37ee72a36aa01a54da5aca
+  docs/models/shared/boxsourceconnectorconfig.md:
+    last_write_checksum: sha1:b000010f3d53f4ec609f9c1e9bcf75d0907843fb
+  docs/models/shared/boxsourceconnectorconfiginput.md:
+    last_write_checksum: sha1:e75625a2d8e1092d752dec9d6416ca2dc7ece940
+  docs/models/shared/config.md:
+    last_write_checksum: sha1:9b8db306af8207882a98a06397fb1df25514a5d5
+  docs/models/shared/confluencesourceconnectorconfig.md:
+    last_write_checksum: sha1:f0fc3f07b8dfe0af11928df4f8246168500ec3bb
+  docs/models/shared/confluencesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:db8a7e7f5f4d5b231fe8cc4de99f848f4cd6ffb1
+  docs/models/shared/connectioncheckstatus.md:
+    last_write_checksum: sha1:db2996b0cf9d1ac947825fae0072fcd70c2ab374
+  docs/models/shared/couchbasedestinationconnectorconfig.md:
+    last_write_checksum: sha1:f8eef3f3b5aebe168049a683018d9d68e74fc4d6
+  docs/models/shared/couchbasedestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:ecbd67c5513db6864aa3096120442104dac98188
+  docs/models/shared/couchbasesourceconnectorconfig.md:
+    last_write_checksum: sha1:aeb00df6171f1642d9322bbb69c932432de6aebe
+  docs/models/shared/couchbasesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:11c20ae7633c07a8e12d80d60ef57c0e79799d79
+  docs/models/shared/createdestinationconnector.md:
+    last_write_checksum: sha1:22cf73e4cf6ca7e97adb7973b2a83ae900039269
+  docs/models/shared/createsourceconnector.md:
+    last_write_checksum: sha1:006ad810becfd9f2d7c8e8ff5de3cb0d0815bf72
+  docs/models/shared/createsourceconnectorconfig.md:
+    last_write_checksum: sha1:29acb21f56b4ddfa16c67240522411fda161afdc
+  docs/models/shared/createworkflow.md:
+    last_write_checksum: sha1:8aaf8738ef81e5c333b21e0052015755d21fdb1a
+  docs/models/shared/crontabentry.md:
+    last_write_checksum: sha1:2e315fb85c5d83ba9190bf0321c84a09b94dc167
+  docs/models/shared/dagnodeconnectioncheck.md:
+    last_write_checksum: sha1:30ce6ae84a9a21ce8fe4227e7a92445bf5aabcf1
+  docs/models/shared/databricksvdtdestinationconnectorconfig.md:
+    last_write_checksum: sha1:defcbc8a8b513bb619e7c794d9d1b3c230988629
+  docs/models/shared/databricksvdtdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:f820591adce85b73f0bda0d805c80f4d7cfdd167
+  docs/models/shared/databricksvolumesconnectorconfig.md:
+    last_write_checksum: sha1:5b329fba41166cc85d8f5d3d20df073b5ef3b64c
+  docs/models/shared/databricksvolumesconnectorconfiginput.md:
+    last_write_checksum: sha1:8d542e8451b21c518c483f92a84f14971c436d0e
+  docs/models/shared/deltatableconnectorconfig.md:
+    last_write_checksum: sha1:91f5278c5797015375fdad027a555dc096d28699
+  docs/models/shared/deltatableconnectorconfiginput.md:
+    last_write_checksum: sha1:fd4a2cc65ff8276774e8b4c335863c082e140d2b
+  docs/models/shared/destinationconnectorinformation.md:
+    last_write_checksum: sha1:3ee4e344b304ba428401ae1c74f1aa5bcdc556da
+  docs/models/shared/destinationconnectorinformationconfig.md:
+    last_write_checksum: sha1:52df1d0ee4ad0ec7cfd1698b5a72f39a93f00806
+  docs/models/shared/destinationconnectortype.md:
+    last_write_checksum: sha1:3b405c8485530eb259e1607d89af14cf94922526
+  docs/models/shared/dropboxsourceconnectorconfig.md:
+    last_write_checksum: sha1:dd236db60bdbbda1422cc81ec574fe9f3f7f4ce3
+  docs/models/shared/dropboxsourceconnectorconfiginput.md:
+    last_write_checksum: sha1:4f22e588c4855d715876878c6f49e83a9e538870
+  docs/models/shared/elasticsearchconnectorconfig.md:
+    last_write_checksum: sha1:f23bb0fdf87d78a2becc35bb6f2bae133f9d534e
+  docs/models/shared/elasticsearchconnectorconfiginput.md:
+    last_write_checksum: sha1:e15f36fe04157454dd5650805ba86f3e822b70a5
+  docs/models/shared/encryptiontype.md:
+    last_write_checksum: sha1:687c0937bd9690e37e9958adaa25a4299d109ba5
+  docs/models/shared/failedfile.md:
+    last_write_checksum: sha1:60da6ce6eb8d531fcb77945d1f2be5a41fe56156
+  docs/models/shared/files.md:
+    last_write_checksum: sha1:3e1b008da7152dbb0849e8d39190773f89068342
+  docs/models/shared/gcsdestinationconnectorconfig.md:
+    last_write_checksum: sha1:99908999197b2b2cc2b84614cae7880824de5f19
+  docs/models/shared/gcsdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:eebb8063d181f6c29f6af21e50a54bbdc2048332
+  docs/models/shared/gcssourceconnectorconfig.md:
+    last_write_checksum: sha1:d67bf6a4572d8d812c86f6861aaa2aef1ff21115
+  docs/models/shared/gcssourceconnectorconfiginput.md:
+    last_write_checksum: sha1:81c8454525972ec3a058d532cf6c32180e2479f6
+  docs/models/shared/googledrivesourceconnectorconfig.md:
+    last_write_checksum: sha1:888a74236ee6e3099bee7193f10022b27d5e19f8
+  docs/models/shared/googledrivesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:e866f029785a3e71230397080ef83a7d407e89f4
+  docs/models/shared/googledrivesourceconnectorconfiginputserviceaccountkey.md:
+    last_write_checksum: sha1:e7ce3dbb4fefc0102792980dd00761438b7de958
+  docs/models/shared/ibmwatsonxs3destinationconnectorconfig.md:
+    last_write_checksum: sha1:9166cd4e8965f1cc1f4e2f987050e607517e56a2
+  docs/models/shared/ibmwatsonxs3destinationconnectorconfiginput.md:
+    last_write_checksum: sha1:c78f1ac09209fcd1a701db0100691fcb2d776f8e
+  docs/models/shared/inputfiles.md:
+    last_write_checksum: sha1:ca7389eeaa181029d40e7816340183113264f250
+  docs/models/shared/jirasourceconnectorconfig.md:
+    last_write_checksum: sha1:e8e593dbc957cf9b0a069e00af628a9ae859c572
+  docs/models/shared/jirasourceconnectorconfiginput.md:
+    last_write_checksum: sha1:063631ef9f815bdd6c143d8863ec465d196d430b
+  docs/models/shared/jobdetails.md:
+    last_write_checksum: sha1:c783b6beb703c315043fb9183943262b130fdcb7
+  docs/models/shared/jobfailedfiles.md:
+    last_write_checksum: sha1:5e68b017291bca72e366c3d69795ead12a9ad8fe
+  docs/models/shared/jobinformation.md:
+    last_write_checksum: sha1:b7c49fd6e05c92ff17978cd82ea458557f6a9796
+  docs/models/shared/jobnodedetails.md:
+    last_write_checksum: sha1:89ee02ecdf254a2334f2c1c86daab5d3dbc8a1f5
+  docs/models/shared/jobprocessingstatus.md:
+    last_write_checksum: sha1:c1e69d7d8d42feb9f95e95a3feff0a6a5d5294be
+  docs/models/shared/jobstatus.md:
+    last_write_checksum: sha1:4e577625cd90e4a2d859d0a5746e8ae37b8a46c7
+  docs/models/shared/kafkaclouddestinationconnectorconfig.md:
+    last_write_checksum: sha1:e765038bd3fb87bb9e9431f212a6b67e7023c1ec
+  docs/models/shared/kafkaclouddestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:6362b1a0ab47db453e9e5051a1ff035b507e6a3e
+  docs/models/shared/kafkacloudsourceconnectorconfig.md:
+    last_write_checksum: sha1:cbe83f080cb55d50b00e1eacfa2aba870d083100
+  docs/models/shared/kafkacloudsourceconnectorconfiginput.md:
+    last_write_checksum: sha1:6a80f801c0d2710b36a3ee475c9204bdacbfa07c
+  docs/models/shared/loc.md:
+    last_write_checksum: sha1:09a04749333ab50ae806c3ac6adcaa90d54df0f1
+  docs/models/shared/milvusdestinationconnectorconfig.md:
+    last_write_checksum: sha1:cb8e3b9c8975429537df3ace8214261df7bec607
+  docs/models/shared/milvusdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:a865313b317fbd1750189e1244df02a8e194c756
+  docs/models/shared/mongodbconnectorconfig.md:
+    last_write_checksum: sha1:999713952b951e58452e16ef2654f446c3586f23
+  docs/models/shared/mongodbconnectorconfiginput.md:
+    last_write_checksum: sha1:281424ee9db5e1b171c9a26f994ce3ff4238bb49
+  docs/models/shared/neo4jdestinationconnectorconfig.md:
+    last_write_checksum: sha1:92461e51cfea8bd7cd1cbca31a4fd31fa67d3019
+  docs/models/shared/neo4jdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:82a1d34bca150ca42fc1dfb670e51dc7480e3a33
+  docs/models/shared/nodefilemetadata.md:
+    last_write_checksum: sha1:51a991310b3ba8c9f68f2ea3e30afc2745948ef0
+  docs/models/shared/onedrivedestinationconnectorconfig.md:
+    last_write_checksum: sha1:15ec1487ed4368dfe742be4765538becc0f76668
+  docs/models/shared/onedrivedestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:b5ce374e6e49566481d8c338824587a51986bef0
+  docs/models/shared/onedrivesourceconnectorconfig.md:
+    last_write_checksum: sha1:d0cc7e551dc0509a6f04cd42f2ab3ef58c41dfc7
+  docs/models/shared/onedrivesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:415b2ce792db84e2404226b87091d3051e0bea50
+  docs/models/shared/outlooksourceconnectorconfig.md:
+    last_write_checksum: sha1:2094d7b13d7ee1d4b8b1f93442b68fd4156b13bc
+  docs/models/shared/outlooksourceconnectorconfiginput.md:
+    last_write_checksum: sha1:01b672957522d39ba725eb6288df1972607a989b
+  docs/models/shared/outputformat.md:
+    last_write_checksum: sha1:2b7d4a5b7b7dc7fd445fbb1e6d2ade4e1fb00ff9
+  docs/models/shared/partitionparameters.md:
+    last_write_checksum: sha1:97be0eccf54324ad0952418803d3d41bb8fd8933
+  docs/models/shared/pineconedestinationconnectorconfig.md:
+    last_write_checksum: sha1:ff6972c9db29b7831dc715cbba7e56809c7515d8
+  docs/models/shared/pineconedestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:84ce5dabb9ba7624e8dd208c675275aa62152f0c
+  docs/models/shared/postgresdestinationconnectorconfig.md:
+    last_write_checksum: sha1:714cbab157bfbae86c7bd76859da844e37c21e8e
+  docs/models/shared/postgresdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:799b15a8b42720e50af6ec3a6ef831a94ec905de
+  docs/models/shared/postgressourceconnectorconfig.md:
+    last_write_checksum: sha1:2fc63c65296ffaea07d914ce6b287ac59bd295fe
+  docs/models/shared/postgressourceconnectorconfiginput.md:
+    last_write_checksum: sha1:3e5b4d837d4c9ec3b24a0175cdeee28640a68362
+  docs/models/shared/qdrantclouddestinationconnectorconfig.md:
+    last_write_checksum: sha1:fb753abb154e30a1641412ca5c79f6283f893e52
+  docs/models/shared/qdrantclouddestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:1e4585d5e49818eb3bd96ce49fdc7352405dd8d0
+  docs/models/shared/redisdestinationconnectorconfig.md:
+    last_write_checksum: sha1:d49bdc8857927c6b94781257e20d1dbb4f931543
+  docs/models/shared/redisdestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:a29bba2080fc820f280e8cbcacdfccd396f463ef
+  docs/models/shared/s3destinationconnectorconfig.md:
+    last_write_checksum: sha1:64f2b76d2e2f13365ca18c962682334643559840
+  docs/models/shared/s3destinationconnectorconfiginput.md:
+    last_write_checksum: sha1:3e7f89ac1bd6c9b41e3e3d72d907e9bdc60ed7a3
+  docs/models/shared/s3sourceconnectorconfig.md:
+    last_write_checksum: sha1:5f3f4543408f6d3e827a4941303bec80a81aa4c8
+  docs/models/shared/s3sourceconnectorconfiginput.md:
+    last_write_checksum: sha1:136160436053ae2256f4ec6bdc1b7d90eef74f6f
+  docs/models/shared/salesforcesourceconnectorconfig.md:
+    last_write_checksum: sha1:8498d86acc3cc77c30b5a4c7ba1f2b93adcedf9d
+  docs/models/shared/salesforcesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:83ef16a5d62c27f56fc4d244c3551af4611b91c0
+  docs/models/shared/schedule.md:
+    last_write_checksum: sha1:bed88c3805344ddaa0164471b736953cd7def29f
+  docs/models/shared/secretreference.md:
+    last_write_checksum: sha1:9ab151dee53e96882bfdd0feefb87e4edd9bc0c2
+  docs/models/shared/security.md:
+    last_write_checksum: sha1:19aaecc4930262a902f34479d6916065d2d606b8
+  docs/models/shared/serviceaccountkey.md:
+    last_write_checksum: sha1:f91f5c52465ef2b08b17d116176024954c686121
+  docs/models/shared/sharepointsourceconnectorconfig.md:
+    last_write_checksum: sha1:c534a730bca4073c38a38bbd683b82239ccf6c5c
+  docs/models/shared/sharepointsourceconnectorconfiginput.md:
+    last_write_checksum: sha1:050c4dbc29588572c67ec76b20798f38cbfe8107
+  docs/models/shared/snowflakedestinationconnectorconfig.md:
+    last_write_checksum: sha1:b215353f8b03f0f0d5ca7be0e328a981fe87c25b
+  docs/models/shared/snowflakedestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:3fe8332ff281a6ba8714750c2a160754edf347e2
+  docs/models/shared/snowflakesourceconnectorconfig.md:
+    last_write_checksum: sha1:ad263dc6b560e84839a56321423e8f9f7881b299
+  docs/models/shared/snowflakesourceconnectorconfiginput.md:
+    last_write_checksum: sha1:7361de32748c0e3982799c32de47afde7faee86d
+  docs/models/shared/sortdirection.md:
+    last_write_checksum: sha1:18885c3283c4e2214739bd2f87b879e13defd9bb
+  docs/models/shared/sourceconnectorinformation.md:
+    last_write_checksum: sha1:635fbe720ba6de5d875a2ae26a18aba49c118353
+  docs/models/shared/sourceconnectorinformationconfig.md:
+    last_write_checksum: sha1:0263a9f5b6dbc4ef0e07a15239e236be66b5750c
+  docs/models/shared/sourceconnectortype.md:
+    last_write_checksum: sha1:1ed56b342903fec2a5c4e6fa8ee843810a90d149
+  docs/models/shared/strategy.md:
+    last_write_checksum: sha1:07155e281d43ece3d6970b315ca1761ea18cce9f
+  docs/models/shared/templatedetail.md:
+    last_write_checksum: sha1:92202714571ec3ef30439dc64cbc96c8430d2891
+  docs/models/shared/templatelistitem.md:
+    last_write_checksum: sha1:4faa1971a0ee68512a9c8be9ba30088726ba92ca
+  docs/models/shared/templatenode.md:
+    last_write_checksum: sha1:0900ecbd8ebdb0261dc0078d5c4a7423c732aae6
+  docs/models/shared/updatedestinationconnector.md:
+    last_write_checksum: sha1:37c58c6b362551502eabf5eca98e99575d642677
+  docs/models/shared/updatedestinationconnectorconfig.md:
+    last_write_checksum: sha1:9ec4cfd55e52c4f03e99a7154172b22e26af83ba
+  docs/models/shared/updatesourceconnector.md:
+    last_write_checksum: sha1:c13569bb40dcaee8f13e077eb5b53d95098ea34d
+  docs/models/shared/updatesourceconnectorconfig.md:
+    last_write_checksum: sha1:c110194e464b7c3c530dc0d768c8747f1474755b
+  docs/models/shared/updateworkflow.md:
+    last_write_checksum: sha1:94e95e0b8746baf81b33fab234ee5d320a3fae2e
+  docs/models/shared/updateworkflowschedule.md:
+    last_write_checksum: sha1:6f8ffbb4ef7891906d94ac6d2b18b693f52717f0
+  docs/models/shared/validationerror.md:
+    last_write_checksum: sha1:5cc3df9eadb5a867d3a0c72debecd66cf30dc339
+  docs/models/shared/vlmmodelprovider.md:
+    last_write_checksum: sha1:3606b2069afaa537150fd1eec58980e438b9aad4
+  docs/models/shared/weaviatedestinationconnectorconfig.md:
+    last_write_checksum: sha1:ab245e5ad184589ec8e67e8d235c0537673a6385
+  docs/models/shared/weaviatedestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:3ef97686843346bf06dc44d14ddaa938e1db84ea
+  docs/models/shared/workflowinformation.md:
+    last_write_checksum: sha1:952fc7a8fd9c2a25e69b03bd3514e2a09043e379
+  docs/models/shared/workflowjobtype.md:
+    last_write_checksum: sha1:fae1144db497ed8907f60e85dfd11f662260c136
+  docs/models/shared/workflownode.md:
+    last_write_checksum: sha1:6f7b9ed5d34ce2fd4065e5051e71e509009504b3
+  docs/models/shared/workflowschedule.md:
+    last_write_checksum: sha1:9f70be7c345c609163ed2eff990a6195e74a7bcb
+  docs/models/shared/workflowstate.md:
+    last_write_checksum: sha1:a2d728f2c4b333a1f4a80a368a64063886d10067
+  docs/models/shared/workflowtype.md:
+    last_write_checksum: sha1:f21c2a3c61be43f9bff16518596fc87a07a6f67c
+  docs/models/shared/zendesksourceconnectorconfig.md:
+    last_write_checksum: sha1:154c44de360321d01d7880cb9cca55ec7a3947bf
+  docs/models/shared/zendesksourceconnectorconfiginput.md:
+    last_write_checksum: sha1:f3a5aeb7282bd636d66f37f21cd163d3c4a578c0
+  docs/models/utils/retryconfig.md:
+    last_write_checksum: sha1:562c0f21e308ad10c27f85f75704c15592c6929d
+  docs/sdks/destinations/README.md:
+    last_write_checksum: sha1:f1d323f36e6832bfda94da124edd1287ed212ac4
+  docs/sdks/general/README.md:
+    last_write_checksum: sha1:b773733847fc4c876b937db85c23828a170ef959
+  docs/sdks/jobs/README.md:
+    last_write_checksum: sha1:7330be63152f4020d75de2f1ad28f665331bb733
+  docs/sdks/sources/README.md:
+    last_write_checksum: sha1:90cbfaee4c5129854425b6fe23a2592bc0719cc8
+  docs/sdks/templates/README.md:
+    last_write_checksum: sha1:14bad5acd71a4029431503ec8ec3755cea410fae
+  docs/sdks/workflows/README.md:
+    last_write_checksum: sha1:1d20be0e51ef1ec5eb3752a58343d88606a1c031
+  poetry.toml:
+    last_write_checksum: sha1:2242305e29dc6921bdf5b200aea5d4bf67830230
+  py.typed:
+    last_write_checksum: sha1:8efc425ffe830805ffcc0f3055871bdcdc542c60
+  pylintrc:
+    last_write_checksum: sha1:db2aebd83e553dd59d3965e79104a3fb780c403a
+  pyproject.toml:
+    last_write_checksum: sha1:c8c5dd42f3990f787b8db57c625080e7b24ff1c7
+  scripts/prepare_readme.py:
+    last_write_checksum: sha1:ccdba5069fbb7997500b6ba22366e004394cdca2
+  scripts/publish.sh:
+    last_write_checksum: sha1:b31bafc19c15ab5ea925fdf8d5d4adce2b115a63
+  src/unstructured_client/__init__.py:
+    last_write_checksum: sha1:da077c0bdfcef64a4a5aea91a17292f72fa2b088
+  src/unstructured_client/_hooks/__init__.py:
+    last_write_checksum: sha1:e3111289afd28ad557c21d9e2f918caabfb7037d
+  src/unstructured_client/_hooks/sdkhooks.py:
+    last_write_checksum: sha1:526e9428e70784e751eacea2b022a0302a7a17f4
+  src/unstructured_client/_hooks/types.py:
+    last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
+  src/unstructured_client/_version.py:
+    last_write_checksum: sha1:04347a4921c6bf252eba5cb11c1ce385548a1c03
+  src/unstructured_client/basesdk.py:
+    last_write_checksum: sha1:c630e3511b954676ab8b477fd7b11c4ce8f443a7
+  src/unstructured_client/destinations.py:
+    last_write_checksum: sha1:918da90d2ac2ec108be3dfd18ec123a0eca88c9f
+  src/unstructured_client/httpclient.py:
+    last_write_checksum: sha1:5e55338d6ee9f01ab648cad4380201a8a3da7dd7
+  src/unstructured_client/jobs.py:
+    last_write_checksum: sha1:d8200021ecd41c623ea2bccfcf284d97d3350936
+  src/unstructured_client/models/__init__.py:
+    last_write_checksum: sha1:fd931d5c2d58b5f9189cc897e038d6d78e362dab
+  src/unstructured_client/models/errors/__init__.py:
+    last_write_checksum: sha1:02c8f92c6032c3dfdf6d02bad73b27678aaf20ef
+  src/unstructured_client/models/errors/httpvalidationerror.py:
+    last_write_checksum: sha1:93a7813ccdbeec8a3f097d6d2ee63df07366a683
+  src/unstructured_client/models/errors/no_response_error.py:
+    last_write_checksum: sha1:7f326424a7d5ae1bcd5c89a0d6b3dbda9138942f
+  src/unstructured_client/models/errors/responsevalidationerror.py:
+    last_write_checksum: sha1:f08e0ff98d80cae65bbac1437d318f76b6affe4c
+  src/unstructured_client/models/errors/sdkerror.py:
+    last_write_checksum: sha1:35dbdbf7704b5a1e857e55c29c35cfe030555252
+  src/unstructured_client/models/errors/servererror.py:
+    last_write_checksum: sha1:35ee229ca11f9300f560931b1003ace97d96a719
+  src/unstructured_client/models/errors/unstructuredclienterror.py:
+    last_write_checksum: sha1:5204738e0a98af5f878cf1a4f743b470312d5fbb
+  src/unstructured_client/models/operations/__init__.py:
+    last_write_checksum: sha1:5b32ee1e14784aeb16f29dd0f65095f772e09428
+  src/unstructured_client/models/operations/cancel_job.py:
+    last_write_checksum: sha1:fdff92949ca59c2445489f0e75e9e347a1d2d030
+  src/unstructured_client/models/operations/create_connection_check_destinations.py:
+    last_write_checksum: sha1:f5c1a792bc7977a58c2ce3e9325e0b91b821eebb
+  src/unstructured_client/models/operations/create_connection_check_sources.py:
+    last_write_checksum: sha1:e81098b56db93e9ff3b557ba6f34224f4c9f6566
+  src/unstructured_client/models/operations/create_destination.py:
+    last_write_checksum: sha1:f6870661f86ccf0342eaa018ef5e5679794e8e1d
+  src/unstructured_client/models/operations/create_job.py:
+    last_write_checksum: sha1:09ae7fe3eeaa58327528855e2eb0b315c8756f9d
+  src/unstructured_client/models/operations/create_source.py:
+    last_write_checksum: sha1:b774183f8ec9f4796dfbe73adfdf0473027c4db4
+  src/unstructured_client/models/operations/create_workflow.py:
+    last_write_checksum: sha1:64418d73d3dd27ed93b575e2ede742c0bba574ec
+  src/unstructured_client/models/operations/delete_destination.py:
+    last_write_checksum: sha1:7832e4aa99fbc1ec98dfc1e650ec0ee1fc2f9d4d
+  src/unstructured_client/models/operations/delete_source.py:
+    last_write_checksum: sha1:a2b1be7accf9ae35f5c498a9279793b509fcb740
+  src/unstructured_client/models/operations/delete_workflow.py:
+    last_write_checksum: sha1:951c9c7de8b0aa374aa31084f33a3590785fa1cf
+  src/unstructured_client/models/operations/download_job_output.py:
+    last_write_checksum: sha1:8c286fe548d11e81b54ef68a1cbd9d529c51168e
+  src/unstructured_client/models/operations/get_connection_check_destinations.py:
+    last_write_checksum: sha1:95509c260c51390ee58f7997091c521d0767044d
+  src/unstructured_client/models/operations/get_connection_check_sources.py:
+    last_write_checksum: sha1:8c4a260e608dbea0546a200dadd8f44d585cfe59
+  src/unstructured_client/models/operations/get_destination.py:
+    last_write_checksum: sha1:35303da1961529967c0593c82e04de58b8b1aa7b
+  src/unstructured_client/models/operations/get_job.py:
+    last_write_checksum: sha1:087899726039102279a068a023c4e6bb3a076ee0
+  src/unstructured_client/models/operations/get_job_details.py:
+    last_write_checksum: sha1:6fd7de956121f6637618fbe1d67710ba04c551c3
+  src/unstructured_client/models/operations/get_job_failed_files.py:
+    last_write_checksum: sha1:f5e4bdb03af4303140f7441e7b6d75705b5475f9
+  src/unstructured_client/models/operations/get_source.py:
+    last_write_checksum: sha1:199bbc799cdc9adfd78a5cd72defa66360747252
+  src/unstructured_client/models/operations/get_template.py:
+    last_write_checksum: sha1:c191b7baae646b12425b84a9ae6e6e9423c2957f
+  src/unstructured_client/models/operations/get_workflow.py:
+    last_write_checksum: sha1:69f91249ed4e8aefe358911b3e38ac1924448376
+  src/unstructured_client/models/operations/list_destinations.py:
+    last_write_checksum: sha1:24d8c36d71132b8828e1d895b22ed92a8c0fd6a4
+  src/unstructured_client/models/operations/list_jobs.py:
+    last_write_checksum: sha1:d49d4046bddc33647aeb6efc9d07b736ca05b7e1
+  src/unstructured_client/models/operations/list_sources.py:
+    last_write_checksum: sha1:b3fc2fbe9911c73074f2bc4de90e62809807c23d
+  src/unstructured_client/models/operations/list_templates.py:
+    last_write_checksum: sha1:705ddddc3fb6dce6653c84775745540f60ee81ee
+  src/unstructured_client/models/operations/list_workflows.py:
+    last_write_checksum: sha1:fcc39a140094e3e1b05a4a7872b8d06455b4bd12
+  src/unstructured_client/models/operations/partition.py:
+    last_write_checksum: sha1:7eef65659f7c295af8500c50807a0b1902212945
+  src/unstructured_client/models/operations/run_workflow.py:
+    last_write_checksum: sha1:af3fc637859d771f243d2f4c8098587312b3aebe
+  src/unstructured_client/models/operations/update_destination.py:
+    last_write_checksum: sha1:6e3dfce61ad34446f17299dc04853efaf6cea653
+  src/unstructured_client/models/operations/update_source.py:
+    last_write_checksum: sha1:5ad731a1ccc08db5dc444a79545f3d59b6989429
+  src/unstructured_client/models/operations/update_workflow.py:
+    last_write_checksum: sha1:2987bcb5781b5002aa307e5255c7072f92b026a6
+  src/unstructured_client/models/shared/__init__.py:
+    last_write_checksum: sha1:84789d683d1f00f60dcf41e302d0812b7a72e2c7
+  src/unstructured_client/models/shared/astradbconnectorconfig.py:
+    last_write_checksum: sha1:c9ada225d014655e2800c4dac8dcb95282a12cbc
+  src/unstructured_client/models/shared/astradbconnectorconfiginput.py:
+    last_write_checksum: sha1:452a4e0f89079aa1520e22c5920cc7927efb0b46
+  src/unstructured_client/models/shared/azureaisearchconnectorconfig.py:
+    last_write_checksum: sha1:b04bb92d9803b10f9dacb9b489eb1da2d8625829
+  src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py:
+    last_write_checksum: sha1:9afce8ddf0ed5337f7b3736b83f358bd552ffea0
+  src/unstructured_client/models/shared/azuredestinationconnectorconfig.py:
+    last_write_checksum: sha1:4ddfddae0ce96a11c48e7969046b02295b7f14b2
+  src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:099467bc2c3d8d8382270c7daa1cc9c4d1efa179
+  src/unstructured_client/models/shared/azuresourceconnectorconfig.py:
+    last_write_checksum: sha1:80aedf8737ed5f3fd921bbd0f928687c6405920a
+  src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py:
+    last_write_checksum: sha1:6d0ed886dcb08fc2a5260e84c02ba4b284801fe4
+  src/unstructured_client/models/shared/body_create_job.py:
+    last_write_checksum: sha1:4e6c48f7dc1571c15daed682392aeab8f4e37211
+  src/unstructured_client/models/shared/body_run_workflow.py:
+    last_write_checksum: sha1:d3e8d5202144158ef9f9864aa8f60e1615832ffd
+  src/unstructured_client/models/shared/boxsourceconnectorconfig.py:
+    last_write_checksum: sha1:1d0f39cf77cb04dd8945d6715b7a64e8927b7f3d
+  src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py:
+    last_write_checksum: sha1:4ed28081e8a1bcf484d1efdbba96726e505ce916
+  src/unstructured_client/models/shared/confluencesourceconnectorconfig.py:
+    last_write_checksum: sha1:645198dcdb1ca26202519f88c6c21a91e3f2942e
+  src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:f8165c831c1300a0ebe5a7fa563ce1a77e2cd904
+  src/unstructured_client/models/shared/connectioncheckstatus.py:
+    last_write_checksum: sha1:ec33f9af1d8679943a3988f3ec2f4b98a5d2c602
+  src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py:
+    last_write_checksum: sha1:a5292001d8ef71f6baf27c1022ee4ce1b3c8c6c4
+  src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:276e270b32835cf1bc3e4da7d70ada24c6d201ac
+  src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py:
+    last_write_checksum: sha1:19f21ab3e207954c6970137c84fd106d6c01a3fc
+  src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:87a98b17a3b14b9defe1b018e4c98a1d9aeea73b
+  src/unstructured_client/models/shared/createdestinationconnector.py:
+    last_write_checksum: sha1:1c60a323f80a24edeec45c4cbc15c85432cc3c6c
+  src/unstructured_client/models/shared/createsourceconnector.py:
+    last_write_checksum: sha1:a2436029be0bfe9533c607b1ed3f26d310d0e522
+  src/unstructured_client/models/shared/createworkflow.py:
+    last_write_checksum: sha1:9201d99f3a9ee2d561b68b68d2af487ee9e21f9d
+  src/unstructured_client/models/shared/crontabentry.py:
+    last_write_checksum: sha1:feae141e003f5248883a7fc3563ad7af44b53b71
+  src/unstructured_client/models/shared/dagnodeconnectioncheck.py:
+    last_write_checksum: sha1:0cd1b38d1f51f121f18ec769c7d4a9cd2d37cc97
+  src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py:
+    last_write_checksum: sha1:85121248ecc45fe662093a00298b5ab4539100e8
+  src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:a99f3d542753b6bf1700d6c94fbcbcf5554d3b32
+  src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py:
+    last_write_checksum: sha1:974fa6e16d1f4099630a274e9ba6619cd856cb68
+  src/unstructured_client/models/shared/databricksvolumesconnectorconfiginput.py:
+    last_write_checksum: sha1:a458440318bbb57ca077b951266703a4ddaf64ef
+  src/unstructured_client/models/shared/deltatableconnectorconfig.py:
+    last_write_checksum: sha1:1fdbc330f0d0ce905d7822eccdfe68142cbf6b74
+  src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
+    last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
+  src/unstructured_client/models/shared/destinationconnectorinformation.py:
+    last_write_checksum: sha1:36455d4144c5de6a6ca78078006679ced5cc0a6e
+  src/unstructured_client/models/shared/destinationconnectortype.py:
+    last_write_checksum: sha1:00ec603c427b636ae82d8a688f5383534e12ab69
+  src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
+    last_write_checksum: sha1:975b665d4a1280a04558b963d7564dafaa04afc1
+  src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py:
+    last_write_checksum: sha1:216b38301a9ceb44a52486ae3f19f847c088337b
+  src/unstructured_client/models/shared/elasticsearchconnectorconfig.py:
+    last_write_checksum: sha1:2b6736c9464d0fbd15d22ad22d614776231b37ba
+  src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py:
+    last_write_checksum: sha1:72f06107b76ca6177cd7beefb7f45286461d0d31
+  src/unstructured_client/models/shared/encryptiontype.py:
+    last_write_checksum: sha1:224acc1fccb4bc7a61cece851990685caeee67a0
+  src/unstructured_client/models/shared/failedfile.py:
+    last_write_checksum: sha1:e090c5b933f8e279910e5faaa2bf50dd3eb84f13
+  src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py:
+    last_write_checksum: sha1:bcb55093e2c7dbf26dcc5b51462a7f837ef0dbbf
+  src/unstructured_client/models/shared/gcsdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:c8cf40b27ae62f62cf75f112ab8f7ecde4ea1a74
+  src/unstructured_client/models/shared/gcssourceconnectorconfig.py:
+    last_write_checksum: sha1:8cd827af3c05ac4af452e8bd37c6220f4a73b050
+  src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py:
+    last_write_checksum: sha1:9d9a968cc78f3378c5aeac2423d98b3a0eb01760
+  src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py:
+    last_write_checksum: sha1:94e22103b01b68e9b29e361e9543bd44d02873e4
+  src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:8cea91d87af52ea443a4614f3e54c5a244bc2ed2
+  src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfig.py:
+    last_write_checksum: sha1:2dcf63d86b10d05c2b15c94e8c39dde93517b5c9
+  src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfiginput.py:
+    last_write_checksum: sha1:0a9bc9d32bf1f6201ebffbc68a84d0e3323de9cd
+  src/unstructured_client/models/shared/jirasourceconnectorconfig.py:
+    last_write_checksum: sha1:5a475b7cb0ebb65a1ff921a3a5e09c77c5042258
+  src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py:
+    last_write_checksum: sha1:796325fd5416e5a6e40851c291ec33358aa762a9
+  src/unstructured_client/models/shared/jobdetails.py:
+    last_write_checksum: sha1:1f9cec3b47347535ff23a200600bfa83572d9fd8
+  src/unstructured_client/models/shared/jobfailedfiles.py:
+    last_write_checksum: sha1:b30fcb1173542a248bdbe676c82c24673ddb1d76
+  src/unstructured_client/models/shared/jobinformation.py:
+    last_write_checksum: sha1:5a51e8012bc008d2791b69dee911faacea6d7764
+  src/unstructured_client/models/shared/jobnodedetails.py:
+    last_write_checksum: sha1:de6ee17639eeff181eff2fb8a481401a2c250062
+  src/unstructured_client/models/shared/jobprocessingstatus.py:
+    last_write_checksum: sha1:fcdf2f6a9ce596ed1a5b966890544bb2e40da68f
+  src/unstructured_client/models/shared/jobstatus.py:
+    last_write_checksum: sha1:ff4c2af6e09b05d25cd753e70f143fcb13d33f99
+  src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py:
+    last_write_checksum: sha1:bc303ce1eb44468f123b3ac3caaf92820f41398f
+  src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:555620cbd0f512ce484a289f095f357ab0963227
+  src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py:
+    last_write_checksum: sha1:b6164b716d36839df0b5c9d2f0af75fda82f9664
+  src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py:
+    last_write_checksum: sha1:aa7692f1f7e3eb6744d34f81a702659803499a6e
+  src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py:
+    last_write_checksum: sha1:464a01f830a6d57dd1b49550e0ded2a3bebe43eb
+  src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:fc8a66fbee8f04c45a4ecb6ecc1c5f1e33e538d2
+  src/unstructured_client/models/shared/mongodbconnectorconfig.py:
+    last_write_checksum: sha1:94bfa797fa7773f62fdb93748e81373313fdb555
+  src/unstructured_client/models/shared/mongodbconnectorconfiginput.py:
+    last_write_checksum: sha1:2ca575b07c184409c4bd9d0c05f9c5d39e14b5c5
+  src/unstructured_client/models/shared/neo4jdestinationconnectorconfig.py:
+    last_write_checksum: sha1:5e7caa96b7df49093c9ee634ac02fda3f1d90450
+  src/unstructured_client/models/shared/neo4jdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:77d08a4a5215c377c8b70eb7e63b244c8798af7f
+  src/unstructured_client/models/shared/nodefilemetadata.py:
+    last_write_checksum: sha1:df211de02dd413ca8f64d8298efcdd1b867ad480
+  src/unstructured_client/models/shared/onedrivedestinationconnectorconfig.py:
+    last_write_checksum: sha1:25af33d491d0bb604255c8e3fb9fcb6bf0ddb486
+  src/unstructured_client/models/shared/onedrivedestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:c697878a9f8fa3a2a7eb59df0ba13c413c382ed6
+  src/unstructured_client/models/shared/onedrivesourceconnectorconfig.py:
+    last_write_checksum: sha1:af9f70cc946dd96d58b1164344b0f5682490cce2
+  src/unstructured_client/models/shared/onedrivesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:50f983e8f78b96d8523ea0c0df7e65f560cb6ea0
+  src/unstructured_client/models/shared/outlooksourceconnectorconfig.py:
+    last_write_checksum: sha1:e414684ad984614ea53f18d3525c35ac023e3b62
+  src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py:
+    last_write_checksum: sha1:7b836a607128f7afe99b2f9ee6a56e8069bae81a
+  src/unstructured_client/models/shared/partition_parameters.py:
+    last_write_checksum: sha1:03c00b398edaae18521b3e215cb723a51bf5c940
+  src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py:
+    last_write_checksum: sha1:a350aef0d94ed7a118d4acb8de1687e6abb54631
+  src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:a7a6755566625df46201c3672c5e34cf7efd92d3
+  src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py:
+    last_write_checksum: sha1:59191acdd3a316d709c6747c4fa5a68757a9907a
+  src/unstructured_client/models/shared/postgresdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:c959eee670ceff082e8bec05264efd4a89e1c5d2
+  src/unstructured_client/models/shared/postgressourceconnectorconfig.py:
+    last_write_checksum: sha1:d4cec9d147bee01ef97c2328acd4764a3fba54ef
+  src/unstructured_client/models/shared/postgressourceconnectorconfiginput.py:
+    last_write_checksum: sha1:73084827edce35a68b9071ca989350bb416d20be
+  src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfig.py:
+    last_write_checksum: sha1:6069ea42140aac20a1d4a696dcde414964b17753
+  src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:4c16445610cf6314e8af45d47dd872933762461c
+  src/unstructured_client/models/shared/redisdestinationconnectorconfig.py:
+    last_write_checksum: sha1:6aa584d9564ee1ba16aaab352a34b4da2124c623
+  src/unstructured_client/models/shared/redisdestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:7defebd3c1c1ecd2e633653e3bf09d66f41c65b0
+  src/unstructured_client/models/shared/s3destinationconnectorconfig.py:
+    last_write_checksum: sha1:60a757df68981b64f07c5d6420bab65d50fc4ac7
+  src/unstructured_client/models/shared/s3destinationconnectorconfiginput.py:
+    last_write_checksum: sha1:044395f271a259844c0da10398cf826fc6797367
+  src/unstructured_client/models/shared/s3sourceconnectorconfig.py:
+    last_write_checksum: sha1:5780fefd557dd44cf4eb097413c61bdeeb2f0feb
+  src/unstructured_client/models/shared/s3sourceconnectorconfiginput.py:
+    last_write_checksum: sha1:2abf0e536ae85a98f2912419d9826403dcad57a7
+  src/unstructured_client/models/shared/salesforcesourceconnectorconfig.py:
+    last_write_checksum: sha1:d3ed1a04b4965511e3242651ec2475eee5b2435b
+  src/unstructured_client/models/shared/salesforcesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:61fe5539cab69ef33c2df0592ab0a90f96ae3e62
+  src/unstructured_client/models/shared/secretreference.py:
+    last_write_checksum: sha1:7412d990eeee22a89e6a506527eceecea7437f9e
+  src/unstructured_client/models/shared/security.py:
+    last_write_checksum: sha1:07ee315df44c21dc5950347b2a1300f23aea53bc
+  src/unstructured_client/models/shared/sharepointsourceconnectorconfig.py:
+    last_write_checksum: sha1:2361dfd298822d6171e3e92e68d1026b1627e488
+  src/unstructured_client/models/shared/sharepointsourceconnectorconfiginput.py:
+    last_write_checksum: sha1:e433ac3c21f8d74b0101f84edd8ccd65dbfd3371
+  src/unstructured_client/models/shared/snowflakedestinationconnectorconfig.py:
+    last_write_checksum: sha1:5f73e0ec0e712a7695dd063b73e73c197cf7e8ad
+  src/unstructured_client/models/shared/snowflakedestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:ed92796870092cae8b3a4d991dce8830836f806c
+  src/unstructured_client/models/shared/snowflakesourceconnectorconfig.py:
+    last_write_checksum: sha1:4d7fe8b816d43065fce3249149d2613e78f72e93
+  src/unstructured_client/models/shared/snowflakesourceconnectorconfiginput.py:
+    last_write_checksum: sha1:0267848ad53dcdc2f65443d9c569c30683792f25
+  src/unstructured_client/models/shared/sortdirection.py:
+    last_write_checksum: sha1:316a46717625825ea3a622089df62f1c02be1482
+  src/unstructured_client/models/shared/sourceconnectorinformation.py:
+    last_write_checksum: sha1:699d383ccaee500ea027e4bd277af43e614b9b24
+  src/unstructured_client/models/shared/sourceconnectortype.py:
+    last_write_checksum: sha1:7c7ae7a8453ad266f3da93be17eddc48be119807
+  src/unstructured_client/models/shared/templatedetail.py:
+    last_write_checksum: sha1:05292e12a45407c2cb6c500386f2d28298e2129f
+  src/unstructured_client/models/shared/templatelistitem.py:
+    last_write_checksum: sha1:8aeb58b48884855d75b0eab458cd20298816f17b
+  src/unstructured_client/models/shared/templatenode.py:
+    last_write_checksum: sha1:e4eb4fda54c7f177addc32f786a59cdaf886ea1d
+  src/unstructured_client/models/shared/updatedestinationconnector.py:
+    last_write_checksum: sha1:ac3328aa63eabc4d83f993fc7532cf99f141dff8
+  src/unstructured_client/models/shared/updatesourceconnector.py:
+    last_write_checksum: sha1:25577dad79e9eca6b8930bf390eb8c5ab94fecc6
+  src/unstructured_client/models/shared/updateworkflow.py:
+    last_write_checksum: sha1:f14b03dfc4d74915d60369f07f17dd6805820cc0
+  src/unstructured_client/models/shared/validationerror.py:
+    last_write_checksum: sha1:d9824b38a8e37ec6b290ee08643569713ad3a093
+  src/unstructured_client/models/shared/weaviatedestinationconnectorconfig.py:
+    last_write_checksum: sha1:d30dbd2c90e6092714067c4fbaf7c99bd90e0a24
+  src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:a11f1165b1e0f74057fbd141f7cc81c438cfd849
+  src/unstructured_client/models/shared/workflowinformation.py:
+    last_write_checksum: sha1:2f4b751b1982f701cfff0e1e1fef9459fe759c82
+  src/unstructured_client/models/shared/workflowjobtype.py:
+    last_write_checksum: sha1:b517456e9467a16ea8704e72da18b32971d8dc1f
+  src/unstructured_client/models/shared/workflownode.py:
+    last_write_checksum: sha1:6638c8382528b58ae3557892859ce266affea592
+  src/unstructured_client/models/shared/workflowschedule.py:
+    last_write_checksum: sha1:3cb03c67f1cdcd634dccc6d0f4d852d19e436f04
+  src/unstructured_client/models/shared/workflowstate.py:
+    last_write_checksum: sha1:1de3dc7980ca8b5d64f6cb40673ceff9f0d69e1b
+  src/unstructured_client/models/shared/workflowtype.py:
+    last_write_checksum: sha1:6db14bdb8108eac8bd050f0e4dbb252d312f09b7
+  src/unstructured_client/models/shared/zendesksourceconnectorconfig.py:
+    last_write_checksum: sha1:e476e4bfae1aec4eb735944fc53d5271ac6e9a7f
+  src/unstructured_client/models/shared/zendesksourceconnectorconfiginput.py:
+    last_write_checksum: sha1:53d57a96ddd09e8af9ef3747c6d948ec7ef63651
+  src/unstructured_client/py.typed:
+    last_write_checksum: sha1:8efc425ffe830805ffcc0f3055871bdcdc542c60
+  src/unstructured_client/sdk.py:
+    last_write_checksum: sha1:beca014799697f82eb44d63e66ca251e417d5fce
+  src/unstructured_client/sdkconfiguration.py:
+    last_write_checksum: sha1:30ec09b03bc31e647e1ca4014979027d47616085
+  src/unstructured_client/sources.py:
+    last_write_checksum: sha1:418f61c8c13359ebfc0e8bf09cab81f65f583dc2
+  src/unstructured_client/templates.py:
+    last_write_checksum: sha1:26f52e5b28cf8b0b9a66ddc945d975a6fe0ea06c
+  src/unstructured_client/types/__init__.py:
+    last_write_checksum: sha1:140ebdd01a46f92ffc710c52c958c4eba3cf68ed
+  src/unstructured_client/types/basemodel.py:
+    last_write_checksum: sha1:615d0b364fa924b0fef719958df34596cc7c1ae2
+  src/unstructured_client/utils/__init__.py:
+    last_write_checksum: sha1:81e0385b93362e0f3f6911b65bd4cc601ebc11e1
+  src/unstructured_client/utils/annotations.py:
+    last_write_checksum: sha1:a4824ad65f730303e4e1e3ec1febf87b4eb46dbc
+  src/unstructured_client/utils/datetimes.py:
+    last_write_checksum: sha1:c721e4123000e7dc61ec52b28a739439d9e17341
+  src/unstructured_client/utils/enums.py:
+    last_write_checksum: sha1:786ba597f79dca6fbc0d87c591752bb8d775ecb7
+  src/unstructured_client/utils/eventstreaming.py:
+    last_write_checksum: sha1:bababae5d54b7efc360db701daa49e18a92c2f3b
+  src/unstructured_client/utils/forms.py:
+    last_write_checksum: sha1:15fa7e9ab1611e062a9984cf06cb20969713d295
+  src/unstructured_client/utils/headers.py:
+    last_write_checksum: sha1:7c6df233ee006332b566a8afa9ce9a245941d935
+  src/unstructured_client/utils/logger.py:
+    last_write_checksum: sha1:f3fdb154a3f09b8cc43d74c7e9c02f899f8086e4
+  src/unstructured_client/utils/metadata.py:
+    last_write_checksum: sha1:c6a560bd0c63ab158582f34dadb69433ea73b3d4
+  src/unstructured_client/utils/queryparams.py:
+    last_write_checksum: sha1:b94c3f314fd3da0d1d215afc2731f48748e2aa59
+  src/unstructured_client/utils/requestbodies.py:
+    last_write_checksum: sha1:e0a3a78158eba39880475d62d61be906625676b8
+  src/unstructured_client/utils/retries.py:
+    last_write_checksum: sha1:5b97ac4f59357d70c2529975d50364c88bcad607
+  src/unstructured_client/utils/security.py:
+    last_write_checksum: sha1:a17130ace2c0db6394f38dd941ad2b700cc755c8
+  src/unstructured_client/utils/serializers.py:
+    last_write_checksum: sha1:a0d184ace7371a14a7d005cca7f358a03e3d4b07
+  src/unstructured_client/utils/unmarshal_json_response.py:
+    last_write_checksum: sha1:44d94d805cd5b5d3f3a7c124dd86d383b6bd62cc
+  src/unstructured_client/utils/url.py:
+    last_write_checksum: sha1:6479961baa90432ca25626f8e40a7bbc32e73b41
+  src/unstructured_client/utils/values.py:
+    last_write_checksum: sha1:acaa178a7c41ddd000f58cc691e4632d925b2553
+  src/unstructured_client/workflows.py:
+    last_write_checksum: sha1:eb92bdbf1fa408dc6d71738341cd853a51a466ae

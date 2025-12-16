@@ -8,9 +8,15 @@ from unstructured_client.types import BaseModel
 class NodeFileMetadataTypedDict(TypedDict):
     file_id: str
     node_id: str
+    node_subtype: str
+    node_type: str
 
 
 class NodeFileMetadata(BaseModel):
     file_id: str
 
     node_id: str
+
+    node_subtype: str
+
+    node_type: str

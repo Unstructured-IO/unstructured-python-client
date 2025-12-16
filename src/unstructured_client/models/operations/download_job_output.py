@@ -25,8 +25,8 @@ class DownloadJobOutputRequestTypedDict(TypedDict):
     file_id: str
     r"""ID of the file to download"""
     job_id: str
-    node_id: str
-    r"""Node ID to retrieve the corresponding output file"""
+    node_id: NotRequired[Nullable[str]]
+    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
     unstructured_api_key: NotRequired[Nullable[str]]
 
 
@@ -41,9 +41,10 @@ class DownloadJobOutputRequest(BaseModel):
     ]
 
     node_id: Annotated[
-        str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
-    ]
-    r"""Node ID to retrieve the corresponding output file"""
+        OptionalNullable[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = UNSET
+    r"""Node ID to retrieve the corresponding output file.If not provided, uses the last node in the workflow."""
 
     unstructured_api_key: Annotated[
         OptionalNullable[str],
@@ -53,8 +54,8 @@ class DownloadJobOutputRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["unstructured-api-key"]
-        nullable_fields = ["unstructured-api-key"]
+        optional_fields = ["node_id", "unstructured-api-key"]
+        nullable_fields = ["node_id", "unstructured-api-key"]
         null_default_fields = []
 
         serialized = handler(self)

@@ -6,6 +6,7 @@
 ### Available Operations
 
 * [cancel_job](#cancel_job) - Cancel Job
+* [create_job](#create_job) - Create Job
 * [download_job_output](#download_job_output) - Download Job output
 * [get_job](#get_job) - Get Job
 * [get_job_details](#get_job_details) - Get Job processing details
@@ -46,6 +47,50 @@ with UnstructuredClient() as uc_client:
 ### Response
 
 **[operations.CancelJobResponse](../../models/operations/canceljobresponse.md)**
+
+### Errors
+
+| Error Type                 | Status Code                | Content Type               |
+| -------------------------- | -------------------------- | -------------------------- |
+| errors.HTTPValidationError | 422                        | application/json           |
+| errors.SDKError            | 4XX, 5XX                   | \*/\*                      |
+
+## create_job
+
+Create a new on-demand job using either a template (with persistent job optimization) or custom DAG.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="create_job" method="post" path="/api/v1/jobs/" -->
+```python
+from unstructured_client import UnstructuredClient
+
+
+with UnstructuredClient() as uc_client:
+
+    res = uc_client.jobs.create_job(request={
+        "body_create_job": {
+            "request_data": "<value>",
+        },
+    })
+
+    assert res.job_information is not None
+
+    # Handle response
+    print(res.job_information)
+
+```
+
+### Parameters
+
+| Parameter                                                                  | Type                                                                       | Required                                                                   | Description                                                                |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `request`                                                                  | [operations.CreateJobRequest](../../models/operations/createjobrequest.md) | :heavy_check_mark:                                                         | The request object to use for the request.                                 |
+| `retries`                                                                  | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)           | :heavy_minus_sign:                                                         | Configuration to override the default retry behavior of the client.        |
+
+### Response
+
+**[operations.CreateJobResponse](../../models/operations/createjobresponse.md)**
 
 ### Errors
 

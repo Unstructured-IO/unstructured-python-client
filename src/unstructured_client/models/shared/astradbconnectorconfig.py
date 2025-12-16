@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,6 +18,7 @@ class AstraDBConnectorConfigTypedDict(TypedDict):
     batch_size: int
     collection_name: str
     token: str
+    binary_encode_vectors: NotRequired[bool]
     keyspace: NotRequired[Nullable[str]]
 
 
@@ -29,11 +31,13 @@ class AstraDBConnectorConfig(BaseModel):
 
     token: str
 
+    binary_encode_vectors: Optional[bool] = True
+
     keyspace: OptionalNullable[str] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["keyspace"]
+        optional_fields = ["binary_encode_vectors", "keyspace"]
         nullable_fields = ["keyspace"]
         null_default_fields = []
 

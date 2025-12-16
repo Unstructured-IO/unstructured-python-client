@@ -37,6 +37,7 @@ class CreateWorkflowTypedDict(TypedDict):
     reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[Schedule]]
     source_id: NotRequired[Nullable[str]]
+    template_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
 
 
@@ -53,6 +54,8 @@ class CreateWorkflow(BaseModel):
 
     source_id: OptionalNullable[str] = UNSET
 
+    template_id: OptionalNullable[str] = UNSET
+
     workflow_nodes: OptionalNullable[List[WorkflowNode]] = UNSET
 
     @model_serializer(mode="wrap")
@@ -62,6 +65,7 @@ class CreateWorkflow(BaseModel):
             "reprocess_all",
             "schedule",
             "source_id",
+            "template_id",
             "workflow_nodes",
         ]
         nullable_fields = [
@@ -69,6 +73,7 @@ class CreateWorkflow(BaseModel):
             "reprocess_all",
             "schedule",
             "source_id",
+            "template_id",
             "workflow_nodes",
         ]
         null_default_fields = []
