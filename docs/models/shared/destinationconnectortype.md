@@ -20,6 +20,7 @@
 | `MOTHERDUCK`                     | motherduck                       |
 | `NEO4J`                          | neo4j                            |
 | `ONEDRIVE`                       | onedrive                         |
+| `OPENSEARCH`                     | opensearch                       |
 | `PINECONE`                       | pinecone                         |
 | `POSTGRES`                       | postgres                         |
 | `REDIS`                          | redis                            |

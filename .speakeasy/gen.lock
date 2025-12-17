@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: e741a96121ddff12793a36dd5e2258f4
+  docChecksum: 9573da525ab969618fc37288c7baec6a
   docVersion: 1.2.23
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.5
-  configChecksum: 3b3b92259de5fc0033e3f01348631e31
+  releaseVersion: 0.42.6
+  configChecksum: 234c791d16e1b5f3af5d003964b292f6
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -180,6 +180,8 @@ generatedFiles:
   - docs/models/shared/onedrivedestinationconnectorconfiginput.md
   - docs/models/shared/onedrivesourceconnectorconfig.md
   - docs/models/shared/onedrivesourceconnectorconfiginput.md
+  - docs/models/shared/opensearchconnectorconfig.md
+  - docs/models/shared/opensearchconnectorconfiginput.md
   - docs/models/shared/outlooksourceconnectorconfig.md
   - docs/models/shared/outlooksourceconnectorconfiginput.md
   - docs/models/shared/outputformat.md
@@ -368,6 +370,8 @@ generatedFiles:
   - src/unstructured_client/models/shared/onedrivedestinationconnectorconfiginput.py
   - src/unstructured_client/models/shared/onedrivesourceconnectorconfig.py
   - src/unstructured_client/models/shared/onedrivesourceconnectorconfiginput.py
+  - src/unstructured_client/models/shared/opensearchconnectorconfig.py
+  - src/unstructured_client/models/shared/opensearchconnectorconfiginput.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfig.py
   - src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/partition_parameters.py
@@ -921,7 +925,7 @@ trackedFiles:
   docs/models/shared/boxsourceconnectorconfiginput.md:
     last_write_checksum: sha1:e75625a2d8e1092d752dec9d6416ca2dc7ece940
   docs/models/shared/config.md:
-    last_write_checksum: sha1:9b8db306af8207882a98a06397fb1df25514a5d5
+    last_write_checksum: sha1:921b555dc3b2f4c796f265958e1e497bc2c2c221
   docs/models/shared/confluencesourceconnectorconfig.md:
     last_write_checksum: sha1:f0fc3f07b8dfe0af11928df4f8246168500ec3bb
   docs/models/shared/confluencesourceconnectorconfiginput.md:
@@ -941,7 +945,7 @@ trackedFiles:
   docs/models/shared/createsourceconnector.md:
     last_write_checksum: sha1:006ad810becfd9f2d7c8e8ff5de3cb0d0815bf72
   docs/models/shared/createsourceconnectorconfig.md:
-    last_write_checksum: sha1:29acb21f56b4ddfa16c67240522411fda161afdc
+    last_write_checksum: sha1:8021615bdecc4203ff24a7663bc51928687771fc
   docs/models/shared/createworkflow.md:
     last_write_checksum: sha1:8aaf8738ef81e5c333b21e0052015755d21fdb1a
   docs/models/shared/crontabentry.md:
@@ -963,9 +967,9 @@ trackedFiles:
   docs/models/shared/destinationconnectorinformation.md:
     last_write_checksum: sha1:3ee4e344b304ba428401ae1c74f1aa5bcdc556da
   docs/models/shared/destinationconnectorinformationconfig.md:
-    last_write_checksum: sha1:52df1d0ee4ad0ec7cfd1698b5a72f39a93f00806
+    last_write_checksum: sha1:a2d78a4773c889d1e189a8f6f31e2a1e234a0b19
   docs/models/shared/destinationconnectortype.md:
-    last_write_checksum: sha1:3b405c8485530eb259e1607d89af14cf94922526
+    last_write_checksum: sha1:85ba31b2dfb9d633b795ba98eb58304bdbd1fef5
   docs/models/shared/dropboxsourceconnectorconfig.md:
     last_write_checksum: sha1:dd236db60bdbbda1422cc81ec574fe9f3f7f4ce3
   docs/models/shared/dropboxsourceconnectorconfiginput.md:
@@ -1048,6 +1052,10 @@ trackedFiles:
     last_write_checksum: sha1:d0cc7e551dc0509a6f04cd42f2ab3ef58c41dfc7
   docs/models/shared/onedrivesourceconnectorconfiginput.md:
     last_write_checksum: sha1:415b2ce792db84e2404226b87091d3051e0bea50
+  docs/models/shared/opensearchconnectorconfig.md:
+    last_write_checksum: sha1:4978902a082f133162d847258b8ac1948acede2e
+  docs/models/shared/opensearchconnectorconfiginput.md:
+    last_write_checksum: sha1:448a11697dd2c4e1cc8c131fb7e7b3f39dc762b5
   docs/models/shared/outlooksourceconnectorconfig.md:
     last_write_checksum: sha1:2094d7b13d7ee1d4b8b1f93442b68fd4156b13bc
   docs/models/shared/outlooksourceconnectorconfiginput.md:
@@ -1113,9 +1121,9 @@ trackedFiles:
   docs/models/shared/sourceconnectorinformation.md:
     last_write_checksum: sha1:635fbe720ba6de5d875a2ae26a18aba49c118353
   docs/models/shared/sourceconnectorinformationconfig.md:
-    last_write_checksum: sha1:0263a9f5b6dbc4ef0e07a15239e236be66b5750c
+    last_write_checksum: sha1:9de17090c726544aacd1844e86a4f8336174a12f
   docs/models/shared/sourceconnectortype.md:
-    last_write_checksum: sha1:1ed56b342903fec2a5c4e6fa8ee843810a90d149
+    last_write_checksum: sha1:a9a430ea130db8da8fc88af4039e411a680684d7
   docs/models/shared/strategy.md:
     last_write_checksum: sha1:07155e281d43ece3d6970b315ca1761ea18cce9f
   docs/models/shared/templatedetail.md:
@@ -1127,11 +1135,11 @@ trackedFiles:
   docs/models/shared/updatedestinationconnector.md:
     last_write_checksum: sha1:37c58c6b362551502eabf5eca98e99575d642677
   docs/models/shared/updatedestinationconnectorconfig.md:
-    last_write_checksum: sha1:9ec4cfd55e52c4f03e99a7154172b22e26af83ba
+    last_write_checksum: sha1:8b87feb4b95b89e93685f7817cb97396a4537d0f
   docs/models/shared/updatesourceconnector.md:
     last_write_checksum: sha1:c13569bb40dcaee8f13e077eb5b53d95098ea34d
   docs/models/shared/updatesourceconnectorconfig.md:
-    last_write_checksum: sha1:c110194e464b7c3c530dc0d768c8747f1474755b
+    last_write_checksum: sha1:33c4d78aa6733a8151b0a8b7558e8b018cd59307
   docs/models/shared/updateworkflow.md:
     last_write_checksum: sha1:94e95e0b8746baf81b33fab234ee5d320a3fae2e
   docs/models/shared/updateworkflowschedule.md:
@@ -1283,7 +1291,7 @@ trackedFiles:
   src/unstructured_client/models/operations/update_workflow.py:
     last_write_checksum: sha1:2987bcb5781b5002aa307e5255c7072f92b026a6
   src/unstructured_client/models/shared/__init__.py:
-    last_write_checksum: sha1:84789d683d1f00f60dcf41e302d0812b7a72e2c7
+    last_write_checksum: sha1:c2ad5956b789b46b0f2f4d630d11171cd4da7550
   src/unstructured_client/models/shared/astradbconnectorconfig.py:
     last_write_checksum: sha1:c9ada225d014655e2800c4dac8dcb95282a12cbc
   src/unstructured_client/models/shared/astradbconnectorconfiginput.py:
@@ -1323,9 +1331,9 @@ trackedFiles:
   src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
     last_write_checksum: sha1:87a98b17a3b14b9defe1b018e4c98a1d9aeea73b
   src/unstructured_client/models/shared/createdestinationconnector.py:
-    last_write_checksum: sha1:1c60a323f80a24edeec45c4cbc15c85432cc3c6c
+    last_write_checksum: sha1:7137800f627ef8537e996ac9cb1d9161cc9eb187
   src/unstructured_client/models/shared/createsourceconnector.py:
-    last_write_checksum: sha1:a2436029be0bfe9533c607b1ed3f26d310d0e522
+    last_write_checksum: sha1:1a469c646e895744b33b804502330f3c543aae3d
   src/unstructured_client/models/shared/createworkflow.py:
     last_write_checksum: sha1:9201d99f3a9ee2d561b68b68d2af487ee9e21f9d
   src/unstructured_client/models/shared/crontabentry.py:
@@ -1345,9 +1353,9 @@ trackedFiles:
   src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
     last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
   src/unstructured_client/models/shared/destinationconnectorinformation.py:
-    last_write_checksum: sha1:36455d4144c5de6a6ca78078006679ced5cc0a6e
+    last_write_checksum: sha1:80bbf3b4fd6f477fe0b2deec328716aeb9054ee3
   src/unstructured_client/models/shared/destinationconnectortype.py:
-    last_write_checksum: sha1:00ec603c427b636ae82d8a688f5383534e12ab69
+    last_write_checksum: sha1:8a535b852261fe20bcdcd5e7ebfc07524270b934
   src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
     last_write_checksum: sha1:975b665d4a1280a04558b963d7564dafaa04afc1
   src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py:
@@ -1422,6 +1430,10 @@ trackedFiles:
     last_write_checksum: sha1:af9f70cc946dd96d58b1164344b0f5682490cce2
   src/unstructured_client/models/shared/onedrivesourceconnectorconfiginput.py:
     last_write_checksum: sha1:50f983e8f78b96d8523ea0c0df7e65f560cb6ea0
+  src/unstructured_client/models/shared/opensearchconnectorconfig.py:
+    last_write_checksum: sha1:7f073c0d825d8506d066e78365db325ac5df6fbd
+  src/unstructured_client/models/shared/opensearchconnectorconfiginput.py:
+    last_write_checksum: sha1:c8bf14e800fac4e048179b623443043079036d27
   src/unstructured_client/models/shared/outlooksourceconnectorconfig.py:
     last_write_checksum: sha1:e414684ad984614ea53f18d3525c35ac023e3b62
   src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py:
@@ -1479,9 +1491,9 @@ trackedFiles:
   src/unstructured_client/models/shared/sortdirection.py:
     last_write_checksum: sha1:316a46717625825ea3a622089df62f1c02be1482
   src/unstructured_client/models/shared/sourceconnectorinformation.py:
-    last_write_checksum: sha1:699d383ccaee500ea027e4bd277af43e614b9b24
+    last_write_checksum: sha1:e704ff822aef603f14d1b243962d177d210982fb
   src/unstructured_client/models/shared/sourceconnectortype.py:
-    last_write_checksum: sha1:7c7ae7a8453ad266f3da93be17eddc48be119807
+    last_write_checksum: sha1:cc3f9e479b10403211055f781aec66a5a918a169
   src/unstructured_client/models/shared/templatedetail.py:
     last_write_checksum: sha1:05292e12a45407c2cb6c500386f2d28298e2129f
   src/unstructured_client/models/shared/templatelistitem.py:
@@ -1489,9 +1501,9 @@ trackedFiles:
   src/unstructured_client/models/shared/templatenode.py:
     last_write_checksum: sha1:e4eb4fda54c7f177addc32f786a59cdaf886ea1d
   src/unstructured_client/models/shared/updatedestinationconnector.py:
-    last_write_checksum: sha1:ac3328aa63eabc4d83f993fc7532cf99f141dff8
+    last_write_checksum: sha1:f3a359c44d4e54ca85c7c69ac087726094d06655
   src/unstructured_client/models/shared/updatesourceconnector.py:
-    last_write_checksum: sha1:25577dad79e9eca6b8930bf390eb8c5ab94fecc6
+    last_write_checksum: sha1:66a29ca6427816cdb1846d63e3d466296dbd3abb
   src/unstructured_client/models/shared/updateworkflow.py:
     last_write_checksum: sha1:f14b03dfc4d74915d60369f07f17dd6805820cc0
   src/unstructured_client/models/shared/validationerror.py:

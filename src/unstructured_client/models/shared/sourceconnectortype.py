@@ -18,6 +18,7 @@ class SourceConnectorType(str, Enum, metaclass=utils.OpenEnumMeta):
     KAFKA_CLOUD = "kafka-cloud"
     MONGODB = "mongodb"
     ONEDRIVE = "onedrive"
+    OPENSEARCH = "opensearch"
     OUTLOOK = "outlook"
     POSTGRES = "postgres"
     S3 = "s3"

@@ -256,6 +256,14 @@ if TYPE_CHECKING:
         OneDriveSourceConnectorConfigInput,
         OneDriveSourceConnectorConfigInputTypedDict,
     )
+    from .opensearchconnectorconfig import (
+        OpenSearchConnectorConfig,
+        OpenSearchConnectorConfigTypedDict,
+    )
+    from .opensearchconnectorconfiginput import (
+        OpenSearchConnectorConfigInput,
+        OpenSearchConnectorConfigInputTypedDict,
+    )
     from .outlooksourceconnectorconfig import (
         OutlookSourceConnectorConfig,
         OutlookSourceConnectorConfigTypedDict,
@@ -570,6 +578,10 @@ __all__ = [
     "OneDriveSourceConnectorConfigInput",
     "OneDriveSourceConnectorConfigInputTypedDict",
     "OneDriveSourceConnectorConfigTypedDict",
+    "OpenSearchConnectorConfig",
+    "OpenSearchConnectorConfigInput",
+    "OpenSearchConnectorConfigInputTypedDict",
+    "OpenSearchConnectorConfigTypedDict",
     "OutlookSourceConnectorConfig",
     "OutlookSourceConnectorConfigInput",
     "OutlookSourceConnectorConfigInputTypedDict",
@@ -823,6 +835,10 @@ _dynamic_imports: dict[str, str] = {
     "OneDriveSourceConnectorConfigTypedDict": ".onedrivesourceconnectorconfig",
     "OneDriveSourceConnectorConfigInput": ".onedrivesourceconnectorconfiginput",
     "OneDriveSourceConnectorConfigInputTypedDict": ".onedrivesourceconnectorconfiginput",
+    "OpenSearchConnectorConfig": ".opensearchconnectorconfig",
+    "OpenSearchConnectorConfigTypedDict": ".opensearchconnectorconfig",
+    "OpenSearchConnectorConfigInput": ".opensearchconnectorconfiginput",
+    "OpenSearchConnectorConfigInputTypedDict": ".opensearchconnectorconfiginput",
     "OutlookSourceConnectorConfig": ".outlooksourceconnectorconfig",
     "OutlookSourceConnectorConfigTypedDict": ".outlooksourceconnectorconfig",
     "OutlookSourceConnectorConfigInput": ".outlooksourceconnectorconfiginput",
