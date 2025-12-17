@@ -75,6 +75,12 @@ value: shared.MongoDBConnectorConfigInput = /* values here */
 value: shared.OneDriveSourceConnectorConfigInput = /* values here */
 ```
 
+### `shared.OpenSearchConnectorConfigInput`
+
+```python
+value: shared.OpenSearchConnectorConfigInput = /* values here */
+```
+
 ### `shared.OutlookSourceConnectorConfigInput`
 
 ```python

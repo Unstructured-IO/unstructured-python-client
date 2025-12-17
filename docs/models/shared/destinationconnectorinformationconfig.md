@@ -87,6 +87,12 @@ value: shared.Neo4jDestinationConnectorConfig = /* values here */
 value: shared.OneDriveDestinationConnectorConfig = /* values here */
 ```
 
+### `shared.OpenSearchConnectorConfig`
+
+```python
+value: shared.OpenSearchConnectorConfig = /* values here */
+```
+
 ### `shared.PineconeDestinationConnectorConfig`
 
 ```python
