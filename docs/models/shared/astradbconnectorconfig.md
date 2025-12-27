@@ -5,6 +5,7 @@
 
 | Field                   | Type                    | Required                | Description             |
 | ----------------------- | ----------------------- | ----------------------- | ----------------------- |
+| `__pydantic_extra__`    | Dict[str, *Any*]        | :heavy_minus_sign:      | N/A                     |
 | `api_endpoint`          | *str*                   | :heavy_check_mark:      | N/A                     |
 | `batch_size`            | *int*                   | :heavy_check_mark:      | N/A                     |
 | `binary_encode_vectors` | *Optional[bool]*        | :heavy_minus_sign:      | N/A                     |
