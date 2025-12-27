@@ -64,22 +64,22 @@ Create a new destination connector using the provided configuration and name.
 <!-- UsageSnippet language="python" operationID="create_destination" method="post" path="/api/v1/destinations/" -->
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.create_destination(request={
-        "create_destination_connector": {
-            "config": {
-                "collection": "<value>",
-                "database": "<value>",
-                "uri": "https://criminal-bowler.com",
-            },
-            "name": "<value>",
-            "type": shared.DestinationConnectorType.ELASTICSEARCH,
-        },
-    })
+    res = uc_client.destinations.create_destination(request=operations.CreateDestinationRequest(
+        create_destination_connector=shared.CreateDestinationConnector(
+            config=shared.MongoDBConnectorConfigInput(
+                collection="<value>",
+                database="<value>",
+                uri="https://criminal-bowler.com",
+            ),
+            name="<value>",
+            type=shared.DestinationConnectorType.ELASTICSEARCH,
+        ),
+    ))
 
     assert res.destination_connector_information is not None
 
@@ -281,13 +281,14 @@ Update the configuration of an existing destination connector.
 <!-- UsageSnippet language="python" operationID="update_destination" method="put" path="/api/v1/destinations/{destination_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.destinations.update_destination(request={
-        "update_destination_connector": {
-            "config": {
+    res = uc_client.destinations.update_destination(request=operations.UpdateDestinationRequest(
+        update_destination_connector=shared.UpdateDestinationConnector(
+            config={
                 "batch_size": 100,
                 "bootstrap_servers": "<value>",
                 "kafka_api_key": "<value>",
@@ -295,9 +296,9 @@ with UnstructuredClient() as uc_client:
                 "secret": "<value>",
                 "topic": "<value>",
             },
-        },
-        "destination_id": "9726962d-9d1e-4f84-8787-c7313d183927",
-    })
+        ),
+        destination_id="9726962d-9d1e-4f84-8787-c7313d183927",
+    ))
 
     assert res.destination_connector_information is not None
 
