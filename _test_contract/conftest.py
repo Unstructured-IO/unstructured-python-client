@@ -7,6 +7,10 @@ import pytest
 
 from unstructured_client import UnstructuredClient, utils
 
+# Python 3.9 workaround: eagerly import retries to avoid lazy import race condition
+# This prevents a KeyError in module lock when templates.py triggers lazy import of utils.retries
+from unstructured_client.utils import retries  # noqa: F401
+
 FAKE_API_KEY = "91pmLBeETAbXCpNylRsLq11FdiZPTk"
 
 
