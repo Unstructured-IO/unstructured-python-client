@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 9573da525ab969618fc37288c7baec6a
+  docChecksum: 550390299c16db8640430b6f95585110
   docVersion: 1.2.23
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.6
-  configChecksum: 234c791d16e1b5f3af5d003964b292f6
+  releaseVersion: 0.43.0
+  configChecksum: 1d743f30c937ee86d66a2dec8f1d9b60
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -15,6 +15,7 @@ features:
   python:
     acceptHeaders: 3.0.0
     additionalDependencies: 1.0.0
+    additionalProperties: 1.0.1
     constsAndDefaults: 1.0.5
     core: 5.19.8
     customCodeRegions: 0.1.1
@@ -899,9 +900,9 @@ trackedFiles:
   docs/models/operations/updateworkflowresponse.md:
     last_write_checksum: sha1:1336948ebad20ffe8e11a836cf0b9faf1d2c0fb4
   docs/models/shared/astradbconnectorconfig.md:
-    last_write_checksum: sha1:4a8f8de642ce6e995d5cb80b95a87acc57754732
+    last_write_checksum: sha1:136db913654100cb7a2e64b42d59a8ab2b75a7fe
   docs/models/shared/astradbconnectorconfiginput.md:
-    last_write_checksum: sha1:4e7282d2f5522f401ae02c55ffc7b0a24ca22c95
+    last_write_checksum: sha1:100949b5b43c671e1e6496ff522fa272e356bcde
   docs/models/shared/azureaisearchconnectorconfig.md:
     last_write_checksum: sha1:ed41a88fb6bddcc2094f9d8b5660dedba9921969
   docs/models/shared/azureaisearchconnectorconfiginput.md:
@@ -1171,7 +1172,7 @@ trackedFiles:
   docs/models/utils/retryconfig.md:
     last_write_checksum: sha1:562c0f21e308ad10c27f85f75704c15592c6929d
   docs/sdks/destinations/README.md:
-    last_write_checksum: sha1:f1d323f36e6832bfda94da124edd1287ed212ac4
+    last_write_checksum: sha1:3b93760c68ab044dd00cab48f09f82ddb46ad625
   docs/sdks/general/README.md:
     last_write_checksum: sha1:b773733847fc4c876b937db85c23828a170ef959
   docs/sdks/jobs/README.md:
@@ -1203,7 +1204,7 @@ trackedFiles:
   src/unstructured_client/_hooks/types.py:
     last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
   src/unstructured_client/_version.py:
-    last_write_checksum: sha1:8df230bbe57fe1ed3def0d60fe15c23ef29eb8d2
+    last_write_checksum: sha1:e29686074f8f478bdf7acfaab9c4faef324e71c5
   src/unstructured_client/basesdk.py:
     last_write_checksum: sha1:c630e3511b954676ab8b477fd7b11c4ce8f443a7
   src/unstructured_client/destinations.py:
@@ -1293,9 +1294,9 @@ trackedFiles:
   src/unstructured_client/models/shared/__init__.py:
     last_write_checksum: sha1:c2ad5956b789b46b0f2f4d630d11171cd4da7550
   src/unstructured_client/models/shared/astradbconnectorconfig.py:
-    last_write_checksum: sha1:c9ada225d014655e2800c4dac8dcb95282a12cbc
+    last_write_checksum: sha1:b4abe6537502e038ad9e49f4e1fed4c7fb368d38
   src/unstructured_client/models/shared/astradbconnectorconfiginput.py:
-    last_write_checksum: sha1:452a4e0f89079aa1520e22c5920cc7927efb0b46
+    last_write_checksum: sha1:730ff0f5475cb26e739660ea01dca2f85b4e81c2
   src/unstructured_client/models/shared/azureaisearchconnectorconfig.py:
     last_write_checksum: sha1:b04bb92d9803b10f9dacb9b489eb1da2d8625829
   src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py:
@@ -1331,7 +1332,7 @@ trackedFiles:
   src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
     last_write_checksum: sha1:87a98b17a3b14b9defe1b018e4c98a1d9aeea73b
   src/unstructured_client/models/shared/createdestinationconnector.py:
-    last_write_checksum: sha1:7137800f627ef8537e996ac9cb1d9161cc9eb187
+    last_write_checksum: sha1:603165ca2218c7acf52f7ab088af4b3c25e58546
   src/unstructured_client/models/shared/createsourceconnector.py:
     last_write_checksum: sha1:1a469c646e895744b33b804502330f3c543aae3d
   src/unstructured_client/models/shared/createworkflow.py:
@@ -1353,7 +1354,7 @@ trackedFiles:
   src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
     last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
   src/unstructured_client/models/shared/destinationconnectorinformation.py:
-    last_write_checksum: sha1:80bbf3b4fd6f477fe0b2deec328716aeb9054ee3
+    last_write_checksum: sha1:6c0b5c3c1a107b80f9bb12dbeb784f31aee5da5c
   src/unstructured_client/models/shared/destinationconnectortype.py:
     last_write_checksum: sha1:8a535b852261fe20bcdcd5e7ebfc07524270b934
   src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
@@ -1501,7 +1502,7 @@ trackedFiles:
   src/unstructured_client/models/shared/templatenode.py:
     last_write_checksum: sha1:e4eb4fda54c7f177addc32f786a59cdaf886ea1d
   src/unstructured_client/models/shared/updatedestinationconnector.py:
-    last_write_checksum: sha1:f3a359c44d4e54ca85c7c69ac087726094d06655
+    last_write_checksum: sha1:5046b8cd7f5e480f26cb5ef8a1d0f3dd606c0673
   src/unstructured_client/models/shared/updatesourceconnector.py:
     last_write_checksum: sha1:66a29ca6427816cdb1846d63e3d466296dbd3abb
   src/unstructured_client/models/shared/updateworkflow.py:
