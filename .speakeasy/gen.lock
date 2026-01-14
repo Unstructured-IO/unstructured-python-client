@@ -5,8 +5,8 @@ management:
   docVersion: 1.2.23
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.7
-  configChecksum: f3ac5d91367e5b0e16ca9f813b77af9a
+  releaseVersion: 0.42.8
+  configChecksum: abbc5148e43147f076699209aa67174a
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -1190,7 +1190,7 @@ trackedFiles:
   pylintrc:
     last_write_checksum: sha1:db2aebd83e553dd59d3965e79104a3fb780c403a
   pyproject.toml:
-    last_write_checksum: sha1:621955f20cac2d988186376042771c4eb875f320
+    last_write_checksum: sha1:6690c2c6cd0795582a8ee7ad5485df40ac64294c
   scripts/prepare_readme.py:
     last_write_checksum: sha1:ccdba5069fbb7997500b6ba22366e004394cdca2
   scripts/publish.sh:
@@ -1204,7 +1204,7 @@ trackedFiles:
   src/unstructured_client/_hooks/types.py:
     last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
   src/unstructured_client/_version.py:
-    last_write_checksum: sha1:4282b6a2eef663243a0f7099d2be65fd3f238dd8
+    last_write_checksum: sha1:12e1a23c8fc0e37624ca8828dc89dc00358be9c9
   src/unstructured_client/basesdk.py:
     last_write_checksum: sha1:c630e3511b954676ab8b477fd7b11c4ce8f443a7
   src/unstructured_client/destinations.py:
@@ -1272,11 +1272,11 @@ trackedFiles:
   src/unstructured_client/models/operations/get_workflow.py:
     last_write_checksum: sha1:69f91249ed4e8aefe358911b3e38ac1924448376
   src/unstructured_client/models/operations/list_destinations.py:
-    last_write_checksum: sha1:24d8c36d71132b8828e1d895b22ed92a8c0fd6a4
+    last_write_checksum: sha1:fff42dcdbd577085b94893bbdb93304b66cfdb94
   src/unstructured_client/models/operations/list_jobs.py:
     last_write_checksum: sha1:d49d4046bddc33647aeb6efc9d07b736ca05b7e1
   src/unstructured_client/models/operations/list_sources.py:
-    last_write_checksum: sha1:b3fc2fbe9911c73074f2bc4de90e62809807c23d
+    last_write_checksum: sha1:cf8b39f1e0fec53a2d06e455d198e3450a8faf33
   src/unstructured_client/models/operations/list_templates.py:
     last_write_checksum: sha1:705ddddc3fb6dce6653c84775745540f60ee81ee
   src/unstructured_client/models/operations/list_workflows.py:
@@ -1332,9 +1332,9 @@ trackedFiles:
   src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
     last_write_checksum: sha1:87a98b17a3b14b9defe1b018e4c98a1d9aeea73b
   src/unstructured_client/models/shared/createdestinationconnector.py:
-    last_write_checksum: sha1:603165ca2218c7acf52f7ab088af4b3c25e58546
+    last_write_checksum: sha1:4dedef674cf9097567f20d04fa26af5a1f8c7785
   src/unstructured_client/models/shared/createsourceconnector.py:
-    last_write_checksum: sha1:1a469c646e895744b33b804502330f3c543aae3d
+    last_write_checksum: sha1:46a5ce3a43766c4408602dd55a86eb2c3bd86512
   src/unstructured_client/models/shared/createworkflow.py:
     last_write_checksum: sha1:9201d99f3a9ee2d561b68b68d2af487ee9e21f9d
   src/unstructured_client/models/shared/crontabentry.py:
@@ -1354,7 +1354,7 @@ trackedFiles:
   src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
     last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
   src/unstructured_client/models/shared/destinationconnectorinformation.py:
-    last_write_checksum: sha1:6c0b5c3c1a107b80f9bb12dbeb784f31aee5da5c
+    last_write_checksum: sha1:8f0ae6448fabb265bfe99d1c2bb9c95e8caa8c6b
   src/unstructured_client/models/shared/destinationconnectortype.py:
     last_write_checksum: sha1:8a535b852261fe20bcdcd5e7ebfc07524270b934
   src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
@@ -1440,7 +1440,7 @@ trackedFiles:
   src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py:
     last_write_checksum: sha1:7b836a607128f7afe99b2f9ee6a56e8069bae81a
   src/unstructured_client/models/shared/partition_parameters.py:
-    last_write_checksum: sha1:03c00b398edaae18521b3e215cb723a51bf5c940
+    last_write_checksum: sha1:20de722171948310ff83a5e0ec3f7d5e29c34d18
   src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py:
     last_write_checksum: sha1:a350aef0d94ed7a118d4acb8de1687e6abb54631
   src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py:
@@ -1492,7 +1492,7 @@ trackedFiles:
   src/unstructured_client/models/shared/sortdirection.py:
     last_write_checksum: sha1:316a46717625825ea3a622089df62f1c02be1482
   src/unstructured_client/models/shared/sourceconnectorinformation.py:
-    last_write_checksum: sha1:e704ff822aef603f14d1b243962d177d210982fb
+    last_write_checksum: sha1:ad74c8ace05852476a96287a577ecb58c6f36825
   src/unstructured_client/models/shared/sourceconnectortype.py:
     last_write_checksum: sha1:cc3f9e479b10403211055f781aec66a5a918a169
   src/unstructured_client/models/shared/templatedetail.py:
@@ -1542,15 +1542,15 @@ trackedFiles:
   src/unstructured_client/types/__init__.py:
     last_write_checksum: sha1:140ebdd01a46f92ffc710c52c958c4eba3cf68ed
   src/unstructured_client/types/basemodel.py:
-    last_write_checksum: sha1:615d0b364fa924b0fef719958df34596cc7c1ae2
+    last_write_checksum: sha1:10d84aedeb9d35edfdadf2c3020caa1d24d8b584
   src/unstructured_client/utils/__init__.py:
-    last_write_checksum: sha1:81e0385b93362e0f3f6911b65bd4cc601ebc11e1
+    last_write_checksum: sha1:887f56a717845fab7445cc368d2a17d850c3565a
   src/unstructured_client/utils/annotations.py:
     last_write_checksum: sha1:a4824ad65f730303e4e1e3ec1febf87b4eb46dbc
   src/unstructured_client/utils/datetimes.py:
     last_write_checksum: sha1:c721e4123000e7dc61ec52b28a739439d9e17341
   src/unstructured_client/utils/enums.py:
-    last_write_checksum: sha1:786ba597f79dca6fbc0d87c591752bb8d775ecb7
+    last_write_checksum: sha1:bc8c3c1285ae09ba8a094ee5c3d9c7f41fa1284d
   src/unstructured_client/utils/eventstreaming.py:
     last_write_checksum: sha1:bababae5d54b7efc360db701daa49e18a92c2f3b
   src/unstructured_client/utils/forms.py:
@@ -1564,13 +1564,13 @@ trackedFiles:
   src/unstructured_client/utils/queryparams.py:
     last_write_checksum: sha1:b94c3f314fd3da0d1d215afc2731f48748e2aa59
   src/unstructured_client/utils/requestbodies.py:
-    last_write_checksum: sha1:e0a3a78158eba39880475d62d61be906625676b8
+    last_write_checksum: sha1:41e2d2d2d3ecc394c8122ca4d4b85e1c3e03f054
   src/unstructured_client/utils/retries.py:
     last_write_checksum: sha1:5b97ac4f59357d70c2529975d50364c88bcad607
   src/unstructured_client/utils/security.py:
     last_write_checksum: sha1:a17130ace2c0db6394f38dd941ad2b700cc755c8
   src/unstructured_client/utils/serializers.py:
-    last_write_checksum: sha1:a0d184ace7371a14a7d005cca7f358a03e3d4b07
+    last_write_checksum: sha1:ce1d8d7f500a9ccba0aeca5057cee9c271f4dfd7
   src/unstructured_client/utils/unmarshal_json_response.py:
     last_write_checksum: sha1:44d94d805cd5b5d3f3a7c124dd86d383b6bd62cc
   src/unstructured_client/utils/url.py:
