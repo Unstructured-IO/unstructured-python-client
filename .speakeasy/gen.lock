@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: 550390299c16db8640430b6f95585110
-  docVersion: 1.2.23
+  docChecksum: d16fe72a4dedf521ed38d340b69e914f
+  docVersion: 1.2.28
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.8
-  configChecksum: abbc5148e43147f076699209aa67174a
+  releaseVersion: 0.42.9
+  configChecksum: 9ce3853dc79759623054c060ed5d5a4d
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -1204,9 +1204,9 @@ trackedFiles:
   src/unstructured_client/_hooks/types.py:
     last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
   src/unstructured_client/_version.py:
-    last_write_checksum: sha1:12e1a23c8fc0e37624ca8828dc89dc00358be9c9
+    last_write_checksum: sha1:58106d46f8d0262fe4c68d0ed473a24bfe224956
   src/unstructured_client/basesdk.py:
-    last_write_checksum: sha1:c630e3511b954676ab8b477fd7b11c4ce8f443a7
+    last_write_checksum: sha1:96b11011fa4af657d7decae17dda0b8ddcecfa32
   src/unstructured_client/destinations.py:
     last_write_checksum: sha1:918da90d2ac2ec108be3dfd18ec123a0eca88c9f
   src/unstructured_client/httpclient.py:
@@ -1232,135 +1232,135 @@ trackedFiles:
   src/unstructured_client/models/operations/__init__.py:
     last_write_checksum: sha1:5b32ee1e14784aeb16f29dd0f65095f772e09428
   src/unstructured_client/models/operations/cancel_job.py:
-    last_write_checksum: sha1:fdff92949ca59c2445489f0e75e9e347a1d2d030
+    last_write_checksum: sha1:6f197b83dfc4adc7a6189a36367d364c004ebbfd
   src/unstructured_client/models/operations/create_connection_check_destinations.py:
-    last_write_checksum: sha1:f5c1a792bc7977a58c2ce3e9325e0b91b821eebb
+    last_write_checksum: sha1:3d83619daf400e41082a222d4cedfd8e9862cf19
   src/unstructured_client/models/operations/create_connection_check_sources.py:
-    last_write_checksum: sha1:e81098b56db93e9ff3b557ba6f34224f4c9f6566
+    last_write_checksum: sha1:640f869ed06c965ad14c6ee40a0b3780401b6b8c
   src/unstructured_client/models/operations/create_destination.py:
-    last_write_checksum: sha1:f6870661f86ccf0342eaa018ef5e5679794e8e1d
+    last_write_checksum: sha1:1f476f1ff4ffc07ff07f2f4e5dbf98d8803590d3
   src/unstructured_client/models/operations/create_job.py:
-    last_write_checksum: sha1:09ae7fe3eeaa58327528855e2eb0b315c8756f9d
+    last_write_checksum: sha1:29fc352b95f339074921fcbd394a3370b4bd4917
   src/unstructured_client/models/operations/create_source.py:
-    last_write_checksum: sha1:b774183f8ec9f4796dfbe73adfdf0473027c4db4
+    last_write_checksum: sha1:d1dc3838bbe4a94c2581675feda07c8add4a3465
   src/unstructured_client/models/operations/create_workflow.py:
-    last_write_checksum: sha1:64418d73d3dd27ed93b575e2ede742c0bba574ec
+    last_write_checksum: sha1:2df3f385f8e0e6d5e63c833b8613644f07200374
   src/unstructured_client/models/operations/delete_destination.py:
-    last_write_checksum: sha1:7832e4aa99fbc1ec98dfc1e650ec0ee1fc2f9d4d
+    last_write_checksum: sha1:e2e34d9a365e5fc24af10706b6b14c5a6147857f
   src/unstructured_client/models/operations/delete_source.py:
-    last_write_checksum: sha1:a2b1be7accf9ae35f5c498a9279793b509fcb740
+    last_write_checksum: sha1:12a80a4d086bef55417dc2c5f9abf8f007fd9918
   src/unstructured_client/models/operations/delete_workflow.py:
-    last_write_checksum: sha1:951c9c7de8b0aa374aa31084f33a3590785fa1cf
+    last_write_checksum: sha1:6edb17ffffb1600b7e9d1a96bb85d3e42f478cfd
   src/unstructured_client/models/operations/download_job_output.py:
-    last_write_checksum: sha1:8c286fe548d11e81b54ef68a1cbd9d529c51168e
+    last_write_checksum: sha1:a97ca9a90dcc6ed2935110560006afe8bf09ae44
   src/unstructured_client/models/operations/get_connection_check_destinations.py:
-    last_write_checksum: sha1:95509c260c51390ee58f7997091c521d0767044d
+    last_write_checksum: sha1:49736d45b3742c04c53c1b15db2c83dd31696ed1
   src/unstructured_client/models/operations/get_connection_check_sources.py:
-    last_write_checksum: sha1:8c4a260e608dbea0546a200dadd8f44d585cfe59
+    last_write_checksum: sha1:d6bdf103f2966d488be8df63cfc4039baf4fd090
   src/unstructured_client/models/operations/get_destination.py:
-    last_write_checksum: sha1:35303da1961529967c0593c82e04de58b8b1aa7b
+    last_write_checksum: sha1:743c3464db04569ea18b8cde544ee27f5e5f686f
   src/unstructured_client/models/operations/get_job.py:
-    last_write_checksum: sha1:087899726039102279a068a023c4e6bb3a076ee0
+    last_write_checksum: sha1:0632cd40b80b408f4571e833a055743f84707769
   src/unstructured_client/models/operations/get_job_details.py:
-    last_write_checksum: sha1:6fd7de956121f6637618fbe1d67710ba04c551c3
+    last_write_checksum: sha1:b0b23d26af43151997eb1b2aa013adbb5cbfd9d1
   src/unstructured_client/models/operations/get_job_failed_files.py:
-    last_write_checksum: sha1:f5e4bdb03af4303140f7441e7b6d75705b5475f9
+    last_write_checksum: sha1:179ead6cdea1a5409cc9346642665c4c824dc98c
   src/unstructured_client/models/operations/get_source.py:
-    last_write_checksum: sha1:199bbc799cdc9adfd78a5cd72defa66360747252
+    last_write_checksum: sha1:4fe314d6ce9c64f2289d0e2aa8bbb0e7c0321c48
   src/unstructured_client/models/operations/get_template.py:
-    last_write_checksum: sha1:c191b7baae646b12425b84a9ae6e6e9423c2957f
+    last_write_checksum: sha1:dcb4be558eec19b2eac24ae165d4c9ac7618f092
   src/unstructured_client/models/operations/get_workflow.py:
-    last_write_checksum: sha1:69f91249ed4e8aefe358911b3e38ac1924448376
+    last_write_checksum: sha1:34c5a5ca73521b51e3582bb93035eee7c452a6bb
   src/unstructured_client/models/operations/list_destinations.py:
-    last_write_checksum: sha1:fff42dcdbd577085b94893bbdb93304b66cfdb94
+    last_write_checksum: sha1:c6543b9db24b0f36709fcc4f3ffd154879ef59fd
   src/unstructured_client/models/operations/list_jobs.py:
-    last_write_checksum: sha1:d49d4046bddc33647aeb6efc9d07b736ca05b7e1
+    last_write_checksum: sha1:5b4f03938bbc70ab55e3672ab8e1ca79a9b9f3f9
   src/unstructured_client/models/operations/list_sources.py:
-    last_write_checksum: sha1:cf8b39f1e0fec53a2d06e455d198e3450a8faf33
+    last_write_checksum: sha1:a157c2d3eccb3098e675b958358d4c22c0f204a9
   src/unstructured_client/models/operations/list_templates.py:
-    last_write_checksum: sha1:705ddddc3fb6dce6653c84775745540f60ee81ee
+    last_write_checksum: sha1:c5308475927955c9b643ad43d25f7417303407d8
   src/unstructured_client/models/operations/list_workflows.py:
-    last_write_checksum: sha1:fcc39a140094e3e1b05a4a7872b8d06455b4bd12
+    last_write_checksum: sha1:39b7e3454d8eec5fcdc229c2cebba311b68024eb
   src/unstructured_client/models/operations/partition.py:
-    last_write_checksum: sha1:7eef65659f7c295af8500c50807a0b1902212945
+    last_write_checksum: sha1:af28b5457d1ab68adaddcf7eb38612b6b200824a
   src/unstructured_client/models/operations/run_workflow.py:
-    last_write_checksum: sha1:af3fc637859d771f243d2f4c8098587312b3aebe
+    last_write_checksum: sha1:f970ba0af771db048eec2a7f6f6c3ac2f9599f1d
   src/unstructured_client/models/operations/update_destination.py:
-    last_write_checksum: sha1:6e3dfce61ad34446f17299dc04853efaf6cea653
+    last_write_checksum: sha1:fed5e0cc05b195044c4a683b9f1f6f55f493235a
   src/unstructured_client/models/operations/update_source.py:
-    last_write_checksum: sha1:5ad731a1ccc08db5dc444a79545f3d59b6989429
+    last_write_checksum: sha1:62389fd05fd1d2eb514ba8b7994622f4c9f8739d
   src/unstructured_client/models/operations/update_workflow.py:
-    last_write_checksum: sha1:2987bcb5781b5002aa307e5255c7072f92b026a6
+    last_write_checksum: sha1:bc89c27c8a0d44d9336c80d8cbbc5bb5b0d749ae
   src/unstructured_client/models/shared/__init__.py:
     last_write_checksum: sha1:c2ad5956b789b46b0f2f4d630d11171cd4da7550
   src/unstructured_client/models/shared/astradbconnectorconfig.py:
-    last_write_checksum: sha1:b4abe6537502e038ad9e49f4e1fed4c7fb368d38
+    last_write_checksum: sha1:6bdbb68c97994cef73a656c84fbfe7e32b3d6277
   src/unstructured_client/models/shared/astradbconnectorconfiginput.py:
-    last_write_checksum: sha1:730ff0f5475cb26e739660ea01dca2f85b4e81c2
+    last_write_checksum: sha1:db758c572314aab7da254f42ed4137199039092f
   src/unstructured_client/models/shared/azureaisearchconnectorconfig.py:
     last_write_checksum: sha1:b04bb92d9803b10f9dacb9b489eb1da2d8625829
   src/unstructured_client/models/shared/azureaisearchconnectorconfiginput.py:
     last_write_checksum: sha1:9afce8ddf0ed5337f7b3736b83f358bd552ffea0
   src/unstructured_client/models/shared/azuredestinationconnectorconfig.py:
-    last_write_checksum: sha1:4ddfddae0ce96a11c48e7969046b02295b7f14b2
+    last_write_checksum: sha1:ef58c63fe3d5736199a0cc2c0db56483116bf2f4
   src/unstructured_client/models/shared/azuredestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:099467bc2c3d8d8382270c7daa1cc9c4d1efa179
+    last_write_checksum: sha1:85eba2fb6cd1bdd650d3e3e3edae26ab6aa29e82
   src/unstructured_client/models/shared/azuresourceconnectorconfig.py:
-    last_write_checksum: sha1:80aedf8737ed5f3fd921bbd0f928687c6405920a
+    last_write_checksum: sha1:d25c65e251e5420948c80356f7b2b1bf89bd23e4
   src/unstructured_client/models/shared/azuresourceconnectorconfiginput.py:
-    last_write_checksum: sha1:6d0ed886dcb08fc2a5260e84c02ba4b284801fe4
+    last_write_checksum: sha1:fe0257ce8ba82c1202b1ac364263a4f441f9ae00
   src/unstructured_client/models/shared/body_create_job.py:
-    last_write_checksum: sha1:4e6c48f7dc1571c15daed682392aeab8f4e37211
+    last_write_checksum: sha1:3b5e488ec9ac0fd2f202693990298d434cb26b4a
   src/unstructured_client/models/shared/body_run_workflow.py:
-    last_write_checksum: sha1:d3e8d5202144158ef9f9864aa8f60e1615832ffd
+    last_write_checksum: sha1:01393d8fa66bb3dcd9b3724aab68a862cacf4dcd
   src/unstructured_client/models/shared/boxsourceconnectorconfig.py:
     last_write_checksum: sha1:1d0f39cf77cb04dd8945d6715b7a64e8927b7f3d
   src/unstructured_client/models/shared/boxsourceconnectorconfiginput.py:
-    last_write_checksum: sha1:4ed28081e8a1bcf484d1efdbba96726e505ce916
+    last_write_checksum: sha1:bf4e5d99e1c52a0ded37d3ef7faf973f7e6d21e9
   src/unstructured_client/models/shared/confluencesourceconnectorconfig.py:
-    last_write_checksum: sha1:645198dcdb1ca26202519f88c6c21a91e3f2942e
+    last_write_checksum: sha1:6bb399208a774cee1be74175672323e859ba1f2d
   src/unstructured_client/models/shared/confluencesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:f8165c831c1300a0ebe5a7fa563ce1a77e2cd904
+    last_write_checksum: sha1:1230f576791d0317bcefaea902c33c15c0e69ec3
   src/unstructured_client/models/shared/connectioncheckstatus.py:
     last_write_checksum: sha1:ec33f9af1d8679943a3988f3ec2f4b98a5d2c602
   src/unstructured_client/models/shared/couchbasedestinationconnectorconfig.py:
-    last_write_checksum: sha1:a5292001d8ef71f6baf27c1022ee4ce1b3c8c6c4
+    last_write_checksum: sha1:b92e12640eb72ed368b4610e58c615faf0577c3e
   src/unstructured_client/models/shared/couchbasedestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:276e270b32835cf1bc3e4da7d70ada24c6d201ac
+    last_write_checksum: sha1:4c221daca092b413d20306f98d02bfa4b79bcbed
   src/unstructured_client/models/shared/couchbasesourceconnectorconfig.py:
-    last_write_checksum: sha1:19f21ab3e207954c6970137c84fd106d6c01a3fc
+    last_write_checksum: sha1:e56efdaedb8ddec2e2043d7e71c852f322a49fc8
   src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:87a98b17a3b14b9defe1b018e4c98a1d9aeea73b
+    last_write_checksum: sha1:0dba4f21a305d1e44aee5da0a299ce87db83609e
   src/unstructured_client/models/shared/createdestinationconnector.py:
     last_write_checksum: sha1:4dedef674cf9097567f20d04fa26af5a1f8c7785
   src/unstructured_client/models/shared/createsourceconnector.py:
     last_write_checksum: sha1:46a5ce3a43766c4408602dd55a86eb2c3bd86512
   src/unstructured_client/models/shared/createworkflow.py:
-    last_write_checksum: sha1:9201d99f3a9ee2d561b68b68d2af487ee9e21f9d
+    last_write_checksum: sha1:54d100957d5a30fe7f310bd0f8d6658de71a9888
   src/unstructured_client/models/shared/crontabentry.py:
     last_write_checksum: sha1:feae141e003f5248883a7fc3563ad7af44b53b71
   src/unstructured_client/models/shared/dagnodeconnectioncheck.py:
-    last_write_checksum: sha1:0cd1b38d1f51f121f18ec769c7d4a9cd2d37cc97
+    last_write_checksum: sha1:a99aa78991427a7e314adc45e5db841e49c7066a
   src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py:
-    last_write_checksum: sha1:85121248ecc45fe662093a00298b5ab4539100e8
+    last_write_checksum: sha1:3f57c9b5c86657b47eb25dd3592af384a58bd8e2
   src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:a99f3d542753b6bf1700d6c94fbcbcf5554d3b32
+    last_write_checksum: sha1:9b58e46281065f9173f05f0a5a627ff46962a44a
   src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py:
-    last_write_checksum: sha1:974fa6e16d1f4099630a274e9ba6619cd856cb68
+    last_write_checksum: sha1:d9b077b1a4aa7441dbef165b27fa887cff32b5b7
   src/unstructured_client/models/shared/databricksvolumesconnectorconfiginput.py:
-    last_write_checksum: sha1:a458440318bbb57ca077b951266703a4ddaf64ef
+    last_write_checksum: sha1:efa4a5f7c38b9318bd892e895a4beb9c5ed47d49
   src/unstructured_client/models/shared/deltatableconnectorconfig.py:
     last_write_checksum: sha1:1fdbc330f0d0ce905d7822eccdfe68142cbf6b74
   src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
     last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
   src/unstructured_client/models/shared/destinationconnectorinformation.py:
-    last_write_checksum: sha1:8f0ae6448fabb265bfe99d1c2bb9c95e8caa8c6b
+    last_write_checksum: sha1:e6b03a2a074d3ac1c612835c4c088c7dca0ce9e7
   src/unstructured_client/models/shared/destinationconnectortype.py:
     last_write_checksum: sha1:8a535b852261fe20bcdcd5e7ebfc07524270b934
   src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
     last_write_checksum: sha1:975b665d4a1280a04558b963d7564dafaa04afc1
   src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py:
-    last_write_checksum: sha1:216b38301a9ceb44a52486ae3f19f847c088337b
+    last_write_checksum: sha1:31feaba45fb19ff782adeccfcda2a02cad3b5317
   src/unstructured_client/models/shared/elasticsearchconnectorconfig.py:
     last_write_checksum: sha1:2b6736c9464d0fbd15d22ad22d614776231b37ba
   src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py:
@@ -1376,43 +1376,43 @@ trackedFiles:
   src/unstructured_client/models/shared/gcssourceconnectorconfig.py:
     last_write_checksum: sha1:8cd827af3c05ac4af452e8bd37c6220f4a73b050
   src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py:
-    last_write_checksum: sha1:9d9a968cc78f3378c5aeac2423d98b3a0eb01760
+    last_write_checksum: sha1:3fd635d552446532ea87e2c5c0035d7670a02188
   src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py:
-    last_write_checksum: sha1:94e22103b01b68e9b29e361e9543bd44d02873e4
+    last_write_checksum: sha1:e0a190c6e9757643b0d3feb5ad99d1288bbc93dd
   src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:8cea91d87af52ea443a4614f3e54c5a244bc2ed2
+    last_write_checksum: sha1:3accf2b36233f015eb54e8b6de2ff3445f991d91
   src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfig.py:
     last_write_checksum: sha1:2dcf63d86b10d05c2b15c94e8c39dde93517b5c9
   src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfiginput.py:
-    last_write_checksum: sha1:0a9bc9d32bf1f6201ebffbc68a84d0e3323de9cd
+    last_write_checksum: sha1:4c2ea75ee974b3135c9e99107cefb31cc442c702
   src/unstructured_client/models/shared/jirasourceconnectorconfig.py:
-    last_write_checksum: sha1:5a475b7cb0ebb65a1ff921a3a5e09c77c5042258
+    last_write_checksum: sha1:2315d8d8e9b1ef18331209c729e90370dbd12681
   src/unstructured_client/models/shared/jirasourceconnectorconfiginput.py:
-    last_write_checksum: sha1:796325fd5416e5a6e40851c291ec33358aa762a9
+    last_write_checksum: sha1:a322748e0f2df693aaac0c7b167b91ecf04ee2f5
   src/unstructured_client/models/shared/jobdetails.py:
-    last_write_checksum: sha1:1f9cec3b47347535ff23a200600bfa83572d9fd8
+    last_write_checksum: sha1:c8ae2193a7d3cc8034011299d6f9067baf0a5966
   src/unstructured_client/models/shared/jobfailedfiles.py:
     last_write_checksum: sha1:b30fcb1173542a248bdbe676c82c24673ddb1d76
   src/unstructured_client/models/shared/jobinformation.py:
-    last_write_checksum: sha1:5a51e8012bc008d2791b69dee911faacea6d7764
+    last_write_checksum: sha1:7c21bc018164286a8eddfbdc29ce3312f340b6e7
   src/unstructured_client/models/shared/jobnodedetails.py:
-    last_write_checksum: sha1:de6ee17639eeff181eff2fb8a481401a2c250062
+    last_write_checksum: sha1:11a4dbcbcd0e330986278e391dd0cd2211cf2fd1
   src/unstructured_client/models/shared/jobprocessingstatus.py:
     last_write_checksum: sha1:fcdf2f6a9ce596ed1a5b966890544bb2e40da68f
   src/unstructured_client/models/shared/jobstatus.py:
     last_write_checksum: sha1:ff4c2af6e09b05d25cd753e70f143fcb13d33f99
   src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfig.py:
-    last_write_checksum: sha1:bc303ce1eb44468f123b3ac3caaf92820f41398f
+    last_write_checksum: sha1:0e378107a4f173c5c681671f26e27194c1eb21be
   src/unstructured_client/models/shared/kafkaclouddestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:555620cbd0f512ce484a289f095f357ab0963227
+    last_write_checksum: sha1:9b20bd9c29547873eb38505583a939e6aba58099
   src/unstructured_client/models/shared/kafkacloudsourceconnectorconfig.py:
-    last_write_checksum: sha1:b6164b716d36839df0b5c9d2f0af75fda82f9664
+    last_write_checksum: sha1:f85de8342fe890725835a4914a2ada512e98fcce
   src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py:
-    last_write_checksum: sha1:aa7692f1f7e3eb6744d34f81a702659803499a6e
+    last_write_checksum: sha1:2d45b94a4c281b03ffda8208284a2d561218f5da
   src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py:
-    last_write_checksum: sha1:464a01f830a6d57dd1b49550e0ded2a3bebe43eb
+    last_write_checksum: sha1:74b50fcea0f67b5e7613881702f8081859167cd9
   src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:fc8a66fbee8f04c45a4ecb6ecc1c5f1e33e538d2
+    last_write_checksum: sha1:ffc7cab7acd484dec9077c4e8f1fb9e12687516a
   src/unstructured_client/models/shared/mongodbconnectorconfig.py:
     last_write_checksum: sha1:94bfa797fa7773f62fdb93748e81373313fdb555
   src/unstructured_client/models/shared/mongodbconnectorconfiginput.py:
@@ -1420,7 +1420,7 @@ trackedFiles:
   src/unstructured_client/models/shared/neo4jdestinationconnectorconfig.py:
     last_write_checksum: sha1:5e7caa96b7df49093c9ee634ac02fda3f1d90450
   src/unstructured_client/models/shared/neo4jdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:77d08a4a5215c377c8b70eb7e63b244c8798af7f
+    last_write_checksum: sha1:0146f9fcef5258d7260560f58d205c951d4ec71f
   src/unstructured_client/models/shared/nodefilemetadata.py:
     last_write_checksum: sha1:df211de02dd413ca8f64d8298efcdd1b867ad480
   src/unstructured_client/models/shared/onedrivedestinationconnectorconfig.py:
@@ -1430,69 +1430,69 @@ trackedFiles:
   src/unstructured_client/models/shared/onedrivesourceconnectorconfig.py:
     last_write_checksum: sha1:af9f70cc946dd96d58b1164344b0f5682490cce2
   src/unstructured_client/models/shared/onedrivesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:50f983e8f78b96d8523ea0c0df7e65f560cb6ea0
+    last_write_checksum: sha1:870ffce1fe8352c5ae45e68eab66d1fa84cae4ac
   src/unstructured_client/models/shared/opensearchconnectorconfig.py:
-    last_write_checksum: sha1:7f073c0d825d8506d066e78365db325ac5df6fbd
+    last_write_checksum: sha1:e7f995033d332a1330e3cb87d0efc4850dac4cdb
   src/unstructured_client/models/shared/opensearchconnectorconfiginput.py:
-    last_write_checksum: sha1:c8bf14e800fac4e048179b623443043079036d27
+    last_write_checksum: sha1:0a1ae48b89eb7f528e169fb87fb119944848852c
   src/unstructured_client/models/shared/outlooksourceconnectorconfig.py:
-    last_write_checksum: sha1:e414684ad984614ea53f18d3525c35ac023e3b62
+    last_write_checksum: sha1:3dc50339517ced0de17099b79c853b98726cc0f8
   src/unstructured_client/models/shared/outlooksourceconnectorconfiginput.py:
-    last_write_checksum: sha1:7b836a607128f7afe99b2f9ee6a56e8069bae81a
+    last_write_checksum: sha1:e74480ed212c00018597f063ba9fdfe587ab3d9f
   src/unstructured_client/models/shared/partition_parameters.py:
-    last_write_checksum: sha1:20de722171948310ff83a5e0ec3f7d5e29c34d18
+    last_write_checksum: sha1:2bb45862e0db446ba23a3ff2d6669cfa01a659c2
   src/unstructured_client/models/shared/pineconedestinationconnectorconfig.py:
     last_write_checksum: sha1:a350aef0d94ed7a118d4acb8de1687e6abb54631
   src/unstructured_client/models/shared/pineconedestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:a7a6755566625df46201c3672c5e34cf7efd92d3
+    last_write_checksum: sha1:2ba631d72a2a0e868d23d0785c75cf52df837b80
   src/unstructured_client/models/shared/postgresdestinationconnectorconfig.py:
     last_write_checksum: sha1:59191acdd3a316d709c6747c4fa5a68757a9907a
   src/unstructured_client/models/shared/postgresdestinationconnectorconfiginput.py:
     last_write_checksum: sha1:c959eee670ceff082e8bec05264efd4a89e1c5d2
   src/unstructured_client/models/shared/postgressourceconnectorconfig.py:
-    last_write_checksum: sha1:d4cec9d147bee01ef97c2328acd4764a3fba54ef
+    last_write_checksum: sha1:83b508951b9180196da721edd1ee8ed8b4587608
   src/unstructured_client/models/shared/postgressourceconnectorconfiginput.py:
-    last_write_checksum: sha1:73084827edce35a68b9071ca989350bb416d20be
+    last_write_checksum: sha1:f5a304f4e54fead87b6512a725d0f0dc18786f69
   src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfig.py:
     last_write_checksum: sha1:6069ea42140aac20a1d4a696dcde414964b17753
   src/unstructured_client/models/shared/qdrantclouddestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:4c16445610cf6314e8af45d47dd872933762461c
+    last_write_checksum: sha1:44fa10d7b1f53e3f6fe327ab0d4f2bdc32153243
   src/unstructured_client/models/shared/redisdestinationconnectorconfig.py:
-    last_write_checksum: sha1:6aa584d9564ee1ba16aaab352a34b4da2124c623
+    last_write_checksum: sha1:611c7302315a4e0a881a9649a3d4418cbf1211ed
   src/unstructured_client/models/shared/redisdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:7defebd3c1c1ecd2e633653e3bf09d66f41c65b0
+    last_write_checksum: sha1:fa93dd6167e5284601e9e1905a2cca478cc532c2
   src/unstructured_client/models/shared/s3destinationconnectorconfig.py:
-    last_write_checksum: sha1:60a757df68981b64f07c5d6420bab65d50fc4ac7
+    last_write_checksum: sha1:47e041a8114fe23c13ca9ea2c911734854c03abe
   src/unstructured_client/models/shared/s3destinationconnectorconfiginput.py:
-    last_write_checksum: sha1:044395f271a259844c0da10398cf826fc6797367
+    last_write_checksum: sha1:6430d848e41d339f5515abed7e6a7a2c4775aa25
   src/unstructured_client/models/shared/s3sourceconnectorconfig.py:
-    last_write_checksum: sha1:5780fefd557dd44cf4eb097413c61bdeeb2f0feb
+    last_write_checksum: sha1:0c09b22d6c10936ef6c065ffaff39fdcc268e57d
   src/unstructured_client/models/shared/s3sourceconnectorconfiginput.py:
-    last_write_checksum: sha1:2abf0e536ae85a98f2912419d9826403dcad57a7
+    last_write_checksum: sha1:5a4611da7b7b5d90080d23d2d568ec08ed71f077
   src/unstructured_client/models/shared/salesforcesourceconnectorconfig.py:
     last_write_checksum: sha1:d3ed1a04b4965511e3242651ec2475eee5b2435b
   src/unstructured_client/models/shared/salesforcesourceconnectorconfiginput.py:
     last_write_checksum: sha1:61fe5539cab69ef33c2df0592ab0a90f96ae3e62
   src/unstructured_client/models/shared/secretreference.py:
-    last_write_checksum: sha1:7412d990eeee22a89e6a506527eceecea7437f9e
+    last_write_checksum: sha1:0bbb14241b2a7f460c16f016778797617cd8b883
   src/unstructured_client/models/shared/security.py:
-    last_write_checksum: sha1:07ee315df44c21dc5950347b2a1300f23aea53bc
+    last_write_checksum: sha1:6284fd49afae271037f7f45c26a480b4a61229a6
   src/unstructured_client/models/shared/sharepointsourceconnectorconfig.py:
-    last_write_checksum: sha1:2361dfd298822d6171e3e92e68d1026b1627e488
+    last_write_checksum: sha1:851911a1151db00d8ea534979170e353e8d3fb00
   src/unstructured_client/models/shared/sharepointsourceconnectorconfiginput.py:
-    last_write_checksum: sha1:e433ac3c21f8d74b0101f84edd8ccd65dbfd3371
+    last_write_checksum: sha1:79df594725c1ed1e02a2472177ee4ccf8578841c
   src/unstructured_client/models/shared/snowflakedestinationconnectorconfig.py:
-    last_write_checksum: sha1:5f73e0ec0e712a7695dd063b73e73c197cf7e8ad
+    last_write_checksum: sha1:2f1b916e32a32f16dee194a4516e1feb6922c890
   src/unstructured_client/models/shared/snowflakedestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:ed92796870092cae8b3a4d991dce8830836f806c
+    last_write_checksum: sha1:2e9f2185d3b4829a372e1a2770fd711177f395ab
   src/unstructured_client/models/shared/snowflakesourceconnectorconfig.py:
-    last_write_checksum: sha1:4d7fe8b816d43065fce3249149d2613e78f72e93
+    last_write_checksum: sha1:e4238ebe8435d62ec1fe3d13824ec27ba1300c60
   src/unstructured_client/models/shared/snowflakesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:0267848ad53dcdc2f65443d9c569c30683792f25
+    last_write_checksum: sha1:b78f12a3bd05499de8814868bf02cf4a506c1001
   src/unstructured_client/models/shared/sortdirection.py:
     last_write_checksum: sha1:316a46717625825ea3a622089df62f1c02be1482
   src/unstructured_client/models/shared/sourceconnectorinformation.py:
-    last_write_checksum: sha1:ad74c8ace05852476a96287a577ecb58c6f36825
+    last_write_checksum: sha1:64259e76331e196105bf958bea191749d6d31a1a
   src/unstructured_client/models/shared/sourceconnectortype.py:
     last_write_checksum: sha1:cc3f9e479b10403211055f781aec66a5a918a169
   src/unstructured_client/models/shared/templatedetail.py:
@@ -1500,25 +1500,25 @@ trackedFiles:
   src/unstructured_client/models/shared/templatelistitem.py:
     last_write_checksum: sha1:8aeb58b48884855d75b0eab458cd20298816f17b
   src/unstructured_client/models/shared/templatenode.py:
-    last_write_checksum: sha1:e4eb4fda54c7f177addc32f786a59cdaf886ea1d
+    last_write_checksum: sha1:c9e94f8ab03141cf4de36e366f729228ea1d45ca
   src/unstructured_client/models/shared/updatedestinationconnector.py:
     last_write_checksum: sha1:5046b8cd7f5e480f26cb5ef8a1d0f3dd606c0673
   src/unstructured_client/models/shared/updatesourceconnector.py:
     last_write_checksum: sha1:66a29ca6427816cdb1846d63e3d466296dbd3abb
   src/unstructured_client/models/shared/updateworkflow.py:
-    last_write_checksum: sha1:f14b03dfc4d74915d60369f07f17dd6805820cc0
+    last_write_checksum: sha1:7a2f60d70b0f7f36ef2e6b2fc64c687ca260048d
   src/unstructured_client/models/shared/validationerror.py:
     last_write_checksum: sha1:d9824b38a8e37ec6b290ee08643569713ad3a093
   src/unstructured_client/models/shared/weaviatedestinationconnectorconfig.py:
-    last_write_checksum: sha1:d30dbd2c90e6092714067c4fbaf7c99bd90e0a24
+    last_write_checksum: sha1:e5697c8f833529eb95db6eea59ea71a80a800f0d
   src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:a11f1165b1e0f74057fbd141f7cc81c438cfd849
+    last_write_checksum: sha1:1dca5adc68d4340d3e153e5b5f6a6d423e15c59c
   src/unstructured_client/models/shared/workflowinformation.py:
-    last_write_checksum: sha1:2f4b751b1982f701cfff0e1e1fef9459fe759c82
+    last_write_checksum: sha1:4aa28e242ae2a5e5220aa76a33ac9d10a0b1ce3b
   src/unstructured_client/models/shared/workflowjobtype.py:
     last_write_checksum: sha1:b517456e9467a16ea8704e72da18b32971d8dc1f
   src/unstructured_client/models/shared/workflownode.py:
-    last_write_checksum: sha1:6638c8382528b58ae3557892859ce266affea592
+    last_write_checksum: sha1:f27388717f3d32d1aaec85690dbcc4c1812888ff
   src/unstructured_client/models/shared/workflowschedule.py:
     last_write_checksum: sha1:3cb03c67f1cdcd634dccc6d0f4d852d19e436f04
   src/unstructured_client/models/shared/workflowstate.py:
@@ -1526,9 +1526,9 @@ trackedFiles:
   src/unstructured_client/models/shared/workflowtype.py:
     last_write_checksum: sha1:6db14bdb8108eac8bd050f0e4dbb252d312f09b7
   src/unstructured_client/models/shared/zendesksourceconnectorconfig.py:
-    last_write_checksum: sha1:e476e4bfae1aec4eb735944fc53d5271ac6e9a7f
+    last_write_checksum: sha1:03e8bec7eaf756bbe2c8f2c314ad9c6d008973d8
   src/unstructured_client/models/shared/zendesksourceconnectorconfiginput.py:
-    last_write_checksum: sha1:53d57a96ddd09e8af9ef3747c6d948ec7ef63651
+    last_write_checksum: sha1:9b6f99c5e3ca50b9fb1a62c9892bfa3a0c11e05c
   src/unstructured_client/py.typed:
     last_write_checksum: sha1:8efc425ffe830805ffcc0f3055871bdcdc542c60
   src/unstructured_client/sdk.py:
@@ -1544,7 +1544,7 @@ trackedFiles:
   src/unstructured_client/types/basemodel.py:
     last_write_checksum: sha1:10d84aedeb9d35edfdadf2c3020caa1d24d8b584
   src/unstructured_client/utils/__init__.py:
-    last_write_checksum: sha1:887f56a717845fab7445cc368d2a17d850c3565a
+    last_write_checksum: sha1:398211d49b762a067ec6d10197a4b11dfd258ff5
   src/unstructured_client/utils/annotations.py:
     last_write_checksum: sha1:a4824ad65f730303e4e1e3ec1febf87b4eb46dbc
   src/unstructured_client/utils/datetimes.py:

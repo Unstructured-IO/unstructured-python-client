@@ -10,6 +10,7 @@ generation:
     requestResponseComponentNamesFeb2024: false
     securityFeb2025: false
     sharedErrorComponentsApr2025: false
+    sharedNestedComponentsJan2026: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
@@ -22,7 +23,7 @@ generation:
   schemas:
     allOfMergeStrategy: shallowMerge
 python:
-  version: 0.42.8
+  version: 0.42.9
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -83,3 +84,4 @@ python:
   responseFormat: envelope
   sseFlatResponse: false
   templateVersion: v2
+  useAsyncHooks: false
