@@ -87,11 +87,15 @@ if TYPE_CHECKING:
         ConfigTypedDict,
         CreateDestinationConnector,
         CreateDestinationConnectorTypedDict,
+        Type,
+        TypeTypedDict,
     )
     from .createsourceconnector import (
         CreateSourceConnector,
         CreateSourceConnectorConfig,
         CreateSourceConnectorConfigTypedDict,
+        CreateSourceConnectorType,
+        CreateSourceConnectorTypeTypedDict,
         CreateSourceConnectorTypedDict,
     )
     from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
@@ -128,6 +132,8 @@ if TYPE_CHECKING:
         DestinationConnectorInformation,
         DestinationConnectorInformationConfig,
         DestinationConnectorInformationConfigTypedDict,
+        DestinationConnectorInformationType,
+        DestinationConnectorInformationTypeTypedDict,
         DestinationConnectorInformationTypedDict,
     )
     from .destinationconnectortype import DestinationConnectorType
@@ -376,12 +382,30 @@ if TYPE_CHECKING:
         SourceConnectorInformation,
         SourceConnectorInformationConfig,
         SourceConnectorInformationConfigTypedDict,
+        SourceConnectorInformationType,
+        SourceConnectorInformationTypeTypedDict,
         SourceConnectorInformationTypedDict,
     )
     from .sourceconnectortype import SourceConnectorType
     from .templatedetail import TemplateDetail, TemplateDetailTypedDict
     from .templatelistitem import TemplateListItem, TemplateListItemTypedDict
     from .templatenode import TemplateNode, TemplateNodeTypedDict
+    from .teradatadestinationconnectorconfig import (
+        TeradataDestinationConnectorConfig,
+        TeradataDestinationConnectorConfigTypedDict,
+    )
+    from .teradatadestinationconnectorconfiginput import (
+        TeradataDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInputTypedDict,
+    )
+    from .teradatasourceconnectorconfig import (
+        TeradataSourceConnectorConfig,
+        TeradataSourceConnectorConfigTypedDict,
+    )
+    from .teradatasourceconnectorconfiginput import (
+        TeradataSourceConnectorConfigInput,
+        TeradataSourceConnectorConfigInputTypedDict,
+    )
     from .updatedestinationconnector import (
         UpdateDestinationConnector,
         UpdateDestinationConnectorConfig,
@@ -475,6 +499,8 @@ __all__ = [
     "CreateSourceConnector",
     "CreateSourceConnectorConfig",
     "CreateSourceConnectorConfigTypedDict",
+    "CreateSourceConnectorType",
+    "CreateSourceConnectorTypeTypedDict",
     "CreateSourceConnectorTypedDict",
     "CreateWorkflow",
     "CreateWorkflowTypedDict",
@@ -497,6 +523,8 @@ __all__ = [
     "DestinationConnectorInformation",
     "DestinationConnectorInformationConfig",
     "DestinationConnectorInformationConfigTypedDict",
+    "DestinationConnectorInformationType",
+    "DestinationConnectorInformationTypeTypedDict",
     "DestinationConnectorInformationTypedDict",
     "DestinationConnectorType",
     "DropboxSourceConnectorConfig",
@@ -644,6 +672,8 @@ __all__ = [
     "SourceConnectorInformation",
     "SourceConnectorInformationConfig",
     "SourceConnectorInformationConfigTypedDict",
+    "SourceConnectorInformationType",
+    "SourceConnectorInformationTypeTypedDict",
     "SourceConnectorInformationTypedDict",
     "SourceConnectorType",
     "Strategy",
@@ -653,6 +683,16 @@ __all__ = [
     "TemplateListItemTypedDict",
     "TemplateNode",
     "TemplateNodeTypedDict",
+    "TeradataDestinationConnectorConfig",
+    "TeradataDestinationConnectorConfigInput",
+    "TeradataDestinationConnectorConfigInputTypedDict",
+    "TeradataDestinationConnectorConfigTypedDict",
+    "TeradataSourceConnectorConfig",
+    "TeradataSourceConnectorConfigInput",
+    "TeradataSourceConnectorConfigInputTypedDict",
+    "TeradataSourceConnectorConfigTypedDict",
+    "Type",
+    "TypeTypedDict",
     "UpdateDestinationConnector",
     "UpdateDestinationConnectorConfig",
     "UpdateDestinationConnectorConfigTypedDict",
@@ -732,9 +772,13 @@ _dynamic_imports: dict[str, str] = {
     "ConfigTypedDict": ".createdestinationconnector",
     "CreateDestinationConnector": ".createdestinationconnector",
     "CreateDestinationConnectorTypedDict": ".createdestinationconnector",
+    "Type": ".createdestinationconnector",
+    "TypeTypedDict": ".createdestinationconnector",
     "CreateSourceConnector": ".createsourceconnector",
     "CreateSourceConnectorConfig": ".createsourceconnector",
     "CreateSourceConnectorConfigTypedDict": ".createsourceconnector",
+    "CreateSourceConnectorType": ".createsourceconnector",
+    "CreateSourceConnectorTypeTypedDict": ".createsourceconnector",
     "CreateSourceConnectorTypedDict": ".createsourceconnector",
     "CreateWorkflow": ".createworkflow",
     "CreateWorkflowTypedDict": ".createworkflow",
@@ -758,6 +802,8 @@ _dynamic_imports: dict[str, str] = {
     "DestinationConnectorInformation": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfig": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfigTypedDict": ".destinationconnectorinformation",
+    "DestinationConnectorInformationType": ".destinationconnectorinformation",
+    "DestinationConnectorInformationTypeTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorInformationTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorType": ".destinationconnectortype",
     "DropboxSourceConnectorConfig": ".dropboxsourceconnectorconfig",
@@ -902,6 +948,8 @@ _dynamic_imports: dict[str, str] = {
     "SourceConnectorInformation": ".sourceconnectorinformation",
     "SourceConnectorInformationConfig": ".sourceconnectorinformation",
     "SourceConnectorInformationConfigTypedDict": ".sourceconnectorinformation",
+    "SourceConnectorInformationType": ".sourceconnectorinformation",
+    "SourceConnectorInformationTypeTypedDict": ".sourceconnectorinformation",
     "SourceConnectorInformationTypedDict": ".sourceconnectorinformation",
     "SourceConnectorType": ".sourceconnectortype",
     "TemplateDetail": ".templatedetail",
@@ -910,6 +958,14 @@ _dynamic_imports: dict[str, str] = {
     "TemplateListItemTypedDict": ".templatelistitem",
     "TemplateNode": ".templatenode",
     "TemplateNodeTypedDict": ".templatenode",
+    "TeradataDestinationConnectorConfig": ".teradatadestinationconnectorconfig",
+    "TeradataDestinationConnectorConfigTypedDict": ".teradatadestinationconnectorconfig",
+    "TeradataDestinationConnectorConfigInput": ".teradatadestinationconnectorconfiginput",
+    "TeradataDestinationConnectorConfigInputTypedDict": ".teradatadestinationconnectorconfiginput",
+    "TeradataSourceConnectorConfig": ".teradatasourceconnectorconfig",
+    "TeradataSourceConnectorConfigTypedDict": ".teradatasourceconnectorconfig",
+    "TeradataSourceConnectorConfigInput": ".teradatasourceconnectorconfiginput",
+    "TeradataSourceConnectorConfigInputTypedDict": ".teradatasourceconnectorconfiginput",
     "UpdateDestinationConnector": ".updatedestinationconnector",
     "UpdateDestinationConnectorConfig": ".updatedestinationconnector",
     "UpdateDestinationConnectorConfigTypedDict": ".updatedestinationconnector",
