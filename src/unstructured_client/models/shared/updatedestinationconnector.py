@@ -89,6 +89,10 @@ from .snowflakedestinationconnectorconfiginput import (
     SnowflakeDestinationConnectorConfigInput,
     SnowflakeDestinationConnectorConfigInputTypedDict,
 )
+from .teradatadestinationconnectorconfiginput import (
+    TeradataDestinationConnectorConfigInput,
+    TeradataDestinationConnectorConfigInputTypedDict,
+)
 from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
@@ -120,6 +124,7 @@ UpdateDestinationConnectorConfigTypedDict = TypeAliasType(
         DatabricksVolumesConnectorConfigInputTypedDict,
         OpenSearchConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
+        TeradataDestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
@@ -151,6 +156,7 @@ UpdateDestinationConnectorConfig = TypeAliasType(
         DatabricksVolumesConnectorConfigInput,
         OpenSearchConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
