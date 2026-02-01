@@ -25,5 +25,6 @@
 | `SHAREPOINT`         | sharepoint           |
 | `SLACK`              | slack                |
 | `SNOWFLAKE`          | snowflake            |
+| `TERADATA`           | teradata             |
 | `JIRA`               | jira                 |
 | `ZENDESK`            | zendesk              |
