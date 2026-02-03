@@ -23,7 +23,7 @@ generation:
   schemas:
     allOfMergeStrategy: shallowMerge
 python:
-  version: 0.42.9
+  version: 0.42.10
   additionalDependencies:
     dev:
       deepdiff: '>=6.0'
@@ -40,6 +40,7 @@ python:
       cryptography: '>=3.1'
       httpx: '>=0.27.0'
       pypdf: '>= 6.2.0'
+      pypdfium: '>= 5.0.0'
       requests-toolbelt: '>=1.0.0'
   allowedRedefinedBuiltins:
     - id
