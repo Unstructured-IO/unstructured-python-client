@@ -1181,3 +1181,13 @@ Based on:
 - [python v0.42.9] .
 ### Releases
 - [PyPI v0.42.9] https://pypi.org/project/unstructured-client/0.42.9 - .
+
+## 2026-02-03 16:49:02
+### Changes
+Based on:
+- OpenAPI Doc  
+- Speakeasy CLI 1.601.0 (2.680.0) https://github.com/speakeasy-api/speakeasy
+### Generated
+- [python v0.42.10] .
+### Releases
+- [PyPI v0.42.10] https://pypi.org/project/unstructured-client/0.42.10 - .
