@@ -18,7 +18,7 @@ import aiofiles
 import httpx
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
-import pypdfium2 as pdfium
+import pypdfium2 as pdfium  # type: ignore[import-untyped]
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -350,9 +350,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         pdf = self._trim_large_pages(pdf, form_data)
 
+        pdf_file.seek(0)
+        pdf_bytes = pdf_file.read()
         if self.cache_tmp_data_feature:
             pdf_chunk_paths = self._get_pdf_chunk_paths(
-                pdf,
+                pdf_bytes,
                 operation_id=operation_id,
                 split_size=split_size,
                 page_start=page_range_start,
@@ -363,7 +365,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
         else:
             pdf_chunks = self._get_pdf_chunks_in_memory(
-                pdf,
+                pdf_bytes,
                 split_size=split_size,
                 page_start=page_range_start,
                 page_end=page_range_end
@@ -468,7 +470,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def _get_pdf_chunks_in_memory(
             self,
-            pdf: PdfReader,
+            pdf_bytes: bytes,
             split_size: int = 1,
             page_start: int = 1,
             page_end: Optional[int] = None
@@ -516,7 +518,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def _get_pdf_chunk_paths(
         self,
-        pdf: PdfReader,
+        pdf_bytes: bytes,
         operation_id: str,
         split_size: int = 1,
         page_start: int = 1,
