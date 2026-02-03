@@ -27,5 +27,6 @@
 | `QDRANT_CLOUD`                   | qdrant-cloud                     |
 | `S3`                             | s3                               |
 | `SNOWFLAKE`                      | snowflake                        |
+| `TERADATA`                       | teradata                         |
 | `WEAVIATE_CLOUD`                 | weaviate-cloud                   |
 | `IBM_WATSONX_S3`                 | ibm_watsonx_s3                   |

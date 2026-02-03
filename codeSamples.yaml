@@ -14,7 +14,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request=operations.CreateDestinationRequest(\n        create_destination_connector=shared.CreateDestinationConnector(\n            name=\"<value>\",\n            type=shared.DestinationConnectorType.MOTHERDUCK,\n            config={\n                \"hosts\": [],\n                \"index_name\": \"<value>\",\n            },\n        ),\n    ))\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request=operations.CreateDestinationRequest(\n        create_destination_connector=shared.CreateDestinationConnector(\n            name=\"<value>\",\n            type=\"<value>\",\n            config=shared.PineconeDestinationConnectorConfigInput(\n                index_name=\"<value>\",\n                api_key=\"<value>\",\n                namespace=\"<value>\",\n                batch_size=50,\n            ),\n        ),\n    ))\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -98,7 +98,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_source"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.DROPBOX,\n            \"config\": {\n                \"box_app_config\": \"<value>\",\n                \"remote_url\": \"https://ugly-ribbon.info\",\n                \"recursive\": True,\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.BOX,\n            \"config\": {\n                \"host\": \"ugly-ribbon.info\",\n                \"database\": \"<value>\",\n                \"port\": 526676,\n                \"username\": \"Albertha_Senger\",\n                \"password\": \"jIalrq2izU8rFxd\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 637100,\n                \"id_column\": \"id\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["delete"]
     update:
       "x-codeSamples":

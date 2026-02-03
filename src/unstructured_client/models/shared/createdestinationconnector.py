@@ -90,6 +90,10 @@ from .snowflakedestinationconnectorconfiginput import (
     SnowflakeDestinationConnectorConfigInput,
     SnowflakeDestinationConnectorConfigInputTypedDict,
 )
+from .teradatadestinationconnectorconfiginput import (
+    TeradataDestinationConnectorConfigInput,
+    TeradataDestinationConnectorConfigInputTypedDict,
+)
 from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
@@ -123,6 +127,7 @@ ConfigTypedDict = TypeAliasType(
         DatabricksVolumesConnectorConfigInputTypedDict,
         OpenSearchConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
+        TeradataDestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
@@ -154,6 +159,7 @@ Config = TypeAliasType(
         DatabricksVolumesConnectorConfigInput,
         OpenSearchConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
@@ -163,10 +169,22 @@ Config = TypeAliasType(
 )
 
 
+TypeTypedDict = TypeAliasType("TypeTypedDict", Union[DestinationConnectorType, str])
+
+
+Type = TypeAliasType(
+    "Type",
+    Union[
+        Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))],
+        str,
+    ],
+)
+
+
 class CreateDestinationConnectorTypedDict(TypedDict):
     config: ConfigTypedDict
     name: str
-    type: DestinationConnectorType
+    type: TypeTypedDict
 
 
 class CreateDestinationConnector(BaseModel):
@@ -174,4 +192,4 @@ class CreateDestinationConnector(BaseModel):
 
     name: str
 
-    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
+    type: Type

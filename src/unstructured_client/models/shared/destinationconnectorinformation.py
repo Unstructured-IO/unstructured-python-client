@@ -90,6 +90,10 @@ from .snowflakedestinationconnectorconfig import (
     SnowflakeDestinationConnectorConfig,
     SnowflakeDestinationConnectorConfigTypedDict,
 )
+from .teradatadestinationconnectorconfig import (
+    TeradataDestinationConnectorConfig,
+    TeradataDestinationConnectorConfigTypedDict,
+)
 from .weaviatedestinationconnectorconfig import (
     WeaviateDestinationConnectorConfig,
     WeaviateDestinationConnectorConfigTypedDict,
@@ -132,6 +136,7 @@ DestinationConnectorInformationConfigTypedDict = TypeAliasType(
         AstraDBConnectorConfigTypedDict,
         OpenSearchConnectorConfigTypedDict,
         RedisDestinationConnectorConfigTypedDict,
+        TeradataDestinationConnectorConfigTypedDict,
         DatabricksVDTDestinationConnectorConfigTypedDict,
         SnowflakeDestinationConnectorConfigTypedDict,
         IBMWatsonxS3DestinationConnectorConfigTypedDict,
@@ -163,10 +168,25 @@ DestinationConnectorInformationConfig = TypeAliasType(
         AstraDBConnectorConfig,
         OpenSearchConnectorConfig,
         RedisDestinationConnectorConfig,
+        TeradataDestinationConnectorConfig,
         DatabricksVDTDestinationConnectorConfig,
         SnowflakeDestinationConnectorConfig,
         IBMWatsonxS3DestinationConnectorConfig,
         Dict[str, Any],
+    ],
+)
+
+
+DestinationConnectorInformationTypeTypedDict = TypeAliasType(
+    "DestinationConnectorInformationTypeTypedDict", Union[DestinationConnectorType, str]
+)
+
+
+DestinationConnectorInformationType = TypeAliasType(
+    "DestinationConnectorInformationType",
+    Union[
+        Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))],
+        str,
     ],
 )
 
@@ -176,7 +196,7 @@ class DestinationConnectorInformationTypedDict(TypedDict):
     created_at: datetime
     id: str
     name: str
-    type: DestinationConnectorType
+    type: DestinationConnectorInformationTypeTypedDict
     updated_at: NotRequired[Nullable[datetime]]
 
 
@@ -189,7 +209,7 @@ class DestinationConnectorInformation(BaseModel):
 
     name: str
 
-    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
+    type: DestinationConnectorInformationType
 
     updated_at: OptionalNullable[datetime] = UNSET
 
