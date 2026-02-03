@@ -13,7 +13,6 @@ from concurrent import futures
 from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
-from threading import Lock
 
 import aiofiles
 import httpx
