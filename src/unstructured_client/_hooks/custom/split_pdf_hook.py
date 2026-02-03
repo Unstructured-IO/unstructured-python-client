@@ -350,8 +350,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         pdf = self._trim_large_pages(pdf, form_data)
 
-        pdf_file.seek(0)
-        pdf_bytes = pdf_file.read()
+        if isinstance(pdf_file, bytes):
+            pdf_bytes = pdf_file
+        else:
+            pdf_file.seek(0)
+            pdf_bytes = pdf_file.read()
+
         if self.cache_tmp_data_feature:
             pdf_chunk_paths = self._get_pdf_chunk_paths(
                 pdf_bytes,
