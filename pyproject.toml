@@ -1,7 +1,7 @@
 
 [project]
 name = "unstructured-client"
-version = "0.42.9"
+version = "0.42.10"
 description = "Python Client SDK for Unstructured API"
 authors = [{ name = "Unstructured" },]
 readme = "README-PYPI.md"
@@ -13,6 +13,7 @@ dependencies = [
     "httpx >=0.27.0",
     "pydantic >=2.11.2",
     "pypdf >= 6.2.0",
+    "pypdfium2 >= 5.0.0",
     "requests-toolbelt >=1.0.0",
 ]
 

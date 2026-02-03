@@ -18,6 +18,7 @@ import aiofiles
 import httpx
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
+import pypdfium2 as pdfium  # type: ignore[import-untyped]
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
@@ -349,9 +350,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         pdf = self._trim_large_pages(pdf, form_data)
 
+        pdf.stream.seek(0)
+        pdf_bytes = pdf.stream.read()
+
         if self.cache_tmp_data_feature:
             pdf_chunk_paths = self._get_pdf_chunk_paths(
-                pdf,
+                pdf_bytes,
                 operation_id=operation_id,
                 split_size=split_size,
                 page_start=page_range_start,
@@ -362,7 +366,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
         else:
             pdf_chunks = self._get_pdf_chunks_in_memory(
-                pdf,
+                pdf_bytes,
                 split_size=split_size,
                 page_start=page_range_start,
                 page_end=page_range_end
@@ -467,7 +471,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     def _get_pdf_chunks_in_memory(
             self,
-            pdf: PdfReader,
+            pdf_bytes: bytes,
             split_size: int = 1,
             page_start: int = 1,
             page_end: Optional[int] = None
@@ -488,27 +492,34 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             The list of temporary file paths.
         """
 
-        offset = page_start - 1
-        offset_end = page_end or len(pdf.pages)
+        with pdfium.PdfDocument(pdf_bytes) as pdf:
 
-        chunk_no = 0
-        while offset < offset_end:
-            chunk_no += 1
-            new_pdf = PdfWriter()
-            chunk_buffer = io.BytesIO()
+            offset = page_start - 1
+            offset_end = page_end if page_end else len(pdf)
 
-            end = min(offset + split_size, offset_end)
+            while offset < offset_end:
+                end = min(offset + split_size, offset_end)
 
-            for page in list(pdf.pages[offset:end]):
-                new_pdf.add_page(page)
-            new_pdf.write(chunk_buffer)
-            chunk_buffer.seek(0)
-            yield chunk_buffer, offset
-            offset += split_size
+                # Create new PDF
+                new_pdf = pdfium.PdfDocument.new()
+
+                # Import pages
+                page_indices = list(range(offset, end))
+                new_pdf.import_pages(pdf, pages=page_indices)
+
+                # Save to buffer
+                chunk_buffer = io.BytesIO()
+                new_pdf.save(chunk_buffer)
+                chunk_buffer.seek(0)
+
+                new_pdf.close()
+
+                yield chunk_buffer, offset
+                offset += split_size
 
     def _get_pdf_chunk_paths(
         self,
-        pdf: PdfReader,
+        pdf_bytes: bytes,
         operation_id: str,
         split_size: int = 1,
         page_start: int = 1,
@@ -530,30 +541,39 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             The list of temporary file paths.
         """
 
-        offset = page_start - 1
-        offset_end = page_end or len(pdf.pages)
+        with pdfium.PdfDocument(pdf_bytes) as pdf:
+            offset = page_start - 1
+            offset_end = page_end if page_end else len(pdf)
 
-        tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
-            dir=self.cache_tmp_data_dir,
-            prefix="unstructured_client_"
-        )
-        self.tempdirs[operation_id] = tempdir
-        tempdir_path = Path(tempdir.name)
-        pdf_chunk_paths: list[Tuple[Path, int]] = []
-        chunk_no = 0
-        while offset < offset_end:
-            chunk_no += 1
-            new_pdf = PdfWriter()
+            # Create temporary directory
+            tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
+                dir=self.cache_tmp_data_dir,
+                prefix="unstructured_client_"
+            )
+            self.tempdirs[operation_id] = tempdir
+            tempdir_path = Path(tempdir.name)
 
-            end = min(offset + split_size, offset_end)
+            pdf_chunk_paths: list[Tuple[Path, int]] = []
+            chunk_no = 0
 
-            for page in list(pdf.pages[offset:end]):
-                new_pdf.add_page(page)
-            with open(tempdir_path / f"chunk_{chunk_no}.pdf", "wb") as pdf_chunk:
-                new_pdf.write(pdf_chunk)
-                pdf_chunk_paths.append((Path(pdf_chunk.name), offset))
-            offset += split_size
-        return pdf_chunk_paths
+            while offset < offset_end:
+                chunk_no += 1
+                end = min(offset + split_size, offset_end)
+
+                # Create new PDF with selected pages
+                new_pdf = pdfium.PdfDocument.new()
+                page_indices = list(range(offset, end))
+                new_pdf.import_pages(pdf, pages=page_indices)
+
+                # Save to file
+                chunk_path = tempdir_path / f"chunk_{chunk_no}.pdf"
+                new_pdf.save(str(chunk_path))  # Convert Path to string
+                new_pdf.close()
+
+                pdf_chunk_paths.append((chunk_path, offset))
+                offset += split_size
+
+            return pdf_chunk_paths
 
     def _get_pdf_chunk_files(
         self, pdf_chunks: list[Tuple[Path, int]]
