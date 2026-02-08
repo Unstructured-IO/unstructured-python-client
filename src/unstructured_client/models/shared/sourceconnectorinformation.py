@@ -82,6 +82,10 @@ from .snowflakesourceconnectorconfig import (
     SnowflakeSourceConnectorConfigTypedDict,
 )
 from .sourceconnectortype import SourceConnectorType
+from .teradatasourceconnectorconfig import (
+    TeradataSourceConnectorConfig,
+    TeradataSourceConnectorConfigTypedDict,
+)
 from .zendesksourceconnectorconfig import (
     ZendeskSourceConnectorConfig,
     ZendeskSourceConnectorConfigTypedDict,
@@ -122,6 +126,7 @@ SourceConnectorInformationConfigTypedDict = TypeAliasType(
         SharePointSourceConnectorConfigTypedDict,
         CouchbaseSourceConnectorConfigTypedDict,
         PostgresSourceConnectorConfigTypedDict,
+        TeradataSourceConnectorConfigTypedDict,
         JiraSourceConnectorConfigTypedDict,
         ConfluenceSourceConnectorConfigTypedDict,
         SnowflakeSourceConnectorConfigTypedDict,
@@ -151,10 +156,24 @@ SourceConnectorInformationConfig = TypeAliasType(
         SharePointSourceConnectorConfig,
         CouchbaseSourceConnectorConfig,
         PostgresSourceConnectorConfig,
+        TeradataSourceConnectorConfig,
         JiraSourceConnectorConfig,
         ConfluenceSourceConnectorConfig,
         SnowflakeSourceConnectorConfig,
         Dict[str, Any],
+    ],
+)
+
+
+SourceConnectorInformationTypeTypedDict = TypeAliasType(
+    "SourceConnectorInformationTypeTypedDict", Union[SourceConnectorType, str]
+)
+
+
+SourceConnectorInformationType = TypeAliasType(
+    "SourceConnectorInformationType",
+    Union[
+        Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))], str
     ],
 )
 
@@ -164,7 +183,7 @@ class SourceConnectorInformationTypedDict(TypedDict):
     created_at: datetime
     id: str
     name: str
-    type: SourceConnectorType
+    type: SourceConnectorInformationTypeTypedDict
     updated_at: NotRequired[Nullable[datetime]]
 
 
@@ -177,7 +196,7 @@ class SourceConnectorInformation(BaseModel):
 
     name: str
 
-    type: Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))]
+    type: SourceConnectorInformationType
 
     updated_at: OptionalNullable[datetime] = UNSET
 
