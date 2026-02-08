@@ -117,6 +117,12 @@ value: shared.SharePointSourceConnectorConfigInput = /* values here */
 value: shared.SnowflakeSourceConnectorConfigInput = /* values here */
 ```
 
+### `shared.TeradataSourceConnectorConfigInput`
+
+```python
+value: shared.TeradataSourceConnectorConfigInput = /* values here */
+```
+
 ### `shared.JiraSourceConnectorConfigInput`
 
 ```python

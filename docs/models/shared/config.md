@@ -129,6 +129,12 @@ value: shared.S3DestinationConnectorConfigInput = /* values here */
 value: shared.SnowflakeDestinationConnectorConfigInput = /* values here */
 ```
 
+### `shared.TeradataDestinationConnectorConfigInput`
+
+```python
+value: shared.TeradataDestinationConnectorConfigInput = /* values here */
+```
+
 ### `shared.WeaviateDestinationConnectorConfigInput`
 
 ```python
