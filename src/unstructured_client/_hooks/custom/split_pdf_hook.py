@@ -124,7 +124,7 @@ def get_optimal_split_size(num_pages: int, concurrency_level: int) -> int:
     return max(split_size, MIN_PAGES_PER_SPLIT)
 
 
-def load_elements_from_response(response: httpx.Response) -> list[dict]:
+async def load_elements_from_response(response: httpx.Response) -> list[dict]:
     """Loads elements from the response content - the response was modified
     to keep the path for the json file that should be loaded and returned
 
@@ -135,8 +135,9 @@ def load_elements_from_response(response: httpx.Response) -> list[dict]:
     Returns:
         list[dict]: The elements loaded from the response content cached in the json file.
     """
-    with open(response.text, mode="r", encoding="utf-8") as file:
-        return json.load(file)
+    async with aiofiles.open(response.text, mode="r", encoding="utf-8") as file:
+        content = await file.read()
+        return json.loads(content)
 
 
 class SplitPdfHook(
@@ -643,7 +644,7 @@ class SplitPdfHook(
                 )
                 successful_responses.append(res)
                 if cache_enabled:
-                    elements.append(load_elements_from_response(res))
+                    elements.append(await load_elements_from_response(res))
                 else:
                     elements.append(res.json())
             else:
