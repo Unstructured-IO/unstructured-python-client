@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 import httpx
 from typing import Any, Callable, List, Optional, Tuple, Union
-from unstructured_client.httpclient import HttpClient
+from unstructured_client.httpclient import AsyncHttpClient, HttpClient
 from unstructured_client.sdkconfiguration import SDKConfiguration
 
 
@@ -95,6 +95,41 @@ class AfterErrorHook(ABC):
         pass
 
 
+class AsyncSDKInitHook(ABC):
+    @abstractmethod
+    async def sdk_init_async(
+        self, base_url: str, client: AsyncHttpClient
+    ) -> Tuple[str, AsyncHttpClient]:
+        pass
+
+
+class AsyncBeforeRequestHook(ABC):
+    @abstractmethod
+    async def before_request_async(
+        self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        pass
+
+
+class AsyncAfterSuccessHook(ABC):
+    @abstractmethod
+    async def after_success_async(
+        self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> Union[httpx.Response, Exception]:
+        pass
+
+
+class AsyncAfterErrorHook(ABC):
+    @abstractmethod
+    async def after_error_async(
+        self,
+        hook_ctx: AfterErrorContext,
+        response: Optional[httpx.Response],
+        error: Optional[Exception],
+    ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
+        pass
+
+
 class Hooks(ABC):
     @abstractmethod
     def register_sdk_init_hook(self, hook: SDKInitHook):
@@ -110,4 +145,20 @@ class Hooks(ABC):
 
     @abstractmethod
     def register_after_error_hook(self, hook: AfterErrorHook):
+        pass
+
+    @abstractmethod
+    def register_async_sdk_init_hook(self, hook: AsyncSDKInitHook):
+        pass
+
+    @abstractmethod
+    def register_async_before_request_hook(self, hook: AsyncBeforeRequestHook):
+        pass
+
+    @abstractmethod
+    def register_async_after_success_hook(self, hook: AsyncAfterSuccessHook):
+        pass
+
+    @abstractmethod
+    def register_async_after_error_hook(self, hook: AsyncAfterErrorHook):
         pass
