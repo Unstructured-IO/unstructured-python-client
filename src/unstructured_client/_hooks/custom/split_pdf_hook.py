@@ -169,9 +169,10 @@ class SplitPdfHook(
         self.api_successful_responses: dict[str, list[httpx.Response]] = {}
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
-        self.allow_failed: bool = DEFAULT_ALLOW_FAILED
-        self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
-        self.cache_tmp_data_dir: str = DEFAULT_CACHE_TMP_DATA_DIR
+        # Store per-operation settings to avoid race conditions with concurrent requests
+        self.allow_failed: dict[str, bool] = {}
+        self.cache_tmp_data_feature: dict[str, bool] = {}
+        self.cache_tmp_data_dir: dict[str, str] = {}
 
     def sdk_init(
             self, base_url: str, client: HttpClient
@@ -306,7 +307,7 @@ class SplitPdfHook(
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
 
-        self.allow_failed = form_utils.get_split_pdf_allow_failed_param(
+        self.allow_failed[operation_id] = form_utils.get_split_pdf_allow_failed_param(
             form_data,
             key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
             fallback_value=DEFAULT_ALLOW_FAILED,
@@ -319,13 +320,13 @@ class SplitPdfHook(
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
 
-        self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
+        self.cache_tmp_data_feature[operation_id] = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
             key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
             fallback_value=DEFAULT_CACHE_TMP_DATA,
         )
 
-        self.cache_tmp_data_dir = form_utils.get_split_pdf_cache_tmp_data_dir(
+        self.cache_tmp_data_dir[operation_id] = form_utils.get_split_pdf_cache_tmp_data_dir(
             form_data,
             key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
             fallback_value=DEFAULT_CACHE_TMP_DATA_DIR,
@@ -353,7 +354,7 @@ class SplitPdfHook(
         pdf.stream.seek(0)
         pdf_bytes = pdf.stream.read()
 
-        if self.cache_tmp_data_feature:
+        if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
             pdf_chunk_paths = self._get_pdf_chunk_paths(
                 pdf_bytes,
                 operation_id=operation_id,
@@ -428,16 +429,17 @@ class SplitPdfHook(
 
 
         if response.status_code == 200:
-            if self.cache_tmp_data_feature:
+            if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
                 # If we get 200, dump the contents to a file and return the path
-                temp_dir = self.tempdirs[operation_id]
-                temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
-                async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
-                    # Avoid reading the entire response into memory
-                    async for bytes_chunk in response.aiter_bytes():
-                        await temp_file.write(bytes_chunk)
-                # we save the path in content attribute to be used in after_success
-                response._content = temp_file_name.encode()  # pylint: disable=protected-access
+                temp_dir = self.tempdirs.get(operation_id)
+                if temp_dir:  # Ensure tempdir still exists
+                    temp_file_name = f"{temp_dir.name}/{uuid.uuid4()}.json"
+                    async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
+                        # Avoid reading the entire response into memory
+                        async for bytes_chunk in response.aiter_bytes():
+                            await temp_file.write(bytes_chunk)
+                    # we save the path in content attribute to be used in after_success
+                    response._content = temp_file_name.encode()  # pylint: disable=protected-access
 
         return response
 
@@ -546,8 +548,9 @@ class SplitPdfHook(
             offset_end = page_end if page_end else len(pdf)
 
             # Create temporary directory
+            cache_dir = self.cache_tmp_data_dir.get(operation_id, DEFAULT_CACHE_TMP_DATA_DIR)
             tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
-                dir=self.cache_tmp_data_dir,
+                dir=cache_dir,
                 prefix="unstructured_client_"
             )
             self.tempdirs[operation_id] = tempdir
@@ -620,7 +623,8 @@ class SplitPdfHook(
             return None
 
         concurrency_level = self.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL)
-        task_responses = await run_tasks(tasks, allow_failed=self.allow_failed, concurrency_level=concurrency_level)
+        allow_failed = self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+        task_responses = await run_tasks(tasks, allow_failed=allow_failed, concurrency_level=concurrency_level)
 
         if task_responses is None:
             return None
@@ -628,6 +632,9 @@ class SplitPdfHook(
         successful_responses = []
         failed_responses = []
         elements = []
+        cache_enabled = self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA)
+        allow_failed = self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+
         for response_number, res in task_responses:
             if res.status_code == 200:
                 logger.debug(
@@ -635,14 +642,14 @@ class SplitPdfHook(
                     response_number,
                 )
                 successful_responses.append(res)
-                if self.cache_tmp_data_feature:
+                if cache_enabled:
                     elements.append(load_elements_from_response(res))
                 else:
                     elements.append(res.json())
             else:
                 error_message = f"Failed to partition set {response_number}."
 
-                if self.allow_failed:
+                if allow_failed:
                     error_message += " Its elements will be omitted from the result."
 
                 logger.error(error_message)
@@ -656,42 +663,24 @@ class SplitPdfHook(
     def after_success(
             self, hook_ctx: AfterSuccessContext, response: httpx.Response
     ) -> Union[httpx.Response, Exception]:
-        """Executes after a successful API request. Awaits all parallel requests and
-        combines the responses into a single response object.
+        """Executes after a successful API request in sync context.
+
+        Note: This is only used by the sync partition() method. The split PDF hook
+        doesn't support sync operations since it needs async for parallel requests.
+        For async operations, use partition_async which calls after_success_async.
 
         Args:
             hook_ctx (AfterSuccessContext): The context object containing information
             about the hook execution.
-            response (httpx.Response): The response object from the SDK call. This was a dummy
-            request just to get us to the AfterSuccessHook.
+            response (httpx.Response): The response object from the SDK call.
 
         Returns:
-            Union[httpx.Response, Exception]: If requests were run in parallel, a
-            combined response object; otherwise, the original response. Can return
-            exception if it ocurred during the execution.
+            Union[httpx.Response, Exception]: The original response since sync hook
+            doesn't support PDF splitting with parallel requests.
         """
-        if not self.is_partition_request:
-            return response
-
-        # Grab the correct id out of the dummy request
-        operation_id = response.request.headers.get("operation_id")
-
-        elements = self._await_elements(operation_id)
-
-        # if fails are disallowed, return the first failed response
-        if not self.allow_failed and self.api_failed_responses.get(operation_id):
-            failure_response = self.api_failed_responses[operation_id][0]
-
-            self._clear_operation(operation_id)
-            return failure_response
-
-        if elements is None:
-            return response
-
-        new_response = request_utils.create_response(elements)
-        self._clear_operation(operation_id)
-
-        return new_response
+        # The sync version doesn't support split PDF operations
+        # Those only work with the async version
+        return response
 
     def after_error(
             self,
@@ -789,7 +778,7 @@ class SplitPdfHook(
             fallback_value=DEFAULT_STARTING_PAGE_NUMBER,
         )
 
-        self.allow_failed = form_utils.get_split_pdf_allow_failed_param(
+        self.allow_failed[operation_id] = form_utils.get_split_pdf_allow_failed_param(
             form_data,
             key=PARTITION_FORM_SPLIT_PDF_ALLOW_FAILED_KEY,
             fallback_value=DEFAULT_ALLOW_FAILED,
@@ -802,13 +791,13 @@ class SplitPdfHook(
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
 
-        self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
+        self.cache_tmp_data_feature[operation_id] = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
             key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_KEY,
             fallback_value=DEFAULT_CACHE_TMP_DATA,
         )
 
-        self.cache_tmp_data_dir = form_utils.get_split_pdf_cache_tmp_data_dir(
+        self.cache_tmp_data_dir[operation_id] = form_utils.get_split_pdf_cache_tmp_data_dir(
             form_data,
             key=PARTITION_FORM_SPLIT_CACHE_TMP_DATA_DIR_KEY,
             fallback_value=DEFAULT_CACHE_TMP_DATA_DIR,
@@ -836,7 +825,7 @@ class SplitPdfHook(
         pdf.stream.seek(0)
         pdf_bytes = pdf.stream.read()
 
-        if self.cache_tmp_data_feature:
+        if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
             pdf_chunk_paths = self._get_pdf_chunk_paths(
                 pdf_bytes,
                 operation_id=operation_id,
@@ -916,7 +905,8 @@ class SplitPdfHook(
         elements = await self._await_elements(operation_id)
 
         # if fails are disallowed, return the first failed response
-        if not self.allow_failed and self.api_failed_responses.get(operation_id):
+        allow_failed = self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+        if not allow_failed and self.api_failed_responses.get(operation_id):
             failure_response = self.api_failed_responses[operation_id][0]
 
             self._clear_operation(operation_id)
@@ -948,7 +938,11 @@ class SplitPdfHook(
         """
         self.coroutines_to_execute.pop(operation_id, None)
         self.api_successful_responses.pop(operation_id, None)
+        self.api_failed_responses.pop(operation_id, None)
         self.concurrency_level.pop(operation_id, None)
+        self.allow_failed.pop(operation_id, None)
+        self.cache_tmp_data_feature.pop(operation_id, None)
+        self.cache_tmp_data_dir.pop(operation_id, None)
         tempdir = self.tempdirs.pop(operation_id, None)
         if tempdir:
             tempdir.cleanup()
