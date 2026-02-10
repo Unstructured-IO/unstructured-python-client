@@ -36,10 +36,19 @@ def init_hooks(hooks: Hooks):
     # Register Before Request hooks
     hooks.register_before_request_hook(split_pdf_hook)
 
-    # Register After Error hooks
+    # Register After Success hooks
     hooks.register_after_success_hook(split_pdf_hook)
     hooks.register_after_success_hook(logger_hook)
 
     # Register After Error hooks
     hooks.register_after_error_hook(split_pdf_hook)
-    hooks.register_after_error_hook(logger_hook)  
+    hooks.register_after_error_hook(logger_hook)
+
+    # Register Async Before Request hooks
+    hooks.register_async_before_request_hook(split_pdf_hook)
+
+    # Register Async After Success hooks
+    hooks.register_async_after_success_hook(split_pdf_hook)
+
+    # Register Async After Error hooks
+    hooks.register_async_after_error_hook(split_pdf_hook)  

@@ -300,7 +300,7 @@ class BaseSDK:
         async def do():
             http_res = None
             try:
-                req = hooks.before_request(BeforeRequestContext(hook_ctx), request)
+                req = await hooks.before_request_async(BeforeRequestContext(hook_ctx), request)
                 logger.debug(
                     "Request:\nMethod: %s\nURL: %s\nHeaders: %s\nBody: %s",
                     req.method,
@@ -314,7 +314,7 @@ class BaseSDK:
 
                 http_res = await client.send(req, stream=stream)
             except Exception as e:
-                _, e = hooks.after_error(AfterErrorContext(hook_ctx), None, e)
+                _, e = await hooks.after_error_async(AfterErrorContext(hook_ctx), None, e)
                 if e is not None:
                     logger.debug("Request Exception", exc_info=True)
                     raise e
@@ -332,7 +332,7 @@ class BaseSDK:
             )
 
             if utils.match_status_codes(error_status_codes, http_res.status_code):
-                result, err = hooks.after_error(
+                result, err = await hooks.after_error_async(
                     AfterErrorContext(hook_ctx), http_res, None
                 )
                 if err is not None:
@@ -354,6 +354,6 @@ class BaseSDK:
             http_res = await do()
 
         if not utils.match_status_codes(error_status_codes, http_res.status_code):
-            http_res = hooks.after_success(AfterSuccessContext(hook_ctx), http_res)
+            http_res = await hooks.after_success_async(AfterSuccessContext(hook_ctx), http_res)
 
         return http_res

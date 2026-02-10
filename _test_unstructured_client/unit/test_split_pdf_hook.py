@@ -526,3 +526,188 @@ def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
         mock_get_fields.assert_called_once_with(mock_request)
         mock_read_pdf.assert_called_once_with(mock_pdf_file)
         mock_check_pdf.assert_called_once_with(mock_pdf_reader)
+
+
+def test_per_request_settings_isolation():
+    """Test that multiple concurrent requests have isolated settings.
+
+    This validates the fix for race conditions where instance-level settings
+    would be shared between concurrent requests, causing one request to use
+    another's configuration.
+    """
+    hook = SplitPdfHook()
+
+    # Simulate two different operations with different settings
+    operation_id_1 = "op-1"
+    operation_id_2 = "op-2"
+
+    # Set different settings for each operation
+    hook.allow_failed[operation_id_1] = True
+    hook.cache_tmp_data_feature[operation_id_1] = True
+    hook.cache_tmp_data_dir[operation_id_1] = "/tmp/op1"
+    hook.concurrency_level[operation_id_1] = 5
+
+    hook.allow_failed[operation_id_2] = False
+    hook.cache_tmp_data_feature[operation_id_2] = False
+    hook.cache_tmp_data_dir[operation_id_2] = "/tmp/op2"
+    hook.concurrency_level[operation_id_2] = 10
+
+    # Verify that each operation has its own isolated settings
+    assert hook.allow_failed[operation_id_1] is True
+    assert hook.allow_failed[operation_id_2] is False
+
+    assert hook.cache_tmp_data_feature[operation_id_1] is True
+    assert hook.cache_tmp_data_feature[operation_id_2] is False
+
+    assert hook.cache_tmp_data_dir[operation_id_1] == "/tmp/op1"
+    assert hook.cache_tmp_data_dir[operation_id_2] == "/tmp/op2"
+
+    assert hook.concurrency_level[operation_id_1] == 5
+    assert hook.concurrency_level[operation_id_2] == 10
+
+
+def test_per_request_settings_cleanup():
+    """Test that per-request settings are properly cleaned up after operation completes."""
+    hook = SplitPdfHook()
+
+    operation_id = "test-op"
+
+    # Set up operation data
+    hook.allow_failed[operation_id] = True
+    hook.cache_tmp_data_feature[operation_id] = True
+    hook.cache_tmp_data_dir[operation_id] = "/tmp/test"
+    hook.concurrency_level[operation_id] = 8
+    hook.coroutines_to_execute[operation_id] = []
+    hook.api_successful_responses[operation_id] = []
+    hook.api_failed_responses[operation_id] = []
+
+    # Verify data exists
+    assert operation_id in hook.allow_failed
+    assert operation_id in hook.cache_tmp_data_feature
+    assert operation_id in hook.cache_tmp_data_dir
+    assert operation_id in hook.concurrency_level
+
+    # Clear the operation
+    hook._clear_operation(operation_id)
+
+    # Verify all data is cleaned up
+    assert operation_id not in hook.allow_failed
+    assert operation_id not in hook.cache_tmp_data_feature
+    assert operation_id not in hook.cache_tmp_data_dir
+    assert operation_id not in hook.concurrency_level
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.api_successful_responses
+    assert operation_id not in hook.api_failed_responses
+
+
+@pytest.mark.asyncio
+async def test_concurrent_async_operations_isolation():
+    """Test that concurrent async operations maintain isolated settings.
+
+    This simulates the real-world scenario where multiple partition_async
+    calls are made concurrently and ensures they don't interfere with each other.
+    """
+    hook = SplitPdfHook()
+
+    # Track which settings each operation saw
+    operation_settings = {}
+
+    async def simulate_operation(op_id: str, allow_failed: bool, cache_enabled: bool):
+        """Simulate an operation that sets and reads its own settings."""
+        # Set operation-specific settings
+        hook.allow_failed[op_id] = allow_failed
+        hook.cache_tmp_data_feature[op_id] = cache_enabled
+        hook.concurrency_level[op_id] = 5
+
+        # Simulate some async work
+        await asyncio.sleep(0.01)
+
+        # Read back settings and verify they haven't changed
+        operation_settings[op_id] = {
+            'allow_failed': hook.allow_failed.get(op_id),
+            'cache_enabled': hook.cache_tmp_data_feature.get(op_id),
+            'concurrency_level': hook.concurrency_level.get(op_id),
+        }
+
+        # Clean up
+        hook._clear_operation(op_id)
+
+    # Run multiple operations concurrently with different settings
+    tasks = [
+        simulate_operation("op-1", True, True),
+        simulate_operation("op-2", False, False),
+        simulate_operation("op-3", True, False),
+        simulate_operation("op-4", False, True),
+    ]
+
+    await asyncio.gather(*tasks)
+
+    # Verify each operation saw its own settings correctly
+    assert operation_settings["op-1"] == {'allow_failed': True, 'cache_enabled': True, 'concurrency_level': 5}
+    assert operation_settings["op-2"] == {'allow_failed': False, 'cache_enabled': False, 'concurrency_level': 5}
+    assert operation_settings["op-3"] == {'allow_failed': True, 'cache_enabled': False, 'concurrency_level': 5}
+    assert operation_settings["op-4"] == {'allow_failed': False, 'cache_enabled': True, 'concurrency_level': 5}
+
+
+@pytest.mark.asyncio
+async def test_await_elements_uses_operation_settings():
+    """Test that _await_elements correctly uses per-operation settings."""
+    hook = SplitPdfHook()
+
+    operation_id = "test-op"
+
+    # Set operation-specific settings
+    hook.allow_failed[operation_id] = True
+    hook.cache_tmp_data_feature[operation_id] = False
+    hook.concurrency_level[operation_id] = 3
+
+    # Mock the coroutines to execute
+    async def mock_coroutine(async_client, limiter):
+        """Mock coroutine that returns a successful response."""
+        response = httpx.Response(
+            status_code=200,
+            json=[{"element": "test"}],
+        )
+        return response
+
+    hook.coroutines_to_execute[operation_id] = [
+        partial(mock_coroutine)
+    ]
+
+    # Mock run_tasks to verify it receives the correct settings
+    with patch("unstructured_client._hooks.custom.split_pdf_hook.run_tasks") as mock_run_tasks:
+        mock_run_tasks.return_value = [(1, httpx.Response(
+            status_code=200,
+            content=b'[{"element": "test"}]',
+        ))]
+
+        await hook._await_elements(operation_id)
+
+        # Verify run_tasks was called with the operation-specific settings
+        mock_run_tasks.assert_called_once()
+        call_args = mock_run_tasks.call_args
+
+        # Check that allow_failed matches what we set
+        assert call_args.kwargs['allow_failed'] is True
+        assert call_args.kwargs['concurrency_level'] == 3
+
+
+def test_default_values_used_when_operation_not_found():
+    """Test that default values are used when operation_id is not in the settings dicts."""
+    hook = SplitPdfHook()
+
+    # Don't set any values for this operation
+    operation_id = "missing-op"
+
+    # Access settings with .get() should return defaults
+    from unstructured_client._hooks.custom.split_pdf_hook import (
+        DEFAULT_ALLOW_FAILED,
+        DEFAULT_CACHE_TMP_DATA,
+        DEFAULT_CACHE_TMP_DATA_DIR,
+        DEFAULT_CONCURRENCY_LEVEL,
+    )
+
+    assert hook.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED) == DEFAULT_ALLOW_FAILED
+    assert hook.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA) == DEFAULT_CACHE_TMP_DATA
+    assert hook.cache_tmp_data_dir.get(operation_id, DEFAULT_CACHE_TMP_DATA_DIR) == DEFAULT_CACHE_TMP_DATA_DIR
+    assert hook.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL) == DEFAULT_CONCURRENCY_LEVEL
