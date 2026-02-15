@@ -64,14 +64,14 @@ Create a new source connector using the provided configuration and name.
 <!-- UsageSnippet language="python" operationID="create_source" method="post" path="/api/v1/sources/" -->
 ```python
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.create_source(request={
-        "create_source_connector": {
-            "config": {
+    res = uc_client.sources.create_source(request=operations.CreateSourceRequest(
+        create_source_connector=shared.CreateSourceConnector(
+            config={
                 "catalog": "<value>",
                 "client_id": "<id>",
                 "client_secret": "<value>",
@@ -79,10 +79,10 @@ with UnstructuredClient() as uc_client:
                 "volume": "<value>",
                 "volume_path": "<value>",
             },
-            "name": "<value>",
-            "type": shared.SourceConnectorType.SALESFORCE,
-        },
-    })
+            name="<value>",
+            type=shared.SourceConnectorType.SALESFORCE,
+        ),
+    ))
 
     assert res.source_connector_information is not None
 
@@ -284,13 +284,14 @@ Update the configuration of an existing source connector.
 <!-- UsageSnippet language="python" operationID="update_source" method="put" path="/api/v1/sources/{source_id}" -->
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations, shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.sources.update_source(request={
-        "update_source_connector": {
-            "config": {
+    res = uc_client.sources.update_source(request=operations.UpdateSourceRequest(
+        update_source_connector=shared.UpdateSourceConnector(
+            config={
                 "batch_size": 615322,
                 "bucket": "<value>",
                 "collection_id": "<id>",
@@ -298,9 +299,9 @@ with UnstructuredClient() as uc_client:
                 "password": "sMt9qfyDYveMwvw",
                 "username": "Rene.Glover-Lakin",
             },
-        },
-        "source_id": "ddfe2014-2c10-4972-9711-fc2801d19038",
-    })
+        ),
+        source_id="ddfe2014-2c10-4972-9711-fc2801d19038",
+    ))
 
     assert res.source_connector_information is not None
 

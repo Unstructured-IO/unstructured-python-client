@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -17,6 +18,8 @@ class MilvusDestinationConnectorConfigTypedDict(TypedDict):
     record_id_key: str
     uri: str
     db_name: NotRequired[Nullable[str]]
+    fields_to_include: NotRequired[Nullable[List[str]]]
+    flatten_metadata: NotRequired[bool]
     password: NotRequired[Nullable[str]]
     token: NotRequired[Nullable[str]]
     user: NotRequired[Nullable[str]]
@@ -31,6 +34,10 @@ class MilvusDestinationConnectorConfig(BaseModel):
 
     db_name: OptionalNullable[str] = UNSET
 
+    fields_to_include: OptionalNullable[List[str]] = UNSET
+
+    flatten_metadata: Optional[bool] = True
+
     password: OptionalNullable[str] = UNSET
 
     token: OptionalNullable[str] = UNSET
@@ -39,8 +46,15 @@ class MilvusDestinationConnectorConfig(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["db_name", "password", "token", "user"]
-        nullable_fields = ["db_name", "password", "token", "user"]
+        optional_fields = [
+            "db_name",
+            "fields_to_include",
+            "flatten_metadata",
+            "password",
+            "token",
+            "user",
+        ]
+        nullable_fields = ["db_name", "fields_to_include", "password", "token", "user"]
         null_default_fields = []
 
         serialized = handler(self)

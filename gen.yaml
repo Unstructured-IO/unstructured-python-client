@@ -22,6 +22,7 @@ generation:
   requestBodyFieldName: ""
   schemas:
     allOfMergeStrategy: shallowMerge
+  versioningStrategy: automatic
 python:
   version: 0.42.10
   additionalDependencies:
@@ -60,6 +61,8 @@ python:
   flattenGlobalSecurity: true
   flattenRequests: false
   flatteningOrder: parameters-first
+  forwardCompatibleEnumsByDefault: false
+  forwardCompatibleUnionsByDefault: "false"
   imports:
     option: openapi
     paths:

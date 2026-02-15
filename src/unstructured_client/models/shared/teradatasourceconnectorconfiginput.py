@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from pydantic import model_serializer
-from typing import Optional
+from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
@@ -13,38 +13,41 @@ from unstructured_client.types import (
 )
 
 
-class SharePointSourceConnectorConfigTypedDict(TypedDict):
-    client_cred: str
-    client_id: str
-    recursive: bool
-    site: str
-    tenant: str
-    authority_url: NotRequired[str]
-    path: NotRequired[Nullable[str]]
-    user_pname: NotRequired[Nullable[str]]
+class TeradataSourceConnectorConfigInputTypedDict(TypedDict):
+    host: str
+    password: str
+    table_name: str
+    user: str
+    batch_size: NotRequired[int]
+    database: NotRequired[Nullable[str]]
+    dbs_port: NotRequired[int]
+    fields: NotRequired[Nullable[List[str]]]
+    id_column: NotRequired[str]
 
 
-class SharePointSourceConnectorConfig(BaseModel):
-    client_cred: str
+class TeradataSourceConnectorConfigInput(BaseModel):
+    host: str
 
-    client_id: str
+    password: str
 
-    recursive: bool
+    table_name: str
 
-    site: str
+    user: str
 
-    tenant: str
+    batch_size: Optional[int] = 100
 
-    authority_url: Optional[str] = "https://login.microsoftonline.com"
+    database: OptionalNullable[str] = UNSET
 
-    path: OptionalNullable[str] = UNSET
+    dbs_port: Optional[int] = 1025
 
-    user_pname: OptionalNullable[str] = UNSET
+    fields: OptionalNullable[List[str]] = UNSET
+
+    id_column: Optional[str] = "id"
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["authority_url", "path", "user_pname"]
-        nullable_fields = ["path", "user_pname"]
+        optional_fields = ["batch_size", "database", "dbs_port", "fields", "id_column"]
+        nullable_fields = ["database", "fields"]
         null_default_fields = []
 
         serialized = handler(self)

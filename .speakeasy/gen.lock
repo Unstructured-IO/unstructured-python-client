@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8b5fa338-9106-4734-abf0-e30d67044a90
 management:
-  docChecksum: d16fe72a4dedf521ed38d340b69e914f
-  docVersion: 1.2.28
+  docChecksum: 1cab59c0575cd5fe49db05715c4b234b
+  docVersion: 1.3.4
   speakeasyVersion: 1.601.0
   generationVersion: 2.680.0
-  releaseVersion: 0.42.9
-  configChecksum: 9ce3853dc79759623054c060ed5d5a4d
+  releaseVersion: 0.42.10
+  configChecksum: fb4fdf3ad1be9a402b3b71c36b3b0ed5
   repoURL: https://github.com/Unstructured-IO/unstructured-python-client.git
   repoSubDirectory: .
   installationURL: https://github.com/Unstructured-IO/unstructured-python-client.git
@@ -121,6 +121,7 @@ generatedFiles:
   - docs/models/shared/confluencesourceconnectorconfig.md
   - docs/models/shared/confluencesourceconnectorconfiginput.md
   - docs/models/shared/connectioncheckstatus.md
+  - docs/models/shared/context.md
   - docs/models/shared/couchbasedestinationconnectorconfig.md
   - docs/models/shared/couchbasedestinationconnectorconfiginput.md
   - docs/models/shared/couchbasesourceconnectorconfig.md
@@ -128,6 +129,7 @@ generatedFiles:
   - docs/models/shared/createdestinationconnector.md
   - docs/models/shared/createsourceconnector.md
   - docs/models/shared/createsourceconnectorconfig.md
+  - docs/models/shared/createsourceconnectortype.md
   - docs/models/shared/createworkflow.md
   - docs/models/shared/crontabentry.md
   - docs/models/shared/dagnodeconnectioncheck.md
@@ -139,6 +141,7 @@ generatedFiles:
   - docs/models/shared/deltatableconnectorconfiginput.md
   - docs/models/shared/destinationconnectorinformation.md
   - docs/models/shared/destinationconnectorinformationconfig.md
+  - docs/models/shared/destinationconnectorinformationtype.md
   - docs/models/shared/destinationconnectortype.md
   - docs/models/shared/dropboxsourceconnectorconfig.md
   - docs/models/shared/dropboxsourceconnectorconfiginput.md
@@ -153,6 +156,7 @@ generatedFiles:
   - docs/models/shared/gcssourceconnectorconfiginput.md
   - docs/models/shared/googledrivesourceconnectorconfig.md
   - docs/models/shared/googledrivesourceconnectorconfiginput.md
+  - docs/models/shared/googledrivesourceconnectorconfiginputoauthtoken.md
   - docs/models/shared/googledrivesourceconnectorconfiginputserviceaccountkey.md
   - docs/models/shared/ibmwatsonxs3destinationconnectorconfig.md
   - docs/models/shared/ibmwatsonxs3destinationconnectorconfiginput.md
@@ -177,6 +181,7 @@ generatedFiles:
   - docs/models/shared/neo4jdestinationconnectorconfig.md
   - docs/models/shared/neo4jdestinationconnectorconfiginput.md
   - docs/models/shared/nodefilemetadata.md
+  - docs/models/shared/oauthtoken.md
   - docs/models/shared/onedrivedestinationconnectorconfig.md
   - docs/models/shared/onedrivedestinationconnectorconfiginput.md
   - docs/models/shared/onedrivesourceconnectorconfig.md
@@ -216,11 +221,17 @@ generatedFiles:
   - docs/models/shared/sortdirection.md
   - docs/models/shared/sourceconnectorinformation.md
   - docs/models/shared/sourceconnectorinformationconfig.md
+  - docs/models/shared/sourceconnectorinformationtype.md
   - docs/models/shared/sourceconnectortype.md
   - docs/models/shared/strategy.md
   - docs/models/shared/templatedetail.md
   - docs/models/shared/templatelistitem.md
   - docs/models/shared/templatenode.md
+  - docs/models/shared/teradatadestinationconnectorconfig.md
+  - docs/models/shared/teradatadestinationconnectorconfiginput.md
+  - docs/models/shared/teradatasourceconnectorconfig.md
+  - docs/models/shared/teradatasourceconnectorconfiginput.md
+  - docs/models/shared/type.md
   - docs/models/shared/updatedestinationconnector.md
   - docs/models/shared/updatedestinationconnectorconfig.md
   - docs/models/shared/updatesourceconnector.md
@@ -406,6 +417,10 @@ generatedFiles:
   - src/unstructured_client/models/shared/templatedetail.py
   - src/unstructured_client/models/shared/templatelistitem.py
   - src/unstructured_client/models/shared/templatenode.py
+  - src/unstructured_client/models/shared/teradatadestinationconnectorconfig.py
+  - src/unstructured_client/models/shared/teradatadestinationconnectorconfiginput.py
+  - src/unstructured_client/models/shared/teradatasourceconnectorconfig.py
+  - src/unstructured_client/models/shared/teradatasourceconnectorconfiginput.py
   - src/unstructured_client/models/shared/updatedestinationconnector.py
   - src/unstructured_client/models/shared/updatesourceconnector.py
   - src/unstructured_client/models/shared/updateworkflow.py
@@ -455,7 +470,7 @@ examples:
         "202":
           application/json: {"created_at": "2025-10-20T23:39:28.789Z", "id": "bf41fdbf-f16d-4daf-afe8-e0ab3b68a315", "status": "SCHEDULED"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   create_destination:
     speakeasy-default-create-destination:
       requestBody:
@@ -464,7 +479,7 @@ examples:
         "200":
           application/json: {"config": {"collection_name": "<value>", "record_id_key": "<value>", "uri": "https://crafty-cannon.biz/"}, "created_at": "2023-03-18T00:34:28.375Z", "id": "76f3fb82-d6f7-4281-8faf-676da88fb481", "name": "<value>", "type": "delta_table"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   delete_destination:
     speakeasy-default-delete-destination:
       parameters:
@@ -474,7 +489,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_connection_check_destinations:
     speakeasy-default-get-connection-check-destinations:
       parameters:
@@ -484,7 +499,7 @@ examples:
         "200":
           application/json: {"created_at": "2023-09-24T22:46:25.633Z", "id": "57977ca1-fa51-43e8-81ca-8d14660edb2f", "status": "SCHEDULED"}
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}, {"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_destination:
     speakeasy-default-get-destination:
       parameters:
@@ -494,14 +509,14 @@ examples:
         "200":
           application/json: {"config": {"api_key": "<value>", "cluster_url": "https://limp-deduction.info/"}, "created_at": "2024-10-05T14:53:37.578Z", "id": "3a19d507-0c6f-45db-9c27-6bda221db7c9", "name": "<value>", "type": "onedrive"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   list_destinations:
     speakeasy-default-list-destinations:
       responses:
         "200":
           application/json: [{"config": {"collection": "<value>", "database": "<value>", "uri": "https://impish-requirement.com/"}, "created_at": "2023-04-30T14:49:41.382Z", "id": "2a9cfce9-9fbf-4632-b0bb-d7f54308d22a", "name": "<value>", "type": "milvus"}, {"config": {"collection": "<value>", "database": "<value>", "uri": "https://impish-requirement.com/"}, "created_at": "2023-04-30T14:49:41.382Z", "id": "2a9cfce9-9fbf-4632-b0bb-d7f54308d22a", "name": "<value>", "type": "milvus"}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>", 692994, 486732], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   update_destination:
     speakeasy-default-update-destination:
       parameters:
@@ -513,7 +528,7 @@ examples:
         "200":
           application/json: {"config": {"batch_size": 995926, "bootstrap_servers": "<value>", "kafka_api_key": "<value>", "port": 738823, "secret": "<value>", "topic": "<value>"}, "created_at": "2025-01-06T19:22:11.814Z", "id": "b21064e2-21ef-4e1e-afed-49c185e47aec", "name": "<value>", "type": "kafka-cloud"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   cancel_job:
     speakeasy-default-cancel-job:
       parameters:
@@ -523,7 +538,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   download_job_output:
     speakeasy-default-download-job-output:
       parameters:
@@ -536,7 +551,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": [{"loc": [451892, "<value>", 520048], "msg": "<value>", "type": "<value>"}, {"loc": [451892, "<value>", 520048], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_job:
     speakeasy-default-get-job:
       parameters:
@@ -546,14 +561,14 @@ examples:
         "200":
           application/json: {"created_at": "2023-12-26T15:26:16.070Z", "id": "efd2f64b-e5c2-40a2-adff-c96bbced66f1", "status": "STOPPED", "workflow_id": "d23287f2-047a-4009-bd2f-c4cedf39ab27", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   list_jobs:
     speakeasy-default-list-jobs:
       responses:
         "200":
           application/json: [{"created_at": "2023-06-24T09:45:55.017Z", "id": "a5da67c3-2840-44f1-a29e-15f7f38b3ae9", "status": "COMPLETED", "workflow_id": "33f7a125-e8b1-42b4-9919-8eee0c8bf5dd", "workflow_name": "<value>"}, {"created_at": "2023-06-24T09:45:55.017Z", "id": "a5da67c3-2840-44f1-a29e-15f7f38b3ae9", "status": "COMPLETED", "workflow_id": "33f7a125-e8b1-42b4-9919-8eee0c8bf5dd", "workflow_name": "<value>"}]
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   create_connection_check_sources:
     speakeasy-default-create-connection-check-sources:
       parameters:
@@ -563,7 +578,7 @@ examples:
         "202":
           application/json: {"created_at": "2024-08-04T05:51:18.286Z", "id": "54af9913-46a4-4c6f-8621-fbdb010d1e1c", "status": "FAILURE"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}, {"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   create_source:
     speakeasy-default-create-source:
       requestBody:
@@ -572,7 +587,7 @@ examples:
         "200":
           application/json: {"config": {"es_api_key": "<value>", "hosts": ["<value 1>", "<value 2>"], "index_name": "<value>"}, "created_at": "2023-01-27T10:18:51.865Z", "id": "0d927c6a-cdd3-4cf8-93d1-64e5bab5ae77", "name": "<value>", "type": "outlook"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>", "<value>", 821563], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   delete_source:
     speakeasy-default-delete-source:
       parameters:
@@ -582,7 +597,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": []}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_connection_check_sources:
     speakeasy-default-get-connection-check-sources:
       parameters:
@@ -592,7 +607,7 @@ examples:
         "200":
           application/json: {"created_at": "2025-03-23T07:48:11.676Z", "id": "049b282d-33c6-4429-9d02-74de94241c1c", "status": "FAILURE"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_source:
     speakeasy-default-get-source:
       parameters:
@@ -602,14 +617,14 @@ examples:
         "200":
           application/json: {"config": {"account": "42519273", "batch_size": 100, "database": "<value>", "host": "cheap-calculus.com", "id_column": "<value>", "password": "REwXIKFWioaChyx", "port": 443, "role": "<value>", "table_name": "<value>", "user": "Geoffrey_Botsford"}, "created_at": "2025-02-20T17:05:31.272Z", "id": "cec63e54-8fcd-4d90-b0cd-a3626915ee21", "name": "<value>", "type": "databricks_volumes"}
         "422":
-          application/json: {"detail": [{"loc": [655647, 154679, "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [655647, 154679, "<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   list_sources:
     speakeasy-default-list-sources:
       responses:
         "200":
           application/json: [{"config": {"drive_id": "<id>", "recursive": true, "service_account_key": "<value>"}, "created_at": "2025-05-21T10:14:46.427Z", "id": "9122423b-ce5d-4ea1-9473-88699f279973", "name": "<value>", "type": "s3"}]
         "422":
-          application/json: {"detail": [{"loc": [32316, 153806], "msg": "<value>", "type": "<value>"}, {"loc": [32316, 153806], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   update_source:
     speakeasy-default-update-source:
       parameters:
@@ -621,7 +636,7 @@ examples:
         "200":
           application/json: {"config": {"api_token": "<value>", "email": "Laron_Leannon@gmail.com", "subdomain": "<value>"}, "created_at": "2025-01-06T17:21:52.810Z", "id": "ba174ff5-4d8c-48f7-a45a-73aa3c0890d9", "name": "<value>", "type": "postgres"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   create_workflow:
     speakeasy-default-create-workflow:
       requestBody:
@@ -630,7 +645,7 @@ examples:
         "200":
           application/json: {"created_at": "2023-01-15T13:52:58.634Z", "destinations": [], "id": "80c8c72f-101a-4a39-974b-49aa299e80d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["47678eb0-4958-4341-ad66-b1b822c1deb9"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   delete_workflow:
     speakeasy-default-delete-workflow:
       parameters:
@@ -640,7 +655,7 @@ examples:
         "200":
           application/json: "<value>"
         "422":
-          application/json: {"detail": [{"loc": [], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_workflow:
     speakeasy-default-get-workflow:
       parameters:
@@ -650,7 +665,7 @@ examples:
         "200":
           application/json: {"created_at": "2024-01-22T17:42:53.375Z", "destinations": ["624abbf1-dbce-4fe0-8d3f-0673956fc10e"], "id": "840c33c3-f30c-4908-9688-2682ed8eea3f", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["349ed27a-eeda-4851-866a-8ce3a65a2957", "9aa34544-3278-446f-a265-efcaa55f9c4a"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   list_workflows:
     speakeasy-default-list-workflows:
       parameters:
@@ -660,7 +675,7 @@ examples:
         "200":
           application/json: [{"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}, {"created_at": "2023-09-02T04:21:23.162Z", "destinations": [], "id": "1e4c63cf-6a6b-407b-b993-b2bc8b3bcefc", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["2e12d926-4caf-4cce-8b5c-3e16722c1c84"], "status": "inactive", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}, {"name": "<value>", "subtype": "<value>", "type": "<value>"}]}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>", 864403], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   run_workflow:
     speakeasy-default-run-workflow:
       parameters:
@@ -670,7 +685,7 @@ examples:
         "202":
           application/json: {"created_at": "2023-06-18T08:23:13.478Z", "id": "31486aa0-728f-4b32-9a2c-dd2a37bba4db", "status": "FAILED", "workflow_id": "4a6d3163-6a94-4eba-af10-3db36886d0cc", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": [13129, "<value>", "<value>"], "msg": "<value>", "type": "<value>"}, {"loc": [13129, "<value>", "<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   update_workflow:
     speakeasy-default-update-workflow:
       parameters:
@@ -682,7 +697,7 @@ examples:
         "200":
           application/json: {"created_at": "2025-01-11T03:06:48.390Z", "destinations": [], "id": "88fd9cfe-ed29-4701-9d1f-8f26d4ea88d3", "name": "<value>", "reprocess_all": false, "schedule": {"crontab_entries": [{"cron_expression": "0 0 * * *"}]}, "sources": ["0957eb7f-57d3-4705-bc49-03de6ad3794d", "a8b88099-9065-4458-a824-b37da7a9bccf", "a024c482-10ba-433a-9100-e6471e9d3db0"], "status": "active", "workflow_nodes": [{"name": "<value>", "subtype": "<value>", "type": "<value>"}]}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   partition:
     speakeasy-default-partition:
       requestBody:
@@ -692,7 +707,7 @@ examples:
           application/json: [{"type": "Title", "element_id": "6aa0ff22f91bbe7e26e8e25ca8052acd", "text": "LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis", "metadata": {"languages": ["eng"], "page_number": 1, "filename": "layout-parser-paper.pdf", "filetype": "application/pdf"}}]
           text/csv: "<value>"
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
         5XX:
           application/json: {"detail": "An error occurred"}
   get_job_details:
@@ -704,7 +719,7 @@ examples:
         "200":
           application/json: {"id": "39a8d74e-66d2-40a4-a9b0-25ee4f08f855", "node_stats": [], "processing_status": "STOPPED"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_job_failed_files:
     speakeasy-default-get-job-failed-files:
       parameters:
@@ -714,7 +729,7 @@ examples:
         "200":
           application/json: {"failed_files": []}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   retrieve:
     speakeasy-default-retrieve:
       responses:
@@ -746,7 +761,7 @@ examples:
         "200":
           application/json: {"created_at": "2024-02-18T20:31:27.125Z", "id": "55723ca1-8ca8-4beb-bf8a-b2c41cc6649d", "status": "IN_PROGRESS", "workflow_id": "3f012d20-710b-43a2-8577-22a817a1352a", "workflow_name": "<value>"}
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   get_template:
     speakeasy-default-get-template:
       parameters:
@@ -756,14 +771,14 @@ examples:
         "200":
           application/json: {"description": "probate legging nor lest wrathful oddly importance metabolite to tricky", "id": "<id>", "last_updated": "<value>", "name": "<value>", "nodes": [], "version": "<value>"}
         "422":
-          application/json: {"detail": "<value>"}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
   list_templates:
     speakeasy-default-list-templates:
       responses:
         "200":
           application/json: [{"description": "without license expostulate gloss specific through huzzah", "id": "<id>", "last_updated": "<value>", "name": "<value>", "version": "<value>"}]
         "422":
-          application/json: {"detail": [{"loc": ["<value>"], "msg": "<value>", "type": "<value>"}]}
+          application/json: {"detail": [{"input": "forty", "loc": ["body", "combine_under_n_chars"], "msg": "Input should be a valid integer, unable to parse string as an integer", "type": "int_parsing"}]}
 examplesVersion: 1.0.2
 generatedTests: {}
 trackedFiles:
@@ -926,13 +941,15 @@ trackedFiles:
   docs/models/shared/boxsourceconnectorconfiginput.md:
     last_write_checksum: sha1:e75625a2d8e1092d752dec9d6416ca2dc7ece940
   docs/models/shared/config.md:
-    last_write_checksum: sha1:921b555dc3b2f4c796f265958e1e497bc2c2c221
+    last_write_checksum: sha1:2eeba15a4cde3e56bb33bca6f552aebdba3abedd
   docs/models/shared/confluencesourceconnectorconfig.md:
     last_write_checksum: sha1:f0fc3f07b8dfe0af11928df4f8246168500ec3bb
   docs/models/shared/confluencesourceconnectorconfiginput.md:
     last_write_checksum: sha1:db8a7e7f5f4d5b231fe8cc4de99f848f4cd6ffb1
   docs/models/shared/connectioncheckstatus.md:
     last_write_checksum: sha1:db2996b0cf9d1ac947825fae0072fcd70c2ab374
+  docs/models/shared/context.md:
+    last_write_checksum: sha1:4c14b386f9f89d98f4dd9487ab030f10478c0e63
   docs/models/shared/couchbasedestinationconnectorconfig.md:
     last_write_checksum: sha1:f8eef3f3b5aebe168049a683018d9d68e74fc4d6
   docs/models/shared/couchbasedestinationconnectorconfiginput.md:
@@ -942,11 +959,13 @@ trackedFiles:
   docs/models/shared/couchbasesourceconnectorconfiginput.md:
     last_write_checksum: sha1:11c20ae7633c07a8e12d80d60ef57c0e79799d79
   docs/models/shared/createdestinationconnector.md:
-    last_write_checksum: sha1:22cf73e4cf6ca7e97adb7973b2a83ae900039269
+    last_write_checksum: sha1:5a7ecba32e71dfcc071f9fc2338548f377ac0945
   docs/models/shared/createsourceconnector.md:
-    last_write_checksum: sha1:006ad810becfd9f2d7c8e8ff5de3cb0d0815bf72
+    last_write_checksum: sha1:845bbd83afa5b77a8eebcaf2878d2a9c43e7c882
   docs/models/shared/createsourceconnectorconfig.md:
-    last_write_checksum: sha1:8021615bdecc4203ff24a7663bc51928687771fc
+    last_write_checksum: sha1:a9d01fc1f0149716ff22d792ed36af868167f279
+  docs/models/shared/createsourceconnectortype.md:
+    last_write_checksum: sha1:d059c96cd894a50237f090b77faaa62366373466
   docs/models/shared/createworkflow.md:
     last_write_checksum: sha1:8aaf8738ef81e5c333b21e0052015755d21fdb1a
   docs/models/shared/crontabentry.md:
@@ -966,11 +985,13 @@ trackedFiles:
   docs/models/shared/deltatableconnectorconfiginput.md:
     last_write_checksum: sha1:fd4a2cc65ff8276774e8b4c335863c082e140d2b
   docs/models/shared/destinationconnectorinformation.md:
-    last_write_checksum: sha1:3ee4e344b304ba428401ae1c74f1aa5bcdc556da
+    last_write_checksum: sha1:b2b58bd6315ccac9c0c18436c1396641a0616e1b
   docs/models/shared/destinationconnectorinformationconfig.md:
-    last_write_checksum: sha1:a2d78a4773c889d1e189a8f6f31e2a1e234a0b19
+    last_write_checksum: sha1:36eb745751ce3e6a9c7e7c66845ece156d980987
+  docs/models/shared/destinationconnectorinformationtype.md:
+    last_write_checksum: sha1:6ea9f4f79319530601232b47afee080c532d3c8a
   docs/models/shared/destinationconnectortype.md:
-    last_write_checksum: sha1:85ba31b2dfb9d633b795ba98eb58304bdbd1fef5
+    last_write_checksum: sha1:16840ff65097322a9a3bdfb196c9acc817964e52
   docs/models/shared/dropboxsourceconnectorconfig.md:
     last_write_checksum: sha1:dd236db60bdbbda1422cc81ec574fe9f3f7f4ce3
   docs/models/shared/dropboxsourceconnectorconfiginput.md:
@@ -980,7 +1001,7 @@ trackedFiles:
   docs/models/shared/elasticsearchconnectorconfiginput.md:
     last_write_checksum: sha1:e15f36fe04157454dd5650805ba86f3e822b70a5
   docs/models/shared/encryptiontype.md:
-    last_write_checksum: sha1:687c0937bd9690e37e9958adaa25a4299d109ba5
+    last_write_checksum: sha1:2949e95eacb456673ba4c8c857d3a59ae9442988
   docs/models/shared/failedfile.md:
     last_write_checksum: sha1:60da6ce6eb8d531fcb77945d1f2be5a41fe56156
   docs/models/shared/files.md:
@@ -994,9 +1015,11 @@ trackedFiles:
   docs/models/shared/gcssourceconnectorconfiginput.md:
     last_write_checksum: sha1:81c8454525972ec3a058d532cf6c32180e2479f6
   docs/models/shared/googledrivesourceconnectorconfig.md:
-    last_write_checksum: sha1:888a74236ee6e3099bee7193f10022b27d5e19f8
+    last_write_checksum: sha1:8f1642835efb6d8557dc913921ab73e28f426627
   docs/models/shared/googledrivesourceconnectorconfiginput.md:
-    last_write_checksum: sha1:e866f029785a3e71230397080ef83a7d407e89f4
+    last_write_checksum: sha1:cc851bb6cd5d15bb06f324b23ac50f1d764cec91
+  docs/models/shared/googledrivesourceconnectorconfiginputoauthtoken.md:
+    last_write_checksum: sha1:64176deabe4692e6781d01c6473fb972778e7738
   docs/models/shared/googledrivesourceconnectorconfiginputserviceaccountkey.md:
     last_write_checksum: sha1:e7ce3dbb4fefc0102792980dd00761438b7de958
   docs/models/shared/ibmwatsonxs3destinationconnectorconfig.md:
@@ -1032,9 +1055,9 @@ trackedFiles:
   docs/models/shared/loc.md:
     last_write_checksum: sha1:09a04749333ab50ae806c3ac6adcaa90d54df0f1
   docs/models/shared/milvusdestinationconnectorconfig.md:
-    last_write_checksum: sha1:cb8e3b9c8975429537df3ace8214261df7bec607
+    last_write_checksum: sha1:7a7d0967c5697c5f888794810f7a3b8592123e5c
   docs/models/shared/milvusdestinationconnectorconfiginput.md:
-    last_write_checksum: sha1:a865313b317fbd1750189e1244df02a8e194c756
+    last_write_checksum: sha1:230324802cebe83be1afa3c798be18f3d104f5c7
   docs/models/shared/mongodbconnectorconfig.md:
     last_write_checksum: sha1:999713952b951e58452e16ef2654f446c3586f23
   docs/models/shared/mongodbconnectorconfiginput.md:
@@ -1045,6 +1068,8 @@ trackedFiles:
     last_write_checksum: sha1:82a1d34bca150ca42fc1dfb670e51dc7480e3a33
   docs/models/shared/nodefilemetadata.md:
     last_write_checksum: sha1:51a991310b3ba8c9f68f2ea3e30afc2745948ef0
+  docs/models/shared/oauthtoken.md:
+    last_write_checksum: sha1:691c0ece2664965fe3c5b635d345ad69c8100d23
   docs/models/shared/onedrivedestinationconnectorconfig.md:
     last_write_checksum: sha1:15ec1487ed4368dfe742be4765538becc0f76668
   docs/models/shared/onedrivedestinationconnectorconfiginput.md:
@@ -1064,7 +1089,7 @@ trackedFiles:
   docs/models/shared/outputformat.md:
     last_write_checksum: sha1:2b7d4a5b7b7dc7fd445fbb1e6d2ade4e1fb00ff9
   docs/models/shared/partitionparameters.md:
-    last_write_checksum: sha1:97be0eccf54324ad0952418803d3d41bb8fd8933
+    last_write_checksum: sha1:fcb8ec90d87f40511b0804816d7fab7a6558767e
   docs/models/shared/pineconedestinationconnectorconfig.md:
     last_write_checksum: sha1:ff6972c9db29b7831dc715cbba7e56809c7515d8
   docs/models/shared/pineconedestinationconnectorconfiginput.md:
@@ -1106,9 +1131,9 @@ trackedFiles:
   docs/models/shared/serviceaccountkey.md:
     last_write_checksum: sha1:f91f5c52465ef2b08b17d116176024954c686121
   docs/models/shared/sharepointsourceconnectorconfig.md:
-    last_write_checksum: sha1:c534a730bca4073c38a38bbd683b82239ccf6c5c
+    last_write_checksum: sha1:3d475a20310090eaa81e37d3b7cd12e7d453786e
   docs/models/shared/sharepointsourceconnectorconfiginput.md:
-    last_write_checksum: sha1:050c4dbc29588572c67ec76b20798f38cbfe8107
+    last_write_checksum: sha1:dbed9717bbc67409128f5863341745b9086ee2b2
   docs/models/shared/snowflakedestinationconnectorconfig.md:
     last_write_checksum: sha1:b215353f8b03f0f0d5ca7be0e328a981fe87c25b
   docs/models/shared/snowflakedestinationconnectorconfiginput.md:
@@ -1120,11 +1145,13 @@ trackedFiles:
   docs/models/shared/sortdirection.md:
     last_write_checksum: sha1:18885c3283c4e2214739bd2f87b879e13defd9bb
   docs/models/shared/sourceconnectorinformation.md:
-    last_write_checksum: sha1:635fbe720ba6de5d875a2ae26a18aba49c118353
+    last_write_checksum: sha1:303c121f222ddaef02daf19215a91d805c6a3e51
   docs/models/shared/sourceconnectorinformationconfig.md:
-    last_write_checksum: sha1:9de17090c726544aacd1844e86a4f8336174a12f
+    last_write_checksum: sha1:f14ddef7e80b810cc392672d97b823b511b1136f
+  docs/models/shared/sourceconnectorinformationtype.md:
+    last_write_checksum: sha1:2f0c483fef70d7e4c537eaca8587e40ec6a7327b
   docs/models/shared/sourceconnectortype.md:
-    last_write_checksum: sha1:a9a430ea130db8da8fc88af4039e411a680684d7
+    last_write_checksum: sha1:4142d2e4f27282d41ab6bc0926cbce2dff57c6f8
   docs/models/shared/strategy.md:
     last_write_checksum: sha1:07155e281d43ece3d6970b315ca1761ea18cce9f
   docs/models/shared/templatedetail.md:
@@ -1133,20 +1160,30 @@ trackedFiles:
     last_write_checksum: sha1:4faa1971a0ee68512a9c8be9ba30088726ba92ca
   docs/models/shared/templatenode.md:
     last_write_checksum: sha1:0900ecbd8ebdb0261dc0078d5c4a7423c732aae6
+  docs/models/shared/teradatadestinationconnectorconfig.md:
+    last_write_checksum: sha1:c3cb809bb968cae3c1842aee3942da434c720428
+  docs/models/shared/teradatadestinationconnectorconfiginput.md:
+    last_write_checksum: sha1:2b2c39b55932d4791556bc3ab361973be6d2f536
+  docs/models/shared/teradatasourceconnectorconfig.md:
+    last_write_checksum: sha1:03548e95ddd37a672b0ade413e922b221a856cd8
+  docs/models/shared/teradatasourceconnectorconfiginput.md:
+    last_write_checksum: sha1:20f8b8b6e285418342fde5a0541bb81b3182c942
+  docs/models/shared/type.md:
+    last_write_checksum: sha1:020f067e52b901867f3e7b64e21a3c0e7cfbfb43
   docs/models/shared/updatedestinationconnector.md:
     last_write_checksum: sha1:37c58c6b362551502eabf5eca98e99575d642677
   docs/models/shared/updatedestinationconnectorconfig.md:
-    last_write_checksum: sha1:8b87feb4b95b89e93685f7817cb97396a4537d0f
+    last_write_checksum: sha1:0514524c697ae12132718da1ab76cd2b16eb42d5
   docs/models/shared/updatesourceconnector.md:
     last_write_checksum: sha1:c13569bb40dcaee8f13e077eb5b53d95098ea34d
   docs/models/shared/updatesourceconnectorconfig.md:
-    last_write_checksum: sha1:33c4d78aa6733a8151b0a8b7558e8b018cd59307
+    last_write_checksum: sha1:1409612ba63ddf456702535483e41ffe958c1c2b
   docs/models/shared/updateworkflow.md:
     last_write_checksum: sha1:94e95e0b8746baf81b33fab234ee5d320a3fae2e
   docs/models/shared/updateworkflowschedule.md:
     last_write_checksum: sha1:6f8ffbb4ef7891906d94ac6d2b18b693f52717f0
   docs/models/shared/validationerror.md:
-    last_write_checksum: sha1:5cc3df9eadb5a867d3a0c72debecd66cf30dc339
+    last_write_checksum: sha1:c13c90ba41f5c240b81426c42f2ab08b95aeb58e
   docs/models/shared/vlmmodelprovider.md:
     last_write_checksum: sha1:3606b2069afaa537150fd1eec58980e438b9aad4
   docs/models/shared/weaviatedestinationconnectorconfig.md:
@@ -1178,7 +1215,7 @@ trackedFiles:
   docs/sdks/jobs/README.md:
     last_write_checksum: sha1:7330be63152f4020d75de2f1ad28f665331bb733
   docs/sdks/sources/README.md:
-    last_write_checksum: sha1:90cbfaee4c5129854425b6fe23a2592bc0719cc8
+    last_write_checksum: sha1:22b3cb55e06756e96e32aeafb10966f806cd9132
   docs/sdks/templates/README.md:
     last_write_checksum: sha1:14bad5acd71a4029431503ec8ec3755cea410fae
   docs/sdks/workflows/README.md:
@@ -1188,9 +1225,9 @@ trackedFiles:
   py.typed:
     last_write_checksum: sha1:8efc425ffe830805ffcc0f3055871bdcdc542c60
   pylintrc:
-    last_write_checksum: sha1:db2aebd83e553dd59d3965e79104a3fb780c403a
+    last_write_checksum: sha1:0e10638ea7d22a917f716f609a4c05ca0cd18e91
   pyproject.toml:
-    last_write_checksum: sha1:6690c2c6cd0795582a8ee7ad5485df40ac64294c
+    last_write_checksum: sha1:fb23c95618ea80c4da55b2a6540746d2648c9322
   scripts/prepare_readme.py:
     last_write_checksum: sha1:ccdba5069fbb7997500b6ba22366e004394cdca2
   scripts/publish.sh:
@@ -1204,7 +1241,7 @@ trackedFiles:
   src/unstructured_client/_hooks/types.py:
     last_write_checksum: sha1:ac25bc33fba97274c6554d0e735b4c90c2650a88
   src/unstructured_client/_version.py:
-    last_write_checksum: sha1:58106d46f8d0262fe4c68d0ed473a24bfe224956
+    last_write_checksum: sha1:3fc00e4f6e52fd7f7eec8980ffe336d4ed4e672c
   src/unstructured_client/basesdk.py:
     last_write_checksum: sha1:96b11011fa4af657d7decae17dda0b8ddcecfa32
   src/unstructured_client/destinations.py:
@@ -1292,7 +1329,7 @@ trackedFiles:
   src/unstructured_client/models/operations/update_workflow.py:
     last_write_checksum: sha1:bc89c27c8a0d44d9336c80d8cbbc5bb5b0d749ae
   src/unstructured_client/models/shared/__init__.py:
-    last_write_checksum: sha1:c2ad5956b789b46b0f2f4d630d11171cd4da7550
+    last_write_checksum: sha1:c4921f45ad9b1514ba76a06524f7d765088a7efe
   src/unstructured_client/models/shared/astradbconnectorconfig.py:
     last_write_checksum: sha1:6bdbb68c97994cef73a656c84fbfe7e32b3d6277
   src/unstructured_client/models/shared/astradbconnectorconfiginput.py:
@@ -1332,9 +1369,9 @@ trackedFiles:
   src/unstructured_client/models/shared/couchbasesourceconnectorconfiginput.py:
     last_write_checksum: sha1:0dba4f21a305d1e44aee5da0a299ce87db83609e
   src/unstructured_client/models/shared/createdestinationconnector.py:
-    last_write_checksum: sha1:4dedef674cf9097567f20d04fa26af5a1f8c7785
+    last_write_checksum: sha1:7728c6fb7ba4811aae864e81bef8b2e90f92375a
   src/unstructured_client/models/shared/createsourceconnector.py:
-    last_write_checksum: sha1:46a5ce3a43766c4408602dd55a86eb2c3bd86512
+    last_write_checksum: sha1:b301bb70477bb4e635e9ad417389b6bfa23e2568
   src/unstructured_client/models/shared/createworkflow.py:
     last_write_checksum: sha1:54d100957d5a30fe7f310bd0f8d6658de71a9888
   src/unstructured_client/models/shared/crontabentry.py:
@@ -1342,21 +1379,21 @@ trackedFiles:
   src/unstructured_client/models/shared/dagnodeconnectioncheck.py:
     last_write_checksum: sha1:a99aa78991427a7e314adc45e5db841e49c7066a
   src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfig.py:
-    last_write_checksum: sha1:3f57c9b5c86657b47eb25dd3592af384a58bd8e2
+    last_write_checksum: sha1:3193d5a7f40663c7dadc4bb3ed9a853a980ad843
   src/unstructured_client/models/shared/databricksvdtdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:9b58e46281065f9173f05f0a5a627ff46962a44a
+    last_write_checksum: sha1:6ceed9b66e7f1acca51a1272f20c2789d884bd67
   src/unstructured_client/models/shared/databricksvolumesconnectorconfig.py:
-    last_write_checksum: sha1:d9b077b1a4aa7441dbef165b27fa887cff32b5b7
+    last_write_checksum: sha1:c7455b1d1321825038f172ce211f45d4104609a0
   src/unstructured_client/models/shared/databricksvolumesconnectorconfiginput.py:
-    last_write_checksum: sha1:efa4a5f7c38b9318bd892e895a4beb9c5ed47d49
+    last_write_checksum: sha1:b07129695bd5de8e199a0dd672e7474069b33ea4
   src/unstructured_client/models/shared/deltatableconnectorconfig.py:
     last_write_checksum: sha1:1fdbc330f0d0ce905d7822eccdfe68142cbf6b74
   src/unstructured_client/models/shared/deltatableconnectorconfiginput.py:
     last_write_checksum: sha1:42ebe9712bc0f083b890cd7ff78208d9e838dfb8
   src/unstructured_client/models/shared/destinationconnectorinformation.py:
-    last_write_checksum: sha1:e6b03a2a074d3ac1c612835c4c088c7dca0ce9e7
+    last_write_checksum: sha1:2f2256265e0320c2e4fa702b16f1fed5ca508c49
   src/unstructured_client/models/shared/destinationconnectortype.py:
-    last_write_checksum: sha1:8a535b852261fe20bcdcd5e7ebfc07524270b934
+    last_write_checksum: sha1:3daf320784e62c0ff3ea8c6628020c429975d663
   src/unstructured_client/models/shared/dropboxsourceconnectorconfig.py:
     last_write_checksum: sha1:975b665d4a1280a04558b963d7564dafaa04afc1
   src/unstructured_client/models/shared/dropboxsourceconnectorconfiginput.py:
@@ -1366,7 +1403,7 @@ trackedFiles:
   src/unstructured_client/models/shared/elasticsearchconnectorconfiginput.py:
     last_write_checksum: sha1:72f06107b76ca6177cd7beefb7f45286461d0d31
   src/unstructured_client/models/shared/encryptiontype.py:
-    last_write_checksum: sha1:224acc1fccb4bc7a61cece851990685caeee67a0
+    last_write_checksum: sha1:3431f0e316556630a8270bb8af23b921924b19c6
   src/unstructured_client/models/shared/failedfile.py:
     last_write_checksum: sha1:e090c5b933f8e279910e5faaa2bf50dd3eb84f13
   src/unstructured_client/models/shared/gcsdestinationconnectorconfig.py:
@@ -1378,9 +1415,9 @@ trackedFiles:
   src/unstructured_client/models/shared/gcssourceconnectorconfiginput.py:
     last_write_checksum: sha1:3fd635d552446532ea87e2c5c0035d7670a02188
   src/unstructured_client/models/shared/googledrivesourceconnectorconfig.py:
-    last_write_checksum: sha1:e0a190c6e9757643b0d3feb5ad99d1288bbc93dd
+    last_write_checksum: sha1:fac82884d5aac46ba8a29635ef65ef3f2f6fa0f2
   src/unstructured_client/models/shared/googledrivesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:3accf2b36233f015eb54e8b6de2ff3445f991d91
+    last_write_checksum: sha1:60031d2824239676ebf2133ff1afee5fd4f62e9e
   src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfig.py:
     last_write_checksum: sha1:2dcf63d86b10d05c2b15c94e8c39dde93517b5c9
   src/unstructured_client/models/shared/ibmwatsonxs3destinationconnectorconfiginput.py:
@@ -1410,9 +1447,9 @@ trackedFiles:
   src/unstructured_client/models/shared/kafkacloudsourceconnectorconfiginput.py:
     last_write_checksum: sha1:2d45b94a4c281b03ffda8208284a2d561218f5da
   src/unstructured_client/models/shared/milvusdestinationconnectorconfig.py:
-    last_write_checksum: sha1:74b50fcea0f67b5e7613881702f8081859167cd9
+    last_write_checksum: sha1:5050320b36cbe841c60eeee90a5861c39b285e83
   src/unstructured_client/models/shared/milvusdestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:ffc7cab7acd484dec9077c4e8f1fb9e12687516a
+    last_write_checksum: sha1:eba11ecd890a06e1cc5aaac77adb955a9df17351
   src/unstructured_client/models/shared/mongodbconnectorconfig.py:
     last_write_checksum: sha1:94bfa797fa7773f62fdb93748e81373313fdb555
   src/unstructured_client/models/shared/mongodbconnectorconfiginput.py:
@@ -1478,37 +1515,45 @@ trackedFiles:
   src/unstructured_client/models/shared/security.py:
     last_write_checksum: sha1:6284fd49afae271037f7f45c26a480b4a61229a6
   src/unstructured_client/models/shared/sharepointsourceconnectorconfig.py:
-    last_write_checksum: sha1:851911a1151db00d8ea534979170e353e8d3fb00
+    last_write_checksum: sha1:c52cf88a26fdf6d634612ac17f092020cd196012
   src/unstructured_client/models/shared/sharepointsourceconnectorconfiginput.py:
-    last_write_checksum: sha1:79df594725c1ed1e02a2472177ee4ccf8578841c
+    last_write_checksum: sha1:217b9aa252ee0235e03560585fc8630fbb73238f
   src/unstructured_client/models/shared/snowflakedestinationconnectorconfig.py:
-    last_write_checksum: sha1:2f1b916e32a32f16dee194a4516e1feb6922c890
+    last_write_checksum: sha1:113b9f7dec1be82ba7b9c146b7b1119213fced13
   src/unstructured_client/models/shared/snowflakedestinationconnectorconfiginput.py:
-    last_write_checksum: sha1:2e9f2185d3b4829a372e1a2770fd711177f395ab
+    last_write_checksum: sha1:d7aaf912055f72fb68d0173b25eff2ff76174180
   src/unstructured_client/models/shared/snowflakesourceconnectorconfig.py:
-    last_write_checksum: sha1:e4238ebe8435d62ec1fe3d13824ec27ba1300c60
+    last_write_checksum: sha1:179f876adea52b9fcdcaf69be47cc76acaeb387f
   src/unstructured_client/models/shared/snowflakesourceconnectorconfiginput.py:
-    last_write_checksum: sha1:b78f12a3bd05499de8814868bf02cf4a506c1001
+    last_write_checksum: sha1:e5da75a6a0f28212058b24dc3752917249c04fff
   src/unstructured_client/models/shared/sortdirection.py:
     last_write_checksum: sha1:316a46717625825ea3a622089df62f1c02be1482
   src/unstructured_client/models/shared/sourceconnectorinformation.py:
-    last_write_checksum: sha1:64259e76331e196105bf958bea191749d6d31a1a
+    last_write_checksum: sha1:d86e00a37a59618d60ae9bf5b584ca7038527677
   src/unstructured_client/models/shared/sourceconnectortype.py:
-    last_write_checksum: sha1:cc3f9e479b10403211055f781aec66a5a918a169
+    last_write_checksum: sha1:4c857bd3d21ab40b9f5cc938558de9b8cfbfecf8
   src/unstructured_client/models/shared/templatedetail.py:
     last_write_checksum: sha1:05292e12a45407c2cb6c500386f2d28298e2129f
   src/unstructured_client/models/shared/templatelistitem.py:
     last_write_checksum: sha1:8aeb58b48884855d75b0eab458cd20298816f17b
   src/unstructured_client/models/shared/templatenode.py:
     last_write_checksum: sha1:c9e94f8ab03141cf4de36e366f729228ea1d45ca
+  src/unstructured_client/models/shared/teradatadestinationconnectorconfig.py:
+    last_write_checksum: sha1:2e88eb8fd9402a2a11b21206f75d6e3e1ebf2d9f
+  src/unstructured_client/models/shared/teradatadestinationconnectorconfiginput.py:
+    last_write_checksum: sha1:09687f2b9b10a0246a901dc7e4c59ddf30b23f4f
+  src/unstructured_client/models/shared/teradatasourceconnectorconfig.py:
+    last_write_checksum: sha1:7422e9fe2bf654031dbdb7db50ff4a04dbdfcdc8
+  src/unstructured_client/models/shared/teradatasourceconnectorconfiginput.py:
+    last_write_checksum: sha1:3030753e0dbb74b84b2fc8100f14d1c705a70f2e
   src/unstructured_client/models/shared/updatedestinationconnector.py:
-    last_write_checksum: sha1:5046b8cd7f5e480f26cb5ef8a1d0f3dd606c0673
+    last_write_checksum: sha1:48517bdb60a16abe20c0f661f26d21efd984f6da
   src/unstructured_client/models/shared/updatesourceconnector.py:
-    last_write_checksum: sha1:66a29ca6427816cdb1846d63e3d466296dbd3abb
+    last_write_checksum: sha1:cbeb1a06dfb94f21a655ca348866a0c013373cfc
   src/unstructured_client/models/shared/updateworkflow.py:
     last_write_checksum: sha1:7a2f60d70b0f7f36ef2e6b2fc64c687ca260048d
   src/unstructured_client/models/shared/validationerror.py:
-    last_write_checksum: sha1:d9824b38a8e37ec6b290ee08643569713ad3a093
+    last_write_checksum: sha1:ca8ee2eda1c0c5cd23d713d5cba9b35e38510039
   src/unstructured_client/models/shared/weaviatedestinationconnectorconfig.py:
     last_write_checksum: sha1:e5697c8f833529eb95db6eea59ea71a80a800f0d
   src/unstructured_client/models/shared/weaviatedestinationconnectorconfiginput.py:
@@ -1544,7 +1589,7 @@ trackedFiles:
   src/unstructured_client/types/basemodel.py:
     last_write_checksum: sha1:10d84aedeb9d35edfdadf2c3020caa1d24d8b584
   src/unstructured_client/utils/__init__.py:
-    last_write_checksum: sha1:398211d49b762a067ec6d10197a4b11dfd258ff5
+    last_write_checksum: sha1:a1f6ae620fb6a3ccc30e99b427e49a0c8be463af
   src/unstructured_client/utils/annotations.py:
     last_write_checksum: sha1:a4824ad65f730303e4e1e3ec1febf87b4eb46dbc
   src/unstructured_client/utils/datetimes.py:
@@ -1552,7 +1597,7 @@ trackedFiles:
   src/unstructured_client/utils/enums.py:
     last_write_checksum: sha1:bc8c3c1285ae09ba8a094ee5c3d9c7f41fa1284d
   src/unstructured_client/utils/eventstreaming.py:
-    last_write_checksum: sha1:bababae5d54b7efc360db701daa49e18a92c2f3b
+    last_write_checksum: sha1:ffa870a25a7e4e2015bfd7a467ccd3aa1de97f0e
   src/unstructured_client/utils/forms.py:
     last_write_checksum: sha1:15fa7e9ab1611e062a9984cf06cb20969713d295
   src/unstructured_client/utils/headers.py:
@@ -1568,7 +1613,7 @@ trackedFiles:
   src/unstructured_client/utils/retries.py:
     last_write_checksum: sha1:5b97ac4f59357d70c2529975d50364c88bcad607
   src/unstructured_client/utils/security.py:
-    last_write_checksum: sha1:a17130ace2c0db6394f38dd941ad2b700cc755c8
+    last_write_checksum: sha1:435dd8b180cefcd733e635b9fa45512da091d9c0
   src/unstructured_client/utils/serializers.py:
     last_write_checksum: sha1:ce1d8d7f500a9ccba0aeca5057cee9c271f4dfd7
   src/unstructured_client/utils/unmarshal_json_response.py:

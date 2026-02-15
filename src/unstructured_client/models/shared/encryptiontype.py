@@ -7,3 +7,4 @@ from enum import Enum
 class EncryptionType(str, Enum):
     RSA = "rsa"
     RSA_AES = "rsa_aes"
+    RUNTIME_CONFIG = "runtime_config"
