@@ -14,6 +14,14 @@ from unstructured_client.types import (
 )
 
 
+OauthTokenTypedDict = TypeAliasType(
+    "OauthTokenTypedDict", Union[SecretReferenceTypedDict, str]
+)
+
+
+OauthToken = TypeAliasType("OauthToken", Union[SecretReference, str])
+
+
 ServiceAccountKeyTypedDict = TypeAliasType(
     "ServiceAccountKeyTypedDict", Union[SecretReferenceTypedDict, str]
 )
@@ -25,8 +33,9 @@ ServiceAccountKey = TypeAliasType("ServiceAccountKey", Union[SecretReference, st
 class GoogleDriveSourceConnectorConfigTypedDict(TypedDict):
     drive_id: str
     recursive: bool
-    service_account_key: ServiceAccountKeyTypedDict
     extensions: NotRequired[Nullable[List[str]]]
+    oauth_token: NotRequired[Nullable[OauthTokenTypedDict]]
+    service_account_key: NotRequired[Nullable[ServiceAccountKeyTypedDict]]
 
 
 class GoogleDriveSourceConnectorConfig(BaseModel):
@@ -34,14 +43,16 @@ class GoogleDriveSourceConnectorConfig(BaseModel):
 
     recursive: bool
 
-    service_account_key: ServiceAccountKey
-
     extensions: OptionalNullable[List[str]] = UNSET
+
+    oauth_token: OptionalNullable[OauthToken] = UNSET
+
+    service_account_key: OptionalNullable[ServiceAccountKey] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["extensions"]
-        nullable_fields = ["extensions"]
+        optional_fields = ["extensions", "oauth_token", "service_account_key"]
+        nullable_fields = ["extensions", "oauth_token", "service_account_key"]
         null_default_fields = []
 
         serialized = handler(self)

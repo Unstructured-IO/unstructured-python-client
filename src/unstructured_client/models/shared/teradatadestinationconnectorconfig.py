@@ -13,38 +13,44 @@ from unstructured_client.types import (
 )
 
 
-class SharePointSourceConnectorConfigTypedDict(TypedDict):
-    client_cred: str
-    client_id: str
-    recursive: bool
-    site: str
-    tenant: str
-    authority_url: NotRequired[str]
-    path: NotRequired[Nullable[str]]
-    user_pname: NotRequired[Nullable[str]]
+class TeradataDestinationConnectorConfigTypedDict(TypedDict):
+    host: str
+    password: str
+    user: str
+    batch_size: NotRequired[int]
+    database: NotRequired[Nullable[str]]
+    dbs_port: NotRequired[int]
+    record_id_key: NotRequired[Nullable[str]]
+    table_name: NotRequired[str]
 
 
-class SharePointSourceConnectorConfig(BaseModel):
-    client_cred: str
+class TeradataDestinationConnectorConfig(BaseModel):
+    host: str
 
-    client_id: str
+    password: str
 
-    recursive: bool
+    user: str
 
-    site: str
+    batch_size: Optional[int] = 50
 
-    tenant: str
+    database: OptionalNullable[str] = UNSET
 
-    authority_url: Optional[str] = "https://login.microsoftonline.com"
+    dbs_port: Optional[int] = 1025
 
-    path: OptionalNullable[str] = UNSET
+    record_id_key: OptionalNullable[str] = UNSET
 
-    user_pname: OptionalNullable[str] = UNSET
+    table_name: Optional[str] = "elements"
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["authority_url", "path", "user_pname"]
-        nullable_fields = ["path", "user_pname"]
+        optional_fields = [
+            "batch_size",
+            "database",
+            "dbs_port",
+            "record_id_key",
+            "table_name",
+        ]
+        nullable_fields = ["database", "record_id_key"]
         null_default_fields = []
 
         serialized = handler(self)

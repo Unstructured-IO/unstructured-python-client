@@ -90,6 +90,10 @@ from .snowflakedestinationconnectorconfiginput import (
     SnowflakeDestinationConnectorConfigInput,
     SnowflakeDestinationConnectorConfigInputTypedDict,
 )
+from .teradatadestinationconnectorconfiginput import (
+    TeradataDestinationConnectorConfigInput,
+    TeradataDestinationConnectorConfigInputTypedDict,
+)
 from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
@@ -110,20 +114,21 @@ ConfigTypedDict = TypeAliasType(
         AzureAISearchConnectorConfigInputTypedDict,
         MongoDBConnectorConfigInputTypedDict,
         QdrantCloudDestinationConnectorConfigInputTypedDict,
-        PineconeDestinationConnectorConfigInputTypedDict,
         DeltaTableConnectorConfigInputTypedDict,
-        Neo4jDestinationConnectorConfigInputTypedDict,
+        PineconeDestinationConnectorConfigInputTypedDict,
         AzureDestinationConnectorConfigInputTypedDict,
+        Neo4jDestinationConnectorConfigInputTypedDict,
         S3DestinationConnectorConfigInputTypedDict,
         OneDriveDestinationConnectorConfigInputTypedDict,
-        MilvusDestinationConnectorConfigInputTypedDict,
-        CouchbaseDestinationConnectorConfigInputTypedDict,
-        KafkaCloudDestinationConnectorConfigInputTypedDict,
         PostgresDestinationConnectorConfigInputTypedDict,
         DatabricksVolumesConnectorConfigInputTypedDict,
+        KafkaCloudDestinationConnectorConfigInputTypedDict,
+        CouchbaseDestinationConnectorConfigInputTypedDict,
         OpenSearchConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
+        TeradataDestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
+        MilvusDestinationConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
         IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
@@ -141,20 +146,21 @@ Config = TypeAliasType(
         AzureAISearchConnectorConfigInput,
         MongoDBConnectorConfigInput,
         QdrantCloudDestinationConnectorConfigInput,
-        PineconeDestinationConnectorConfigInput,
         DeltaTableConnectorConfigInput,
-        Neo4jDestinationConnectorConfigInput,
+        PineconeDestinationConnectorConfigInput,
         AzureDestinationConnectorConfigInput,
+        Neo4jDestinationConnectorConfigInput,
         S3DestinationConnectorConfigInput,
         OneDriveDestinationConnectorConfigInput,
-        MilvusDestinationConnectorConfigInput,
-        CouchbaseDestinationConnectorConfigInput,
-        KafkaCloudDestinationConnectorConfigInput,
         PostgresDestinationConnectorConfigInput,
         DatabricksVolumesConnectorConfigInput,
+        KafkaCloudDestinationConnectorConfigInput,
+        CouchbaseDestinationConnectorConfigInput,
         OpenSearchConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
+        MilvusDestinationConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
         IBMWatsonxS3DestinationConnectorConfigInput,
@@ -163,10 +169,22 @@ Config = TypeAliasType(
 )
 
 
+TypeTypedDict = TypeAliasType("TypeTypedDict", Union[DestinationConnectorType, str])
+
+
+Type = TypeAliasType(
+    "Type",
+    Union[
+        Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))],
+        str,
+    ],
+)
+
+
 class CreateDestinationConnectorTypedDict(TypedDict):
     config: ConfigTypedDict
     name: str
-    type: DestinationConnectorType
+    type: TypeTypedDict
 
 
 class CreateDestinationConnector(BaseModel):
@@ -174,4 +192,4 @@ class CreateDestinationConnector(BaseModel):
 
     name: str
 
-    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
+    type: Type

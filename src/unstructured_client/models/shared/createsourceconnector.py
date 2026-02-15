@@ -82,6 +82,10 @@ from .snowflakesourceconnectorconfiginput import (
     SnowflakeSourceConnectorConfigInputTypedDict,
 )
 from .sourceconnectortype import SourceConnectorType
+from .teradatasourceconnectorconfiginput import (
+    TeradataSourceConnectorConfigInput,
+    TeradataSourceConnectorConfigInputTypedDict,
+)
 from .zendesksourceconnectorconfiginput import (
     ZendeskSourceConnectorConfigInput,
     ZendeskSourceConnectorConfigInputTypedDict,
@@ -98,22 +102,23 @@ CreateSourceConnectorConfigTypedDict = TypeAliasType(
     Union[
         MongoDBConnectorConfigInputTypedDict,
         DropboxSourceConnectorConfigInputTypedDict,
-        BoxSourceConnectorConfigInputTypedDict,
         GCSSourceConnectorConfigInputTypedDict,
+        BoxSourceConnectorConfigInputTypedDict,
         ElasticsearchConnectorConfigInputTypedDict,
         SalesforceSourceConnectorConfigInputTypedDict,
         GoogleDriveSourceConnectorConfigInputTypedDict,
         ZendeskSourceConnectorConfigInputTypedDict,
         AzureSourceConnectorConfigInputTypedDict,
-        S3SourceConnectorConfigInputTypedDict,
-        DatabricksVolumesConnectorConfigInputTypedDict,
         OneDriveSourceConnectorConfigInputTypedDict,
         KafkaCloudSourceConnectorConfigInputTypedDict,
         OutlookSourceConnectorConfigInputTypedDict,
-        OpenSearchConnectorConfigInputTypedDict,
+        DatabricksVolumesConnectorConfigInputTypedDict,
+        S3SourceConnectorConfigInputTypedDict,
         SharePointSourceConnectorConfigInputTypedDict,
+        OpenSearchConnectorConfigInputTypedDict,
         CouchbaseSourceConnectorConfigInputTypedDict,
         PostgresSourceConnectorConfigInputTypedDict,
+        TeradataSourceConnectorConfigInputTypedDict,
         JiraSourceConnectorConfigInputTypedDict,
         ConfluenceSourceConnectorConfigInputTypedDict,
         SnowflakeSourceConnectorConfigInputTypedDict,
@@ -127,22 +132,23 @@ CreateSourceConnectorConfig = TypeAliasType(
     Union[
         MongoDBConnectorConfigInput,
         DropboxSourceConnectorConfigInput,
-        BoxSourceConnectorConfigInput,
         GCSSourceConnectorConfigInput,
+        BoxSourceConnectorConfigInput,
         ElasticsearchConnectorConfigInput,
         SalesforceSourceConnectorConfigInput,
         GoogleDriveSourceConnectorConfigInput,
         ZendeskSourceConnectorConfigInput,
         AzureSourceConnectorConfigInput,
-        S3SourceConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInput,
         OneDriveSourceConnectorConfigInput,
         KafkaCloudSourceConnectorConfigInput,
         OutlookSourceConnectorConfigInput,
-        OpenSearchConnectorConfigInput,
+        DatabricksVolumesConnectorConfigInput,
+        S3SourceConnectorConfigInput,
         SharePointSourceConnectorConfigInput,
+        OpenSearchConnectorConfigInput,
         CouchbaseSourceConnectorConfigInput,
         PostgresSourceConnectorConfigInput,
+        TeradataSourceConnectorConfigInput,
         JiraSourceConnectorConfigInput,
         ConfluenceSourceConnectorConfigInput,
         SnowflakeSourceConnectorConfigInput,
@@ -151,10 +157,23 @@ CreateSourceConnectorConfig = TypeAliasType(
 )
 
 
+CreateSourceConnectorTypeTypedDict = TypeAliasType(
+    "CreateSourceConnectorTypeTypedDict", Union[SourceConnectorType, str]
+)
+
+
+CreateSourceConnectorType = TypeAliasType(
+    "CreateSourceConnectorType",
+    Union[
+        Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))], str
+    ],
+)
+
+
 class CreateSourceConnectorTypedDict(TypedDict):
     config: CreateSourceConnectorConfigTypedDict
     name: str
-    type: SourceConnectorType
+    type: CreateSourceConnectorTypeTypedDict
 
 
 class CreateSourceConnector(BaseModel):
@@ -162,4 +181,4 @@ class CreateSourceConnector(BaseModel):
 
     name: str
 
-    type: Annotated[SourceConnectorType, PlainValidator(validate_open_enum(False))]
+    type: CreateSourceConnectorType
