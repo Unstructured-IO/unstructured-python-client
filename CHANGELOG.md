@@ -1,3 +1,12 @@
+## 0.42.11
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Retry on `httpx.RemoteProtocolError` (e.g. "Server disconnected without sending a response") when `retry_connection_errors=True`. Previously, mid-request server crashes were treated as permanent errors and not retried.
+
 ## 0.42.5
 
 ### Enhancements
