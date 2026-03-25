@@ -89,6 +89,11 @@ def retry(func, retries: Retries):
                     raise
 
                 raise PermanentError(exception) from exception
+            except httpx.RemoteProtocolError as exception:
+                if retries.config.retry_connection_errors:
+                    raise
+
+                raise PermanentError(exception) from exception
             except httpx.TimeoutException as exception:
                 if retries.config.retry_connection_errors:
                     raise
@@ -134,6 +139,11 @@ async def retry_async(func, retries: Retries):
                         if res.status_code == parsed_code:
                             raise TemporaryError(res)
             except httpx.ConnectError as exception:
+                if retries.config.retry_connection_errors:
+                    raise
+
+                raise PermanentError(exception) from exception
+            except httpx.RemoteProtocolError as exception:
                 if retries.config.retry_connection_errors:
                     raise
 
