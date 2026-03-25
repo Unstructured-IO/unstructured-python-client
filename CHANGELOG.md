@@ -1,3 +1,12 @@
+## 0.42.12
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Retry on all `httpx.TransportError` subclasses (including `ReadError`, `WriteError`, `ConnectError`, `RemoteProtocolError`, and all timeout types) when `retry_connection_errors=True`. Previously only `ConnectError`, `RemoteProtocolError`, and `TimeoutException` were retried — `ReadError` (TCP connection reset mid-response) was treated as permanent.
+
 ## 0.42.11
 
 ### Enhancements

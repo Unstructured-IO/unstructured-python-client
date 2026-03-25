@@ -1,4 +1,4 @@
-"""Tests for retry logic, specifically covering RemoteProtocolError retry behavior."""
+"""Tests for retry logic covering all TransportError subclasses."""
 
 import asyncio
 from unittest.mock import MagicMock
@@ -32,12 +32,22 @@ def _make_retries(retry_connection_errors: bool) -> Retries:
     )
 
 
-class TestRemoteProtocolErrorRetry:
-    """Test that RemoteProtocolError (e.g. 'Server disconnected without sending a response')
-    is retried when retry_connection_errors=True."""
+# All TransportError subclasses that should be retried
+TRANSPORT_ERRORS = [
+    (httpx.ConnectError, "Connection refused"),
+    (httpx.RemoteProtocolError, "Server disconnected without sending a response."),
+    (httpx.ReadError, ""),
+    (httpx.WriteError, ""),
+    (httpx.ConnectTimeout, "Timed out"),
+    (httpx.ReadTimeout, "Timed out"),
+]
 
-    def test_remote_protocol_error_retried_when_enabled(self):
-        """RemoteProtocolError should be retried and succeed on subsequent attempt."""
+
+class TestTransportErrorRetry:
+    """All httpx.TransportError subclasses should be retried when retry_connection_errors=True."""
+
+    @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
+    def test_transport_error_retried_when_enabled(self, exc_class, msg):
         retries_config = _make_retries(retry_connection_errors=True)
 
         mock_response = MagicMock(spec=httpx.Response)
@@ -49,53 +59,29 @@ class TestRemoteProtocolErrorRetry:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                raise httpx.RemoteProtocolError(
-                    "Server disconnected without sending a response."
-                )
+                raise exc_class(msg)
             return mock_response
 
         result = retry(func, retries_config)
         assert result.status_code == 200
         assert call_count == 2
 
-    def test_remote_protocol_error_not_retried_when_disabled(self):
-        """RemoteProtocolError should raise PermanentError when retry_connection_errors=False."""
+    @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
+    def test_transport_error_not_retried_when_disabled(self, exc_class, msg):
         retries_config = _make_retries(retry_connection_errors=False)
 
         def func():
-            raise httpx.RemoteProtocolError(
-                "Server disconnected without sending a response."
-            )
+            raise exc_class(msg)
 
-        with pytest.raises(httpx.RemoteProtocolError):
+        with pytest.raises(exc_class):
             retry(func, retries_config)
 
-    def test_connect_error_still_retried(self):
-        """Existing ConnectError retry behavior should be preserved."""
-        retries_config = _make_retries(retry_connection_errors=True)
 
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 200
+class TestTransportErrorRetryAsync:
+    """Async: All httpx.TransportError subclasses should be retried."""
 
-        call_count = 0
-
-        def func():
-            nonlocal call_count
-            call_count += 1
-            if call_count == 1:
-                raise httpx.ConnectError("Connection refused")
-            return mock_response
-
-        result = retry(func, retries_config)
-        assert result.status_code == 200
-        assert call_count == 2
-
-
-class TestRemoteProtocolErrorRetryAsync:
-    """Async versions of the RemoteProtocolError retry tests."""
-
-    def test_remote_protocol_error_retried_async(self):
-        """Async: RemoteProtocolError should be retried when retry_connection_errors=True."""
+    @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
+    def test_transport_error_retried_async(self, exc_class, msg):
         retries_config = _make_retries(retry_connection_errors=True)
 
         mock_response = MagicMock(spec=httpx.Response)
@@ -107,23 +93,19 @@ class TestRemoteProtocolErrorRetryAsync:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                raise httpx.RemoteProtocolError(
-                    "Server disconnected without sending a response."
-                )
+                raise exc_class(msg)
             return mock_response
 
         result = asyncio.run(retry_async(func, retries_config))
         assert result.status_code == 200
         assert call_count == 2
 
-    def test_remote_protocol_error_not_retried_async_when_disabled(self):
-        """Async: RemoteProtocolError should not be retried when retry_connection_errors=False."""
+    @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
+    def test_transport_error_not_retried_async_when_disabled(self, exc_class, msg):
         retries_config = _make_retries(retry_connection_errors=False)
 
         async def func():
-            raise httpx.RemoteProtocolError(
-                "Server disconnected without sending a response."
-            )
+            raise exc_class(msg)
 
-        with pytest.raises(httpx.RemoteProtocolError):
+        with pytest.raises(exc_class):
             asyncio.run(retry_async(func, retries_config))
