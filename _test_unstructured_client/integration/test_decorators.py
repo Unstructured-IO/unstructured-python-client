@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Counter, defaultdict
+import math
 import tempfile
 from pathlib import Path
 from typing import Literal
@@ -26,25 +28,77 @@ FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 _HI_RES_STRATEGIES = ("hi_res", Strategy.HI_RES)
 
 
+def _allowed_delta(expected: int, *, absolute: int, ratio: float) -> int:
+    return max(absolute, math.ceil(expected * ratio))
+
+
+def _text_size(elements) -> int:
+    return sum(len((element.get("text") or "").strip()) for element in elements)
+
+
+def _elements_by_page(elements):
+    pages = defaultdict(list)
+    for element in elements:
+        pages[element["metadata"]["page_number"]].append(element)
+    return pages
+
+
+def _assert_hi_res_output_is_similar(resp_split, resp_single):
+    split_pages = _elements_by_page(resp_split.elements)
+    single_pages = _elements_by_page(resp_single.elements)
+
+    assert set(split_pages) == set(single_pages)
+
+    assert abs(len(resp_split.elements) - len(resp_single.elements)) <= _allowed_delta(
+        len(resp_single.elements),
+        absolute=4,
+        ratio=0.1,
+    )
+
+    split_type_counts = Counter(element["type"] for element in resp_split.elements)
+    single_type_counts = Counter(element["type"] for element in resp_single.elements)
+    assert set(split_type_counts) == set(single_type_counts)
+    for element_type, expected_count in single_type_counts.items():
+        assert abs(split_type_counts[element_type] - expected_count) <= _allowed_delta(
+            expected_count,
+            absolute=2,
+            ratio=0.2,
+        )
+
+    assert abs(_text_size(resp_split.elements) - _text_size(resp_single.elements)) <= _allowed_delta(
+        _text_size(resp_single.elements),
+        absolute=250,
+        ratio=0.2,
+    )
+
+    for page_number, single_page_elements in single_pages.items():
+        split_page_elements = split_pages[page_number]
+
+        assert abs(len(split_page_elements) - len(single_page_elements)) <= _allowed_delta(
+            len(single_page_elements),
+            absolute=2,
+            ratio=0.2,
+        )
+        assert abs(_text_size(split_page_elements) - _text_size(single_page_elements)) <= _allowed_delta(
+            _text_size(single_page_elements),
+            absolute=120,
+            ratio=0.3,
+        )
+
+
 def _assert_split_unsplit_equivalent(resp_split, resp_single, strategy, extra_exclude_paths=None):
     """Compare split-PDF and single-request responses.
 
     For hi_res (OCR-based), splitting changes per-page context so text and
-    element counts can vary slightly.  We only check structural equivalence.
+    OCR text can vary slightly. We still check page coverage, type distribution,
+    and text volume so split requests cannot silently drift too far.
     For deterministic strategies (fast, etc.) we keep strict DeepDiff equality.
     """
     assert resp_split.status_code == resp_single.status_code
     assert resp_split.content_type == resp_single.content_type
 
     if strategy in _HI_RES_STRATEGIES:
-        count_diff = abs(len(resp_split.elements) - len(resp_single.elements))
-        assert count_diff <= 10, (
-            f"Element count diverged too far: "
-            f"{len(resp_split.elements)} vs {len(resp_single.elements)}"
-        )
-        split_pages = {e["metadata"]["page_number"] for e in resp_split.elements}
-        single_pages = {e["metadata"]["page_number"] for e in resp_single.elements}
-        assert split_pages == single_pages
+        _assert_hi_res_output_is_similar(resp_split, resp_single)
     else:
         assert len(resp_split.elements) == len(resp_single.elements)
 

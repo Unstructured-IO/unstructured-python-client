@@ -32,6 +32,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       env:
+        UV_LOCKED: "1"
         UV_PYTHON: ${{ matrix.python-version }}
       run: make install
     - name: Run unit tests
@@ -51,6 +52,7 @@ jobs:
         python-version: "3.13"
     - name: Install dependencies
       env:
+        UV_LOCKED: "1"
         UV_PYTHON: "3.13"
       run: make install
     - name: Lint
@@ -74,6 +76,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       env:
+        UV_LOCKED: "1"
         UV_PYTHON: ${{ matrix.python-version }}
       run: make install
     - name: Run integration tests
@@ -98,6 +101,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         env:
+          UV_LOCKED: "1"
           UV_PYTHON: ${{ matrix.python-version }}
         run: |
           make install

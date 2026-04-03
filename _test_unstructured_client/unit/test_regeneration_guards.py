@@ -40,6 +40,19 @@ def test_publish_script_is_hardened():
     assert 'uv publish --token "${PYPI_TOKEN}" --check-url https://pypi.org/simple' in publish_script
 
 
+def test_makefile_installs_with_locked_uv_sync():
+    makefile = (REPO_ROOT / "Makefile").read_text()
+
+    assert "uv sync --locked" in makefile
+
+
+def test_ci_installs_with_locked_uv_sync():
+    workflow = (REPO_ROOT / ".github" / "workflows" / "ci.yaml").read_text()
+
+    assert 'UV_LOCKED: "1"' in workflow
+    assert "run: make install" in workflow
+
+
 def test_body_create_job_input_files_are_serialized_as_multipart_files():
     request = shared.BodyCreateJob(
         request_data="{}",

@@ -11,7 +11,7 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 .PHONY: install
 install:
 	python scripts/prepare_readme.py
-	uv sync
+	uv sync --locked
 
 ## install-speakeasy-cli:			download the speakeasy cli tool
 .PHONY: install-speakeasy-cli

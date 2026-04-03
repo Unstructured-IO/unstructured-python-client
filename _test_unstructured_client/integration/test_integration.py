@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 
+from deepdiff import DeepDiff
 import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
@@ -134,7 +135,8 @@ async def test_partition_async_returns_elements(client, doc_path):
 async def test_partition_async_processes_concurrent_files(client, doc_path):
     """
     Assert that partition_async can be used to send multiple files concurrently.
-    Sends two page ranges via asyncio.gather and verifies both return valid results.
+    Send two page ranges serially and then via asyncio.gather.
+    Both execution modes should return the same payloads.
     """
     filename = "layout-parser-paper.pdf"
 
@@ -165,14 +167,28 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
         )
     ]
 
+    serial_results = []
+    for req in requests:
+        res = await client.general.partition_async(request=req)
+        assert res.status_code == 200
+        serial_results.append(res.elements)
+
     results = await asyncio.gather(
         client.general.partition_async(request=requests[0]),
         client.general.partition_async(request=requests[1])
     )
 
+    concurrent_results = []
     for res in results:
         assert res.status_code == 200
-        assert len(res.elements) > 0
+        concurrent_results.append(res.elements)
+
+    diff = DeepDiff(
+        t1=serial_results,
+        t2=concurrent_results,
+        ignore_order=True,
+    )
+    assert len(diff) == 0
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
