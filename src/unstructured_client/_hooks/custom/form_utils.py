@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from typing import Union
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
-FormData: TypeAlias = "dict[str, Union[str, shared.Files, list[str]]]"
+FormData: TypeAlias = "dict[str, Union[str, shared.Files, list[str]]]"  # pylint: disable=invalid-name
 
 PARTITION_FORM_FILES_KEY = "files"
 PARTITION_FORM_SPLIT_PDF_PAGE_KEY = "split_pdf_page"
