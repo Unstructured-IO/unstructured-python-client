@@ -14,7 +14,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_destination"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request=operations.CreateDestinationRequest(\n        create_destination_connector=shared.CreateDestinationConnector(\n            name=\"<value>\",\n            type=shared.DestinationConnectorType.MOTHERDUCK,\n            config={\n                \"hosts\": [],\n                \"index_name\": \"<value>\",\n            },\n        ),\n    ))\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.destinations.create_destination(request=operations.CreateDestinationRequest(\n        create_destination_connector=shared.CreateDestinationConnector(\n            name=\"<value>\",\n            type=\"<value>\",\n            config=shared.PineconeDestinationConnectorConfigInput(\n                index_name=\"<value>\",\n                api_key=\"<value>\",\n                namespace=\"<value>\",\n                batch_size=50,\n            ),\n        ),\n    ))\n\n    assert res.destination_connector_information is not None\n\n    # Handle response\n    print(res.destination_connector_information)"
   - target: $["paths"]["/api/v1/destinations/{destination_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -87,6 +87,66 @@ actions:
         - "lang": "python"
           "label": "get_job_failed_files"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.jobs.get_job_failed_files(request={\n        \"job_id\": \"ad262041-3530-40a9-9f83-b004e947a203\",\n    })\n\n    assert res.job_failed_files is not None\n\n    # Handle response\n    print(res.job_failed_files)"
+  - target: $["paths"]["/api/v1/notifications"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "list_notifications_api_v1_notifications_get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.notifications.list_notifications_api_v1_notifications_get(request={})\n\n    assert res.notification_list_response is not None\n\n    # Handle response\n    print(res.notification_list_response)"
+  - target: $["paths"]["/api/v1/notifications/channels"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "list_channels_api_v1_notifications_channels_get"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.list_channels_api_v1_notifications_channels_get(request={\n        \"channel_type\": shared.ChannelType.WEBHOOK,\n    })\n\n    assert res.channel_list_response is not None\n\n    # Handle response\n    print(res.channel_list_response)"
+  - target: $["paths"]["/api/v1/notifications/channels"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "create_channel_api_v1_notifications_channels_post"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.create_channel_api_v1_notifications_channels_post(request={\n        \"request_body\": {\n            \"channel_type\": \"webhook\",\n            \"event_types\": [\n                shared.NotificationEventType.JOB_COMPLETED,\n            ],\n            \"enabled\": True,\n            \"url\": \"https://weird-manner.net/\",\n        },\n    })\n\n    assert res.response_create_channel_api_v1_notifications_channels_post is not None\n\n    # Handle response\n    print(res.response_create_channel_api_v1_notifications_channels_post)"
+  - target: $["paths"]["/api/v1/notifications/channels/{channel_id}"]["delete"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "delete_channel_api_v1_notifications_channels__channel_id__delete"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.delete_channel_api_v1_notifications_channels_channel_id_delete(request={\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
+  - target: $["paths"]["/api/v1/notifications/channels/{channel_id}"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_channel_api_v1_notifications_channels__channel_id__get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.get_channel_api_v1_notifications_channels_channel_id_get(request={\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res.response_get_channel_api_v1_notifications_channels_channel_id_get is not None\n\n    # Handle response\n    print(res.response_get_channel_api_v1_notifications_channels_channel_id_get)"
+  - target: $["paths"]["/api/v1/notifications/channels/{channel_id}"]["patch"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "update_channel_api_v1_notifications_channels__channel_id__patch"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.update_channel_api_v1_notifications_channels_channel_id_patch(request={\n        \"channel_id\": \"<id>\",\n        \"update_channel_request\": {},\n    })\n\n    assert res.response_update_channel_api_v1_notifications_channels_channel_id_patch is not None\n\n    # Handle response\n    print(res.response_update_channel_api_v1_notifications_channels_channel_id_patch)"
+  - target: $["paths"]["/api/v1/notifications/channels/{channel_id}/verify"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "verify_channel_api_v1_notifications_channels__channel_id__verify_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.channels.verify_channel_api_v1_notifications_channels_channel_id_verify_post(request={\n        \"channel_id\": \"<id>\",\n        \"verify_channel_request\": {\n            \"code\": \"<value>\",\n        },\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
+  - target: $["paths"]["/api/v1/notifications/mark-read"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "mark_read_api_v1_notifications_mark_read_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.notifications.mark_read_api_v1_notifications_mark_read_post(request={\n        \"mark_read_request\": {},\n    })\n\n    assert res.mark_read_response is not None\n\n    # Handle response\n    print(res.mark_read_response)"
+  - target: $["paths"]["/api/v1/notifications/unread-count"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_unread_count_api_v1_notifications_unread_count_get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.notifications.get_unread_count_api_v1_notifications_unread_count_get(request={})\n\n    assert res.unread_count_response is not None\n\n    # Handle response\n    print(res.unread_count_response)"
+  - target: $["paths"]["/api/v1/notifications/{notification_id}"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_notification_api_v1_notifications__notification_id__get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.notifications.get_notification_api_v1_notifications_notification_id_get(request={\n        \"notification_id\": \"864270b9-965a-43bf-adb6-a812798b9977\",\n    })\n\n    assert res.notification_response is not None\n\n    # Handle response\n    print(res.notification_response)"
   - target: $["paths"]["/api/v1/sources/"]["get"]
     update:
       "x-codeSamples":
@@ -98,7 +158,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "create_source"
-          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request={\n        \"create_source_connector\": {\n            \"name\": \"<value>\",\n            \"type\": shared.SourceConnectorType.DROPBOX,\n            \"config\": {\n                \"box_app_config\": \"<value>\",\n                \"remote_url\": \"https://ugly-ribbon.info\",\n                \"recursive\": True,\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.create_source(request=operations.CreateSourceRequest(\n        create_source_connector=shared.CreateSourceConnector(\n            name=\"<value>\",\n            type=shared.SourceConnectorType.BOX,\n            config={\n                \"host\": \"ugly-ribbon.info\",\n                \"database\": \"<value>\",\n                \"port\": 526676,\n                \"username\": \"Albertha_Senger\",\n                \"password\": \"jIalrq2izU8rFxd\",\n                \"table_name\": \"<value>\",\n                \"batch_size\": 637100,\n                \"id_column\": \"id\",\n            },\n        ),\n    ))\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}"]["delete"]
     update:
       "x-codeSamples":
@@ -116,7 +176,7 @@ actions:
       "x-codeSamples":
         - "lang": "python"
           "label": "update_source"
-          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request={\n        \"source_id\": \"6ddfe201-42c1-4097-a271-1fc2801d1903\",\n        \"update_source_connector\": {\n            \"config\": {\n                \"bucket\": \"<value>\",\n                \"connection_string\": \"<value>\",\n                \"batch_size\": 615322,\n                \"username\": \"Lue.Murphy87\",\n                \"password\": \"qfyDYveMwvwoQEV\",\n                \"collection_id\": \"<id>\",\n            },\n        },\n    })\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import operations, shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.sources.update_source(request=operations.UpdateSourceRequest(\n        source_id=\"6ddfe201-42c1-4097-a271-1fc2801d1903\",\n        update_source_connector=shared.UpdateSourceConnector(\n            config={\n                \"bucket\": \"<value>\",\n                \"connection_string\": \"<value>\",\n                \"batch_size\": 615322,\n                \"username\": \"Lue.Murphy87\",\n                \"password\": \"qfyDYveMwvwoQEV\",\n                \"collection_id\": \"<id>\",\n            },\n        ),\n    ))\n\n    assert res.source_connector_information is not None\n\n    # Handle response\n    print(res.source_connector_information)"
   - target: $["paths"]["/api/v1/sources/{source_id}/connection-check"]["get"]
     update:
       "x-codeSamples":
@@ -171,6 +231,60 @@ actions:
         - "lang": "python"
           "label": "update_workflow"
           "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.update_workflow(request={\n        \"workflow_id\": \"b9b7e688-353f-4ff2-bcd7-a49b5fa5f6c7\",\n        \"update_workflow\": {},\n    })\n\n    assert res.workflow_information is not None\n\n    # Handle response\n    print(res.workflow_information)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "list_workflow_channels_api_v1_workflows__workflow_id__notifications_channels_get"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.list_workflow_channels_api_v1_workflows_workflow_id_notifications_channels_get(request={\n        \"workflow_id\": \"396ae11f-0443-440d-9d93-3aafb1d4e45b\",\n        \"channel_type\": shared.ChannelType.EMAIL,\n    })\n\n    assert res.channel_list_response is not None\n\n    # Handle response\n    print(res.channel_list_response)"
+        - "lang": "python"
+          "label": "list_workflow_channels_api_v1_workflows__workflow_id__notifications_channels_get"
+          "source": "from unstructured_client import UnstructuredClient\nfrom unstructured_client.models import shared\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.list_workflow_channels_api_v1_workflows_workflow_id_notifications_channels_get(request={\n        \"workflow_id\": \"396ae11f-0443-440d-9d93-3aafb1d4e45b\",\n        \"channel_type\": shared.ChannelType.EMAIL,\n    })\n\n    assert res.channel_list_response is not None\n\n    # Handle response\n    print(res.channel_list_response)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "create_workflow_channel_api_v1_workflows__workflow_id__notifications_channels_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post(request={\n        \"workflow_id\": \"202cb485-b362-46dd-9a70-2cc80a0334e0\",\n        \"request_body\": {\n            \"channel_type\": \"email\",\n            \"event_types\": [],\n            \"enabled\": True,\n            \"email_config\": {\n                \"recipient_email\": \"Joaquin_Rowe@yahoo.com\",\n            },\n        },\n    })\n\n    assert res.response_create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post is not None\n\n    # Handle response\n    print(res.response_create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post)"
+        - "lang": "python"
+          "label": "create_workflow_channel_api_v1_workflows__workflow_id__notifications_channels_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post(request={\n        \"workflow_id\": \"202cb485-b362-46dd-9a70-2cc80a0334e0\",\n        \"request_body\": {\n            \"channel_type\": \"email\",\n            \"event_types\": [],\n            \"enabled\": True,\n            \"email_config\": {\n                \"recipient_email\": \"Joaquin_Rowe@yahoo.com\",\n            },\n        },\n    })\n\n    assert res.response_create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post is not None\n\n    # Handle response\n    print(res.response_create_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_post)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels/{channel_id}"]["delete"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "delete_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__delete"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.delete_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_delete(request={\n        \"workflow_id\": \"702977f1-229e-4c29-b272-f3b341e640b3\",\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
+        - "lang": "python"
+          "label": "delete_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__delete"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.delete_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_delete(request={\n        \"workflow_id\": \"702977f1-229e-4c29-b272-f3b341e640b3\",\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels/{channel_id}"]["get"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "get_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get(request={\n        \"workflow_id\": \"d62674fd-06b6-479a-8cdd-a80b8f8fcdfe\",\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res.response_get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get is not None\n\n    # Handle response\n    print(res.response_get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get)"
+        - "lang": "python"
+          "label": "get_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__get"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get(request={\n        \"workflow_id\": \"d62674fd-06b6-479a-8cdd-a80b8f8fcdfe\",\n        \"channel_id\": \"<id>\",\n    })\n\n    assert res.response_get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get is not None\n\n    # Handle response\n    print(res.response_get_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_get)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels/{channel_id}"]["patch"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "update_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__patch"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch(request={\n        \"workflow_id\": \"6732a38f-9865-453e-a3d9-59972464e976\",\n        \"channel_id\": \"<id>\",\n        \"update_channel_request\": {},\n    })\n\n    assert res.response_update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch is not None\n\n    # Handle response\n    print(res.response_update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch)"
+        - "lang": "python"
+          "label": "update_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__patch"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch(request={\n        \"workflow_id\": \"6732a38f-9865-453e-a3d9-59972464e976\",\n        \"channel_id\": \"<id>\",\n        \"update_channel_request\": {},\n    })\n\n    assert res.response_update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch is not None\n\n    # Handle response\n    print(res.response_update_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_patch)"
+  - target: $["paths"]["/api/v1/workflows/{workflow_id}/notifications/channels/{channel_id}/verify"]["post"]
+    update:
+      "x-codeSamples":
+        - "lang": "python"
+          "label": "verify_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__verify_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflow_channels.verify_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_verify_post(request={\n        \"workflow_id\": \"0304693f-aa71-4717-b4f2-8e52d1f1363e\",\n        \"channel_id\": \"<id>\",\n        \"verify_channel_request\": {\n            \"code\": \"<value>\",\n        },\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
+        - "lang": "python"
+          "label": "verify_workflow_channel_api_v1_workflows__workflow_id__notifications_channels__channel_id__verify_post"
+          "source": "from unstructured_client import UnstructuredClient\n\n\nwith UnstructuredClient() as uc_client:\n\n    res = uc_client.workflows.verify_workflow_channel_api_v1_workflows_workflow_id_notifications_channels_channel_id_verify_post(request={\n        \"workflow_id\": \"0304693f-aa71-4717-b4f2-8e52d1f1363e\",\n        \"channel_id\": \"<id>\",\n        \"verify_channel_request\": {\n            \"code\": \"<value>\",\n        },\n    })\n\n    assert res is not None\n\n    # Handle response\n    print(res)"
   - target: $["paths"]["/api/v1/workflows/{workflow_id}/run"]["post"]
     update:
       "x-codeSamples":

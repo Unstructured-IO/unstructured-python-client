@@ -16,6 +16,7 @@ class S3SourceConnectorConfigTypedDict(TypedDict):
     anonymous: bool
     recursive: bool
     remote_url: str
+    ambient_credentials: NotRequired[Nullable[bool]]
     endpoint_url: NotRequired[Nullable[str]]
     key: NotRequired[Nullable[str]]
     secret: NotRequired[Nullable[str]]
@@ -29,6 +30,8 @@ class S3SourceConnectorConfig(BaseModel):
 
     remote_url: str
 
+    ambient_credentials: OptionalNullable[bool] = UNSET
+
     endpoint_url: OptionalNullable[str] = UNSET
 
     key: OptionalNullable[str] = UNSET
@@ -39,8 +42,20 @@ class S3SourceConnectorConfig(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["endpoint_url", "key", "secret", "token"]
-        nullable_fields = ["endpoint_url", "key", "secret", "token"]
+        optional_fields = [
+            "ambient_credentials",
+            "endpoint_url",
+            "key",
+            "secret",
+            "token",
+        ]
+        nullable_fields = [
+            "ambient_credentials",
+            "endpoint_url",
+            "key",
+            "secret",
+            "token",
+        ]
         null_default_fields = []
 
         serialized = handler(self)

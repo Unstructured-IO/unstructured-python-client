@@ -37,18 +37,8 @@ if TYPE_CHECKING:
         AzureSourceConnectorConfigInput,
         AzureSourceConnectorConfigInputTypedDict,
     )
-    from .body_create_job import (
-        BodyCreateJob,
-        BodyCreateJobTypedDict,
-        InputFiles,
-        InputFilesTypedDict,
-    )
-    from .body_run_workflow import (
-        BodyRunWorkflow,
-        BodyRunWorkflowInputFiles,
-        BodyRunWorkflowInputFilesTypedDict,
-        BodyRunWorkflowTypedDict,
-    )
+    from .body_create_job import BodyCreateJob, BodyCreateJobTypedDict
+    from .body_run_workflow import BodyRunWorkflow, BodyRunWorkflowTypedDict
     from .boxsourceconnectorconfig import (
         BoxSourceConnectorConfig,
         BoxSourceConnectorConfigTypedDict,
@@ -57,6 +47,13 @@ if TYPE_CHECKING:
         BoxSourceConnectorConfigInput,
         BoxSourceConnectorConfigInputTypedDict,
     )
+    from .channellistresponse import (
+        ChannelListResponse,
+        ChannelListResponseTypedDict,
+        Items,
+        ItemsTypedDict,
+    )
+    from .channeltype import ChannelType
     from .confluencesourceconnectorconfig import (
         ConfluenceSourceConnectorConfig,
         ConfluenceSourceConnectorConfigTypedDict,
@@ -87,12 +84,24 @@ if TYPE_CHECKING:
         ConfigTypedDict,
         CreateDestinationConnector,
         CreateDestinationConnectorTypedDict,
+        Type,
+        TypeTypedDict,
+    )
+    from .createemailchannelrequest import (
+        CreateEmailChannelRequest,
+        CreateEmailChannelRequestTypedDict,
     )
     from .createsourceconnector import (
         CreateSourceConnector,
         CreateSourceConnectorConfig,
         CreateSourceConnectorConfigTypedDict,
+        CreateSourceConnectorType,
+        CreateSourceConnectorTypeTypedDict,
         CreateSourceConnectorTypedDict,
+    )
+    from .createwebhookchannelrequest import (
+        CreateWebhookChannelRequest,
+        CreateWebhookChannelRequestTypedDict,
     )
     from .createworkflow import CreateWorkflow, CreateWorkflowTypedDict, Schedule
     from .crontabentry import CronTabEntry, CronTabEntryTypedDict
@@ -128,6 +137,8 @@ if TYPE_CHECKING:
         DestinationConnectorInformation,
         DestinationConnectorInformationConfig,
         DestinationConnectorInformationConfigTypedDict,
+        DestinationConnectorInformationType,
+        DestinationConnectorInformationTypeTypedDict,
         DestinationConnectorInformationTypedDict,
     )
     from .destinationconnectortype import DestinationConnectorType
@@ -146,6 +157,19 @@ if TYPE_CHECKING:
     from .elasticsearchconnectorconfiginput import (
         ElasticsearchConnectorConfigInput,
         ElasticsearchConnectorConfigInputTypedDict,
+    )
+    from .emailchannelconfig import EmailChannelConfig, EmailChannelConfigTypedDict
+    from .emailchannelconfigresponse import (
+        EmailChannelConfigResponse,
+        EmailChannelConfigResponseTypedDict,
+    )
+    from .emailchannelconfigupdate import (
+        EmailChannelConfigUpdate,
+        EmailChannelConfigUpdateTypedDict,
+    )
+    from .emailchannelresponse import (
+        EmailChannelResponse,
+        EmailChannelResponseTypedDict,
     )
     from .encryptiontype import EncryptionType
     from .failedfile import FailedFile, FailedFileTypedDict
@@ -168,11 +192,15 @@ if TYPE_CHECKING:
     from .googledrivesourceconnectorconfig import (
         GoogleDriveSourceConnectorConfig,
         GoogleDriveSourceConnectorConfigTypedDict,
+        OauthToken,
+        OauthTokenTypedDict,
         ServiceAccountKey,
         ServiceAccountKeyTypedDict,
     )
     from .googledrivesourceconnectorconfiginput import (
         GoogleDriveSourceConnectorConfigInput,
+        GoogleDriveSourceConnectorConfigInputOauthToken,
+        GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict,
         GoogleDriveSourceConnectorConfigInputServiceAccountKey,
         GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict,
         GoogleDriveSourceConnectorConfigInputTypedDict,
@@ -215,6 +243,8 @@ if TYPE_CHECKING:
         KafkaCloudSourceConnectorConfigInput,
         KafkaCloudSourceConnectorConfigInputTypedDict,
     )
+    from .markreadrequest import MarkReadRequest, MarkReadRequestTypedDict
+    from .markreadresponse import MarkReadResponse, MarkReadResponseTypedDict
     from .milvusdestinationconnectorconfig import (
         MilvusDestinationConnectorConfig,
         MilvusDestinationConnectorConfigTypedDict,
@@ -240,6 +270,15 @@ if TYPE_CHECKING:
         Neo4jDestinationConnectorConfigInputTypedDict,
     )
     from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
+    from .notificationeventtype import NotificationEventType
+    from .notificationlistresponse import (
+        NotificationListResponse,
+        NotificationListResponseTypedDict,
+    )
+    from .notificationresponse import (
+        NotificationResponse,
+        NotificationResponseTypedDict,
+    )
     from .onedrivedestinationconnectorconfig import (
         OneDriveDestinationConnectorConfig,
         OneDriveDestinationConnectorConfigTypedDict,
@@ -376,12 +415,35 @@ if TYPE_CHECKING:
         SourceConnectorInformation,
         SourceConnectorInformationConfig,
         SourceConnectorInformationConfigTypedDict,
+        SourceConnectorInformationType,
+        SourceConnectorInformationTypeTypedDict,
         SourceConnectorInformationTypedDict,
     )
     from .sourceconnectortype import SourceConnectorType
     from .templatedetail import TemplateDetail, TemplateDetailTypedDict
     from .templatelistitem import TemplateListItem, TemplateListItemTypedDict
     from .templatenode import TemplateNode, TemplateNodeTypedDict
+    from .teradatadestinationconnectorconfig import (
+        TeradataDestinationConnectorConfig,
+        TeradataDestinationConnectorConfigTypedDict,
+    )
+    from .teradatadestinationconnectorconfiginput import (
+        TeradataDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInputTypedDict,
+    )
+    from .teradatasourceconnectorconfig import (
+        TeradataSourceConnectorConfig,
+        TeradataSourceConnectorConfigTypedDict,
+    )
+    from .teradatasourceconnectorconfiginput import (
+        TeradataSourceConnectorConfigInput,
+        TeradataSourceConnectorConfigInputTypedDict,
+    )
+    from .unreadcountresponse import UnreadCountResponse, UnreadCountResponseTypedDict
+    from .updatechannelrequest import (
+        UpdateChannelRequest,
+        UpdateChannelRequestTypedDict,
+    )
     from .updatedestinationconnector import (
         UpdateDestinationConnector,
         UpdateDestinationConnectorConfig,
@@ -400,10 +462,16 @@ if TYPE_CHECKING:
         UpdateWorkflowTypedDict,
     )
     from .validationerror import (
+        Context,
+        ContextTypedDict,
         Loc,
         LocTypedDict,
         ValidationError,
         ValidationErrorTypedDict,
+    )
+    from .verifychannelrequest import (
+        VerifyChannelRequest,
+        VerifyChannelRequestTypedDict,
     )
     from .weaviatedestinationconnectorconfig import (
         WeaviateDestinationConnectorConfig,
@@ -412,6 +480,10 @@ if TYPE_CHECKING:
     from .weaviatedestinationconnectorconfiginput import (
         WeaviateDestinationConnectorConfigInput,
         WeaviateDestinationConnectorConfigInputTypedDict,
+    )
+    from .webhookchannelresponse import (
+        WebhookChannelResponse,
+        WebhookChannelResponseTypedDict,
     )
     from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
     from .workflowjobtype import WorkflowJobType
@@ -448,13 +520,14 @@ __all__ = [
     "BodyCreateJob",
     "BodyCreateJobTypedDict",
     "BodyRunWorkflow",
-    "BodyRunWorkflowInputFiles",
-    "BodyRunWorkflowInputFilesTypedDict",
     "BodyRunWorkflowTypedDict",
     "BoxSourceConnectorConfig",
     "BoxSourceConnectorConfigInput",
     "BoxSourceConnectorConfigInputTypedDict",
     "BoxSourceConnectorConfigTypedDict",
+    "ChannelListResponse",
+    "ChannelListResponseTypedDict",
+    "ChannelType",
     "Config",
     "ConfigTypedDict",
     "ConfluenceSourceConnectorConfig",
@@ -462,6 +535,8 @@ __all__ = [
     "ConfluenceSourceConnectorConfigInputTypedDict",
     "ConfluenceSourceConnectorConfigTypedDict",
     "ConnectionCheckStatus",
+    "Context",
+    "ContextTypedDict",
     "CouchbaseDestinationConnectorConfig",
     "CouchbaseDestinationConnectorConfigInput",
     "CouchbaseDestinationConnectorConfigInputTypedDict",
@@ -472,10 +547,16 @@ __all__ = [
     "CouchbaseSourceConnectorConfigTypedDict",
     "CreateDestinationConnector",
     "CreateDestinationConnectorTypedDict",
+    "CreateEmailChannelRequest",
+    "CreateEmailChannelRequestTypedDict",
     "CreateSourceConnector",
     "CreateSourceConnectorConfig",
     "CreateSourceConnectorConfigTypedDict",
+    "CreateSourceConnectorType",
+    "CreateSourceConnectorTypeTypedDict",
     "CreateSourceConnectorTypedDict",
+    "CreateWebhookChannelRequest",
+    "CreateWebhookChannelRequestTypedDict",
     "CreateWorkflow",
     "CreateWorkflowTypedDict",
     "CronTabEntry",
@@ -497,6 +578,8 @@ __all__ = [
     "DestinationConnectorInformation",
     "DestinationConnectorInformationConfig",
     "DestinationConnectorInformationConfigTypedDict",
+    "DestinationConnectorInformationType",
+    "DestinationConnectorInformationTypeTypedDict",
     "DestinationConnectorInformationTypedDict",
     "DestinationConnectorType",
     "DropboxSourceConnectorConfig",
@@ -507,6 +590,14 @@ __all__ = [
     "ElasticsearchConnectorConfigInput",
     "ElasticsearchConnectorConfigInputTypedDict",
     "ElasticsearchConnectorConfigTypedDict",
+    "EmailChannelConfig",
+    "EmailChannelConfigResponse",
+    "EmailChannelConfigResponseTypedDict",
+    "EmailChannelConfigTypedDict",
+    "EmailChannelConfigUpdate",
+    "EmailChannelConfigUpdateTypedDict",
+    "EmailChannelResponse",
+    "EmailChannelResponseTypedDict",
     "EncryptionType",
     "FailedFile",
     "FailedFileTypedDict",
@@ -522,6 +613,8 @@ __all__ = [
     "GCSSourceConnectorConfigTypedDict",
     "GoogleDriveSourceConnectorConfig",
     "GoogleDriveSourceConnectorConfigInput",
+    "GoogleDriveSourceConnectorConfigInputOauthToken",
+    "GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict",
     "GoogleDriveSourceConnectorConfigInputServiceAccountKey",
     "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict",
     "GoogleDriveSourceConnectorConfigInputTypedDict",
@@ -530,8 +623,8 @@ __all__ = [
     "IBMWatsonxS3DestinationConnectorConfigInput",
     "IBMWatsonxS3DestinationConnectorConfigInputTypedDict",
     "IBMWatsonxS3DestinationConnectorConfigTypedDict",
-    "InputFiles",
-    "InputFilesTypedDict",
+    "Items",
+    "ItemsTypedDict",
     "JiraSourceConnectorConfig",
     "JiraSourceConnectorConfigInput",
     "JiraSourceConnectorConfigInputTypedDict",
@@ -556,6 +649,10 @@ __all__ = [
     "KafkaCloudSourceConnectorConfigTypedDict",
     "Loc",
     "LocTypedDict",
+    "MarkReadRequest",
+    "MarkReadRequestTypedDict",
+    "MarkReadResponse",
+    "MarkReadResponseTypedDict",
     "MilvusDestinationConnectorConfig",
     "MilvusDestinationConnectorConfigInput",
     "MilvusDestinationConnectorConfigInputTypedDict",
@@ -570,6 +667,13 @@ __all__ = [
     "Neo4jDestinationConnectorConfigTypedDict",
     "NodeFileMetadata",
     "NodeFileMetadataTypedDict",
+    "NotificationEventType",
+    "NotificationListResponse",
+    "NotificationListResponseTypedDict",
+    "NotificationResponse",
+    "NotificationResponseTypedDict",
+    "OauthToken",
+    "OauthTokenTypedDict",
     "OneDriveDestinationConnectorConfig",
     "OneDriveDestinationConnectorConfigInput",
     "OneDriveDestinationConnectorConfigInputTypedDict",
@@ -644,6 +748,8 @@ __all__ = [
     "SourceConnectorInformation",
     "SourceConnectorInformationConfig",
     "SourceConnectorInformationConfigTypedDict",
+    "SourceConnectorInformationType",
+    "SourceConnectorInformationTypeTypedDict",
     "SourceConnectorInformationTypedDict",
     "SourceConnectorType",
     "Strategy",
@@ -653,6 +759,20 @@ __all__ = [
     "TemplateListItemTypedDict",
     "TemplateNode",
     "TemplateNodeTypedDict",
+    "TeradataDestinationConnectorConfig",
+    "TeradataDestinationConnectorConfigInput",
+    "TeradataDestinationConnectorConfigInputTypedDict",
+    "TeradataDestinationConnectorConfigTypedDict",
+    "TeradataSourceConnectorConfig",
+    "TeradataSourceConnectorConfigInput",
+    "TeradataSourceConnectorConfigInputTypedDict",
+    "TeradataSourceConnectorConfigTypedDict",
+    "Type",
+    "TypeTypedDict",
+    "UnreadCountResponse",
+    "UnreadCountResponseTypedDict",
+    "UpdateChannelRequest",
+    "UpdateChannelRequestTypedDict",
     "UpdateDestinationConnector",
     "UpdateDestinationConnectorConfig",
     "UpdateDestinationConnectorConfigTypedDict",
@@ -667,10 +787,14 @@ __all__ = [
     "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
+    "VerifyChannelRequest",
+    "VerifyChannelRequestTypedDict",
     "WeaviateDestinationConnectorConfig",
     "WeaviateDestinationConnectorConfigInput",
     "WeaviateDestinationConnectorConfigInputTypedDict",
     "WeaviateDestinationConnectorConfigTypedDict",
+    "WebhookChannelResponse",
+    "WebhookChannelResponseTypedDict",
     "WorkflowInformation",
     "WorkflowInformationTypedDict",
     "WorkflowJobType",
@@ -705,16 +829,17 @@ _dynamic_imports: dict[str, str] = {
     "AzureSourceConnectorConfigInputTypedDict": ".azuresourceconnectorconfiginput",
     "BodyCreateJob": ".body_create_job",
     "BodyCreateJobTypedDict": ".body_create_job",
-    "InputFiles": ".body_create_job",
-    "InputFilesTypedDict": ".body_create_job",
     "BodyRunWorkflow": ".body_run_workflow",
-    "BodyRunWorkflowInputFiles": ".body_run_workflow",
-    "BodyRunWorkflowInputFilesTypedDict": ".body_run_workflow",
     "BodyRunWorkflowTypedDict": ".body_run_workflow",
     "BoxSourceConnectorConfig": ".boxsourceconnectorconfig",
     "BoxSourceConnectorConfigTypedDict": ".boxsourceconnectorconfig",
     "BoxSourceConnectorConfigInput": ".boxsourceconnectorconfiginput",
     "BoxSourceConnectorConfigInputTypedDict": ".boxsourceconnectorconfiginput",
+    "ChannelListResponse": ".channellistresponse",
+    "ChannelListResponseTypedDict": ".channellistresponse",
+    "Items": ".channellistresponse",
+    "ItemsTypedDict": ".channellistresponse",
+    "ChannelType": ".channeltype",
     "ConfluenceSourceConnectorConfig": ".confluencesourceconnectorconfig",
     "ConfluenceSourceConnectorConfigTypedDict": ".confluencesourceconnectorconfig",
     "ConfluenceSourceConnectorConfigInput": ".confluencesourceconnectorconfiginput",
@@ -732,10 +857,18 @@ _dynamic_imports: dict[str, str] = {
     "ConfigTypedDict": ".createdestinationconnector",
     "CreateDestinationConnector": ".createdestinationconnector",
     "CreateDestinationConnectorTypedDict": ".createdestinationconnector",
+    "Type": ".createdestinationconnector",
+    "TypeTypedDict": ".createdestinationconnector",
+    "CreateEmailChannelRequest": ".createemailchannelrequest",
+    "CreateEmailChannelRequestTypedDict": ".createemailchannelrequest",
     "CreateSourceConnector": ".createsourceconnector",
     "CreateSourceConnectorConfig": ".createsourceconnector",
     "CreateSourceConnectorConfigTypedDict": ".createsourceconnector",
+    "CreateSourceConnectorType": ".createsourceconnector",
+    "CreateSourceConnectorTypeTypedDict": ".createsourceconnector",
     "CreateSourceConnectorTypedDict": ".createsourceconnector",
+    "CreateWebhookChannelRequest": ".createwebhookchannelrequest",
+    "CreateWebhookChannelRequestTypedDict": ".createwebhookchannelrequest",
     "CreateWorkflow": ".createworkflow",
     "CreateWorkflowTypedDict": ".createworkflow",
     "Schedule": ".createworkflow",
@@ -758,6 +891,8 @@ _dynamic_imports: dict[str, str] = {
     "DestinationConnectorInformation": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfig": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfigTypedDict": ".destinationconnectorinformation",
+    "DestinationConnectorInformationType": ".destinationconnectorinformation",
+    "DestinationConnectorInformationTypeTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorInformationTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorType": ".destinationconnectortype",
     "DropboxSourceConnectorConfig": ".dropboxsourceconnectorconfig",
@@ -768,6 +903,14 @@ _dynamic_imports: dict[str, str] = {
     "ElasticsearchConnectorConfigTypedDict": ".elasticsearchconnectorconfig",
     "ElasticsearchConnectorConfigInput": ".elasticsearchconnectorconfiginput",
     "ElasticsearchConnectorConfigInputTypedDict": ".elasticsearchconnectorconfiginput",
+    "EmailChannelConfig": ".emailchannelconfig",
+    "EmailChannelConfigTypedDict": ".emailchannelconfig",
+    "EmailChannelConfigResponse": ".emailchannelconfigresponse",
+    "EmailChannelConfigResponseTypedDict": ".emailchannelconfigresponse",
+    "EmailChannelConfigUpdate": ".emailchannelconfigupdate",
+    "EmailChannelConfigUpdateTypedDict": ".emailchannelconfigupdate",
+    "EmailChannelResponse": ".emailchannelresponse",
+    "EmailChannelResponseTypedDict": ".emailchannelresponse",
     "EncryptionType": ".encryptiontype",
     "FailedFile": ".failedfile",
     "FailedFileTypedDict": ".failedfile",
@@ -781,9 +924,13 @@ _dynamic_imports: dict[str, str] = {
     "GCSSourceConnectorConfigInputTypedDict": ".gcssourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfig": ".googledrivesourceconnectorconfig",
     "GoogleDriveSourceConnectorConfigTypedDict": ".googledrivesourceconnectorconfig",
+    "OauthToken": ".googledrivesourceconnectorconfig",
+    "OauthTokenTypedDict": ".googledrivesourceconnectorconfig",
     "ServiceAccountKey": ".googledrivesourceconnectorconfig",
     "ServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfig",
     "GoogleDriveSourceConnectorConfigInput": ".googledrivesourceconnectorconfiginput",
+    "GoogleDriveSourceConnectorConfigInputOauthToken": ".googledrivesourceconnectorconfiginput",
+    "GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict": ".googledrivesourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfigInputServiceAccountKey": ".googledrivesourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfiginput",
     "GoogleDriveSourceConnectorConfigInputTypedDict": ".googledrivesourceconnectorconfiginput",
@@ -813,6 +960,10 @@ _dynamic_imports: dict[str, str] = {
     "KafkaCloudSourceConnectorConfigTypedDict": ".kafkacloudsourceconnectorconfig",
     "KafkaCloudSourceConnectorConfigInput": ".kafkacloudsourceconnectorconfiginput",
     "KafkaCloudSourceConnectorConfigInputTypedDict": ".kafkacloudsourceconnectorconfiginput",
+    "MarkReadRequest": ".markreadrequest",
+    "MarkReadRequestTypedDict": ".markreadrequest",
+    "MarkReadResponse": ".markreadresponse",
+    "MarkReadResponseTypedDict": ".markreadresponse",
     "MilvusDestinationConnectorConfig": ".milvusdestinationconnectorconfig",
     "MilvusDestinationConnectorConfigTypedDict": ".milvusdestinationconnectorconfig",
     "MilvusDestinationConnectorConfigInput": ".milvusdestinationconnectorconfiginput",
@@ -827,6 +978,11 @@ _dynamic_imports: dict[str, str] = {
     "Neo4jDestinationConnectorConfigInputTypedDict": ".neo4jdestinationconnectorconfiginput",
     "NodeFileMetadata": ".nodefilemetadata",
     "NodeFileMetadataTypedDict": ".nodefilemetadata",
+    "NotificationEventType": ".notificationeventtype",
+    "NotificationListResponse": ".notificationlistresponse",
+    "NotificationListResponseTypedDict": ".notificationlistresponse",
+    "NotificationResponse": ".notificationresponse",
+    "NotificationResponseTypedDict": ".notificationresponse",
     "OneDriveDestinationConnectorConfig": ".onedrivedestinationconnectorconfig",
     "OneDriveDestinationConnectorConfigTypedDict": ".onedrivedestinationconnectorconfig",
     "OneDriveDestinationConnectorConfigInput": ".onedrivedestinationconnectorconfiginput",
@@ -902,6 +1058,8 @@ _dynamic_imports: dict[str, str] = {
     "SourceConnectorInformation": ".sourceconnectorinformation",
     "SourceConnectorInformationConfig": ".sourceconnectorinformation",
     "SourceConnectorInformationConfigTypedDict": ".sourceconnectorinformation",
+    "SourceConnectorInformationType": ".sourceconnectorinformation",
+    "SourceConnectorInformationTypeTypedDict": ".sourceconnectorinformation",
     "SourceConnectorInformationTypedDict": ".sourceconnectorinformation",
     "SourceConnectorType": ".sourceconnectortype",
     "TemplateDetail": ".templatedetail",
@@ -910,6 +1068,18 @@ _dynamic_imports: dict[str, str] = {
     "TemplateListItemTypedDict": ".templatelistitem",
     "TemplateNode": ".templatenode",
     "TemplateNodeTypedDict": ".templatenode",
+    "TeradataDestinationConnectorConfig": ".teradatadestinationconnectorconfig",
+    "TeradataDestinationConnectorConfigTypedDict": ".teradatadestinationconnectorconfig",
+    "TeradataDestinationConnectorConfigInput": ".teradatadestinationconnectorconfiginput",
+    "TeradataDestinationConnectorConfigInputTypedDict": ".teradatadestinationconnectorconfiginput",
+    "TeradataSourceConnectorConfig": ".teradatasourceconnectorconfig",
+    "TeradataSourceConnectorConfigTypedDict": ".teradatasourceconnectorconfig",
+    "TeradataSourceConnectorConfigInput": ".teradatasourceconnectorconfiginput",
+    "TeradataSourceConnectorConfigInputTypedDict": ".teradatasourceconnectorconfiginput",
+    "UnreadCountResponse": ".unreadcountresponse",
+    "UnreadCountResponseTypedDict": ".unreadcountresponse",
+    "UpdateChannelRequest": ".updatechannelrequest",
+    "UpdateChannelRequestTypedDict": ".updatechannelrequest",
     "UpdateDestinationConnector": ".updatedestinationconnector",
     "UpdateDestinationConnectorConfig": ".updatedestinationconnector",
     "UpdateDestinationConnectorConfigTypedDict": ".updatedestinationconnector",
@@ -921,14 +1091,20 @@ _dynamic_imports: dict[str, str] = {
     "UpdateWorkflow": ".updateworkflow",
     "UpdateWorkflowSchedule": ".updateworkflow",
     "UpdateWorkflowTypedDict": ".updateworkflow",
+    "Context": ".validationerror",
+    "ContextTypedDict": ".validationerror",
     "Loc": ".validationerror",
     "LocTypedDict": ".validationerror",
     "ValidationError": ".validationerror",
     "ValidationErrorTypedDict": ".validationerror",
+    "VerifyChannelRequest": ".verifychannelrequest",
+    "VerifyChannelRequestTypedDict": ".verifychannelrequest",
     "WeaviateDestinationConnectorConfig": ".weaviatedestinationconnectorconfig",
     "WeaviateDestinationConnectorConfigTypedDict": ".weaviatedestinationconnectorconfig",
     "WeaviateDestinationConnectorConfigInput": ".weaviatedestinationconnectorconfiginput",
     "WeaviateDestinationConnectorConfigInputTypedDict": ".weaviatedestinationconnectorconfiginput",
+    "WebhookChannelResponse": ".webhookchannelresponse",
+    "WebhookChannelResponseTypedDict": ".webhookchannelresponse",
     "WorkflowInformation": ".workflowinformation",
     "WorkflowInformationTypedDict": ".workflowinformation",
     "WorkflowJobType": ".workflowjobtype",

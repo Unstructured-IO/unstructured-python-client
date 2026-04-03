@@ -15,6 +15,7 @@ from unstructured_client.types import (
 
 class S3DestinationConnectorConfigInputTypedDict(TypedDict):
     remote_url: str
+    ambient_credentials: NotRequired[bool]
     anonymous: NotRequired[bool]
     endpoint_url: NotRequired[Nullable[str]]
     key: NotRequired[Nullable[str]]
@@ -24,6 +25,8 @@ class S3DestinationConnectorConfigInputTypedDict(TypedDict):
 
 class S3DestinationConnectorConfigInput(BaseModel):
     remote_url: str
+
+    ambient_credentials: Optional[bool] = False
 
     anonymous: Optional[bool] = False
 
@@ -37,7 +40,14 @@ class S3DestinationConnectorConfigInput(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["anonymous", "endpoint_url", "key", "secret", "token"]
+        optional_fields = [
+            "ambient_credentials",
+            "anonymous",
+            "endpoint_url",
+            "key",
+            "secret",
+            "token",
+        ]
         nullable_fields = ["endpoint_url", "key", "secret", "token"]
         null_default_fields = []
 

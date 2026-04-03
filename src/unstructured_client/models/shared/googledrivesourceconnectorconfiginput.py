@@ -14,6 +14,17 @@ from unstructured_client.types import (
 )
 
 
+GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict = TypeAliasType(
+    "GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict",
+    Union[SecretReferenceTypedDict, str],
+)
+
+
+GoogleDriveSourceConnectorConfigInputOauthToken = TypeAliasType(
+    "GoogleDriveSourceConnectorConfigInputOauthToken", Union[SecretReference, str]
+)
+
+
 GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict = TypeAliasType(
     "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict",
     Union[SecretReferenceTypedDict, str],
@@ -28,24 +39,40 @@ GoogleDriveSourceConnectorConfigInputServiceAccountKey = TypeAliasType(
 
 class GoogleDriveSourceConnectorConfigInputTypedDict(TypedDict):
     drive_id: str
-    service_account_key: GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict
     extensions: NotRequired[Nullable[List[str]]]
+    oauth_token: NotRequired[
+        Nullable[GoogleDriveSourceConnectorConfigInputOauthTokenTypedDict]
+    ]
     recursive: NotRequired[bool]
+    service_account_key: NotRequired[
+        Nullable[GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict]
+    ]
 
 
 class GoogleDriveSourceConnectorConfigInput(BaseModel):
     drive_id: str
 
-    service_account_key: GoogleDriveSourceConnectorConfigInputServiceAccountKey
-
     extensions: OptionalNullable[List[str]] = UNSET
+
+    oauth_token: OptionalNullable[GoogleDriveSourceConnectorConfigInputOauthToken] = (
+        UNSET
+    )
 
     recursive: Optional[bool] = True
 
+    service_account_key: OptionalNullable[
+        GoogleDriveSourceConnectorConfigInputServiceAccountKey
+    ] = UNSET
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["extensions", "recursive"]
-        nullable_fields = ["extensions"]
+        optional_fields = [
+            "extensions",
+            "oauth_token",
+            "recursive",
+            "service_account_key",
+        ]
+        nullable_fields = ["extensions", "oauth_token", "service_account_key"]
         null_default_fields = []
 
         serialized = handler(self)

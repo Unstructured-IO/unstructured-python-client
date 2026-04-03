@@ -15,27 +15,39 @@ from unstructured_client.types import OptionalNullable, UNSET
 import weakref
 
 if TYPE_CHECKING:
+    from unstructured_client.channels import Channels
     from unstructured_client.destinations import Destinations
     from unstructured_client.general import General
     from unstructured_client.jobs import Jobs
+    from unstructured_client.notifications import Notifications
     from unstructured_client.sources import Sources
     from unstructured_client.templates import Templates
+    from unstructured_client.workflow_channels import WorkflowChannels
     from unstructured_client.workflows import Workflows
 
 
 class UnstructuredClient(BaseSDK):
     destinations: "Destinations"
     jobs: "Jobs"
+    notifications: "Notifications"
+    channels: "Channels"
     sources: "Sources"
     templates: "Templates"
     workflows: "Workflows"
+    workflow_channels: "WorkflowChannels"
     general: "General"
     _sub_sdk_map = {
         "destinations": ("unstructured_client.destinations", "Destinations"),
         "jobs": ("unstructured_client.jobs", "Jobs"),
+        "notifications": ("unstructured_client.notifications", "Notifications"),
+        "channels": ("unstructured_client.channels", "Channels"),
         "sources": ("unstructured_client.sources", "Sources"),
         "templates": ("unstructured_client.templates", "Templates"),
         "workflows": ("unstructured_client.workflows", "Workflows"),
+        "workflow_channels": (
+            "unstructured_client.workflow_channels",
+            "WorkflowChannels",
+        ),
         "general": ("unstructured_client.general", "General"),
     }
 

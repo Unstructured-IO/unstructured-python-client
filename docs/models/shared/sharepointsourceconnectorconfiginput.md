@@ -12,4 +12,4 @@
 | `recursive`             | *Optional[bool]*        | :heavy_minus_sign:      | N/A                     |
 | `site`                  | *str*                   | :heavy_check_mark:      | N/A                     |
 | `tenant`                | *str*                   | :heavy_check_mark:      | N/A                     |
-| `user_pname`            | *str*                   | :heavy_check_mark:      | N/A                     |
+| `user_pname`            | *OptionalNullable[str]* | :heavy_minus_sign:      | N/A                     |

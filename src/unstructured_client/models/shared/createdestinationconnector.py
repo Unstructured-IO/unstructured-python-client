@@ -90,6 +90,10 @@ from .snowflakedestinationconnectorconfiginput import (
     SnowflakeDestinationConnectorConfigInput,
     SnowflakeDestinationConnectorConfigInputTypedDict,
 )
+from .teradatadestinationconnectorconfiginput import (
+    TeradataDestinationConnectorConfigInput,
+    TeradataDestinationConnectorConfigInputTypedDict,
+)
 from .weaviatedestinationconnectorconfiginput import (
     WeaviateDestinationConnectorConfigInput,
     WeaviateDestinationConnectorConfigInputTypedDict,
@@ -110,20 +114,21 @@ ConfigTypedDict = TypeAliasType(
         AzureAISearchConnectorConfigInputTypedDict,
         MongoDBConnectorConfigInputTypedDict,
         QdrantCloudDestinationConnectorConfigInputTypedDict,
-        PineconeDestinationConnectorConfigInputTypedDict,
         DeltaTableConnectorConfigInputTypedDict,
-        Neo4jDestinationConnectorConfigInputTypedDict,
+        PineconeDestinationConnectorConfigInputTypedDict,
         AzureDestinationConnectorConfigInputTypedDict,
-        S3DestinationConnectorConfigInputTypedDict,
+        Neo4jDestinationConnectorConfigInputTypedDict,
         OneDriveDestinationConnectorConfigInputTypedDict,
-        MilvusDestinationConnectorConfigInputTypedDict,
-        CouchbaseDestinationConnectorConfigInputTypedDict,
-        KafkaCloudDestinationConnectorConfigInputTypedDict,
         PostgresDestinationConnectorConfigInputTypedDict,
+        S3DestinationConnectorConfigInputTypedDict,
         DatabricksVolumesConnectorConfigInputTypedDict,
+        KafkaCloudDestinationConnectorConfigInputTypedDict,
+        CouchbaseDestinationConnectorConfigInputTypedDict,
         OpenSearchConnectorConfigInputTypedDict,
         RedisDestinationConnectorConfigInputTypedDict,
+        TeradataDestinationConnectorConfigInputTypedDict,
         AstraDBConnectorConfigInputTypedDict,
+        MilvusDestinationConnectorConfigInputTypedDict,
         DatabricksVDTDestinationConnectorConfigInputTypedDict,
         SnowflakeDestinationConnectorConfigInputTypedDict,
         IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
@@ -141,20 +146,21 @@ Config = TypeAliasType(
         AzureAISearchConnectorConfigInput,
         MongoDBConnectorConfigInput,
         QdrantCloudDestinationConnectorConfigInput,
-        PineconeDestinationConnectorConfigInput,
         DeltaTableConnectorConfigInput,
-        Neo4jDestinationConnectorConfigInput,
+        PineconeDestinationConnectorConfigInput,
         AzureDestinationConnectorConfigInput,
-        S3DestinationConnectorConfigInput,
+        Neo4jDestinationConnectorConfigInput,
         OneDriveDestinationConnectorConfigInput,
-        MilvusDestinationConnectorConfigInput,
-        CouchbaseDestinationConnectorConfigInput,
-        KafkaCloudDestinationConnectorConfigInput,
         PostgresDestinationConnectorConfigInput,
+        S3DestinationConnectorConfigInput,
         DatabricksVolumesConnectorConfigInput,
+        KafkaCloudDestinationConnectorConfigInput,
+        CouchbaseDestinationConnectorConfigInput,
         OpenSearchConnectorConfigInput,
         RedisDestinationConnectorConfigInput,
+        TeradataDestinationConnectorConfigInput,
         AstraDBConnectorConfigInput,
+        MilvusDestinationConnectorConfigInput,
         DatabricksVDTDestinationConnectorConfigInput,
         SnowflakeDestinationConnectorConfigInput,
         IBMWatsonxS3DestinationConnectorConfigInput,
@@ -163,10 +169,22 @@ Config = TypeAliasType(
 )
 
 
+TypeTypedDict = TypeAliasType("TypeTypedDict", Union[DestinationConnectorType, str])
+
+
+Type = TypeAliasType(
+    "Type",
+    Union[
+        Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))],
+        str,
+    ],
+)
+
+
 class CreateDestinationConnectorTypedDict(TypedDict):
     config: ConfigTypedDict
     name: str
-    type: DestinationConnectorType
+    type: TypeTypedDict
 
 
 class CreateDestinationConnector(BaseModel):
@@ -174,4 +192,4 @@ class CreateDestinationConnector(BaseModel):
 
     name: str
 
-    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
+    type: Type

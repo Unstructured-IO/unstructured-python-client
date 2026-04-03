@@ -1,0 +1,15 @@
+# CreateWebhookChannelRequest
+
+Request to create a webhook notification channel.
+
+
+## Fields
+
+| Field                                                                              | Type                                                                               | Required                                                                           | Description                                                                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `channel_type`                                                                     | *Optional[Literal["webhook"]]*                                                     | :heavy_minus_sign:                                                                 | N/A                                                                                |
+| `description`                                                                      | *OptionalNullable[str]*                                                            | :heavy_minus_sign:                                                                 | Channel description                                                                |
+| `enabled`                                                                          | *Optional[bool]*                                                                   | :heavy_minus_sign:                                                                 | Enable/disable channel                                                             |
+| `event_types`                                                                      | List[[shared.NotificationEventType](../../models/shared/notificationeventtype.md)] | :heavy_check_mark:                                                                 | Event types to subscribe to                                                        |
+| `secret`                                                                           | *OptionalNullable[str]*                                                            | :heavy_minus_sign:                                                                 | Consumer-supplied signing secret (24-75 bytes)                                     |
+| `url`                                                                              | *str*                                                                              | :heavy_check_mark:                                                                 | Webhook endpoint URL (HTTPS required)                                              |

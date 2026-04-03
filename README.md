@@ -208,7 +208,7 @@ with UnstructuredClient() as uc_client:
 ### Error Classes
 **Primary errors:**
 * [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py): The base class for HTTP error responses.
-  * [`HTTPValidationError`](./src/unstructured_client/models/errors/httpvalidationerror.py): Validation Error. Status code `422`.
+  * [`HTTPValidationError`](./src/unstructured_client/models/errors/httpvalidationerror.py): Validation Error. Status code `422`. *
 
 <details><summary>Less common errors (6)</summary>
 
@@ -221,7 +221,7 @@ with UnstructuredClient() as uc_client:
 
 
 **Inherit from [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py)**:
-* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 30 methods.*
+* [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 52 methods.*
 * [`ResponseValidationError`](./src/unstructured_client/models/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
 
 </details>
@@ -439,20 +439,33 @@ Certain SDK methods accept file objects as part of a request body or multi-part 
 
 ```python
 from unstructured_client import UnstructuredClient
+from unstructured_client.models import shared
 
 
 with UnstructuredClient() as uc_client:
 
-    res = uc_client.jobs.create_job(request={
-        "body_create_job": {
-            "request_data": "<value>",
+    res = uc_client.general.partition(request={
+        "partition_parameters": {
+            "chunking_strategy": "by_title",
+            "files": {
+                "content": open("example.file", "rb"),
+                "file_name": "example.file",
+            },
+            "split_pdf_cache_tmp_data_dir": "<value>",
+            "split_pdf_page_range": [
+                1,
+                10,
+            ],
+            "strategy": shared.Strategy.AUTO,
+            "vlm_model": "gpt-4o",
+            "vlm_model_provider": shared.VLMModelProvider.OPENAI,
         },
     })
 
-    assert res.job_information is not None
+    assert res.elements is not None
 
     # Handle response
-    print(res.job_information)
+    print(res.elements)
 
 ```
 <!-- End File uploads [file-upload] -->

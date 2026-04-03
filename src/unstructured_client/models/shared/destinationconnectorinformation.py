@@ -90,6 +90,10 @@ from .snowflakedestinationconnectorconfig import (
     SnowflakeDestinationConnectorConfig,
     SnowflakeDestinationConnectorConfigTypedDict,
 )
+from .teradatadestinationconnectorconfig import (
+    TeradataDestinationConnectorConfig,
+    TeradataDestinationConnectorConfigTypedDict,
+)
 from .weaviatedestinationconnectorconfig import (
     WeaviateDestinationConnectorConfig,
     WeaviateDestinationConnectorConfigTypedDict,
@@ -122,16 +126,17 @@ DestinationConnectorInformationConfigTypedDict = TypeAliasType(
         DeltaTableConnectorConfigTypedDict,
         Neo4jDestinationConnectorConfigTypedDict,
         AzureDestinationConnectorConfigTypedDict,
-        S3DestinationConnectorConfigTypedDict,
         OneDriveDestinationConnectorConfigTypedDict,
         MilvusDestinationConnectorConfigTypedDict,
-        CouchbaseDestinationConnectorConfigTypedDict,
+        S3DestinationConnectorConfigTypedDict,
         KafkaCloudDestinationConnectorConfigTypedDict,
-        PostgresDestinationConnectorConfigTypedDict,
-        DatabricksVolumesConnectorConfigTypedDict,
         AstraDBConnectorConfigTypedDict,
-        OpenSearchConnectorConfigTypedDict,
+        DatabricksVolumesConnectorConfigTypedDict,
+        PostgresDestinationConnectorConfigTypedDict,
+        CouchbaseDestinationConnectorConfigTypedDict,
+        TeradataDestinationConnectorConfigTypedDict,
         RedisDestinationConnectorConfigTypedDict,
+        OpenSearchConnectorConfigTypedDict,
         DatabricksVDTDestinationConnectorConfigTypedDict,
         SnowflakeDestinationConnectorConfigTypedDict,
         IBMWatsonxS3DestinationConnectorConfigTypedDict,
@@ -153,20 +158,35 @@ DestinationConnectorInformationConfig = TypeAliasType(
         DeltaTableConnectorConfig,
         Neo4jDestinationConnectorConfig,
         AzureDestinationConnectorConfig,
-        S3DestinationConnectorConfig,
         OneDriveDestinationConnectorConfig,
         MilvusDestinationConnectorConfig,
-        CouchbaseDestinationConnectorConfig,
+        S3DestinationConnectorConfig,
         KafkaCloudDestinationConnectorConfig,
-        PostgresDestinationConnectorConfig,
-        DatabricksVolumesConnectorConfig,
         AstraDBConnectorConfig,
-        OpenSearchConnectorConfig,
+        DatabricksVolumesConnectorConfig,
+        PostgresDestinationConnectorConfig,
+        CouchbaseDestinationConnectorConfig,
+        TeradataDestinationConnectorConfig,
         RedisDestinationConnectorConfig,
+        OpenSearchConnectorConfig,
         DatabricksVDTDestinationConnectorConfig,
         SnowflakeDestinationConnectorConfig,
         IBMWatsonxS3DestinationConnectorConfig,
         Dict[str, Any],
+    ],
+)
+
+
+DestinationConnectorInformationTypeTypedDict = TypeAliasType(
+    "DestinationConnectorInformationTypeTypedDict", Union[DestinationConnectorType, str]
+)
+
+
+DestinationConnectorInformationType = TypeAliasType(
+    "DestinationConnectorInformationType",
+    Union[
+        Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))],
+        str,
     ],
 )
 
@@ -176,7 +196,7 @@ class DestinationConnectorInformationTypedDict(TypedDict):
     created_at: datetime
     id: str
     name: str
-    type: DestinationConnectorType
+    type: DestinationConnectorInformationTypeTypedDict
     updated_at: NotRequired[Nullable[datetime]]
 
 
@@ -189,7 +209,7 @@ class DestinationConnectorInformation(BaseModel):
 
     name: str
 
-    type: Annotated[DestinationConnectorType, PlainValidator(validate_open_enum(False))]
+    type: DestinationConnectorInformationType
 
     updated_at: OptionalNullable[datetime] = UNSET
 

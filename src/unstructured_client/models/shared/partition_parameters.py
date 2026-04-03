@@ -85,6 +85,10 @@ class PartitionParametersTypedDict(TypedDict):
     r"""If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500"""
     content_type: NotRequired[Nullable[str]]
     r"""A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype."""
+    contextual_chunking_auth: NotRequired[Nullable[str]]
+    r"""JSON-encoded auth credentials for the contextual chunking provider. Structure depends on the provider."""
+    contextual_chunking_service_name: NotRequired[Nullable[str]]
+    r"""Pre-resolved prompt service name for contextual chunking (e.g. 'BedrockContextualChunking'). When set, uses this service with the provided auth instead of the default env-var-based model selection."""
     coordinates: NotRequired[bool]
     r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
     do_not_break_similarity_on_footer_header: NotRequired[bool]
@@ -177,6 +181,16 @@ class PartitionParameters(BaseModel):
 
     content_type: Annotated[OptionalNullable[str], FieldMetadata(multipart=True)] = None
     r"""A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype."""
+
+    contextual_chunking_auth: Annotated[
+        OptionalNullable[str], FieldMetadata(multipart=True)
+    ] = None
+    r"""JSON-encoded auth credentials for the contextual chunking provider. Structure depends on the provider."""
+
+    contextual_chunking_service_name: Annotated[
+        OptionalNullable[str], FieldMetadata(multipart=True)
+    ] = None
+    r"""Pre-resolved prompt service name for contextual chunking (e.g. 'BedrockContextualChunking'). When set, uses this service with the provided auth instead of the default env-var-based model selection."""
 
     coordinates: Annotated[Optional[bool], FieldMetadata(multipart=True)] = False
     r"""If `True`, return coordinates for each element extracted via OCR. Default: `False`"""
@@ -350,6 +364,8 @@ class PartitionParameters(BaseModel):
             "chunking_strategy",
             "combine_under_n_chars",
             "content_type",
+            "contextual_chunking_auth",
+            "contextual_chunking_service_name",
             "coordinates",
             "do_not_break_similarity_on_footer_header",
             "encoding",
@@ -392,6 +408,8 @@ class PartitionParameters(BaseModel):
             "chunking_strategy",
             "combine_under_n_chars",
             "content_type",
+            "contextual_chunking_auth",
+            "contextual_chunking_service_name",
             "encoding",
             "gz_uncompressed_content_type",
             "hi_res_model_name",
@@ -410,6 +428,8 @@ class PartitionParameters(BaseModel):
             "chunking_strategy",
             "combine_under_n_chars",
             "content_type",
+            "contextual_chunking_auth",
+            "contextual_chunking_service_name",
             "encoding",
             "gz_uncompressed_content_type",
             "hi_res_model_name",

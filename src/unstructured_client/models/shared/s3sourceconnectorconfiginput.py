@@ -15,6 +15,7 @@ from unstructured_client.types import (
 
 class S3SourceConnectorConfigInputTypedDict(TypedDict):
     remote_url: str
+    ambient_credentials: NotRequired[bool]
     anonymous: NotRequired[bool]
     endpoint_url: NotRequired[Nullable[str]]
     key: NotRequired[Nullable[str]]
@@ -25,6 +26,8 @@ class S3SourceConnectorConfigInputTypedDict(TypedDict):
 
 class S3SourceConnectorConfigInput(BaseModel):
     remote_url: str
+
+    ambient_credentials: Optional[bool] = False
 
     anonymous: Optional[bool] = False
 
@@ -41,6 +44,7 @@ class S3SourceConnectorConfigInput(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = [
+            "ambient_credentials",
             "anonymous",
             "endpoint_url",
             "key",

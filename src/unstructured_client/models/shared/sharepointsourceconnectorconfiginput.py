@@ -18,10 +18,10 @@ class SharePointSourceConnectorConfigInputTypedDict(TypedDict):
     client_id: str
     site: str
     tenant: str
-    user_pname: str
     authority_url: NotRequired[str]
     path: NotRequired[Nullable[str]]
     recursive: NotRequired[bool]
+    user_pname: NotRequired[Nullable[str]]
 
 
 class SharePointSourceConnectorConfigInput(BaseModel):
@@ -33,18 +33,18 @@ class SharePointSourceConnectorConfigInput(BaseModel):
 
     tenant: str
 
-    user_pname: str
-
     authority_url: Optional[str] = "https://login.microsoftonline.com"
 
     path: OptionalNullable[str] = UNSET
 
     recursive: Optional[bool] = False
 
+    user_pname: OptionalNullable[str] = UNSET
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["authority_url", "path", "recursive"]
-        nullable_fields = ["path"]
+        optional_fields = ["authority_url", "path", "recursive", "user_pname"]
+        nullable_fields = ["path", "user_pname"]
         null_default_fields = []
 
         serialized = handler(self)
