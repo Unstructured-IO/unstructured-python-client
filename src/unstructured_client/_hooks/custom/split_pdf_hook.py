@@ -425,7 +425,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         return httpx.Request(
             "GET",
-            "http://no-op",
+            f"{self.partition_base_url}/general/docs",
             headers={"operation_id": operation_id},
             extensions=request.extensions.copy(),
         )

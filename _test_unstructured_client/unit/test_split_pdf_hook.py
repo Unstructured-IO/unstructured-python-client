@@ -587,6 +587,6 @@ def test_before_request_uses_in_memory_noop_request_for_split_pdf():
         result = hook.before_request(mock_hook_ctx, mock_request)
 
     assert isinstance(result, httpx.Request)
-    assert str(result.url) == "http://no-op"
+    assert str(result.url) == "http://localhost:8888/general/docs"
     assert result.headers["operation_id"]
     assert result.extensions["timeout"]["read"] == 12.0
