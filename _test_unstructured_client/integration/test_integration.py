@@ -5,17 +5,25 @@ import json
 import os
 from pathlib import Path
 
-import pytest
 from deepdiff import DeepDiff
+import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
+FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+LOCAL_API_URL = "http://localhost:8000"
+
+
 @pytest.fixture(scope="function")
 def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
+    _client = UnstructuredClient(
+        api_key_auth=os.getenv("UNSTRUCTURED_API_KEY") or FAKE_KEY,
+        server_url=os.getenv("UNSTRUCTURED_SERVER_URL") or LOCAL_API_URL,
+        timeout_ms=120_000,
+    )
     yield _client
 
 
@@ -127,8 +135,8 @@ async def test_partition_async_returns_elements(client, doc_path):
 async def test_partition_async_processes_concurrent_files(client, doc_path):
     """
     Assert that partition_async can be used to send multiple files concurrently.
-    Send two separate portions of the test doc, serially and then using asyncio.gather.
-    The results for both runs should match.
+    Send two page ranges serially and then via asyncio.gather.
+    Both execution modes should return the same payloads.
     """
     filename = "layout-parser-paper.pdf"
 
@@ -138,8 +146,6 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
             file_name=filename,
         )
 
-    # Set up two SDK requests
-    # For different page ranges
     requests = [
         operations.PartitionRequest(
             partition_parameters=shared.PartitionParameters(
@@ -161,29 +167,27 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
         )
     ]
 
-    serial_responses = []
+    serial_results = []
     for req in requests:
         res = await client.general.partition_async(request=req)
-
         assert res.status_code == 200
-        serial_responses.append(res.elements)
+        serial_results.append(res.elements)
 
-    concurrent_responses = []
     results = await asyncio.gather(
         client.general.partition_async(request=requests[0]),
         client.general.partition_async(request=requests[1])
     )
 
+    concurrent_results = []
     for res in results:
         assert res.status_code == 200
-        concurrent_responses.append(res.elements)
+        concurrent_results.append(res.elements)
 
     diff = DeepDiff(
-        t1=serial_responses,
-        t2=concurrent_responses,
+        t1=serial_results,
+        t2=concurrent_results,
         ignore_order=True,
     )
-
     assert len(diff) == 0
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import io
 from asyncio import Task
 from collections import Counter
 from functools import partial
@@ -28,6 +29,7 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     MAX_PAGES_PER_SPLIT,
     MIN_PAGES_PER_SPLIT,
     SplitPdfHook,
+    _get_request_timeout_seconds,
     get_optimal_split_size, run_tasks,
 )
 from unstructured_client._hooks.types import BeforeRequestContext
@@ -47,6 +49,8 @@ def test_unit_clear_operation():
         requests.Response(),
         requests.Response(),
     ]
+    hook.api_failed_responses[operation_id] = [requests.Response()]
+    hook.operation_timeouts[operation_id] = 30.0
 
     assert len(hook.coroutines_to_execute[operation_id]) == 2
     assert len(hook.api_successful_responses[operation_id]) == 2
@@ -55,6 +59,18 @@ def test_unit_clear_operation():
 
     assert hook.coroutines_to_execute.get(operation_id) is None
     assert hook.api_successful_responses.get(operation_id) is None
+    assert hook.api_failed_responses.get(operation_id) is None
+    assert hook.operation_timeouts.get(operation_id) is None
+
+
+def test_unit_get_request_timeout_seconds_uses_request_timeout_extension():
+    request = httpx.Request(
+        "POST",
+        "http://localhost",
+        extensions={"timeout": {"connect": 10.0, "read": 30.0, "write": 20.0, "pool": 5.0}},
+    )
+
+    assert _get_request_timeout_seconds(request) == 30.0
 
 
 def test_unit_prepare_request_headers():
@@ -526,3 +542,79 @@ def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
         mock_get_fields.assert_called_once_with(mock_request)
         mock_read_pdf.assert_called_once_with(mock_pdf_file)
         mock_check_pdf.assert_called_once_with(mock_pdf_reader)
+
+
+def _make_hook_with_split_request():
+    """Helper: run before_request with mocked PDF parsing so it returns a dummy request."""
+    hook = SplitPdfHook()
+    mock_client = httpx.Client()
+    hook.sdk_init(base_url="http://localhost:8888", client=mock_client)
+
+    mock_hook_ctx = MagicMock()
+    mock_hook_ctx.operation_id = "partition"
+    mock_hook_ctx.config.timeout_ms = 12_000
+
+    mock_request = MagicMock(spec=httpx.Request)
+    mock_request.headers = {"Content-Type": "multipart/form-data"}
+    mock_request.url = httpx.URL("http://localhost:8888/general/v0/general")
+    mock_request.extensions = {"timeout": {"connect": 12.0, "read": 12.0, "write": 12.0, "pool": 12.0}}
+
+    mock_pdf_file = MagicMock()
+    mock_form_data = {
+        "split_pdf_page": "true",
+        "strategy": "fast",
+        "files": {
+            "filename": "test.pdf",
+            "content_type": "application/pdf",
+            "file": mock_pdf_file,
+        },
+    }
+    mock_pdf_reader = MagicMock()
+    mock_pdf_reader.get_num_pages.return_value = 100
+    mock_pdf_reader.pages = [MagicMock()] * 100
+    mock_pdf_reader.stream = io.BytesIO(b"fake-pdf-bytes")
+
+    with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
+         patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
+         patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
+         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url, \
+         patch.object(hook, "_trim_large_pages", side_effect=lambda pdf, fd: pdf), \
+         patch.object(hook, "_get_pdf_chunks_in_memory", return_value=[]):
+        mock_get_fields.return_value = mock_form_data
+        mock_read_pdf.return_value = mock_pdf_reader
+        mock_check_pdf.return_value = mock_pdf_reader
+        mock_get_base_url.return_value = "http://localhost:8888"
+
+        result = hook.before_request(mock_hook_ctx, mock_request)
+
+    return hook, mock_hook_ctx, result
+
+
+def test_before_request_returns_dummy_with_timeout_and_operation_id():
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+
+    assert isinstance(result, httpx.Request)
+    assert str(result.url) == "http://localhost:8888/general/docs"
+    assert result.headers["operation_id"]
+    assert result.extensions["timeout"]["read"] == 12.0
+    assert mock_hook_ctx.operation_id in hook.pending_operation_ids
+
+
+def test_after_error_cleans_up_split_state():
+    """If the dummy request fails, after_error must release all per-operation state."""
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+
+    assert operation_id in hook.executors
+    assert operation_id in hook.coroutines_to_execute
+
+    from unstructured_client._hooks.types import AfterErrorContext
+    error_ctx = MagicMock(spec=AfterErrorContext)
+    error_ctx.operation_id = mock_hook_ctx.operation_id
+
+    hook.after_error(error_ctx, None, ConnectionError("DNS failed"))
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.operation_timeouts
+    assert mock_hook_ctx.operation_id not in hook.pending_operation_ids

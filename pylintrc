@@ -89,7 +89,7 @@ persistent=yes
 
 # Minimum Python version to use for version dependent checks. Will default to
 # the version used to run pylint.
-py-version=3.9
+py-version=3.11
 
 # Discover python modules and packages in the file system subtree.
 recursive=no
@@ -100,9 +100,6 @@ recursive=no
 # source root.
 source-roots=src
 
-# When enabled, pylint would attempt to guess common misconfiguration and emit
-# user-friendly hints instead of false-positive error messages.
-suggestion-mode=yes
 
 # Allow loading of arbitrary C extensions. Extensions are imported into the
 # active Python interpreter and may run arbitrary code.
@@ -188,6 +185,7 @@ good-names=i,
            Run,
            _,
            e,
+           cc,
            id
 
 # Good variable names regexes, separated by a comma. If names match any regex,
@@ -458,7 +456,8 @@ disable=raw-checker-failed,
         consider-using-with,
         wildcard-import,
         unused-wildcard-import,
-        too-many-return-statements
+        too-many-return-statements,
+        too-many-positional-arguments
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

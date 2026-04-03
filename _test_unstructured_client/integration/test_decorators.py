@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Counter, defaultdict
+import math
 import tempfile
 from pathlib import Path
 from typing import Literal
@@ -22,6 +24,95 @@ from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+TEST_TIMEOUT_MS = 300_000
+
+_HI_RES_STRATEGIES = ("hi_res", Strategy.HI_RES)
+
+
+def _allowed_delta(expected: int, *, absolute: int, ratio: float) -> int:
+    return max(absolute, math.ceil(expected * ratio))
+
+
+def _text_size(elements) -> int:
+    return sum(len((element.get("text") or "").strip()) for element in elements)
+
+
+def _elements_by_page(elements):
+    pages = defaultdict(list)
+    for element in elements:
+        pages[element["metadata"]["page_number"]].append(element)
+    return pages
+
+
+def _assert_hi_res_output_is_similar(resp_split, resp_single):
+    split_pages = _elements_by_page(resp_split.elements)
+    single_pages = _elements_by_page(resp_single.elements)
+
+    assert set(split_pages) == set(single_pages)
+
+    assert abs(len(resp_split.elements) - len(resp_single.elements)) <= _allowed_delta(
+        len(resp_single.elements),
+        absolute=4,
+        ratio=0.1,
+    )
+
+    split_type_counts = Counter(element["type"] for element in resp_split.elements)
+    single_type_counts = Counter(element["type"] for element in resp_single.elements)
+    assert set(split_type_counts) == set(single_type_counts)
+    for element_type, expected_count in single_type_counts.items():
+        assert abs(split_type_counts[element_type] - expected_count) <= _allowed_delta(
+            expected_count,
+            absolute=2,
+            ratio=0.2,
+        )
+
+    assert abs(_text_size(resp_split.elements) - _text_size(resp_single.elements)) <= _allowed_delta(
+        _text_size(resp_single.elements),
+        absolute=250,
+        ratio=0.2,
+    )
+
+    for page_number, single_page_elements in single_pages.items():
+        split_page_elements = split_pages[page_number]
+
+        assert abs(len(split_page_elements) - len(single_page_elements)) <= _allowed_delta(
+            len(single_page_elements),
+            absolute=2,
+            ratio=0.2,
+        )
+        assert abs(_text_size(split_page_elements) - _text_size(single_page_elements)) <= _allowed_delta(
+            _text_size(single_page_elements),
+            absolute=120,
+            ratio=0.3,
+        )
+
+
+def _assert_split_unsplit_equivalent(resp_split, resp_single, strategy, extra_exclude_paths=None):
+    """Compare split-PDF and single-request responses.
+
+    For hi_res (OCR-based), splitting changes per-page context so text and
+    OCR text can vary slightly. We still check page coverage, type distribution,
+    and text volume so split requests cannot silently drift too far.
+    For deterministic strategies (fast, etc.) we keep strict DeepDiff equality.
+    """
+    assert resp_split.status_code == resp_single.status_code
+    assert resp_split.content_type == resp_single.content_type
+
+    if strategy in _HI_RES_STRATEGIES:
+        _assert_hi_res_output_is_similar(resp_split, resp_single)
+    else:
+        assert len(resp_split.elements) == len(resp_single.elements)
+
+        excludes = [r"root\[\d+\]\['metadata'\]\['parent_id'\]"]
+        if extra_exclude_paths:
+            excludes.extend(extra_exclude_paths)
+
+        diff = DeepDiff(
+            t1=resp_split.elements,
+            t2=resp_single.elements,
+            exclude_regex_paths=excludes,
+        )
+        assert len(diff) == 0
 
 
 @pytest.mark.parametrize("concurrency_level", [1, 2, 5])
@@ -53,7 +144,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -100,18 +191,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
         request=req,
     )
 
-    assert len(resp_split.elements) == len(resp_single.elements)
-    assert resp_split.content_type == resp_single.content_type
-    assert resp_split.status_code == resp_single.status_code
-
-    diff = DeepDiff(
-        t1=resp_split.elements,
-        t2=resp_single.elements,
-        exclude_regex_paths=[
-            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
-        ],
-    )
-    assert len(diff) == 0
+    _assert_split_unsplit_equivalent(resp_split, resp_single, strategy)
 
 
 @pytest.mark.parametrize(("filename", "expected_ok", "strategy"), [
@@ -136,7 +216,7 @@ def test_integration_split_pdf_with_caching(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -183,19 +263,7 @@ def test_integration_split_pdf_with_caching(
         request=req
     )
 
-    assert len(resp_split.elements) == len(resp_single.elements)
-    assert resp_split.content_type == resp_single.content_type
-    assert resp_split.status_code == resp_single.status_code
-
-    diff = DeepDiff(
-        t1=resp_split.elements,
-        t2=resp_single.elements,
-        exclude_regex_paths=[
-            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
-            r"root\[\d+\]\['element_id'\]",
-        ],
-    )
-    assert len(diff) == 0
+    _assert_split_unsplit_equivalent(resp_split, resp_single, strategy)
 
     # make sure the cache dir was cleaned if passed explicitly
     if cache_dir:
@@ -212,7 +280,7 @@ def test_long_pages_hi_res(filename):
         split_pdf_concurrency_level=15
     ), )
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     response = client.general.partition(
         request=req,
@@ -231,7 +299,7 @@ def test_integration_split_pdf_for_file_with_no_name():
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open("_sample_docs/layout-parser-paper-fast.pdf", "rb") as f:
         files = shared.Files(
@@ -287,7 +355,7 @@ def test_integration_split_pdf_with_page_range(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     filename = "_sample_docs/layout-parser-paper.pdf"
     with open(filename, "rb") as f:
@@ -351,7 +419,7 @@ def test_integration_split_pdf_strict_mode(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -400,18 +468,7 @@ def test_integration_split_pdf_strict_mode(
         server_url="http://localhost:8000",
     )
 
-    assert len(resp_split.elements) == len(resp_single.elements)
-    assert resp_split.content_type == resp_single.content_type
-    assert resp_split.status_code == resp_single.status_code
-
-    diff = DeepDiff(
-        t1=resp_split.elements,
-        t2=resp_single.elements,
-        exclude_regex_paths=[
-            r"root\[\d+\]\['metadata'\]\['parent_id'\]",
-        ],
-    )
-    assert len(diff) == 0
+    _assert_split_unsplit_equivalent(resp_split, resp_single, strategy)
 
 
 @pytest.mark.asyncio
