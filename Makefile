@@ -10,9 +10,8 @@ DOCKER_IMAGE ?= downloads.unstructured.io/unstructured-io/unstructured-api:lates
 ## install:					installs all test, dev, and experimental requirements
 .PHONY: install
 install:
-	pip install -U poetry
 	python scripts/prepare_readme.py
-	poetry install
+	uv sync
 
 ## install-speakeasy-cli:			download the speakeasy cli tool
 .PHONY: install-speakeasy-cli
@@ -28,16 +27,16 @@ test: test-unit test-integration-docker
 
 .PHONY: test-unit
 test-unit:
-	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "unit"
+	PYTHONPATH=. uv run pytest -n auto _test_unstructured_client -v -k "unit"
 
 .PHONY: test-contract
 test-contract:
-	PYTHONPATH=. poetry run pytest -n auto _test_contract -v
+	PYTHONPATH=. uv run pytest -n auto _test_contract -v
 
 # Assumes you have unstructured-api running on localhost:8000
 .PHONY: test-integration
 test-integration:
-	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "integration"
+	PYTHONPATH=. uv run pytest -n auto _test_unstructured_client -v -k "integration"
 
 # Runs the unstructured-api in docker for tests
 .PHONY: test-integration-docker
@@ -45,13 +44,13 @@ test-integration-docker:
 	-docker stop unstructured-api && docker kill unstructured-api
 	docker run --name unstructured-api -p 8000:8000 -d --rm ${DOCKER_IMAGE} --host 0.0.0.0 && \
 	curl -s -o /dev/null --retry 10 --retry-delay 5 --retry-all-errors http://localhost:8000/general/docs && \
-	PYTHONPATH=. poetry run pytest -n auto _test_unstructured_client -v -k "integration" && \
+	PYTHONPATH=. uv run pytest -n auto _test_unstructured_client -v -k "integration" && \
 	docker kill unstructured-api
 
 .PHONY: lint
 lint:
-	poetry run pylint --rcfile=pylintrc src
-	poetry run mypy src
+	uv run pylint --rcfile=pylintrc src
+	uv run mypy src
 
 #############
 # Speakeasy #

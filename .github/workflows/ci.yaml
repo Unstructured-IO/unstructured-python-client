@@ -20,17 +20,22 @@ jobs:
   test_unit:
     strategy:
       matrix:
-        python-version: [ "3.9","3.10","3.11", "3.12" ]
+        python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v6
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      env:
+        UV_PYTHON: ${{ matrix.python-version }}
       run: make install
     - name: Run unit tests
+      env:
+        UV_PYTHON: ${{ matrix.python-version }}
       run: |
         make test-unit
 
@@ -38,48 +43,64 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v6
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
     - name: Install dependencies
+      env:
+        UV_PYTHON: "3.13"
       run: make install
     - name: Lint
+      env:
+        UV_PYTHON: "3.13"
       run: |
         make lint
 
   test_integration:
     strategy:
       matrix:
-        python-version: [ "3.9","3.10","3.11", "3.12" ]
+        python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v6
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      env:
+        UV_PYTHON: ${{ matrix.python-version }}
       run: make install
     - name: Run integration tests
+      env:
+        UV_PYTHON: ${{ matrix.python-version }}
+        UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
       run: |
         make test-integration-docker
-      env:
-        UNSTRUCTURED_API_KEY: ${{ secrets.UNSTRUCTURED_API_KEY }}
 
   test_contract:
     strategy:
       matrix:
-        python-version: [ "3.9","3.10","3.11", "3.12" ]
+        python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: ubuntu-latest
-    env:
-      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     steps:
       - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
+        env:
+          UV_PYTHON: ${{ matrix.python-version }}
         run: |
           make install
       - name: Run contract tests
+        env:
+          UV_PYTHON: ${{ matrix.python-version }}
         run: |
           make test-contract
 

@@ -13,9 +13,17 @@ from unstructured_client.models.errors import SDKError, ServerError, HTTPValidat
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 
+FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+LOCAL_API_URL = "http://localhost:8000"
+
+
 @pytest.fixture(scope="function")
 def client() -> UnstructuredClient:
-    _client = UnstructuredClient(api_key_auth=os.getenv("UNSTRUCTURED_API_KEY"))
+    _client = UnstructuredClient(
+        api_key_auth=os.getenv("UNSTRUCTURED_API_KEY") or FAKE_KEY,
+        server_url=os.getenv("UNSTRUCTURED_SERVER_URL") or LOCAL_API_URL,
+        timeout_ms=120_000,
+    )
     yield _client
 
 
