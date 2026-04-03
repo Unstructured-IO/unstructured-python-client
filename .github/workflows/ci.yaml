@@ -19,6 +19,7 @@ concurrency:
 jobs:
   test_unit:
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: ubuntu-latest
@@ -60,6 +61,7 @@ jobs:
 
   test_integration:
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: opensource-linux-8core
@@ -83,6 +85,7 @@ jobs:
 
   test_contract:
     strategy:
+      fail-fast: false
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
     runs-on: opensource-linux-8core

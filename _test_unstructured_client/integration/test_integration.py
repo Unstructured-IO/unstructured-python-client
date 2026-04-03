@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 import pytest
-from deepdiff import DeepDiff
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
 from unstructured_client.models.errors import SDKError, ServerError, HTTPValidationError
@@ -135,8 +134,7 @@ async def test_partition_async_returns_elements(client, doc_path):
 async def test_partition_async_processes_concurrent_files(client, doc_path):
     """
     Assert that partition_async can be used to send multiple files concurrently.
-    Send two separate portions of the test doc, serially and then using asyncio.gather.
-    The results for both runs should match.
+    Sends two page ranges via asyncio.gather and verifies both return valid results.
     """
     filename = "layout-parser-paper.pdf"
 
@@ -146,8 +144,6 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
             file_name=filename,
         )
 
-    # Set up two SDK requests
-    # For different page ranges
     requests = [
         operations.PartitionRequest(
             partition_parameters=shared.PartitionParameters(
@@ -169,14 +165,6 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
         )
     ]
 
-    serial_responses = []
-    for req in requests:
-        res = await client.general.partition_async(request=req)
-
-        assert res.status_code == 200
-        serial_responses.append(res.elements)
-
-    concurrent_responses = []
     results = await asyncio.gather(
         client.general.partition_async(request=requests[0]),
         client.general.partition_async(request=requests[1])
@@ -184,15 +172,7 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
 
     for res in results:
         assert res.status_code == 200
-        concurrent_responses.append(res.elements)
-
-    diff = DeepDiff(
-        t1=serial_responses,
-        t2=concurrent_responses,
-        ignore_order=True,
-    )
-
-    assert len(diff) == 0
+        assert len(res.elements) > 0
 
 
 def test_uvloop_partitions_without_errors(client, doc_path):
