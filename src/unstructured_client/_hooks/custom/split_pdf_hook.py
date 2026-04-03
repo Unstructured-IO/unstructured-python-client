@@ -294,7 +294,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # We need to pass it on to after_success so
         # we know which results are ours
         operation_id = str(uuid.uuid4())
-        self.operation_timeouts[operation_id] = _get_request_timeout_seconds(request)
 
         content_type = request.headers.get("Content-Type")
         if content_type is None:
@@ -336,15 +335,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             fallback_value=DEFAULT_ALLOW_FAILED,
         )
 
-        self.concurrency_level[operation_id] = form_utils.get_split_pdf_concurrency_level_param(
+        concurrency_level = form_utils.get_split_pdf_concurrency_level_param(
             form_data,
             key=PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
             fallback_value=DEFAULT_CONCURRENCY_LEVEL,
             max_allowed=MAX_CONCURRENCY_LEVEL,
         )
-
-        executor = futures.ThreadPoolExecutor(max_workers=1)
-        self.executors[operation_id] = executor
 
         self.cache_tmp_data_feature = form_utils.get_split_pdf_cache_tmp_data(
             form_data,
@@ -367,13 +363,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         page_count = page_range_end - page_range_start + 1
 
         split_size = get_optimal_split_size(
-            num_pages=page_count, concurrency_level=self.concurrency_level[operation_id]
+            num_pages=page_count, concurrency_level=concurrency_level
         )
 
         # If the doc is small enough, and we aren't slicing it with a page range:
         # do not split, just continue with the original request
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
+
+        self.concurrency_level[operation_id] = concurrency_level
+        self.executors[operation_id] = futures.ThreadPoolExecutor(max_workers=1)
 
         pdf = self._trim_large_pages(pdf, form_data)
 
@@ -420,7 +419,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
 
-        # Track the operation_id so after_error can clean up if the dummy request fails.
+        self.operation_timeouts[operation_id] = _get_request_timeout_seconds(request)
         self.pending_operation_ids[hook_ctx.operation_id] = operation_id
 
         return httpx.Request(
