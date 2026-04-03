@@ -191,6 +191,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.executors: dict[str, futures.ThreadPoolExecutor] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
         self.operation_timeouts: dict[str, Optional[float]] = {}
+        self.pending_operation_ids: dict[str, str] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
         self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
         self.cache_tmp_data_dir: str = DEFAULT_CACHE_TMP_DATA_DIR
@@ -419,9 +420,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self.coroutines_to_execute[operation_id].append(coroutine)
             set_index += 1
 
-        # Return a dummy request for the SDK to use
-        # This allows us to skip right to the AfterRequestHook and await all the calls
-        # Also, pass the operation_id so after_success can await the right results
+        # Track the operation_id so after_error can clean up if the dummy request fails.
+        self.pending_operation_ids[hook_ctx.operation_id] = operation_id
 
         return httpx.Request(
             "GET",
@@ -658,7 +658,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if executor is None:
             raise RuntimeError("Executor not found for operation_id")
         task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
-        future_timeout = (timeout_seconds or DEFAULT_FUTURE_TIMEOUT_MINUTES * 60) + TIMEOUT_BUFFER_SECONDS
+
+        # The per-chunk timeout bounds each HTTP call, but the batch may run in
+        # multiple waves (ceil(chunks / concurrency)).  Scale the outer future
+        # timeout accordingly so healthy multi-wave batches aren't killed early.
+        num_waves = max(1, math.ceil(len(tasks) / concurrency_level))
+        per_chunk = timeout_seconds or DEFAULT_FUTURE_TIMEOUT_MINUTES * 60
+        future_timeout = per_chunk * num_waves + TIMEOUT_BUFFER_SECONDS
         task_responses = task_responses_future.result(timeout=future_timeout)
 
         if task_responses is None:
@@ -714,6 +720,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # Grab the correct id out of the dummy request
         operation_id = response.request.headers.get("operation_id")
+        self.pending_operation_ids.pop(hook_ctx.operation_id, None)
         try:
             elements = self._await_elements(operation_id)
 
@@ -735,20 +742,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             response: Optional[httpx.Response],
             error: Optional[Exception],
     ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
-        """This hook is unused. In the before hook, we return a mock request
-        for the SDK to run. This will take us right to the after_success hook
-        to await the split results.
+        """Clean up split-PDF state when the dummy request fails.
 
-        Args:
-            hook_ctx (AfterErrorContext): The AfterErrorContext object containing
-            information about the hook context.
-            response (Optional[httpx.Response]): The Response object representing
-            the response received before the exception occurred.
-            error (Optional[Exception]): The exception object that was thrown.
-
-        Returns:
-            Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
+        If `before_request` prepared a split operation but the subsequent
+        dummy request errored (e.g. network failure on GET /general/docs),
+        we must release the executor, temp files, and coroutine list that
+        were allocated for that operation.
         """
+        operation_id = self.pending_operation_ids.pop(hook_ctx.operation_id, None)
+        if operation_id is not None:
+            self._clear_operation(operation_id)
         return (response, error)
 
     def _clear_operation(self, operation_id: str) -> None:
@@ -765,7 +768,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.operation_timeouts.pop(operation_id, None)
         executor = self.executors.pop(operation_id, None)
         if executor is not None:
-            executor.shutdown(wait=True)
+            executor.shutdown(wait=False, cancel_futures=True)
         tempdir = self.tempdirs.pop(operation_id, None)
         if tempdir:
             tempdir.cleanup()

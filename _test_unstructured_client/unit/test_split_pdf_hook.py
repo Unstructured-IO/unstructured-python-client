@@ -544,7 +544,8 @@ def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
         mock_check_pdf.assert_called_once_with(mock_pdf_reader)
 
 
-def test_before_request_uses_in_memory_noop_request_for_split_pdf():
+def _make_hook_with_split_request():
+    """Helper: run before_request with mocked PDF parsing so it returns a dummy request."""
     hook = SplitPdfHook()
     mock_client = httpx.Client()
     hook.sdk_init(base_url="http://localhost:8888", client=mock_client)
@@ -586,7 +587,34 @@ def test_before_request_uses_in_memory_noop_request_for_split_pdf():
 
         result = hook.before_request(mock_hook_ctx, mock_request)
 
+    return hook, mock_hook_ctx, result
+
+
+def test_before_request_returns_dummy_with_timeout_and_operation_id():
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+
     assert isinstance(result, httpx.Request)
     assert str(result.url) == "http://localhost:8888/general/docs"
     assert result.headers["operation_id"]
     assert result.extensions["timeout"]["read"] == 12.0
+    assert mock_hook_ctx.operation_id in hook.pending_operation_ids
+
+
+def test_after_error_cleans_up_split_state():
+    """If the dummy request fails, after_error must release all per-operation state."""
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+
+    assert operation_id in hook.executors
+    assert operation_id in hook.coroutines_to_execute
+
+    from unstructured_client._hooks.types import AfterErrorContext
+    error_ctx = MagicMock(spec=AfterErrorContext)
+    error_ctx.operation_id = mock_hook_ctx.operation_id
+
+    hook.after_error(error_ctx, None, ConnectionError("DNS failed"))
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.operation_timeouts
+    assert mock_hook_ctx.operation_id not in hook.pending_operation_ids
