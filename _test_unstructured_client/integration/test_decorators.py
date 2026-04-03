@@ -24,6 +24,7 @@ from unstructured_client._hooks.custom import form_utils
 from unstructured_client._hooks.custom import split_pdf_hook
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+TEST_TIMEOUT_MS = 300_000
 
 _HI_RES_STRATEGIES = ("hi_res", Strategy.HI_RES)
 
@@ -143,7 +144,7 @@ def test_integration_split_pdf_has_same_output_as_non_split(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -215,7 +216,7 @@ def test_integration_split_pdf_with_caching(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(
@@ -282,7 +283,7 @@ def test_long_pages_hi_res(filename):
         split_pdf_concurrency_level=15
     ), )
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     response = client.general.partition(
         request=req,
@@ -301,7 +302,7 @@ def test_integration_split_pdf_for_file_with_no_name():
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open("_sample_docs/layout-parser-paper-fast.pdf", "rb") as f:
         files = shared.Files(
@@ -357,7 +358,7 @@ def test_integration_split_pdf_with_page_range(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     filename = "_sample_docs/layout-parser-paper.pdf"
     with open(filename, "rb") as f:
@@ -421,7 +422,7 @@ def test_integration_split_pdf_strict_mode(
     except requests.exceptions.ConnectionError:
         assert False, "The unstructured-api is not running on localhost:8000"
 
-    client = UnstructuredClient(api_key_auth=FAKE_KEY)
+    client = UnstructuredClient(api_key_auth=FAKE_KEY, timeout_ms=TEST_TIMEOUT_MS)
 
     with open(filename, "rb") as f:
         files = shared.Files(

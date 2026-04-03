@@ -56,6 +56,27 @@ MIN_PAGES_PER_SPLIT = 2
 MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
+TIMEOUT_BUFFER_SECONDS = 5
+
+
+def _get_request_timeout_seconds(request: httpx.Request) -> Optional[float]:
+    timeout = request.extensions.get("timeout")
+    if timeout is None:
+        return None
+
+    if isinstance(timeout, (int, float)):
+        return float(timeout)
+
+    if isinstance(timeout, dict):
+        timeout_values = [
+            float(value)
+            for value in timeout.values()
+            if isinstance(value, (int, float))
+        ]
+        if timeout_values:
+            return max(timeout_values)
+
+    return None
 
 def _run_coroutines_in_separate_thread(
         coroutines_task: Coroutine[Any, Any, list[tuple[int, httpx.Response]]],
@@ -72,6 +93,7 @@ async def run_tasks(
     coroutines: list[partial[Coroutine[Any, Any, httpx.Response]]],
     allow_failed: bool = False,
     concurrency_level: int = 10,
+    client_timeout: Optional[httpx.Timeout] = None,
 ) -> list[tuple[int, httpx.Response]]:
     """Run a list of coroutines in parallel and return the results in order.
 
@@ -84,14 +106,15 @@ async def run_tasks(
     """
 
 
-    # Use a variable to adjust the httpx client timeout, or default to 30 minutes
-    # When we're able to reuse the SDK to make these calls, we can remove this var
-    # The SDK timeout will be controlled by parameter
     limiter = asyncio.Semaphore(concurrency_level)
-    client_timeout_minutes = 60
-    if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
-        client_timeout_minutes = int(timeout_var)
-    client_timeout = httpx.Timeout(60 * client_timeout_minutes)
+    if client_timeout is None:
+        # Use a variable to adjust the httpx client timeout, or default to 60 minutes.
+        # When we're able to reuse the SDK to make these calls, we can remove this var
+        # and let the SDK timeout flow through directly.
+        client_timeout_minutes = 60
+        if timeout_var := os.getenv("UNSTRUCTURED_CLIENT_TIMEOUT_MINUTES"):
+            client_timeout_minutes = int(timeout_var)
+        client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
     async with httpx.AsyncClient(timeout=client_timeout) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
@@ -166,6 +189,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.api_failed_responses: dict[str, list[httpx.Response]] = {}
         self.executors: dict[str, futures.ThreadPoolExecutor] = {}
         self.tempdirs: dict[str, tempfile.TemporaryDirectory] = {}
+        self.operation_timeouts: dict[str, Optional[float]] = {}
         self.allow_failed: bool = DEFAULT_ALLOW_FAILED
         self.cache_tmp_data_feature: bool = DEFAULT_CACHE_TMP_DATA
         self.cache_tmp_data_dir: str = DEFAULT_CACHE_TMP_DATA_DIR
@@ -268,6 +292,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # We need to pass it on to after_success so
         # we know which results are ours
         operation_id = str(uuid.uuid4())
+        self.operation_timeouts[operation_id] = _get_request_timeout_seconds(request)
 
         content_type = request.headers.get("Content-Type")
         if content_type is None:
@@ -397,14 +422,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # This allows us to skip right to the AfterRequestHook and await all the calls
         # Also, pass the operation_id so after_success can await the right results
 
-        # Note: We need access to the async_client from the sdk_init hook in order to set
-        # up a mock request like this.
-        # For now, just make an extra request against our api, which should return 200.
-        # dummy_request = httpx.Request("GET",  "http://no-op")
         return httpx.Request(
             "GET",
-            f"{self.partition_base_url}/general/docs",
+            "http://no-op",
             headers={"operation_id": operation_id},
+            extensions=request.extensions.copy(),
         )
 
     async def call_api_partial(
@@ -620,7 +642,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             return None
 
         concurrency_level = self.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL)
-        coroutines = run_tasks(tasks, allow_failed=self.allow_failed, concurrency_level=concurrency_level)
+        timeout_seconds = self.operation_timeouts.get(operation_id)
+        client_timeout = httpx.Timeout(timeout_seconds) if timeout_seconds is not None else None
+        coroutines = run_tasks(
+            tasks,
+            allow_failed=self.allow_failed,
+            concurrency_level=concurrency_level,
+            client_timeout=client_timeout,
+        )
 
         # sending the coroutines to a separate thread to avoid blocking the current event loop
         # this operation should be removed when the SDK is updated to support async hooks
@@ -628,7 +657,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if executor is None:
             raise RuntimeError("Executor not found for operation_id")
         task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
-        task_responses = task_responses_future.result()
+        if timeout_seconds is None:
+            task_responses = task_responses_future.result()
+        else:
+            task_responses = task_responses_future.result(timeout=timeout_seconds + TIMEOUT_BUFFER_SECONDS)
 
         if task_responses is None:
             return None
@@ -683,23 +715,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # Grab the correct id out of the dummy request
         operation_id = response.request.headers.get("operation_id")
+        try:
+            elements = self._await_elements(operation_id)
 
-        elements = self._await_elements(operation_id)
+            # if fails are disallowed, return the first failed response
+            if not self.allow_failed and self.api_failed_responses.get(operation_id):
+                return self.api_failed_responses[operation_id][0]
 
-        # if fails are disallowed, return the first failed response
-        if not self.allow_failed and self.api_failed_responses.get(operation_id):
-            failure_response = self.api_failed_responses[operation_id][0]
+            if elements is None:
+                return response
 
-            self._clear_operation(operation_id)
-            return failure_response
-
-        if elements is None:
-            return response
-
-        new_response = request_utils.create_response(elements)
-        self._clear_operation(operation_id)
-
-        return new_response
+            return request_utils.create_response(elements)
+        finally:
+            if operation_id is not None:
+                self._clear_operation(operation_id)
 
     def after_error(
             self,
@@ -732,7 +761,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """
         self.coroutines_to_execute.pop(operation_id, None)
         self.api_successful_responses.pop(operation_id, None)
+        self.api_failed_responses.pop(operation_id, None)
         self.concurrency_level.pop(operation_id, None)
+        self.operation_timeouts.pop(operation_id, None)
         executor = self.executors.pop(operation_id, None)
         if executor is not None:
             executor.shutdown(wait=True)
