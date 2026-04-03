@@ -1,0 +1,12 @@
+# DagNodeConnectionCheck
+
+
+## Fields
+
+| Field                                                                        | Type                                                                         | Required                                                                     | Description                                                                  |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `created_at`                                                                 | [date](https://docs.python.org/3/library/datetime.html#date-objects)         | :heavy_check_mark:                                                           | N/A                                                                          |
+| `id`                                                                         | *str*                                                                        | :heavy_check_mark:                                                           | N/A                                                                          |
+| `reason`                                                                     | *OptionalNullable[str]*                                                      | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `reported_at`                                                                | [date](https://docs.python.org/3/library/datetime.html#date-objects)         | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `status`                                                                     | [shared.ConnectionCheckStatus](../../models/shared/connectioncheckstatus.md) | :heavy_check_mark:                                                           | N/A                                                                          |

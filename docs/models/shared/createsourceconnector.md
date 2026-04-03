@@ -1,0 +1,10 @@
+# CreateSourceConnector
+
+
+## Fields
+
+| Field                                                                                    | Type                                                                                     | Required                                                                                 | Description                                                                              |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `config`                                                                                 | [shared.CreateSourceConnectorConfig](../../models/shared/createsourceconnectorconfig.md) | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `name`                                                                                   | *str*                                                                                    | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `type`                                                                                   | [shared.CreateSourceConnectorType](../../models/shared/createsourceconnectortype.md)     | :heavy_check_mark:                                                                       | N/A                                                                                      |
