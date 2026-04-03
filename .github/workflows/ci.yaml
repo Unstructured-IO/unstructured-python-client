@@ -62,7 +62,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     steps:
     - uses: actions/checkout@v4
     - uses: astral-sh/setup-uv@v6
@@ -85,7 +85,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
