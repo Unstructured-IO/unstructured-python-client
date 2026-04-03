@@ -263,10 +263,7 @@ def test_integration_split_pdf_with_caching(
         request=req
     )
 
-    _assert_split_unsplit_equivalent(
-        resp_split, resp_single, strategy,
-        extra_exclude_paths=[r"root\[\d+\]\['element_id'\]"],
-    )
+    _assert_split_unsplit_equivalent(resp_split, resp_single, strategy)
 
     # make sure the cache dir was cleaned if passed explicitly
     if cache_dir:

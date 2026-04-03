@@ -57,6 +57,7 @@ MAX_PAGES_PER_SPLIT = 20
 HI_RES_STRATEGY = 'hi_res'
 MAX_PAGE_LENGTH = 4000
 TIMEOUT_BUFFER_SECONDS = 5
+DEFAULT_FUTURE_TIMEOUT_MINUTES = 60
 
 
 def _get_request_timeout_seconds(request: httpx.Request) -> Optional[float]:
@@ -657,10 +658,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if executor is None:
             raise RuntimeError("Executor not found for operation_id")
         task_responses_future = executor.submit(_run_coroutines_in_separate_thread, coroutines)
-        if timeout_seconds is None:
-            task_responses = task_responses_future.result()
-        else:
-            task_responses = task_responses_future.result(timeout=timeout_seconds + TIMEOUT_BUFFER_SECONDS)
+        future_timeout = (timeout_seconds or DEFAULT_FUTURE_TIMEOUT_MINUTES * 60) + TIMEOUT_BUFFER_SECONDS
+        task_responses = task_responses_future.result(timeout=future_timeout)
 
         if task_responses is None:
             return None
