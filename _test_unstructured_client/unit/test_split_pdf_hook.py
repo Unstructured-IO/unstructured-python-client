@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import io
+import logging
 from asyncio import Task
 from collections import Counter
+from concurrent import futures
 from functools import partial
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
@@ -28,12 +30,16 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     MAX_CONCURRENCY_LEVEL,
     MAX_PAGES_PER_SPLIT,
     MIN_PAGES_PER_SPLIT,
+    SPLIT_PDF_HEADER_PREFIX,
     SplitPdfHook,
     _get_request_timeout_seconds,
-    get_optimal_split_size, run_tasks,
+    get_optimal_split_size,
+    run_tasks,
 )
-from unstructured_client._hooks.types import BeforeRequestContext
+from unstructured_client._hooks.types import AfterErrorContext, AfterSuccessContext, BeforeRequestContext
 from unstructured_client.models import shared
+from unstructured_client.types import UNSET
+from unstructured_client.utils import BackoffStrategy, RetryConfig
 
 
 def test_unit_clear_operation():
@@ -41,10 +47,7 @@ def test_unit_clear_operation():
     hook = SplitPdfHook()
     operation_id = "some_id"
 
-    async def example():
-        pass
-
-    hook.coroutines_to_execute[operation_id] = [example(), example()]
+    hook.coroutines_to_execute[operation_id] = [MagicMock(), MagicMock()]
     hook.api_successful_responses[operation_id] = [
         requests.Response(),
         requests.Response(),
@@ -87,7 +90,7 @@ def test_unit_prepare_request_headers():
     headers = request_utils.prepare_request_headers(test_headers)
 
     assert headers != test_headers
-    assert headers, expected_headers
+    assert dict(headers) == expected_headers
 
 
 def test_unit_create_response():
@@ -100,9 +103,9 @@ def test_unit_create_response():
 
     response = request_utils.create_response(test_elements)
 
-    assert response.status_code, expected_status_code
-    assert response._content, expected_content
-    assert response.headers.get("Content-Length"), expected_content_length
+    assert response.status_code == expected_status_code
+    assert response._content == expected_content
+    assert response.headers.get("Content-Length") == expected_content_length
 
 
 def test_unit_decode_content_disposition():
@@ -544,25 +547,635 @@ def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
         mock_check_pdf.assert_called_once_with(mock_pdf_reader)
 
 
-def _make_hook_with_split_request():
+_MISSING = object()
+
+
+def _httpx_response(content: str, status_code: int = 200) -> httpx.Response:
+    return httpx.Response(
+        status_code=status_code,
+        content=content.encode(),
+        request=httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+    )
+
+
+def _httpx_json_response(payload: list[dict], status_code: int = 200) -> httpx.Response:
+    return httpx.Response(
+        status_code=status_code,
+        json=payload,
+        request=httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+    )
+
+
+async def _transport_error_request(
+    async_client: httpx.AsyncClient,  # pragma: no cover - signature compatibility
+    limiter: asyncio.Semaphore,  # pragma: no cover - signature compatibility
+    error_cls: type[httpx.TransportError],
+    request_id: str,
+):
+    raise error_cls(
+        f"transport failure for {request_id}",
+        request=httpx.Request("POST", f"http://localhost:8888/chunk/{request_id}"),
+    )
+
+
+async def _slow_success_request(
+    async_client: httpx.AsyncClient,  # pragma: no cover - signature compatibility
+    limiter: asyncio.Semaphore,  # pragma: no cover - signature compatibility
+    content: str,
+) -> httpx.Response:
+    await asyncio.sleep(0.05)
+    return _httpx_response(content)
+
+
+async def _cancelled_request(
+    async_client: httpx.AsyncClient,  # pragma: no cover - signature compatibility
+    limiter: asyncio.Semaphore,  # pragma: no cover - signature compatibility
+) -> httpx.Response:
+    raise asyncio.CancelledError()
+
+
+def _make_hook_with_split_request(
+    hook: SplitPdfHook | None = None,
+    *,
+    timeout_extension: object = _MISSING,
+    config_timeout_ms: int | None = 12_000,
+    retry_config: RetryConfig | object = UNSET,
+    allow_failed: str | None = None,
+    cache_tmp_data: str | None = None,
+    pdf_chunks: list[tuple[io.BytesIO, int]] | None = None,
+):
     """Helper: run before_request with mocked PDF parsing so it returns a dummy request."""
+    hook = hook or SplitPdfHook()
+    if hook.client is None:
+        hook.sdk_init(base_url="http://localhost:8888", client=httpx.Client())
+
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    hook_ctx.operation_id = "partition"
+    hook_ctx.config = MagicMock()
+    hook_ctx.config.timeout_ms = config_timeout_ms
+    hook_ctx.config.retry_config = retry_config
+
+    request_extensions: dict[str, object] = {}
+    if timeout_extension is not _MISSING and timeout_extension is not None:
+        request_extensions["timeout"] = timeout_extension
+    elif config_timeout_ms is not None:
+        timeout_seconds = config_timeout_ms / 1000
+        request_extensions["timeout"] = {
+            "connect": timeout_seconds,
+            "read": timeout_seconds,
+            "write": timeout_seconds,
+            "pool": timeout_seconds,
+        }
+
+    request = httpx.Request(
+        "POST",
+        "http://localhost:8888/general/v0/general",
+        headers={"Content-Type": "multipart/form-data"},
+        extensions=request_extensions,
+    )
+
+    mock_pdf_file = MagicMock()
+    form_data = {
+        "split_pdf_page": "true",
+        "strategy": "fast",
+        "files": {
+            "filename": "test.pdf",
+            "content_type": "application/pdf",
+            "file": mock_pdf_file,
+        },
+    }
+    if allow_failed is not None:
+        form_data["split_pdf_allow_failed"] = allow_failed
+    if cache_tmp_data is not None:
+        form_data["split_pdf_cache_tmp_data"] = cache_tmp_data
+
+    mock_pdf_reader = MagicMock()
+    mock_pdf_reader.get_num_pages.return_value = 100
+    mock_pdf_reader.pages = [MagicMock()] * 100
+    mock_pdf_reader.stream = io.BytesIO(b"fake-pdf-bytes")
+
+    with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
+         patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
+         patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
+         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url, \
+         patch.object(hook, "_trim_large_pages", side_effect=lambda pdf, fd: pdf), \
+         patch.object(hook, "_get_pdf_chunk_paths", return_value=[]), \
+         patch.object(hook, "_get_pdf_chunks_in_memory", return_value=pdf_chunks or []):
+        mock_get_fields.return_value = form_data
+        mock_read_pdf.return_value = mock_pdf_reader
+        mock_check_pdf.return_value = mock_pdf_reader
+        mock_get_base_url.return_value = "http://localhost:8888"
+
+        result = hook.before_request(hook_ctx, request)
+
+    return hook, hook_ctx, result
+
+
+def test_before_request_returns_dummy_with_timeout_and_operation_id():
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+
+    assert isinstance(result, httpx.Request)
+    assert str(result.url) == "http://localhost:8888/general/docs"
+    assert operation_id
+    assert result.extensions["timeout"]["read"] == 12.0
+    assert result.extensions["split_pdf_operation_id"] == operation_id
+    assert operation_id in hook.pending_operation_ids
+
+
+def test_before_request_logs_split_plan(caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.INFO, logger="unstructured-client")
+
+    _, _, result = _make_hook_with_split_request(
+        allow_failed="true",
+        pdf_chunks=[(io.BytesIO(b"chunk-1"), 0), (io.BytesIO(b"chunk-2"), 2)],
+    )
+
+    operation_id = result.headers["operation_id"]
+    assert f"event=plan_created operation_id={operation_id}" in caplog.text
+    assert "chunk_count=2" in caplog.text
+    assert "allow_failed=True" in caplog.text
+    assert "cache_mode=disabled" in caplog.text
+
+
+def test_after_error_cleans_up_split_state():
+    """If the dummy request fails, after_error must release all per-operation state."""
+    hook, mock_hook_ctx, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+
+    assert operation_id in hook.executors
+    assert operation_id in hook.coroutines_to_execute
+
+    error_ctx = MagicMock(spec=AfterErrorContext)
+    error_ctx.operation_id = mock_hook_ctx.operation_id
+
+    hook.after_error(error_ctx, None, httpx.ConnectError("DNS failed", request=result))
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.operation_timeouts
+    assert operation_id not in hook.pending_operation_ids
+
+
+@pytest.mark.parametrize(
+    ("extensions", "expected_timeout"),
+    [
+        ({}, None),
+        ({"timeout": 42.0}, 42.0),
+    ],
+)
+def test_unit_get_request_timeout_seconds_edge_cases(extensions, expected_timeout):
+    request = httpx.Request("POST", "http://localhost", extensions=extensions)
+    assert _get_request_timeout_seconds(request) == expected_timeout
+
+
+@pytest.mark.asyncio
+async def test_unit_run_tasks_allow_failed_transport_exception():
+    tasks = [
+        partial(_slow_success_request, content="1"),
+        partial(_transport_error_request, error_cls=httpx.ReadError, request_id="2"),
+        partial(_slow_success_request, content="3"),
+    ]
+
+    responses = await run_tasks(tasks, allow_failed=True)
+
+    assert [response.status_code for _, response in responses] == [200, 500, 200]
+    assert responses[1][1].extensions["transport_exception"].__class__ is httpx.ReadError
+
+
+@pytest.mark.asyncio
+async def test_unit_run_tasks_allow_failed_cancelled_error_treated_as_failure():
+    tasks = [
+        partial(_slow_success_request, content="1"),
+        partial(_cancelled_request),
+        partial(_slow_success_request, content="3"),
+    ]
+
+    responses = await run_tasks(tasks, allow_failed=True)
+
+    assert [response.status_code for _, response in responses] == [200, 500, 200]
+    assert isinstance(responses[1][1].extensions["transport_exception"], asyncio.CancelledError)
+
+
+@pytest.mark.asyncio
+async def test_unit_run_tasks_disallow_failed_transport_exception_cancels_remaining():
+    cancelled_counter = Counter()
+
+    async def _raises_transport_error(
+        async_client: httpx.AsyncClient,
+        limiter: asyncio.Semaphore,
+    ) -> httpx.Response:
+        raise httpx.ConnectError(
+            "connect failed",
+            request=httpx.Request("POST", "http://localhost:8888/chunk/failure"),
+        )
+
+    async def _cancelled_task(
+        async_client: httpx.AsyncClient,
+        limiter: asyncio.Semaphore,
+        content: str,
+        cancelled_counter: Counter,
+    ) -> httpx.Response:
+        try:
+            await asyncio.sleep(0.5)
+            return _httpx_response(content)
+        except asyncio.CancelledError:
+            cancelled_counter.update(["cancelled"])
+            raise
+
+    tasks = [
+        partial(_raises_transport_error),
+        *[
+            partial(_cancelled_task, content=f"{index}", cancelled_counter=cancelled_counter)
+            for index in range(2, 20)
+        ],
+    ]
+
+    with pytest.raises(httpx.ConnectError):
+        await run_tasks(tasks, allow_failed=False)
+
+    await asyncio.sleep(0)
+    assert cancelled_counter["cancelled"] > 0
+
+
+def test_unit_concurrent_operations_use_independent_state():
     hook = SplitPdfHook()
-    mock_client = httpx.Client()
-    hook.sdk_init(base_url="http://localhost:8888", client=mock_client)
+    hook.sdk_init(base_url="http://localhost:8888", client=httpx.Client())
 
-    mock_hook_ctx = MagicMock()
-    mock_hook_ctx.operation_id = "partition"
-    mock_hook_ctx.config.timeout_ms = 12_000
+    hook, _, first_result = _make_hook_with_split_request(
+        hook=hook,
+        allow_failed="true",
+        cache_tmp_data="true",
+    )
+    hook, _, second_result = _make_hook_with_split_request(
+        hook=hook,
+        allow_failed="false",
+        cache_tmp_data="false",
+    )
 
-    mock_request = MagicMock(spec=httpx.Request)
-    mock_request.headers = {"Content-Type": "multipart/form-data"}
-    mock_request.url = httpx.URL("http://localhost:8888/general/v0/general")
-    mock_request.extensions = {"timeout": {"connect": 12.0, "read": 12.0, "write": 12.0, "pool": 12.0}}
+    first_operation_id = first_result.headers["operation_id"]
+    second_operation_id = second_result.headers["operation_id"]
 
+    assert first_operation_id != second_operation_id
+    assert hook.allow_failed[first_operation_id] is True
+    assert hook.allow_failed[second_operation_id] is False
+    assert hook.cache_tmp_data_feature[first_operation_id] is True
+    assert hook.cache_tmp_data_feature[second_operation_id] is False
+
+
+def test_unit_after_error_cleans_only_matching_operation_on_transport_failure():
+    hook = SplitPdfHook()
+    hook.sdk_init(base_url="http://localhost:8888", client=httpx.Client())
+
+    hook, _, first_result = _make_hook_with_split_request(hook=hook, allow_failed="true")
+    hook, _, second_result = _make_hook_with_split_request(hook=hook, allow_failed="false")
+
+    first_operation_id = first_result.headers["operation_id"]
+    second_operation_id = second_result.headers["operation_id"]
+
+    error_ctx = MagicMock(spec=AfterErrorContext)
+    error_ctx.operation_id = "partition"
+
+    hook.after_error(
+        error_ctx,
+        None,
+        httpx.ConnectError("DNS failed", request=first_result),
+    )
+
+    assert first_operation_id not in hook.executors
+    assert first_operation_id not in hook.coroutines_to_execute
+    assert first_operation_id not in hook.pending_operation_ids
+    assert second_operation_id in hook.executors
+    assert second_operation_id in hook.coroutines_to_execute
+    assert second_operation_id in hook.pending_operation_ids
+
+
+def test_unit_before_request_uses_hook_ctx_timeout_when_request_timeout_missing():
+    hook, _, result = _make_hook_with_split_request(
+        timeout_extension=None,
+        config_timeout_ms=34_000,
+    )
+    operation_id = result.headers["operation_id"]
+
+    assert hook.operation_timeouts[operation_id] == 34.0
+
+
+@pytest.mark.asyncio
+async def test_unit_before_request_threads_client_retry_config_into_chunk_execution():
+    retry_config = RetryConfig(
+        "backoff",
+        BackoffStrategy(1, 2, 3.0, 4),
+        retry_connection_errors=False,
+    )
+    hook, _, result = _make_hook_with_split_request(
+        retry_config=retry_config,
+        pdf_chunks=[(io.BytesIO(b"chunk"), 0)],
+    )
+    operation_id = result.headers["operation_id"]
+    coroutine = hook.coroutines_to_execute[operation_id][0]
+
+    with patch(
+        "unstructured_client._hooks.custom.request_utils.call_api_async",
+        new=AsyncMock(return_value=_httpx_json_response([])),
+    ) as mock_call_api_async:
+        async with httpx.AsyncClient() as client:
+            await coroutine(async_client=client, limiter=asyncio.Semaphore(1))
+
+    assert mock_call_api_async.await_args.kwargs["retry_config"] is retry_config
+
+
+def test_unit_after_success_clears_on_await_elements_exception():
+    hook, _, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+
+    with patch.object(hook, "_await_elements", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError):
+            hook.after_success(success_ctx, response)
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+
+
+def test_unit_future_timeout_triggers_cleanup(caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.INFO, logger="unstructured-client")
+    hook, _, result = _make_hook_with_split_request(pdf_chunks=[(io.BytesIO(b"chunk"), 0)])
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+
+    fake_future: futures.Future[list[tuple[int, httpx.Response]]] = futures.Future()
+
+    def _raise_timeout(timeout=None):
+        raise futures.TimeoutError()
+
+    fake_future.result = _raise_timeout  # type: ignore[method-assign]
+    fake_executor = MagicMock()
+    tempdir = MagicMock()
+    tempdir.name = "/tmp/test-split-timeout"
+    loop = MagicMock()
+
+    def _submit_side_effect(*args, **kwargs):
+        args[1].close()
+        loop_holder = args[2]
+        loop_holder["loop"] = loop
+        return fake_future
+
+    fake_executor.submit.side_effect = _submit_side_effect
+    hook.executors[operation_id] = fake_executor
+    hook.tempdirs[operation_id] = tempdir
+
+    with pytest.raises(futures.TimeoutError):
+        hook.after_success(success_ctx, response)
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+    loop.call_soon_threadsafe.assert_called()
+    tempdir.cleanup.assert_not_called()
+    fake_executor.shutdown.assert_not_called()
+    assert f"event=batch_timeout operation_id={operation_id}" in caplog.text
+
+    fake_future.set_exception(futures.CancelledError())
+
+    tempdir.cleanup.assert_called_once()
+    fake_executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)
+
+
+def test_unit_future_timeout_preserves_timeout_when_loop_is_closed(
+    caplog: pytest.LogCaptureFixture,
+):
+    caplog.set_level(logging.INFO, logger="unstructured-client")
+    hook, _, result = _make_hook_with_split_request(pdf_chunks=[(io.BytesIO(b"chunk"), 0)])
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+
+    fake_future: futures.Future[list[tuple[int, httpx.Response]]] = futures.Future()
+
+    def _raise_timeout(timeout=None):
+        raise futures.TimeoutError()
+
+    fake_future.result = _raise_timeout  # type: ignore[method-assign]
+    fake_executor = MagicMock()
+    tempdir = MagicMock()
+    tempdir.name = "/tmp/test-split-timeout-closed-loop"
+    loop = MagicMock()
+    loop.call_soon_threadsafe.side_effect = RuntimeError("Event loop is closed")
+
+    def _submit_side_effect(*args, **kwargs):
+        loop_holder = args[2]
+        loop_holder["loop"] = loop
+        return fake_future
+
+    fake_executor.submit.side_effect = _submit_side_effect
+    hook.executors[operation_id] = fake_executor
+    hook.tempdirs[operation_id] = tempdir
+
+    with pytest.raises(futures.TimeoutError):
+        hook.after_success(success_ctx, response)
+
+    assert "event=loop_closed_during_cancel" in caplog.text
+    fake_future.set_exception(futures.CancelledError())
+    tempdir.cleanup.assert_called_once()
+    fake_executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)
+
+
+def test_unit_clear_operation_does_not_raise_when_loop_is_closed():
+    hook = SplitPdfHook()
+    operation_id = "loop-closed-clear-operation"
+    future: futures.Future[list[tuple[int, httpx.Response]]] = futures.Future()
+    executor = MagicMock()
+    tempdir = MagicMock()
+    loop = MagicMock()
+    loop.call_soon_threadsafe.side_effect = RuntimeError("Event loop is closed")
+
+    hook.coroutines_to_execute[operation_id] = [MagicMock()]
+    hook.executors[operation_id] = executor
+    hook.tempdirs[operation_id] = tempdir
+    hook.operation_futures[operation_id] = future
+    hook.operation_loops[operation_id] = {"loop": loop}
+
+    hook._clear_operation(operation_id)
+
+    future.set_result([])
+    tempdir.cleanup.assert_called_once()
+    executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)
+
+
+@pytest.mark.asyncio
+async def test_unit_call_api_async_closes_file_on_exception():
+    pdf_chunk_file = MagicMock(spec=io.BufferedReader)
+    pdf_chunk_file.closed = False
+    request = httpx.Request("POST", "http://localhost:8888/general/v0/general")
+    client = AsyncMock(spec=httpx.AsyncClient)
+
+    with patch(
+        "unstructured_client._hooks.custom.request_utils.retry_async",
+        new=AsyncMock(side_effect=httpx.ConnectError("boom", request=request)),
+    ):
+        with pytest.raises(httpx.ConnectError):
+            await request_utils.call_api_async(
+                client=client,
+                pdf_chunk_request=request,
+                pdf_chunk_file=pdf_chunk_file,
+                limiter=asyncio.Semaphore(1),
+            )
+
+    pdf_chunk_file.close.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_unit_call_api_async_logs_chunk_context(caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.DEBUG, logger="unstructured-client")
+    pdf_chunk_file = io.BytesIO(b"chunk")
+    request = httpx.Request("POST", "http://localhost:8888/general/v0/general")
+    client = AsyncMock(spec=httpx.AsyncClient)
+
+    with patch(
+        "unstructured_client._hooks.custom.request_utils.retry_async",
+        new=AsyncMock(side_effect=httpx.ConnectError("boom", request=request)),
+    ):
+        with pytest.raises(httpx.ConnectError):
+            await request_utils.call_api_async(
+                client=client,
+                pdf_chunk_request=request,
+                pdf_chunk_file=pdf_chunk_file,
+                limiter=asyncio.Semaphore(1),
+                operation_id="op-123",
+                chunk_index=4,
+                page_number=17,
+            )
+
+    assert "event=chunk_request_error operation_id=op-123 chunk_index=4 page_number=17" in caplog.text
+
+
+def test_unit_allow_failed_partial_results(caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.INFO, logger="unstructured-client")
+    hook = SplitPdfHook()
+    operation_id = "allow-failed-partial"
+    hook.coroutines_to_execute[operation_id] = [partial(_request_mock, fails=False, content="unused")] * 3
+    hook.concurrency_level[operation_id] = 3
+    hook.allow_failed[operation_id] = True
+    hook.cache_tmp_data_feature[operation_id] = False
+    hook.executors[operation_id] = MagicMock()
+
+    fake_future = MagicMock()
+    fake_future.result.return_value = [
+        (1, _httpx_json_response([{"page_number": 1}])),
+        (2, _httpx_response("boom", status_code=500)),
+        (3, _httpx_json_response([{"page_number": 3}])),
+    ]
+    hook.executors[operation_id].submit.return_value = fake_future
+
+    elements = hook._await_elements(operation_id)
+
+    assert elements == [{"page_number": 1}, {"page_number": 3}]
+    assert len(hook.api_failed_responses[operation_id]) == 1
+    assert f"event=batch_complete operation_id={operation_id}" in caplog.text
+    assert "success_count=2" in caplog.text
+    assert "failure_count=1" in caplog.text
+
+
+def test_unit_allow_failed_all_fail_records_failures():
+    hook = SplitPdfHook()
+    operation_id = "allow-failed-all-fail"
+    hook.coroutines_to_execute[operation_id] = [partial(_request_mock, fails=False, content="unused")] * 2
+    hook.concurrency_level[operation_id] = 2
+    hook.allow_failed[operation_id] = True
+    hook.cache_tmp_data_feature[operation_id] = False
+    hook.executors[operation_id] = MagicMock()
+
+    fake_future = MagicMock()
+    fake_future.result.return_value = [
+        (1, _httpx_response("boom", status_code=500)),
+        (2, _httpx_response("boom", status_code=500)),
+    ]
+    hook.executors[operation_id].submit.return_value = fake_future
+
+    assert hook._await_elements(operation_id) == []
+    assert len(hook.api_failed_responses[operation_id]) == 2
+
+
+def test_unit_allow_failed_after_success_returns_first_failed_response_when_zero_chunks_succeed():
+    hook, _, result = _make_hook_with_split_request(allow_failed="true")
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+    failed_response = _httpx_response("transport failure", status_code=500)
+    failed_response.extensions["transport_exception"] = httpx.ConnectError(
+        "boom",
+        request=failed_response.request,
+    )
+    hook._annotate_failure_response(
+        operation_id,
+        failed_chunk_index=1,
+        successful_count=0,
+        failed_count=1,
+        total_chunks=1,
+        response=failed_response,
+    )
+    hook.allow_failed[operation_id] = True
+    hook.api_successful_responses[operation_id] = []
+    hook.api_failed_responses[operation_id] = [failed_response]
+
+    with patch.object(hook, "_await_elements", return_value=[]):
+        returned_response = hook.after_success(success_ctx, response)
+
+    assert returned_response is failed_response
+    assert returned_response.headers[f"{SPLIT_PDF_HEADER_PREFIX}Operation-Id"] == operation_id
+    assert returned_response.headers[f"{SPLIT_PDF_HEADER_PREFIX}Chunk-Index"] == "1"
+    assert returned_response.headers[f"{SPLIT_PDF_HEADER_PREFIX}Success-Count"] == "0"
+    assert returned_response.headers[f"{SPLIT_PDF_HEADER_PREFIX}Failure-Count"] == "1"
+    assert returned_response.extensions["split_pdf_failure_metadata"][
+        f"{SPLIT_PDF_HEADER_PREFIX}Operation-Id"
+    ] == operation_id
+
+
+def test_unit_disallow_failed_after_success_returns_first_failed_response():
+    hook, _, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+    failed_response = _httpx_response("failure", status_code=500)
+    hook.allow_failed[operation_id] = False
+    hook.api_failed_responses[operation_id] = [failed_response]
+
+    with patch.object(hook, "_await_elements", return_value=[]):
+        returned_response = hook.after_success(success_ctx, response)
+
+    assert returned_response is failed_response
+
+
+def test_before_request_failure_after_state_setup_cleans_partial_operation():
+    hook = SplitPdfHook()
+    hook.sdk_init(base_url="http://localhost:8888", client=httpx.Client())
+    executor = MagicMock()
+    tempdir = MagicMock()
+    tempdir.name = "/tmp/before-request-failure"
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    hook_ctx.operation_id = "partition"
+    hook_ctx.config = MagicMock()
+    hook_ctx.config.timeout_ms = 12_000
+    hook_ctx.config.retry_config = UNSET
+    request = httpx.Request(
+        "POST",
+        "http://localhost:8888/general/v0/general",
+        headers={"Content-Type": "multipart/form-data"},
+        extensions={"timeout": {"connect": 12.0, "read": 12.0, "write": 12.0, "pool": 12.0}},
+    )
     mock_pdf_file = MagicMock()
     mock_form_data = {
         "split_pdf_page": "true",
         "strategy": "fast",
+        "split_pdf_cache_tmp_data": "true",
         "files": {
             "filename": "test.pdf",
             "content_type": "application/pdf",
@@ -574,47 +1187,34 @@ def _make_hook_with_split_request():
     mock_pdf_reader.pages = [MagicMock()] * 100
     mock_pdf_reader.stream = io.BytesIO(b"fake-pdf-bytes")
 
+    def _chunk_paths_side_effect(*args, **kwargs):
+        hook.tempdirs[kwargs["operation_id"]] = tempdir
+        return [(Path("/tmp/chunk-1.pdf"), 0)]
+
     with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
          patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
          patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
          patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url, \
+         patch("unstructured_client._hooks.custom.split_pdf_hook.futures.ThreadPoolExecutor", return_value=executor), \
+         patch("unstructured_client._hooks.custom.request_utils.create_pdf_chunk_request", side_effect=RuntimeError("chunk build failed")), \
          patch.object(hook, "_trim_large_pages", side_effect=lambda pdf, fd: pdf), \
-         patch.object(hook, "_get_pdf_chunks_in_memory", return_value=[]):
+         patch.object(hook, "_get_pdf_chunk_paths", side_effect=_chunk_paths_side_effect), \
+         patch.object(hook, "_get_pdf_chunk_files", return_value=[(io.BytesIO(b"chunk"), 0)]):
         mock_get_fields.return_value = mock_form_data
         mock_read_pdf.return_value = mock_pdf_reader
         mock_check_pdf.return_value = mock_pdf_reader
         mock_get_base_url.return_value = "http://localhost:8888"
 
-        result = hook.before_request(mock_hook_ctx, mock_request)
+        with pytest.raises(RuntimeError, match="chunk build failed"):
+            hook.before_request(hook_ctx, request)
 
-    return hook, mock_hook_ctx, result
-
-
-def test_before_request_returns_dummy_with_timeout_and_operation_id():
-    hook, mock_hook_ctx, result = _make_hook_with_split_request()
-
-    assert isinstance(result, httpx.Request)
-    assert str(result.url) == "http://localhost:8888/general/docs"
-    assert result.headers["operation_id"]
-    assert result.extensions["timeout"]["read"] == 12.0
-    assert mock_hook_ctx.operation_id in hook.pending_operation_ids
-
-
-def test_after_error_cleans_up_split_state():
-    """If the dummy request fails, after_error must release all per-operation state."""
-    hook, mock_hook_ctx, result = _make_hook_with_split_request()
-    operation_id = result.headers["operation_id"]
-
-    assert operation_id in hook.executors
-    assert operation_id in hook.coroutines_to_execute
-
-    from unstructured_client._hooks.types import AfterErrorContext
-    error_ctx = MagicMock(spec=AfterErrorContext)
-    error_ctx.operation_id = mock_hook_ctx.operation_id
-
-    hook.after_error(error_ctx, None, ConnectionError("DNS failed"))
-
-    assert operation_id not in hook.executors
-    assert operation_id not in hook.coroutines_to_execute
-    assert operation_id not in hook.operation_timeouts
-    assert mock_hook_ctx.operation_id not in hook.pending_operation_ids
+    assert hook.coroutines_to_execute == {}
+    assert hook.executors == {}
+    assert hook.tempdirs == {}
+    assert hook.operation_timeouts == {}
+    assert hook.operation_retry_configs == {}
+    assert hook.allow_failed == {}
+    assert hook.cache_tmp_data_feature == {}
+    assert hook.cache_tmp_data_dir == {}
+    tempdir.cleanup.assert_called_once()
+    executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)

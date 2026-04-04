@@ -17,14 +17,34 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, TypeVar
 
 import pytest
 from unstructured_client import UnstructuredClient
 from unstructured_client.models import shared, operations
-from unstructured_client.models.errors import SDKError
+from unstructured_client.models.errors import SDKError, UnstructuredClientError
 
+T = TypeVar("T")
+
+PLATFORM_429_MAX_ATTEMPTS = 5
+PLATFORM_429_INITIAL_DELAY_SECONDS = 5.0
+PLATFORM_429_MAX_DELAY_SECONDS = 30.0
+
+
+def call_with_rate_limit_retry(func: Callable[..., T], *args, **kwargs) -> T:
+    delay_seconds = PLATFORM_429_INITIAL_DELAY_SECONDS
+    for attempt in range(1, PLATFORM_429_MAX_ATTEMPTS + 1):
+        try:
+            return func(*args, **kwargs)
+        except UnstructuredClientError as exc:
+            if exc.status_code != 429 or attempt == PLATFORM_429_MAX_ATTEMPTS:
+                raise
+            time.sleep(delay_seconds)
+            delay_seconds = min(delay_seconds * 2, PLATFORM_429_MAX_DELAY_SECONDS)
+
+    raise RuntimeError("429 retry loop exited unexpectedly")
 
 @pytest.fixture(scope="module")
 def doc_path() -> Path:
@@ -54,7 +74,8 @@ def created_workflow_id(platform_client: UnstructuredClient) -> Optional[str]:
     workflow_id = None
     try:
         # Create a workflow for testing
-        create_response = platform_client.workflows.create_workflow(
+        create_response = call_with_rate_limit_retry(
+            platform_client.workflows.create_workflow,
             request=operations.CreateWorkflowRequest(
                 create_workflow=shared.CreateWorkflow(
                     name="test_integration_workflow",
@@ -71,11 +92,13 @@ def created_workflow_id(platform_client: UnstructuredClient) -> Optional[str]:
         if workflow_id:
             try:
                 # Try to get the workflow first to see if it still exists
-                platform_client.workflows.get_workflow(
+                call_with_rate_limit_retry(
+                    platform_client.workflows.get_workflow,
                     request=operations.GetWorkflowRequest(workflow_id=workflow_id)
                 )
                 # If we get here, it exists, so delete it
-                platform_client.workflows.delete_workflow(
+                call_with_rate_limit_retry(
+                    platform_client.workflows.delete_workflow,
                     request=operations.DeleteWorkflowRequest(workflow_id=workflow_id)
                 )
             except SDKError:
@@ -94,7 +117,8 @@ def test_workflow_lifecycle(
     Test the complete workflow lifecycle including workflows, jobs, and templates.
     """
     # 1. List workflows
-    list_response = platform_client.workflows.list_workflows(
+    list_response = call_with_rate_limit_retry(
+        platform_client.workflows.list_workflows,
         request=operations.ListWorkflowsRequest()
     )
     assert list_response.status_code == 200
@@ -102,7 +126,8 @@ def test_workflow_lifecycle(
     
     # 2. Get workflow (using the created workflow)
     if created_workflow_id:
-        get_response = platform_client.workflows.get_workflow(
+        get_response = call_with_rate_limit_retry(
+            platform_client.workflows.get_workflow,
             request=operations.GetWorkflowRequest(workflow_id=created_workflow_id)
         )
         assert get_response.status_code == 200
@@ -110,7 +135,8 @@ def test_workflow_lifecycle(
         assert get_response.workflow_information.name == "test_integration_workflow"
     
     # 3. List templates
-    list_templates_response = platform_client.templates.list_templates(
+    list_templates_response = call_with_rate_limit_retry(
+        platform_client.templates.list_templates,
         request=operations.ListTemplatesRequest()
     )
     assert list_templates_response.status_code == 200
@@ -128,7 +154,8 @@ def test_workflow_lifecycle(
     if template_id not in template_ids and len(templates) > 0:
         template_id = templates[0].id
     
-    get_template_response = platform_client.templates.get_template(
+    get_template_response = call_with_rate_limit_retry(
+        platform_client.templates.get_template,
         request=operations.GetTemplateRequest(template_id=template_id)
     )
     assert get_template_response.status_code == 200
@@ -152,7 +179,8 @@ def test_workflow_lifecycle(
     with open(pdf_path, "rb") as f:
         pdf_content = f.read()
     
-    create_job_response = platform_client.jobs.create_job(
+    create_job_response = call_with_rate_limit_retry(
+        platform_client.jobs.create_job,
         request=operations.CreateJobRequest(
             body_create_job=shared.BodyCreateJob(
                 request_data=request_data,
@@ -172,14 +200,16 @@ def test_workflow_lifecycle(
     assert create_job_response.job_information.status in ["SCHEDULED", "IN_PROGRESS"]
     
     # 6. Get job
-    get_job_response = platform_client.jobs.get_job(
+    get_job_response = call_with_rate_limit_retry(
+        platform_client.jobs.get_job,
         request=operations.GetJobRequest(job_id=job_id)
     )
     assert get_job_response.status_code == 200
     assert str(get_job_response.job_information.id) == job_id
     
     # 7. List jobs
-    list_jobs_response = platform_client.jobs.list_jobs(
+    list_jobs_response = call_with_rate_limit_retry(
+        platform_client.jobs.list_jobs,
         request=operations.ListJobsRequest()
     )
     assert list_jobs_response.status_code == 200
@@ -187,7 +217,8 @@ def test_workflow_lifecycle(
     
     # 8. Delete workflow (cleanup is handled by fixture, but we can verify it works)
     if created_workflow_id:
-        delete_response = platform_client.workflows.delete_workflow(
+        delete_response = call_with_rate_limit_retry(
+            platform_client.workflows.delete_workflow,
             request=operations.DeleteWorkflowRequest(workflow_id=created_workflow_id)
         )
         assert delete_response.status_code in [200, 204]
@@ -198,7 +229,8 @@ def test_workflow_lifecycle_with_custom_dag_job(platform_client: UnstructuredCli
     Test creating a job with a custom DAG (ephemeral job type).
     """
     # 1. List templates to understand the structure
-    list_templates_response = platform_client.templates.list_templates(
+    list_templates_response = call_with_rate_limit_retry(
+        platform_client.templates.list_templates,
         request=operations.ListTemplatesRequest()
     )
     assert list_templates_response.status_code == 200
@@ -222,7 +254,8 @@ def test_workflow_lifecycle_with_custom_dag_job(platform_client: UnstructuredCli
         "job_nodes": custom_nodes,
     })
     
-    create_job_response = platform_client.jobs.create_job(
+    create_job_response = call_with_rate_limit_retry(
+        platform_client.jobs.create_job,
         request=operations.CreateJobRequest(
             body_create_job=shared.BodyCreateJob(
                 request_data=request_data,
@@ -234,7 +267,8 @@ def test_workflow_lifecycle_with_custom_dag_job(platform_client: UnstructuredCli
     assert job_id is not None
     
     # 3. Verify the job can be retrieved
-    get_job_response = platform_client.jobs.get_job(
+    get_job_response = call_with_rate_limit_retry(
+        platform_client.jobs.get_job,
         request=operations.GetJobRequest(job_id=job_id)
     )
     assert get_job_response.status_code == 200

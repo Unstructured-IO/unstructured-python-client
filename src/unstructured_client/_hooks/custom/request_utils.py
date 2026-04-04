@@ -4,7 +4,7 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO
+from typing import Tuple, Any, BinaryIO, Optional
 from urllib.parse import urlparse
 
 import httpx
@@ -32,6 +32,34 @@ from unstructured_client.utils import (
 )
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
+
+
+def create_default_retry_config() -> RetryConfig:
+    one_second = 1000
+    one_minute = 1000 * 60
+    return RetryConfig(
+        "backoff",
+        BackoffStrategy(
+            initial_interval=one_second * 3,
+            max_interval=one_minute * 12,
+            max_elapsed_time=one_minute * 30,
+            exponent=1.88,
+        ),
+        retry_connection_errors=True,
+    )
+
+
+def create_split_retry_config(retry_config: Optional[RetryConfig]) -> RetryConfig:
+    if retry_config is None:
+        return create_default_retry_config()
+
+    # Split chunk requests run after the top-level dummy request has already
+    # succeeded, so they must preserve their own transport-level retry budget.
+    return RetryConfig(
+        retry_config.strategy,
+        retry_config.backoff,
+        True,
+    )
 
 
 def get_multipart_stream_fields(request: httpx.Request) -> dict[str, Any]:
@@ -163,34 +191,48 @@ async def call_api_async(
     pdf_chunk_request: httpx.Request,
     pdf_chunk_file: BinaryIO,
     limiter: asyncio.Semaphore,
+    retry_config: Optional[RetryConfig] = None,
+    operation_id: Optional[str] = None,
+    chunk_index: Optional[int] = None,
+    page_number: Optional[int] = None,
 ) -> httpx.Response:
-    one_second = 1000
-    one_minute = 1000 * 60
-
-    retry_config = RetryConfig(
-        "backoff",
-        BackoffStrategy(
-            initial_interval=one_second * 3,
-            max_interval=one_minute * 12,
-            max_elapsed_time=one_minute * 30,
-            exponent=1.88,
-        ),
-        retry_connection_errors=True,
-    )
-
     retryable_codes = ["5xx"]
+    effective_retry_config = create_split_retry_config(retry_config)
 
     async def do_request():
         return await client.send(pdf_chunk_request)
 
     async with limiter:
         try:
+            logger.debug(
+                "split_pdf event=chunk_request_send operation_id=%s chunk_index=%s page_number=%s retry_config_mode=%s retry_connection_errors=%s",
+                operation_id,
+                chunk_index,
+                page_number,
+                "sdk_custom" if retry_config is not None else "sdk_default_or_unset",
+                effective_retry_config.retry_connection_errors,
+            )
             response = await retry_async(
-                do_request, Retries(retry_config, retryable_codes)
+                do_request, Retries(effective_retry_config, retryable_codes)
+            )
+            logger.debug(
+                "split_pdf event=chunk_request_response operation_id=%s chunk_index=%s page_number=%s status_code=%d",
+                operation_id,
+                chunk_index,
+                page_number,
+                response.status_code,
             )
             return response
         except Exception as e:
-            logger.error("Request failed with error: %s", e, exc_info=e)
+            logger.error(
+                "split_pdf event=chunk_request_error operation_id=%s chunk_index=%s page_number=%s error_type=%s error=%s",
+                operation_id,
+                chunk_index,
+                page_number,
+                type(e).__name__,
+                e,
+                exc_info=e,
+            )
             raise e
         finally:
             if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
