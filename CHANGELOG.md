@@ -1,3 +1,16 @@
+## 0.43.1
+
+### Enhancements
+* Add split-PDF observability with operation-aware batch planning, timeout, cancellation, and completion logs.
+* Make long-running integration tests stream live progress, timings, and backend failure context for split and single partition phases.
+
+### Features
+
+### Fixes
+* Preserve chunk-local transport retries for split-PDF execution even when SDK-level retries disable connection-error retries for top-level requests.
+* Harden split-PDF timeout and cleanup paths against closed event loops and cancelled chunk tasks.
+* Stabilize `hi_res` split integration coverage by using a smaller derived multi-page fixture instead of the flaky full `layout-parser-paper.pdf` path for equivalence and caching checks.
+
 ## 0.42.12
 
 ### Enhancements

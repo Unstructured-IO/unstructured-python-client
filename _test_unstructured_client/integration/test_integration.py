@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 from pathlib import Path
+import time
 
 from deepdiff import DeepDiff
 import pytest
@@ -15,6 +17,13 @@ from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
 FAKE_KEY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 LOCAL_API_URL = "http://localhost:8000"
+logger = logging.getLogger("integration.split_pdf")
+
+
+def _log_integration_progress(event: str, **fields) -> None:
+    rendered_fields = " ".join(f"{key}={value}" for key, value in fields.items())
+    print(f"integration event={event} {rendered_fields}", flush=True)
+    logger.info("integration event=%s %s", event, rendered_fields)
 
 
 @pytest.fixture(scope="function")
@@ -51,8 +60,18 @@ def test_partition_strategies(split_pdf, strategy, client, doc_path):
         )
     )
 
+    case_context = f"test=partition_strategies file={filename} strategy={strategy} split_pdf={split_pdf}"
+    _log_integration_progress("partition_start", case_context=case_context)
+    started_at = time.perf_counter()
     response = client.general.partition(
         request=req
+    )
+    _log_integration_progress(
+        "partition_complete",
+        case_context=case_context,
+        status_code=response.status_code,
+        element_count=len(response.elements),
+        elapsed_ms=round((time.perf_counter() - started_at) * 1000),
     )
     assert response.status_code == 200
     assert len(response.elements)
@@ -126,7 +145,17 @@ async def test_partition_async_returns_elements(client, doc_path):
         )
     )
 
+    _log_integration_progress("partition_async_start", file=filename, strategy="fast", split_pdf=True)
+    started_at = time.perf_counter()
     response = await client.general.partition_async(request=req)
+    _log_integration_progress(
+        "partition_async_complete",
+        file=filename,
+        strategy="fast",
+        status_code=response.status_code,
+        element_count=len(response.elements),
+        elapsed_ms=round((time.perf_counter() - started_at) * 1000),
+    )
     assert response.status_code == 200
     assert len(response.elements)
 
@@ -168,14 +197,29 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
     ]
 
     serial_results = []
+    _log_integration_progress("partition_async_serial_start", request_count=len(requests), file=filename)
     for req in requests:
+        started_at = time.perf_counter()
         res = await client.general.partition_async(request=req)
         assert res.status_code == 200
         serial_results.append(res.elements)
+        _log_integration_progress(
+            "partition_async_serial_complete",
+            status_code=res.status_code,
+            element_count=len(res.elements),
+            elapsed_ms=round((time.perf_counter() - started_at) * 1000),
+        )
 
+    _log_integration_progress("partition_async_concurrent_start", request_count=len(requests), file=filename)
+    started_at = time.perf_counter()
     results = await asyncio.gather(
         client.general.partition_async(request=requests[0]),
         client.general.partition_async(request=requests[1])
+    )
+    _log_integration_progress(
+        "partition_async_concurrent_complete",
+        request_count=len(results),
+        elapsed_ms=round((time.perf_counter() - started_at) * 1000),
     )
 
     concurrent_results = []
@@ -193,8 +237,9 @@ async def test_partition_async_processes_concurrent_files(client, doc_path):
 
 def test_uvloop_partitions_without_errors(client, doc_path):
     """Test that we can use pdf splitting within another asyncio loop."""
+    filename = "layout-parser-paper-fast.pdf"
+
     async def call_api():
-        filename = "layout-parser-paper-fast.pdf"
         with open(doc_path / filename, "rb") as f:
             files = shared.Files(
                 content=f.read(),
@@ -220,8 +265,14 @@ def test_uvloop_partitions_without_errors(client, doc_path):
             return []
 
     import uvloop
-    uvloop.install()
-    elements = asyncio.run(call_api())
+    started_at = time.perf_counter()
+    elements = uvloop.run(call_api())
+    _log_integration_progress(
+        "uvloop_partition_complete",
+        file=filename,
+        element_count=len(elements),
+        elapsed_ms=round((time.perf_counter() - started_at) * 1000),
+    )
     assert len(elements) > 0
 
 

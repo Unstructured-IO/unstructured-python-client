@@ -17,6 +17,7 @@ from unstructured_client.httpclient import HttpClient
 from collections import defaultdict
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
+SPLIT_HEADER_PREFIX = "X-Unstructured-Split-"
 
 
 class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
@@ -25,22 +26,41 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
     def __init__(self) -> None:
         self.retries_counter: DefaultDict[str, int] = defaultdict(int)
 
+    @staticmethod
+    def _split_response_context(response: Optional[httpx.Response]) -> str:
+        if response is None:
+            return ""
+        operation_id = response.headers.get(f"{SPLIT_HEADER_PREFIX}Operation-Id")
+        chunk_index = response.headers.get(f"{SPLIT_HEADER_PREFIX}Chunk-Index")
+        success_count = response.headers.get(f"{SPLIT_HEADER_PREFIX}Success-Count")
+        failure_count = response.headers.get(f"{SPLIT_HEADER_PREFIX}Failure-Count")
+        if not any([operation_id, chunk_index, success_count, failure_count]):
+            return ""
+        return (
+            f" split_operation_id={operation_id}"
+            f" split_chunk_index={chunk_index}"
+            f" split_success_count={success_count}"
+            f" split_failure_count={failure_count}"
+        )
+
     def log_retries(self, response: Optional[httpx.Response],  error: Optional[Exception], operation_id: str,):
         """Log retries to give users visibility into requests."""
+        split_context = self._split_response_context(response)
 
         if response is not None and response.status_code // 100 == 5:
             logger.info(
                 "Failed to process a request due to API server error with status code %d. "
-                "Attempting retry number %d after sleep.",
+                "Attempting retry number %d after sleep.%s",
                 response.status_code,
                 self.retries_counter[operation_id],
+                split_context,
             )
             if response.text:
                 logger.info("Server message - %s", response.text)
         
-        elif error is not None and isinstance(error, httpx.ConnectError):
+        elif error is not None and isinstance(error, httpx.TransportError):
             logger.info(
-                "Failed to process a request due to connection error - %s. "
+                "Failed to process a request due to transport error - %s. "
                 "Attempting retry number %d after sleep.",
                 error,
                 self.retries_counter[operation_id],
@@ -79,7 +99,12 @@ class LoggerHook(AfterErrorHook, AfterSuccessHook, SDKInitHook):
             # a success here when one of the split requests was partitioned successfully
             return response, error
         if response:
-            logger.error("Server responded with %d - %s", response.status_code, response.text)
+            logger.error(
+                "Server responded with %d - %s%s",
+                response.status_code,
+                response.text,
+                self._split_response_context(response),
+            )
         if error is not None:
             logger.error("Following error occurred - %s", error, exc_info=error)
         return response, error
