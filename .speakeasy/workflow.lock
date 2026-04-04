@@ -32,9 +32,6 @@ workflow:
         unstructured-python:
             target: python
             source: my-source
-            publish:
-                pypi:
-                    token: $PYPI_TOKEN
             codeSamples:
                 output: codeSamples.yaml
                 registry:

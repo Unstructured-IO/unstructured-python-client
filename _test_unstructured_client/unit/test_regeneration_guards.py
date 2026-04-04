@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 import tomllib
 
@@ -37,7 +38,34 @@ def test_publish_script_is_hardened():
 
     assert "set -euo pipefail" in publish_script
     assert "sys.version_info < (3, 11)" in publish_script
-    assert 'uv publish --token "${PYPI_TOKEN}" --check-url https://pypi.org/simple' in publish_script
+    assert "uv build --out-dir dist --clear" in publish_script
+
+
+def test_release_workflow_uses_trusted_publishing():
+    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
+
+    assert "release:" in workflow
+    assert "pypa/gh-action-pypi-publish" in workflow
+    assert "PYPI_TOKEN" not in workflow
+    assert "upload-artifact" in workflow
+    assert "download-artifact" in workflow
+    assert re.search(r"publish:\n\s+needs: build", workflow)
+    assert re.search(r"publish:\n(?:.*\n)*?\s+permissions:\n\s+contents: read\n\s+id-token: write", workflow)
+
+
+def test_release_workflow_keeps_oidc_out_of_build_job():
+    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
+
+    build_job = workflow.split("\n  publish:\n", maxsplit=1)[0]
+
+    assert "id-token: write" not in build_job
+
+
+def test_speakeasy_workflow_does_not_manage_pypi_publishing():
+    workflow = (REPO_ROOT / ".speakeasy" / "workflow.yaml").read_text()
+
+    assert "publish:" not in workflow
+    assert "PYPI_TOKEN" not in workflow
 
 
 def test_makefile_installs_with_locked_uv_sync():

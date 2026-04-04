@@ -27,7 +27,7 @@ generation:
     generateNewTests: false
     skipResponseBodyAssertions: false
 python:
-  version: 0.43.1
+  version: 0.43.2
   additionalDependencies:
     dev:
       deepdiff: '>=9.0.0'
