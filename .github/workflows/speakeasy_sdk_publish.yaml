@@ -1,20 +1,78 @@
-name: Publish
+name: PyPI Release
+
+on:
+  release:
+    types:
+      - published
+
 permissions:
-  checks: write
-  contents: write
-  pull-requests: write
-  statuses: write
-"on":
-  push:
-    branches:
-      - main
-    paths:
-      - RELEASES.md
-      - '*/RELEASES.md'
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.13"
+
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        env:
+          UV_LOCKED: "1"
+          UV_PYTHON: ${{ env.PYTHON_VERSION }}
+        run: make install
+
+      - name: Validate version matches release tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKG_VERSION=$(PYTHONPATH=src uv run python - <<'PYEOF'
+          from unstructured_client._version import __version__
+          print(__version__)
+          PYEOF
+          )
+          if [[ "$TAG" != "$PKG_VERSION" && "$TAG" != "v$PKG_VERSION" ]]; then
+            echo "Tag '$TAG' does not match package version '$PKG_VERSION'"
+            exit 1
+          fi
+
+      - name: Build artifacts
+        run: uv build --out-dir dist --clear
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
   publish:
-    uses: speakeasy-api/sdk-generation-action/.github/workflows/sdk-publish.yaml@v15
-    secrets:
-      github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      pypi_token: ${{ secrets.PYPI_TOKEN }}
-      speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1

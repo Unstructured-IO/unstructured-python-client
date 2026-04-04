@@ -1,3 +1,13 @@
+## 0.43.2
+
+### Enhancements
+* Switch PyPI publishing to GitHub trusted publishing so releases can publish via OIDC without a long-lived `PYPI_TOKEN` secret.
+
+### Features
+
+### Fixes
+* Align release automation, package metadata, and generator config on `0.43.2` for the trusted-publishing release flow.
+
 ## 0.43.1
 
 ### Enhancements
