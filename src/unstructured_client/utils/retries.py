@@ -172,7 +172,11 @@ def retry_with_backoff(
                 if isinstance(exception, TemporaryError):
                     return exception.response
 
-                raise
+                elapsed_seconds = (now - start) / 1000
+                raise type(exception)(
+                    f"{type(exception).__name__} after {retries + 1} retries "
+                    f"over {elapsed_seconds:.1f}s: {exception}"
+                ) from exception
             sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
             sleep = min(sleep, max_interval / 1000)
             time.sleep(sleep)
@@ -200,7 +204,11 @@ async def retry_with_backoff_async(
                 if isinstance(exception, TemporaryError):
                     return exception.response
 
-                raise
+                elapsed_seconds = (now - start) / 1000
+                raise type(exception)(
+                    f"{type(exception).__name__} after {retries + 1} retries "
+                    f"over {elapsed_seconds:.1f}s: {exception}"
+                ) from exception
             sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
             sleep = min(sleep, max_interval / 1000)
             await asyncio.sleep(sleep)
