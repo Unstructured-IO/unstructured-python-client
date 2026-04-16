@@ -174,7 +174,7 @@ def retry_with_backoff(
 
                 elapsed_seconds = (now - start) / 1000
                 raise type(exception)(
-                    f"{type(exception).__name__} after {retries + 1} retries "
+                    f"{type(exception).__name__} after {retries + 1} attempts "
                     f"over {elapsed_seconds:.1f}s: {exception}"
                 ) from exception
             sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
@@ -206,7 +206,7 @@ async def retry_with_backoff_async(
 
                 elapsed_seconds = (now - start) / 1000
                 raise type(exception)(
-                    f"{type(exception).__name__} after {retries + 1} retries "
+                    f"{type(exception).__name__} after {retries + 1} attempts "
                     f"over {elapsed_seconds:.1f}s: {exception}"
                 ) from exception
             sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
