@@ -502,6 +502,102 @@ s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
+## Authentication with Client Secrets
+
+> Available from SDK version **X.Y.Z** (first release carrying the
+> `unstructured_client.auth` module).
+
+If you are running against an Unstructured deployment that issues **client
+secrets** (`uns_sk_...`) — e.g. Dedicated Instances or self-hosted
+clusters with `DEPLOYMENT_MODE=dedicated` on account-service — the SDK
+can transparently exchange that secret for a short-lived JWT, cache it,
+refresh it before expiry, and send it on every request as
+`Authorization: Bearer <jwt>`.
+
+### Synchronous usage
+
+```python
+from unstructured_client import UnstructuredClient
+from unstructured_client.auth import ClientCredentials
+
+client = UnstructuredClient(
+    api_key_auth=ClientCredentials(
+        client_secret="uns_sk_...",
+        server_url="https://accounts.unstructuredapp.io",  # account-service base URL
+    ),
+    server_url="https://platform.unstructuredapp.io",       # platform-api / core-product
+)
+
+# Every operation automatically carries Authorization: Bearer <jwt>.
+client.general.partition(...)
+```
+
+### Asynchronous usage
+
+```python
+import asyncio
+from unstructured_client import UnstructuredClient
+from unstructured_client.auth import AsyncClientCredentials
+
+async def main() -> None:
+    auth = AsyncClientCredentials(
+        client_secret="uns_sk_...",
+        server_url="https://accounts.unstructuredapp.io",
+    )
+    async with UnstructuredClient(api_key_auth=auth) as client:
+        await client.general.partition_async(...)
+
+asyncio.run(main())
+```
+
+### Legacy API-key bridge
+
+For deployments still using legacy api-tracking keys, the same machinery
+is available through `LegacyKeyExchange` / `AsyncLegacyKeyExchange`. It
+hits the same `/auth/token-exchange` endpoint with
+`grant_type=api_key` and is intentionally transitional — migrate to
+`ClientCredentials` once client secrets are provisioned.
+
+```python
+from unstructured_client.auth import LegacyKeyExchange
+
+client = UnstructuredClient(
+    api_key_auth=LegacyKeyExchange(
+        api_key="your-legacy-uns_ak-key",
+        server_url="https://accounts.unstructuredapp.io",
+    ),
+)
+```
+
+### Behavior and tuning
+
+- **Caching:** JWTs are held in-memory and reused until
+  `refresh_buffer_seconds` (default **60s**) before absolute expiry.
+- **Concurrency:** sync callers share a `threading.Lock`, async callers
+  share an `asyncio.Lock`. Ten concurrent requests on a cold cache drive
+  exactly one exchange.
+- **Retries:** 5xx and network errors retry with exponential backoff
+  (default `max_retries=3`). `400` / `401` fail fast with
+  `TokenExchangeError` / `InvalidCredentialError`.
+- **Outage fallback:** if account-service is unreachable *and* a cached
+  token is still within its absolute TTL, the cached token is returned
+  and a warning is logged on `unstructured-client.auth`.
+- **Disabled exchange:** when the server responds with
+  `token_exchange_enabled=False`, the call raises
+  `TokenExchangeDisabledError` — that deployment expects the plain
+  `api_key_auth="..."` string form instead.
+
+### Backward compatibility
+
+Passing a plain string still works exactly as before:
+
+```python
+client = UnstructuredClient(api_key_auth="your-key")
+```
+
+In that case the SDK sends `unstructured-api-key: your-key` without any
+token exchange, identical to pre-`auth` SDK versions.
+
 ### Maturity
 
 This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning usage

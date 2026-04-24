@@ -45,123 +45,126 @@ def fake_clock(monkeypatch):
     return state
 
 
-class DescribeAsyncClientCredentials:
-    @pytest.mark.asyncio
-    async def it_exchanges_then_caches(self, fake_clock):
-        transport = AsyncScriptedTransport(
-            [exchange_response(access_token="jwt-1", expires_in=900)]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-        )
+@pytest.mark.asyncio
+async def test_exchanges_then_caches(fake_clock):
+    transport = AsyncScriptedTransport(
+        [exchange_response(access_token="jwt-1", expires_in=900)]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+    )
 
-        first = await acc.acquire()
-        second = await acc.acquire()
+    first = await acc.acquire()
+    second = await acc.acquire()
 
-        assert first == second == "jwt-1"
-        assert len(transport.requests) == 1
-        assert body_of(transport.requests[0]) == {
-            "grant_type": "client_credentials",
-            "client_secret": SECRET,
-        }
+    assert first == second == "jwt-1"
+    assert len(transport.requests) == 1
+    assert body_of(transport.requests[0]) == {
+        "grant_type": "client_credentials",
+        "client_secret": SECRET,
+    }
 
-    @pytest.mark.asyncio
-    async def it_raises_invalid_credential_on_401(self, fake_clock):
-        transport = AsyncScriptedTransport(
-            [httpx.Response(401, json={"detail": "bad"})]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-            max_retries=5,
-        )
 
-        with pytest.raises(InvalidCredentialError):
-            await acc.acquire()
+@pytest.mark.asyncio
+async def test_raises_invalid_credential_on_401(fake_clock):
+    transport = AsyncScriptedTransport([httpx.Response(401, json={"detail": "bad"})])
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+        max_retries=5,
+    )
 
-    @pytest.mark.asyncio
-    async def it_retries_5xx_then_succeeds(self, fake_clock):
-        transport = AsyncScriptedTransport(
-            [
-                httpx.Response(500),
-                httpx.Response(502),
-                exchange_response(access_token="jwt-1", expires_in=900),
-            ]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-            max_retries=3,
-        )
+    with pytest.raises(InvalidCredentialError):
+        await acc.acquire()
 
-        assert await acc.acquire() == "jwt-1"
-        assert len(transport.requests) == 3
 
-    @pytest.mark.asyncio
-    async def it_serializes_concurrent_acquires(self, fake_clock):
-        """Ten concurrent ``acquire()`` calls must share one exchange."""
-        transport = AsyncScriptedTransport(
-            [exchange_response(access_token="jwt-1", expires_in=900)]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-        )
+@pytest.mark.asyncio
+async def test_retries_5xx_then_succeeds(fake_clock):
+    transport = AsyncScriptedTransport(
+        [
+            httpx.Response(500),
+            httpx.Response(502),
+            exchange_response(access_token="jwt-1", expires_in=900),
+        ]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+        max_retries=3,
+    )
 
-        results: List[str] = await asyncio.gather(*(acc.acquire() for _ in range(10)))
+    assert await acc.acquire() == "jwt-1"
+    assert len(transport.requests) == 3
 
-        assert results == ["jwt-1"] * 10
-        assert len(transport.requests) == 1
 
-    @pytest.mark.asyncio
-    async def it_raises_outage_error_without_cached_token(self, fake_clock):
-        transport = AsyncScriptedTransport([httpx.Response(500)] * 4)
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-            max_retries=3,
-        )
+@pytest.mark.asyncio
+async def test_serializes_concurrent_acquires(fake_clock):
+    """Ten concurrent ``acquire()`` calls must share one exchange."""
+    transport = AsyncScriptedTransport(
+        [exchange_response(access_token="jwt-1", expires_in=900)]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+    )
 
-        with pytest.raises(TokenExchangeError):
-            await acc.acquire()
+    results: List[str] = await asyncio.gather(*(acc.acquire() for _ in range(10)))
 
-    def it_sync_call_works_outside_running_loop(self, fake_clock):
-        """``__call__`` is the SDK entry point; must work without a loop."""
-        transport = AsyncScriptedTransport(
-            [exchange_response(access_token="jwt-1", expires_in=900)]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-        )
+    assert results == ["jwt-1"] * 10
+    assert len(transport.requests) == 1
 
-        assert acc() == "jwt-1"
 
-    @pytest.mark.asyncio
-    async def it_sync_call_works_inside_running_loop(self, fake_clock):
-        """Driving __call__ from a running loop offloads to a worker thread."""
-        transport = AsyncScriptedTransport(
-            [exchange_response(access_token="jwt-1", expires_in=900)]
-        )
-        http_client = httpx.AsyncClient(transport=transport)
-        acc = AsyncClientCredentials(
-            client_secret=SECRET,
-            server_url=SERVER_URL,
-            http_client=http_client,
-        )
+@pytest.mark.asyncio
+async def test_raises_outage_error_without_cached_token(fake_clock):
+    transport = AsyncScriptedTransport([httpx.Response(500)] * 4)
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+        max_retries=3,
+    )
 
-        token = await asyncio.to_thread(acc)
-        assert token == "jwt-1"
+    with pytest.raises(TokenExchangeError):
+        await acc.acquire()
+
+
+def test_sync_call_works_outside_running_loop(fake_clock):
+    """``__call__`` is the SDK entry point; must work without a loop."""
+    transport = AsyncScriptedTransport(
+        [exchange_response(access_token="jwt-1", expires_in=900)]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+    )
+
+    assert acc() == "jwt-1"
+
+
+@pytest.mark.asyncio
+async def test_sync_call_works_inside_running_loop(fake_clock):
+    """Driving __call__ from a running loop offloads to a worker thread."""
+    transport = AsyncScriptedTransport(
+        [exchange_response(access_token="jwt-1", expires_in=900)]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+    )
+
+    token = await asyncio.to_thread(acc)
+    assert token == "jwt-1"
