@@ -87,8 +87,15 @@ class UnstructuredClient(BaseSDK):
 
         security: Any = None
         if callable(api_key_auth):
-            # pylint: disable=unnecessary-lambda-assignment
-            security = lambda: shared.Security(api_key_auth=api_key_auth())
+            # Preserve a reference to the user-supplied callable on the
+            # security factory so custom hooks (e.g. the auth-header hook)
+            # can detect ClientCredentials / LegacyKeyExchange instances
+            # without reaching into lambda closures.
+            def _security_factory() -> shared.Security:
+                return shared.Security(api_key_auth=api_key_auth())
+
+            setattr(_security_factory, "__wrapped_callable__", api_key_auth)
+            security = _security_factory
         else:
             security = shared.Security(api_key_auth=api_key_auth)
 
