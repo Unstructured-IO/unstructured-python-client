@@ -17,6 +17,7 @@ from typing import Union
 import httpx
 
 from unstructured_client._hooks.types import BeforeRequestContext, BeforeRequestHook
+from unstructured_client.auth._base import _ExchangeCallableBase
 
 
 class AuthHeaderBeforeRequestHook(BeforeRequestHook):
@@ -43,11 +44,8 @@ class AuthHeaderBeforeRequestHook(BeforeRequestHook):
         token-exchange callables.
 
         The SDK wraps a user-supplied callable into an internal factory and
-        attaches ``__wrapped_callable__`` to it (see ``sdk.py``). We import
-        the base class lazily to avoid any cycle at module load.
+        attaches ``__wrapped_callable__`` to it (see ``sdk.py``).
         """
-        from unstructured_client.auth._base import _ExchangeCallableBase
-
         if security_source is None:
             return False
 

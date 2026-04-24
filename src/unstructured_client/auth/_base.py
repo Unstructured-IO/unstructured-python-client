@@ -16,7 +16,6 @@ No public API lives here. Users import from :mod:`unstructured_client.auth`.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import random
 import threading

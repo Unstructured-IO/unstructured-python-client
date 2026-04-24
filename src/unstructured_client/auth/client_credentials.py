@@ -19,13 +19,14 @@ JWT in-memory and refreshes it shortly before expiry.
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import time
 from typing import Any, Dict, Optional
 
 import httpx
 
 from ._base import _ExchangeCallableBase
-from ._exceptions import InvalidCredentialError, TokenExchangeError
+from ._exceptions import TokenExchangeError
 
 
 class ClientCredentials(_ExchangeCallableBase):
@@ -254,14 +255,12 @@ class AsyncClientCredentials(_ExchangeCallableBase):
         temporary loop via :func:`asyncio.run`.
         """
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
         except RuntimeError:
             return asyncio.run(self.acquire())
 
         # Inside a running loop - offload to a worker thread that drives its
         # own event loop so we don't block the caller's loop on httpx IO.
-        import concurrent.futures
-
         def _run_in_new_loop() -> str:
             return asyncio.run(self.acquire())
 
