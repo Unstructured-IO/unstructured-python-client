@@ -20,13 +20,48 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import threading
 import time
+import weakref
 from typing import Any, Dict, Optional
 
 import httpx
 
 from ._base import _ExchangeCallableBase
 from ._exceptions import TokenExchangeError
+
+
+def _close_httpx_client(client: Optional[httpx.Client]) -> None:
+    """Best-effort sync close used by :func:`weakref.finalize`."""
+    if client is None:
+        return
+    try:
+        client.close()
+    except Exception:  # noqa: BLE001 - finalize must never raise
+        pass
+
+
+def _close_async_httpx_client(client: Optional[httpx.AsyncClient]) -> None:
+    """Best-effort async close from :func:`weakref.finalize`.
+
+    ``AsyncClient.aclose`` is a coroutine, so we run it on a fresh event loop
+    on a worker thread to avoid touching whatever loop (if any) the user is
+    currently running.
+    """
+    if client is None:
+        return
+
+    def _run() -> None:
+        try:
+            asyncio.run(client.aclose())
+        except Exception:  # noqa: BLE001
+            pass
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            pool.submit(_run).result(timeout=5)
+    except Exception:  # noqa: BLE001 - finalize must never raise
+        pass
 
 
 class ClientCredentials(_ExchangeCallableBase):
@@ -73,6 +108,28 @@ class ClientCredentials(_ExchangeCallableBase):
         self._client_secret = client_secret
         self._http_client = http_client
         self._owns_http_client = http_client is None
+        # Separate init lock so :meth:`_get_http_client` can atomically create
+        # the lazy client even though :meth:`_exchange` already holds the
+        # outer ``self._lock`` (a non-reentrant ``threading.Lock``).
+        self._http_client_init_lock = threading.Lock()
+        self._finalizer: Optional[weakref.finalize] = None
+        if self._owns_http_client:
+            # Register a finalizer that closes a lazily-created private
+            # ``httpx.Client`` if the user never calls :meth:`close`. The
+            # closure binds an attribute lookup (``self._http_client``) at
+            # finalize-time via a small accessor so the finalizer doesn't
+            # itself keep ``self`` alive.
+            owner_ref = weakref.ref(self)
+
+            def _finalize() -> None:
+                owner = owner_ref()
+                if owner is None:
+                    return
+                # pylint: disable=protected-access
+                _close_httpx_client(owner._http_client)
+                owner._http_client = None
+
+            self._finalizer = weakref.finalize(self, _finalize)
 
     def _build_request_body(self) -> Dict[str, Any]:
         return {
@@ -81,9 +138,18 @@ class ClientCredentials(_ExchangeCallableBase):
         }
 
     def _get_http_client(self) -> httpx.Client:
-        if self._http_client is None:
-            self._http_client = httpx.Client(timeout=self._request_timeout_seconds)
-        return self._http_client
+        """Return the lazily-initialized private ``httpx.Client``.
+
+        Atomic across threads: a dedicated init lock guarantees that only a
+        single private client is ever created even if two callers race here
+        before any cache exists.
+        """
+        if self._http_client is not None:
+            return self._http_client
+        with self._http_client_init_lock:
+            if self._http_client is None:
+                self._http_client = httpx.Client(timeout=self._request_timeout_seconds)
+            return self._http_client
 
     def __call__(self) -> str:
         """Return a valid JWT, performing an exchange only when necessary."""
@@ -145,16 +211,23 @@ class ClientCredentials(_ExchangeCallableBase):
         if self._owns_http_client and self._http_client is not None:
             self._http_client.close()
             self._http_client = None
+        if self._finalizer is not None:
+            # We've already cleaned up; detach the finalizer so it doesn't
+            # double-close.
+            self._finalizer.detach()
+            self._finalizer = None
 
 
 class AsyncClientCredentials(_ExchangeCallableBase):
     """Asynchronous twin of :class:`ClientCredentials`.
 
-    The synchronous wrapper (:meth:`__call__`) runs the async exchange via
-    :func:`asyncio.run` when invoked from a non-async context, so it can still
-    be plugged into the SDK's sync-only ``api_key_auth`` callable hook. When
-    already inside a running loop, it uses that loop's executor to avoid
-    deadlocking.
+    Async callers should ``await acquire()`` for a non-blocking exchange.
+
+    The synchronous :meth:`__call__` exists so ``AsyncClientCredentials`` can
+    still be plugged into the SDK's sync-only ``api_key_auth`` callable hook.
+    Note that calling :meth:`__call__` from inside a running event loop blocks
+    that loop while the exchange runs on a worker thread - prefer
+    :meth:`acquire` in async-native code.
     """
 
     def __init__(
@@ -178,7 +251,29 @@ class AsyncClientCredentials(_ExchangeCallableBase):
         self._client_secret = client_secret
         self._http_client = http_client
         self._owns_http_client = http_client is None
-        self._async_lock = asyncio.Lock()
+        self._http_client_init_lock = threading.Lock()
+        # The async lock is created lazily inside a coroutine so it binds to
+        # the *currently running* event loop. We refresh it whenever the
+        # running loop changes (e.g. a fresh ``asyncio.run()`` invocation
+        # after the cache lapses). A dedicated init lock guards the lazy
+        # field assignment so it stays decoupled from ``self._lock`` (the
+        # sync-entry coalescing lock) and can't deadlock with it.
+        self._async_lock: Optional[asyncio.Lock] = None
+        self._async_lock_loop: Optional[asyncio.AbstractEventLoop] = None
+        self._async_lock_init_lock = threading.Lock()
+        self._finalizer: Optional[weakref.finalize] = None
+        if self._owns_http_client:
+            owner_ref = weakref.ref(self)
+
+            def _finalize() -> None:
+                owner = owner_ref()
+                if owner is None:
+                    return
+                # pylint: disable=protected-access
+                _close_async_httpx_client(owner._http_client)
+                owner._http_client = None
+
+            self._finalizer = weakref.finalize(self, _finalize)
 
     def _build_request_body(self) -> Dict[str, Any]:
         return {
@@ -187,9 +282,33 @@ class AsyncClientCredentials(_ExchangeCallableBase):
         }
 
     def _get_http_client(self) -> httpx.AsyncClient:
-        if self._http_client is None:
-            self._http_client = httpx.AsyncClient(timeout=self._request_timeout_seconds)
-        return self._http_client
+        """Return the lazily-initialized private ``httpx.AsyncClient``.
+
+        Atomic across threads: a dedicated init lock guarantees only a single
+        private client is ever created.
+        """
+        if self._http_client is not None:
+            return self._http_client
+        with self._http_client_init_lock:
+            if self._http_client is None:
+                self._http_client = httpx.AsyncClient(
+                    timeout=self._request_timeout_seconds
+                )
+            return self._http_client
+
+    def _get_async_lock(self) -> asyncio.Lock:
+        """Return an :class:`asyncio.Lock` bound to the *currently running* loop.
+
+        A dedicated threading lock guards the lazy field assignment so
+        multiple OS threads concurrently driving their own event loops
+        can't race to replace the lock.
+        """
+        loop = asyncio.get_running_loop()
+        with self._async_lock_init_lock:
+            if self._async_lock is None or self._async_lock_loop is not loop:
+                self._async_lock = asyncio.Lock()
+                self._async_lock_loop = loop
+            return self._async_lock
 
     async def acquire(self) -> str:
         """Async variant of ``__call__``. Returns a valid JWT."""
@@ -198,7 +317,7 @@ class AsyncClientCredentials(_ExchangeCallableBase):
         if cached is not None:
             return cached
 
-        async with self._async_lock:
+        async with self._get_async_lock():
             now = time.monotonic()
             cached = self._cached_token_if_fresh(now)
             if cached is not None:
@@ -249,27 +368,59 @@ class AsyncClientCredentials(_ExchangeCallableBase):
     def __call__(self) -> str:
         """Sync entry point so the SDK's ``api_key_auth`` callable hook works.
 
-        When invoked from inside a running event loop (the usual case for
-        async SDK methods), the exchange runs in the loop's default executor
-        so we don't reenter :func:`asyncio.run`. Otherwise we spin up a
-        temporary loop via :func:`asyncio.run`.
+        Async-native code should ``await acquire()`` instead - it does not
+        block the caller's event loop and does not pay the cost of spinning
+        up a new event loop on a worker thread.
+
+        Concurrency notes:
+
+        * Outside a running loop, ``asyncio.run(self.acquire())`` drives a
+          fresh event loop. The threading lock coalesces concurrent OS
+          threads onto a single exchange so we don't fire N HTTP calls.
+        * Inside a running loop, we offload to a worker thread that runs a
+          private event loop. ``future.result()`` then blocks the caller's
+          loop until the exchange completes. This is unavoidable while we
+          have to return a sync value to Speakeasy's security factory; if
+          you need a non-blocking path, await :meth:`acquire` directly.
         """
+        now = time.monotonic()
+        cached = self._cached_token_if_fresh(now)
+        if cached is not None:
+            return cached
+
         try:
             asyncio.get_running_loop()
+            inside_running_loop = True
         except RuntimeError:
-            return asyncio.run(self.acquire())
+            inside_running_loop = False
 
-        # Inside a running loop - offload to a worker thread that drives its
-        # own event loop so we don't block the caller's loop on httpx IO.
-        def _run_in_new_loop() -> str:
-            return asyncio.run(self.acquire())
+        # Coalesce concurrent OS threads onto a single in-flight exchange.
+        # ``self._lock`` is non-reentrant; ``acquire()`` and helpers that run
+        # under it use dedicated init locks (``_http_client_init_lock`` and
+        # ``_async_lock_init_lock``) to avoid re-entering this lock.
+        with self._lock:
+            now = time.monotonic()
+            cached = self._cached_token_if_fresh(now)
+            if cached is not None:
+                return cached
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            future = pool.submit(_run_in_new_loop)
-            return future.result()
+            if not inside_running_loop:
+                return asyncio.run(self.acquire())
+
+            # Inside a running loop. ``future.result()`` blocks the caller's
+            # loop while the worker thread runs the exchange (see docstring).
+            def _run_in_new_loop() -> str:
+                return asyncio.run(self.acquire())
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(_run_in_new_loop)
+                return future.result()
 
     async def aclose(self) -> None:
         """Close the private HTTP client, if one was created internally."""
         if self._owns_http_client and self._http_client is not None:
             await self._http_client.aclose()
             self._http_client = None
+        if self._finalizer is not None:
+            self._finalizer.detach()
+            self._finalizer = None

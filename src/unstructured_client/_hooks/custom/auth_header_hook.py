@@ -1,11 +1,12 @@
 """Before-request hook that promotes exchanged JWTs to ``Authorization: Bearer``.
 
-Speakeasy's generated ``Security`` model places ``api_key_auth`` in the
+The generated ``Security`` model places ``api_key_auth`` in the
 ``unstructured-api-key`` header. When the user supplies a token-exchange
-callable (``ClientCredentials`` or ``LegacyKeyExchange``) the value is a JWT
-and must be sent as ``Authorization: Bearer <jwt>`` so the service-side
-``utic-jwt-auth`` validator picks it up (see ``core-product`` auth_context
-and ``platform-api`` public_api/dependencies).
+callable from :mod:`unstructured_client.auth` (such as
+:class:`~unstructured_client.auth.ClientCredentials` or
+:class:`~unstructured_client.auth.LegacyKeyExchange`) the value is a JWT
+and must be sent as ``Authorization: Bearer <jwt>`` so the server-side
+JWT validator accepts it.
 
 Plain-string ``api_key_auth`` is untouched.
 """
@@ -43,8 +44,10 @@ class AuthHeaderBeforeRequestHook(BeforeRequestHook):
         """Return True when ``security_source`` was built from one of our
         token-exchange callables.
 
-        The SDK wraps a user-supplied callable into an internal factory and
-        attaches ``__wrapped_callable__`` to it (see ``sdk.py``).
+        ``UnstructuredClient.__init__`` wraps a user-supplied callable into an
+        internal security factory and attaches ``__wrapped_callable__`` to it
+        so this hook can detect token-exchange instances without reaching
+        into the lambda's closure.
         """
         if security_source is None:
             return False

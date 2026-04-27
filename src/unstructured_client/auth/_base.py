@@ -165,12 +165,16 @@ class _ExchangeCallableBase:
         """Map HTTP status to auth-specific exceptions before retry decisions."""
         if response.status_code == 401:
             raise InvalidCredentialError(
-                "Account-service rejected the credential (401). Check that the "
-                "client secret / API key is correct and not revoked.",
+                f"Account-service rejected the credential (401) at "
+                f"{self._exchange_url}. Check that the client secret / API "
+                f"key is correct and not revoked.",
             )
         if response.status_code == 400:
             raise TokenExchangeError(
-                f"Account-service rejected the token-exchange request (400): "
+                f"Account-service rejected the token-exchange request (400) "
+                f"at {self._exchange_url}. This commonly indicates the "
+                f"server_url is pointing somewhere other than account-service "
+                f"(for example, at platform-api). Response body: "
                 f"{response.text[:500]}",
             )
 

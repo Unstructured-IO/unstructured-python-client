@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from typing import List
 
 import httpx
@@ -168,3 +169,94 @@ async def test_sync_call_works_inside_running_loop(fake_clock):
 
     token = await asyncio.to_thread(acc)
     assert token == "jwt-1"
+
+
+def test_sync_call_re_exchanges_after_cache_lapse_across_loops(fake_clock):
+    """Regression: ``__call__`` must not crash on the second exchange.
+
+    Each invocation outside a running loop spins a fresh event loop via
+    ``asyncio.run``. The internal ``asyncio.Lock`` is created lazily inside
+    ``acquire`` so it binds to whatever loop is current; if it were created
+    in ``__init__`` it would stay bound to the first loop and ``async with``
+    would raise ``RuntimeError`` on the second exchange.
+    """
+    transport = AsyncScriptedTransport(
+        [
+            exchange_response(access_token="jwt-1", expires_in=900),
+            exchange_response(access_token="jwt-2", expires_in=900),
+        ]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+        refresh_buffer_seconds=60,
+    )
+
+    assert acc() == "jwt-1"
+    fake_clock["now"] += 900 - 30  # past refresh buffer
+    assert acc() == "jwt-2"
+    assert len(transport.requests) == 2
+
+
+@pytest.mark.asyncio
+async def test_acquire_re_uses_correct_async_lock_after_loop_change(fake_clock):
+    """The lazy per-loop lock must refresh when the running loop changes."""
+    transport = AsyncScriptedTransport(
+        [
+            exchange_response(access_token="jwt-1", expires_in=900),
+            exchange_response(access_token="jwt-2", expires_in=900),
+        ]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+        refresh_buffer_seconds=60,
+    )
+
+    first = await acc.acquire()
+    assert first == "jwt-1"
+    first_loop = acc._async_lock_loop  # type: ignore[attr-defined]
+
+    fake_clock["now"] += 900 - 30  # past refresh buffer
+
+    # Run the next exchange on a *different* event loop driven from a worker
+    # thread; the lazy-init code path must re-bind the lock to that loop.
+    second = await asyncio.to_thread(lambda: asyncio.run(acc.acquire()))
+    assert second == "jwt-2"
+
+    second_loop = acc._async_lock_loop  # type: ignore[attr-defined]
+    assert second_loop is not None
+    assert second_loop is not first_loop
+
+
+def test_sync_call_coalesces_concurrent_threads_into_one_exchange(fake_clock):
+    """Two OS threads racing into ``__call__`` must share one exchange."""
+    barrier = threading.Barrier(2)
+    transport = AsyncScriptedTransport(
+        [exchange_response(access_token="jwt-1", expires_in=900)]
+    )
+    http_client = httpx.AsyncClient(transport=transport)
+    acc = AsyncClientCredentials(
+        client_secret=SECRET,
+        server_url=SERVER_URL,
+        http_client=http_client,
+    )
+
+    results = []
+
+    def _worker():
+        barrier.wait()
+        results.append(acc())
+
+    threads = [threading.Thread(target=_worker) for _ in range(2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert results == ["jwt-1", "jwt-1"]
+    assert len(transport.requests) == 1

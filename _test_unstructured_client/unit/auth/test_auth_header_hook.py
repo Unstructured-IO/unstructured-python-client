@@ -175,6 +175,40 @@ def test_integration_sends_bearer_header_for_client_credentials():
     assert "unstructured-api-key" not in {k.lower() for k in headers}
 
 
+def test_security_factory_exposes_wrapped_callable_for_hook_detection():
+    """Speakeasy-regen guard: the security factory built by ``UnstructuredClient``
+    must expose ``__wrapped_callable__`` so :class:`AuthHeaderBeforeRequestHook`
+    can recognize our token-exchange callables.
+
+    If a future Speakeasy regeneration strips the hand-edited block in
+    ``sdk.py``, this test will fail loudly instead of letting the auth-header
+    rewrite silently break for every user.
+    """
+    transport = ScriptedTransport([exchange_response()])
+    cc = ClientCredentials(
+        client_secret=SECRET,
+        server_url=ACCOUNTS_URL,
+        http_client=httpx.Client(transport=transport),
+    )
+
+    session = UnstructuredClient(
+        api_key_auth=cc,
+        client=httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200))),
+        server_url=SERVER_URL,
+    )
+
+    security_factory = session.sdk_configuration.security
+    assert callable(security_factory), (
+        "When api_key_auth is callable, sdk.py must wrap it in a factory."
+    )
+    wrapped = getattr(security_factory, "__wrapped_callable__", None)
+    assert wrapped is cc, (
+        "sdk.py must attach __wrapped_callable__ pointing at the original "
+        "user callable; without it AuthHeaderBeforeRequestHook cannot detect "
+        "ClientCredentials / LegacyKeyExchange instances."
+    )
+
+
 def test_integration_leaves_legacy_path_unchanged_for_plain_string():
     captured: dict = {}
 

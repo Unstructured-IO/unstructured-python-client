@@ -19,7 +19,6 @@ Plain-string ``api_key_auth="..."`` continues to work unchanged and is sent
 as the ``unstructured-api-key`` header.
 """
 
-from ._base import _ExchangeCallableBase
 from ._exceptions import (
     InvalidCredentialError,
     TokenExchangeDisabledError,
@@ -36,5 +35,4 @@ __all__ = [
     "LegacyKeyExchange",
     "TokenExchangeDisabledError",
     "TokenExchangeError",
-    "_ExchangeCallableBase",
 ]

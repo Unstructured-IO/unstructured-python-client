@@ -8,7 +8,9 @@ transitional and will be removed once legacy keys are decommissioned.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+import httpx
 
 from .client_credentials import AsyncClientCredentials, ClientCredentials
 
@@ -20,6 +22,9 @@ class LegacyKeyExchange(ClientCredentials):
     api-tracking) and exchanges it for an account-service JWT. Caching,
     refresh, and retry behavior are identical to
     :class:`~unstructured_client.auth.ClientCredentials`.
+
+    The legacy key is stored once on the inherited ``_client_secret`` slot;
+    only the request body shape differs from the parent class.
 
     .. deprecated::
         Prefer :class:`~unstructured_client.auth.ClientCredentials` with a
@@ -36,7 +41,7 @@ class LegacyKeyExchange(ClientCredentials):
         refresh_buffer_seconds: int = 60,
         request_timeout_seconds: float = 30.0,
         max_retries: int = 3,
-        http_client=None,
+        http_client: Optional[httpx.Client] = None,
     ) -> None:
         if not api_key:
             raise ValueError("api_key must be a non-empty string")
@@ -48,10 +53,9 @@ class LegacyKeyExchange(ClientCredentials):
             max_retries=max_retries,
             http_client=http_client,
         )
-        self._api_key = api_key
 
     def _build_request_body(self) -> Dict[str, Any]:
-        return {"grant_type": "api_key", "api_key": self._api_key}
+        return {"grant_type": "api_key", "api_key": self._client_secret}
 
 
 class AsyncLegacyKeyExchange(AsyncClientCredentials):
@@ -70,7 +74,7 @@ class AsyncLegacyKeyExchange(AsyncClientCredentials):
         refresh_buffer_seconds: int = 60,
         request_timeout_seconds: float = 30.0,
         max_retries: int = 3,
-        http_client=None,
+        http_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         if not api_key:
             raise ValueError("api_key must be a non-empty string")
@@ -82,7 +86,6 @@ class AsyncLegacyKeyExchange(AsyncClientCredentials):
             max_retries=max_retries,
             http_client=http_client,
         )
-        self._api_key = api_key
 
     def _build_request_body(self) -> Dict[str, Any]:
-        return {"grant_type": "api_key", "api_key": self._api_key}
+        return {"grant_type": "api_key", "api_key": self._client_secret}

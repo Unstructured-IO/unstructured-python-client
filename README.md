@@ -504,7 +504,7 @@ s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 
 ## Authentication with Client Secrets
 
-> Available from SDK version **X.Y.Z** (first release carrying the
+> Available from SDK version **0.44.0** (first release carrying the
 > `unstructured_client.auth` module).
 
 If you are running against an Unstructured deployment that issues **client
@@ -586,6 +586,14 @@ client = UnstructuredClient(
   `token_exchange_enabled=False`, the call raises
   `TokenExchangeDisabledError` — that deployment expects the plain
   `api_key_auth="..."` string form instead.
+- **Custom HTTP client:** pass `http_client=httpx.Client(...)` (or
+  `httpx.AsyncClient(...)` for the async variant) to share a connection
+  pool, route through a corporate proxy, pin a custom CA bundle for mTLS,
+  or otherwise control how the SDK reaches account-service. When the
+  argument is omitted, the auth callable lazily creates and owns a private
+  `httpx.Client`; that client is closed automatically when the auth
+  instance is garbage-collected, or you can call `close()` /
+  `aclose()` explicitly.
 
 ### Backward compatibility
 

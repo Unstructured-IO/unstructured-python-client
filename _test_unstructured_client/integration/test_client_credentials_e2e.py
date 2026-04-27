@@ -2,15 +2,15 @@
 :class:`LegacyKeyExchange`.
 
 This test is **opt-in**: it only runs when every required env var is set.
-Point it at a deployment (e.g. the ``unsightly-koala`` dedicated-instance
-test cluster) that has ``DEPLOYMENT_MODE=dedicated`` and a valid client
-secret provisioned via account-service.
+Point it at any deployment that has ``DEPLOYMENT_MODE=dedicated`` (or any
+other configuration that accepts ``/auth/token-exchange``) and a valid
+client secret provisioned via account-service.
 
 Required env vars
 -----------------
 
 - ``UNS_ACCOUNTS_URL``   base URL of account-service (e.g.
-  ``https://accounts.unsightly-koala.example``)
+  ``https://accounts.<your-deployment>.example``)
 - ``UNS_CLIENT_SECRET``  ``uns_sk_...`` client secret
 - ``UNS_PLATFORM_API_URL`` platform-api base URL to hit after exchange
 
@@ -48,8 +48,8 @@ LEGACY_API_KEY = os.getenv("UNS_LEGACY_API_KEY")
 
 _REASON = (
     "Opt-in E2E: set UNS_ACCOUNTS_URL, UNS_CLIENT_SECRET, and "
-    "UNS_PLATFORM_API_URL to run against a real dedicated-instance "
-    "deployment (e.g. unsightly-koala)."
+    "UNS_PLATFORM_API_URL to run against a real deployment that supports "
+    "/auth/token-exchange."
 )
 
 
