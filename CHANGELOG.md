@@ -1,3 +1,13 @@
+## 0.43.4
+
+### Enhancements
+
+### Features
+
+### Fixes
+* Route split-PDF `partition_async()` result collection through awaited async hook dispatch instead of creating a nested event loop in a worker thread.
+* Add cancellation cleanup for in-flight split-PDF chunk tasks and preserve existing sync `partition()` split-PDF behavior with lazy executor creation.
+
 ## 0.43.2
 
 ### Enhancements

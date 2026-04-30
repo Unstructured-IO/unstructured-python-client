@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
+import threading
 from asyncio import Task
 from collections import Counter
 from concurrent import futures
@@ -15,7 +16,6 @@ import pytest
 import requests
 from requests_toolbelt import MultipartDecoder
 
-from _test_unstructured_client.unit_utils import sample_docs_path
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
     FormData,
@@ -36,8 +36,11 @@ from unstructured_client._hooks.custom.split_pdf_hook import (
     get_optimal_split_size,
     run_tasks,
 )
+from unstructured_client._hooks.sdkhooks import SDKHooks
 from unstructured_client._hooks.types import AfterErrorContext, AfterSuccessContext, BeforeRequestContext
+from unstructured_client.basesdk import BaseSDK
 from unstructured_client.models import shared
+from unstructured_client.sdkconfiguration import SDKConfiguration
 from unstructured_client.types import UNSET
 from unstructured_client.utils import BackoffStrategy, RetryConfig
 
@@ -671,6 +674,81 @@ def _make_hook_with_split_request(
     return hook, hook_ctx, result
 
 
+def _make_sdk_hook_context():
+    hook_ctx = MagicMock()
+    hook_ctx.config = MagicMock()
+    hook_ctx.base_url = "http://localhost:8888"
+    hook_ctx.operation_id = "partition"
+    hook_ctx.oauth2_scopes = None
+    hook_ctx.security_source = None
+    return hook_ctx
+
+
+class _BlockingAsyncClient:
+    def __init__(self) -> None:
+        self.started = asyncio.Event()
+
+    async def send(self, request: httpx.Request, stream=False) -> httpx.Response:
+        del stream
+        self.started.set()
+        await asyncio.Event().wait()
+        return httpx.Response(status_code=200, request=request)
+
+
+@pytest.mark.asyncio
+async def test_unit_do_request_async_cancellation_after_before_request_cleans_split_state():
+    operation_id = "cancelled-operation"
+    split_hook = SplitPdfHook()
+    split_hook.coroutines_to_execute[operation_id] = [MagicMock()]
+    split_hook.pending_operation_ids[operation_id] = operation_id
+    tempdir = MagicMock()
+    split_hook.tempdirs[operation_id] = tempdir
+
+    def _prepared_split_request(hook_ctx, request):
+        del hook_ctx, request
+        return httpx.Request(
+            "GET",
+            "http://localhost:8888/general/docs",
+            headers={"operation_id": operation_id},
+            extensions={"split_pdf_operation_id": operation_id},
+        )
+
+    split_hook.before_request = _prepared_split_request  # type: ignore[method-assign]
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [split_hook]
+    hooks.after_error_hooks = [split_hook]
+    hooks.after_success_hooks = [split_hook]
+
+    client = _BlockingAsyncClient()
+    config = SDKConfiguration(
+        client=None,
+        client_supplied=False,
+        async_client=client,  # type: ignore[arg-type]
+        async_client_supplied=True,
+        debug_logger=logging.getLogger("test"),
+    )
+    config.__dict__["_hooks"] = hooks
+    sdk = BaseSDK(config)
+    task = asyncio.create_task(
+        sdk.do_request_async(
+            _make_sdk_hook_context(),
+            httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+            error_status_codes=[],
+        )
+    )
+
+    await client.started.wait()
+    task.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert operation_id not in split_hook.coroutines_to_execute
+    assert operation_id not in split_hook.pending_operation_ids
+    assert operation_id not in split_hook.tempdirs
+    tempdir.cleanup.assert_called_once()
+
+
 def test_before_request_returns_dummy_with_timeout_and_operation_id():
     hook, mock_hook_ctx, result = _make_hook_with_split_request()
     operation_id = result.headers["operation_id"]
@@ -703,7 +781,7 @@ def test_after_error_cleans_up_split_state():
     hook, mock_hook_ctx, result = _make_hook_with_split_request()
     operation_id = result.headers["operation_id"]
 
-    assert operation_id in hook.executors
+    assert operation_id not in hook.executors
     assert operation_id in hook.coroutines_to_execute
 
     error_ctx = MagicMock(spec=AfterErrorContext)
@@ -744,17 +822,15 @@ async def test_unit_run_tasks_allow_failed_transport_exception():
 
 
 @pytest.mark.asyncio
-async def test_unit_run_tasks_allow_failed_cancelled_error_treated_as_failure():
+async def test_unit_run_tasks_allow_failed_cancelled_error_propagates():
     tasks = [
         partial(_slow_success_request, content="1"),
         partial(_cancelled_request),
         partial(_slow_success_request, content="3"),
     ]
 
-    responses = await run_tasks(tasks, allow_failed=True)
-
-    assert [response.status_code for _, response in responses] == [200, 500, 200]
-    assert isinstance(responses[1][1].extensions["transport_exception"], asyncio.CancelledError)
+    with pytest.raises(asyncio.CancelledError):
+        await run_tasks(tasks, allow_failed=True)
 
 
 @pytest.mark.asyncio
@@ -845,9 +921,121 @@ def test_unit_after_error_cleans_only_matching_operation_on_transport_failure():
     assert first_operation_id not in hook.executors
     assert first_operation_id not in hook.coroutines_to_execute
     assert first_operation_id not in hook.pending_operation_ids
-    assert second_operation_id in hook.executors
+    assert second_operation_id not in hook.executors
     assert second_operation_id in hook.coroutines_to_execute
     assert second_operation_id in hook.pending_operation_ids
+
+
+@pytest.mark.asyncio
+async def test_unit_sdk_hooks_after_success_async_uses_optional_async_hook():
+    calls: list[str] = []
+
+    class AsyncHook:
+        async def after_success_async(self, hook_ctx, response):
+            calls.append("async")
+            response.headers["X-Async-Hook"] = "called"
+            return response
+
+    class SyncHook:
+        def after_success(self, hook_ctx, response):
+            calls.append("sync")
+            response.headers["X-Sync-Hook"] = "called"
+            return response
+
+    hooks = SDKHooks()
+    hooks.after_success_hooks = [AsyncHook(), SyncHook()]  # type: ignore[list-item]
+    response = httpx.Response(status_code=200)
+
+    returned_response = await hooks.after_success_async(MagicMock(spec=AfterSuccessContext), response)
+
+    assert returned_response is response
+    assert calls == ["async", "sync"]
+    assert response.headers["X-Async-Hook"] == "called"
+    assert response.headers["X-Sync-Hook"] == "called"
+
+
+@pytest.mark.asyncio
+async def test_unit_sdk_hooks_after_success_async_ignores_sync_method_with_async_name():
+    calls: list[str] = []
+
+    class SyncHook:
+        def after_success_async(self, hook_ctx, response):
+            calls.append("non-awaitable")
+            return response
+
+        def after_success(self, hook_ctx, response):
+            calls.append("sync")
+            response.headers["X-Sync-Hook"] = "called"
+            return response
+
+    hooks = SDKHooks()
+    hooks.after_success_hooks = [SyncHook()]  # type: ignore[list-item]
+    response = httpx.Response(status_code=200)
+
+    returned_response = await hooks.after_success_async(MagicMock(spec=AfterSuccessContext), response)
+
+    assert returned_response is response
+    assert calls == ["sync"]
+    assert response.headers["X-Sync-Hook"] == "called"
+
+
+@pytest.mark.asyncio
+async def test_unit_sdk_hooks_after_error_async_uses_optional_async_hook():
+    calls: list[str] = []
+
+    class AsyncHook:
+        async def after_error_async(self, hook_ctx, response, error):
+            calls.append("async")
+            response.headers["X-Async-Error-Hook"] = "called"
+            return response, error
+
+    class SyncHook:
+        def after_error(self, hook_ctx, response, error):
+            calls.append("sync")
+            response.headers["X-Sync-Error-Hook"] = "called"
+            return response, error
+
+    hooks = SDKHooks()
+    hooks.after_error_hooks = [AsyncHook(), SyncHook()]  # type: ignore[list-item]
+    response = httpx.Response(status_code=500)
+
+    returned_response, returned_error = await hooks.after_error_async(
+        MagicMock(spec=AfterErrorContext),
+        response,
+        None,
+    )
+
+    assert returned_response is response
+    assert returned_error is None
+    assert calls == ["async", "sync"]
+    assert response.headers["X-Async-Error-Hook"] == "called"
+    assert response.headers["X-Sync-Error-Hook"] == "called"
+
+
+@pytest.mark.asyncio
+async def test_unit_sdk_hooks_before_request_async_runs_sync_hooks_off_loop():
+    loop_thread_id = threading.get_ident()
+    hook_thread_id = None
+
+    class SyncHook:
+        def before_request(self, hook_ctx, request):
+            nonlocal hook_thread_id
+            hook_thread_id = threading.get_ident()
+            request.headers["X-Sync-Before-Hook"] = "called"
+            return request
+
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [SyncHook()]  # type: ignore[list-item]
+    request = httpx.Request("GET", "http://localhost")
+
+    returned_request = await hooks.before_request_async(
+        MagicMock(spec=BeforeRequestContext),
+        request,
+    )
+
+    assert returned_request is request
+    assert request.headers["X-Sync-Before-Hook"] == "called"
+    assert hook_thread_id != loop_thread_id
 
 
 def test_unit_before_request_uses_hook_ctx_timeout_when_request_timeout_missing():
@@ -895,6 +1083,162 @@ def test_unit_after_success_clears_on_await_elements_exception():
         with pytest.raises(RuntimeError):
             hook.after_success(success_ctx, response)
 
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+
+
+@pytest.mark.asyncio
+async def test_unit_after_success_async_clears_on_await_elements_exception():
+    hook, _, result = _make_hook_with_split_request()
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+
+    with patch.object(hook, "_await_elements_async", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError):
+            await hook.after_success_async(success_ctx, response)
+
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+
+
+@pytest.mark.asyncio
+async def test_unit_after_success_async_collects_chunks_without_sync_executor():
+    hook, _, result = _make_hook_with_split_request(
+        pdf_chunks=[(io.BytesIO(b"chunk-1"), 0), (io.BytesIO(b"chunk-2"), 2)],
+    )
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+
+    assert operation_id not in hook.executors
+
+    with patch(
+        "unstructured_client._hooks.custom.request_utils.call_api_async",
+        new=AsyncMock(
+            side_effect=[
+                _httpx_json_response([{"page_number": 1}]),
+                _httpx_json_response([{"page_number": 3}]),
+            ]
+        ),
+    ) as mock_call_api_async:
+        returned_response = await hook.after_success_async(success_ctx, response)
+
+    assert returned_response.json() == [{"page_number": 1}, {"page_number": 3}]
+    assert mock_call_api_async.await_count == 2
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+
+
+@pytest.mark.asyncio
+async def test_unit_after_success_async_cancels_pending_chunks_and_clears_state():
+    hook, _, result = _make_hook_with_split_request(
+        pdf_chunks=[(io.BytesIO(b"chunk-1"), 0), (io.BytesIO(b"chunk-2"), 2)],
+    )
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+    started = asyncio.Event()
+    started_counter = Counter()
+    cancelled_counter = Counter()
+
+    async def _pending_request(
+        async_client: httpx.AsyncClient,
+        limiter: asyncio.Semaphore,
+    ) -> httpx.Response:
+        try:
+            started_counter.update(["started"])
+            if started_counter["started"] == 2:
+                started.set()
+            await asyncio.Event().wait()
+            return _httpx_json_response([])
+        except asyncio.CancelledError:
+            cancelled_counter.update(["cancelled"])
+            raise
+
+    hook.coroutines_to_execute[operation_id] = [partial(_pending_request)] * 2
+
+    task = asyncio.create_task(hook.after_success_async(success_ctx, response))
+    await started.wait()
+    task.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert cancelled_counter["cancelled"] == 2
+    assert operation_id not in hook.executors
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+
+
+@pytest.mark.asyncio
+async def test_unit_after_success_async_timeout_cancels_chunks_and_clears_state():
+    hook, _, result = _make_hook_with_split_request(
+        pdf_chunks=[(io.BytesIO(b"chunk-1"), 0), (io.BytesIO(b"chunk-2"), 2)],
+    )
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+    tempdir = MagicMock()
+    hook.tempdirs[operation_id] = tempdir
+    hook.operation_timeouts[operation_id] = 0.001
+    cancelled_counter = Counter()
+
+    async def _pending_request(
+        async_client: httpx.AsyncClient,
+        limiter: asyncio.Semaphore,
+    ) -> httpx.Response:
+        del async_client, limiter
+        try:
+            await asyncio.Event().wait()
+            return _httpx_json_response([])
+        except asyncio.CancelledError:
+            cancelled_counter.update(["cancelled"])
+            raise
+
+    hook.coroutines_to_execute[operation_id] = [partial(_pending_request)] * 2
+
+    with patch("unstructured_client._hooks.custom.split_pdf_hook.TIMEOUT_BUFFER_SECONDS", 0):
+        with pytest.raises(TimeoutError):
+            await hook.after_success_async(success_ctx, response)
+
+    assert cancelled_counter["cancelled"] == 2
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+    assert operation_id not in hook.tempdirs
+    tempdir.cleanup.assert_called_once()
+
+
+def test_unit_after_success_sync_lazily_creates_and_cleans_executor():
+    hook, _, result = _make_hook_with_split_request(
+        pdf_chunks=[(io.BytesIO(b"chunk"), 0)],
+    )
+    operation_id = result.headers["operation_id"]
+    response = httpx.Response(status_code=200, request=result)
+    success_ctx = MagicMock(spec=AfterSuccessContext)
+    success_ctx.operation_id = "partition"
+    fake_executor = MagicMock()
+    fake_future = MagicMock()
+    fake_future.done.return_value = True
+    fake_future.result.return_value = [(1, _httpx_json_response([{"page_number": 1}]))]
+    fake_executor.submit.return_value = fake_future
+
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.futures.ThreadPoolExecutor",
+        return_value=fake_executor,
+    ):
+        returned_response = hook.after_success(success_ctx, response)
+
+    assert returned_response.json() == [{"page_number": 1}]
+    fake_executor.submit.assert_called_once()
+    fake_executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)
     assert operation_id not in hook.executors
     assert operation_id not in hook.coroutines_to_execute
     assert operation_id not in hook.pending_operation_ids
@@ -1217,4 +1561,4 @@ def test_before_request_failure_after_state_setup_cleans_partial_operation():
     assert hook.cache_tmp_data_feature == {}
     assert hook.cache_tmp_data_dir == {}
     tempdir.cleanup.assert_called_once()
-    executor.shutdown.assert_called_once_with(wait=False, cancel_futures=True)
+    executor.shutdown.assert_not_called()
