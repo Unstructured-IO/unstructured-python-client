@@ -289,6 +289,8 @@ def _request_task_cancellation(
     if loop is None:
         return False
     try:
+        # This loop is private to the split-PDF worker thread, so all_tasks()
+        # only targets chunk requests for the current split operation.
         loop.call_soon_threadsafe(_cancel_running_tasks)
         return True
     except RuntimeError as exc:
@@ -533,7 +535,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # the platform operations do). Here we need to get the base url from the request object.
         if hook_ctx.operation_id != "partition":
             return request
-        self.partition_base_url = get_base_url(request.url)
+        partition_base_url = get_base_url(request.url)
 
         if self.client is None:
             logger.warning("HTTP client not accessible! Continuing without splitting.")
@@ -717,7 +719,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             dummy_request_extensions[OPERATION_ID_EXTENSION_KEY] = operation_id
             return httpx.Request(
                 "GET",
-                f"{self.partition_base_url}/general/docs",
+                f"{partition_base_url}/general/docs",
                 headers={"operation_id": operation_id},
                 extensions=dummy_request_extensions,
             )
@@ -764,11 +766,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_number=page_number,
         )
 
-        # Immediately delete request to save memory
-        del response._request  # pylint: disable=protected-access
-        response._request = None  # pylint: disable=protected-access
-
-
         if response.status_code == 200:
             if cache_tmp_data_feature:
                 if temp_dir_path is None:
@@ -788,6 +785,26 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     page_number,
                     Path(temp_file_name).name,
                 )
+                response = httpx.Response(
+                    status_code=response.status_code,
+                    headers=response.headers,
+                    content=temp_file_name.encode(),
+                    extensions=response.extensions,
+                )
+            else:
+                response = httpx.Response(
+                    status_code=response.status_code,
+                    headers=response.headers,
+                    content=response.content,
+                    extensions=response.extensions,
+                )
+        else:
+            response = httpx.Response(
+                status_code=response.status_code,
+                headers=response.headers,
+                content=response.content,
+                extensions=response.extensions,
+            )
 
         logger.debug(
             "split_pdf event=chunk_complete operation_id=%s chunk_index=%d page_number=%d status_code=%d",

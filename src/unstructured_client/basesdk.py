@@ -20,7 +20,7 @@ from unstructured_client.utils import (
 from urllib.parse import parse_qs, urlparse
 
 
-class _RequestBoundCancelledError(Exception):
+class _RequestBoundCancelledError(asyncio.CancelledError):
     def __init__(self, request: httpx.Request, cancellation: asyncio.CancelledError):
         super().__init__(str(cancellation) or "Request cancelled")
         self.request = request
@@ -326,6 +326,24 @@ class BaseSDK:
             except Exception:
                 logger.debug("Cancellation cleanup failed", exc_info=True)
 
+        def cleanup_when_before_request_finishes(
+            before_request_task: "asyncio.Task[httpx.Request]",
+            cancellation: asyncio.CancelledError,
+        ) -> None:
+            def on_done(task: "asyncio.Task[httpx.Request]") -> None:
+                if task.cancelled():
+                    return
+                try:
+                    completed_req = task.result()
+                except Exception:
+                    logger.debug("Cancelled request setup failed before cleanup", exc_info=True)
+                    return
+                asyncio.create_task(
+                    cleanup_cancelled_request(completed_req, None, cancellation)
+                )
+
+            before_request_task.add_done_callback(on_done)
+
         async def do():
             http_res = None
             req = None
@@ -335,13 +353,13 @@ class BaseSDK:
                 )
                 try:
                     # Sync before-request hooks may be running in a worker thread; if the caller
-                    # cancels, wait for setup to finish so cancellation cleanup can find request state.
+                    # cancels, let setup finish in the background so cleanup can find request state.
                     req = await asyncio.shield(before_request_task)
-                except asyncio.CancelledError:
-                    if not before_request_task.done():
-                        req = await asyncio.shield(before_request_task)
-                    elif not before_request_task.cancelled():
+                except asyncio.CancelledError as cancellation:
+                    if before_request_task.done() and not before_request_task.cancelled():
                         req = before_request_task.result()
+                    else:
+                        cleanup_when_before_request_finishes(before_request_task, cancellation)
                     raise
                 logger.debug(
                     "Request:\nMethod: %s\nURL: %s\nHeaders: %s\nBody: %s",

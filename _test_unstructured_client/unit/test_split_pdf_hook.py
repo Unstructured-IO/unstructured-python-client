@@ -1038,6 +1038,119 @@ async def test_unit_sdk_hooks_before_request_async_runs_sync_hooks_off_loop():
     assert hook_thread_id != loop_thread_id
 
 
+@pytest.mark.asyncio
+async def test_unit_sdk_hooks_before_request_async_serializes_sync_hooks():
+    release_first_hook = threading.Event()
+    first_hook_started = threading.Event()
+    active_lock = threading.Lock()
+    active_hooks = 0
+    max_active_hooks = 0
+
+    class SyncHook:
+        def before_request(self, hook_ctx, request):
+            nonlocal active_hooks, max_active_hooks
+            del hook_ctx
+            with active_lock:
+                active_hooks += 1
+                max_active_hooks = max(max_active_hooks, active_hooks)
+                if active_hooks == 1:
+                    first_hook_started.set()
+            try:
+                release_first_hook.wait(timeout=1)
+                request.headers["X-Sync-Before-Hook"] = "called"
+                return request
+            finally:
+                with active_lock:
+                    active_hooks -= 1
+
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [SyncHook()]  # type: ignore[list-item]
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    first_request = httpx.Request("GET", "http://localhost/first")
+    second_request = httpx.Request("GET", "http://localhost/second")
+
+    first_task = asyncio.create_task(hooks.before_request_async(hook_ctx, first_request))
+    await asyncio.to_thread(first_hook_started.wait, 1)
+    second_task = asyncio.create_task(hooks.before_request_async(hook_ctx, second_request))
+    await asyncio.sleep(0.01)
+    release_first_hook.set()
+
+    returned_first, returned_second = await asyncio.gather(first_task, second_task)
+
+    assert returned_first is first_request
+    assert returned_second is second_request
+    assert first_request.headers["X-Sync-Before-Hook"] == "called"
+    assert second_request.headers["X-Sync-Before-Hook"] == "called"
+    assert max_active_hooks == 1
+
+
+@pytest.mark.asyncio
+async def test_unit_do_request_async_cancellation_during_before_request_cleans_up_later():
+    setup_started = threading.Event()
+    release_setup = threading.Event()
+    cleanup_called = asyncio.Event()
+    cancellation_is_asyncio_cancelled_error = []
+    operation_id = "cancelled-during-setup"
+
+    class SlowBeforeRequestHook:
+        def before_request(self, hook_ctx, request):
+            del hook_ctx, request
+            setup_started.set()
+            release_setup.wait(timeout=1)
+            return httpx.Request(
+                "GET",
+                "http://localhost:8888/general/docs",
+                headers={"operation_id": operation_id},
+                extensions={"split_pdf_operation_id": operation_id},
+            )
+
+    class CancellationObserverHook:
+        async def after_error_async(self, hook_ctx, response, error):
+            del hook_ctx, response
+            cancellation_is_asyncio_cancelled_error.append(
+                isinstance(error, asyncio.CancelledError)
+            )
+            cleanup_called.set()
+            return None, error
+
+        def after_error(self, hook_ctx, response, error):  # pragma: no cover - dispatch guard
+            raise AssertionError("async hook should be awaited")
+
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [SlowBeforeRequestHook()]  # type: ignore[list-item]
+    hooks.after_error_hooks = [CancellationObserverHook()]  # type: ignore[list-item]
+
+    client = _BlockingAsyncClient()
+    config = SDKConfiguration(
+        client=None,
+        client_supplied=False,
+        async_client=client,  # type: ignore[arg-type]
+        async_client_supplied=True,
+        debug_logger=logging.getLogger("test"),
+    )
+    config.__dict__["_hooks"] = hooks
+    sdk = BaseSDK(config)
+    task = asyncio.create_task(
+        sdk.do_request_async(
+            _make_sdk_hook_context(),
+            httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+            error_status_codes=[],
+        )
+    )
+
+    await asyncio.to_thread(setup_started.wait, 1)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await asyncio.wait_for(task, timeout=0.05)
+
+    assert not cleanup_called.is_set()
+
+    release_setup.set()
+    await asyncio.wait_for(cleanup_called.wait(), timeout=1)
+
+    assert cancellation_is_asyncio_cancelled_error == [True]
+
+
 def test_unit_before_request_uses_hook_ctx_timeout_when_request_timeout_missing():
     hook, _, result = _make_hook_with_split_request(
         timeout_extension=None,
