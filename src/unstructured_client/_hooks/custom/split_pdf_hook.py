@@ -725,6 +725,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self._clear_operation(operation_id)
             raise
 
+    async def before_request_async(
+            self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        # PDFium is not thread-safe, so split setup must not be pushed into the
+        # default executor. Keep this path synchronous; only response reassembly
+        # is offloaded from the event loop.
+        return self.before_request(hook_ctx, request)
+
     async def call_api_partial(
             self,
             pdf_chunk_request: httpx.Request,
@@ -892,19 +900,19 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             The list of temporary file paths.
         """
 
+        # Create temporary directory
+        tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
+            dir=cache_tmp_data_dir,
+            prefix="unstructured_client_"
+        )
+        self.tempdirs[operation_id] = tempdir
+        tempdir_path = Path(tempdir.name)
+
+        pdf_chunk_paths: list[Tuple[Path, int]] = []
         with pdfium.PdfDocument(pdf_bytes) as pdf:
             offset = page_start - 1
             offset_end = page_end if page_end else len(pdf)
 
-            # Create temporary directory
-            tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
-                dir=cache_tmp_data_dir,
-                prefix="unstructured_client_"
-            )
-            self.tempdirs[operation_id] = tempdir
-            tempdir_path = Path(tempdir.name)
-
-            pdf_chunk_paths: list[Tuple[Path, int]] = []
             chunk_no = 0
 
             while offset < offset_end:
@@ -924,7 +932,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 pdf_chunk_paths.append((chunk_path, offset))
                 offset += split_size
 
-            return pdf_chunk_paths
+        return pdf_chunk_paths
 
     def _get_pdf_chunk_files(
         self, pdf_chunks: list[Tuple[Path, int]]
@@ -1099,7 +1107,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
             raise
 
-        return self._elements_from_task_responses(
+        return await asyncio.to_thread(
+            self._elements_from_task_responses,
             operation_id,
             task_responses,
             started_at=started_at,
@@ -1272,7 +1281,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         try:
             elements = await self._await_elements_async(operation_id)
-            return self._build_after_success_response(operation_id, response, elements)
+            return await asyncio.to_thread(
+                self._build_after_success_response,
+                operation_id,
+                response,
+                elements,
+            )
         finally:
             if operation_id is not None:
                 self._clear_operation(operation_id)
