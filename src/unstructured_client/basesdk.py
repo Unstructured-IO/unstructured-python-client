@@ -313,11 +313,15 @@ class BaseSDK:
         ) -> None:
             if req is None and response is None:
                 return
+            cleanup_request = req
+            if cleanup_request is None and response is not None:
+                cleanup_request = response.request
+            assert cleanup_request is not None
             try:
                 await hooks.after_error_async(
                     AfterErrorContext(hook_ctx),
                     response,
-                    _RequestBoundCancelledError(req or response.request, cancellation),
+                    _RequestBoundCancelledError(cleanup_request, cancellation),
                 )
             except Exception:
                 logger.debug("Cancellation cleanup failed", exc_info=True)
