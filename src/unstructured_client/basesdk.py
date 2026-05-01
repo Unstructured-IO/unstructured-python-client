@@ -323,6 +323,8 @@ class BaseSDK:
                     response,
                     _RequestBoundCancelledError(cleanup_request, cancellation),
                 )
+            except asyncio.CancelledError:
+                logger.debug("Cancellation cleanup cancelled", exc_info=True)
             except Exception:
                 logger.debug("Cancellation cleanup failed", exc_info=True)
 

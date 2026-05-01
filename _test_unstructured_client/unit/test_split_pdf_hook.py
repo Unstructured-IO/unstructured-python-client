@@ -749,6 +749,62 @@ async def test_unit_do_request_async_cancellation_after_before_request_cleans_sp
     tempdir.cleanup.assert_called_once()
 
 
+@pytest.mark.asyncio
+async def test_unit_do_request_async_cancellation_logs_cancelled_cleanup(
+    caplog: pytest.LogCaptureFixture,
+):
+    caplog.set_level(logging.DEBUG, logger="test")
+    operation_id = "cancelled-cleanup"
+
+    class PreparedRequestHook:
+        def before_request(self, hook_ctx, request):
+            del hook_ctx, request
+            return httpx.Request(
+                "GET",
+                "http://localhost:8888/general/docs",
+                headers={"operation_id": operation_id},
+                extensions={"split_pdf_operation_id": operation_id},
+            )
+
+    class CancelledCleanupHook:
+        async def after_error_async(self, hook_ctx, response, error):
+            del hook_ctx, response, error
+            raise asyncio.CancelledError()
+
+        def after_error(self, hook_ctx, response, error):  # pragma: no cover - dispatch guard
+            raise AssertionError("async hook should be awaited")
+
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [PreparedRequestHook()]  # type: ignore[list-item]
+    hooks.after_error_hooks = [CancelledCleanupHook()]  # type: ignore[list-item]
+
+    client = _BlockingAsyncClient()
+    config = SDKConfiguration(
+        client=None,
+        client_supplied=False,
+        async_client=client,  # type: ignore[arg-type]
+        async_client_supplied=True,
+        debug_logger=logging.getLogger("test"),
+    )
+    config.__dict__["_hooks"] = hooks
+    sdk = BaseSDK(config)
+    task = asyncio.create_task(
+        sdk.do_request_async(
+            _make_sdk_hook_context(),
+            httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+            error_status_codes=[],
+        )
+    )
+
+    await client.started.wait()
+    task.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert "Cancellation cleanup cancelled" in caplog.text
+
+
 def test_before_request_returns_dummy_with_timeout_and_operation_id():
     hook, mock_hook_ctx, result = _make_hook_with_split_request()
     operation_id = result.headers["operation_id"]
