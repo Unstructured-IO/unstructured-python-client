@@ -834,6 +834,34 @@ async def test_unit_run_tasks_allow_failed_cancelled_error_propagates():
 
 
 @pytest.mark.asyncio
+async def test_unit_run_tasks_caller_cancelled_logs_pending_task_count(
+    caplog: pytest.LogCaptureFixture,
+):
+    caplog.set_level(logging.WARNING, logger="unstructured-client")
+
+    async def _wait_forever(
+        async_client: httpx.AsyncClient,
+        limiter: asyncio.Semaphore,
+    ) -> httpx.Response:
+        del async_client, limiter
+        await asyncio.Event().wait()
+        return _httpx_response("unreachable")
+
+    tasks = [partial(_wait_forever), partial(_wait_forever), partial(_wait_forever)]
+    run_task = asyncio.create_task(
+        run_tasks(tasks, allow_failed=False, operation_id="caller-cancelled")
+    )
+    await asyncio.sleep(0)
+
+    run_task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await run_task
+
+    assert "event=batch_cancel_remaining operation_id=caller-cancelled" in caplog.text
+    assert "remaining_tasks=3" in caplog.text
+
+
+@pytest.mark.asyncio
 async def test_unit_run_tasks_disallow_failed_transport_exception_cancels_remaining():
     cancelled_counter = Counter()
 

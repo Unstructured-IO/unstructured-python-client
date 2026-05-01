@@ -167,11 +167,12 @@ async def run_tasks(
         except asyncio.CancelledError:
             for task in tasks:
                 task.cancel()
+            remaining_tasks = sum(1 for task in tasks if not task.done())
             await asyncio.gather(*tasks, return_exceptions=True)
             logger.warning(
                 "split_pdf event=batch_cancel_remaining operation_id=%s reason=caller_cancelled remaining_tasks=%d",
                 operation_id,
-                sum(1 for task in tasks if not task.done()),
+                remaining_tasks,
             )
             raise
 
