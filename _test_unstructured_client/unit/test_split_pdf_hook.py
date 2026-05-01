@@ -69,6 +69,25 @@ def test_unit_clear_operation():
     assert hook.operation_timeouts.get(operation_id) is None
 
 
+def test_unit_clear_operation_closes_unconsumed_chunk_files(tmp_path: Path):
+    hook = SplitPdfHook()
+    operation_id = "cache-mode-clear"
+    chunk_path = tmp_path / "chunk.pdf"
+    chunk_path.write_bytes(b"%PDF")
+    chunk_file = open(chunk_path, mode="rb")  # pylint: disable=consider-using-with
+    tempdir = MagicMock()
+
+    hook.coroutines_to_execute[operation_id] = [
+        partial(hook.call_api_partial, pdf_chunk_file=chunk_file),
+    ]
+    hook.tempdirs[operation_id] = tempdir
+
+    hook._clear_operation(operation_id)
+
+    assert chunk_file.closed
+    tempdir.cleanup.assert_called_once()
+
+
 def test_unit_get_request_timeout_seconds_uses_request_timeout_extension():
     request = httpx.Request(
         "POST",
@@ -878,15 +897,17 @@ async def test_unit_run_tasks_allow_failed_transport_exception():
 
 
 @pytest.mark.asyncio
-async def test_unit_run_tasks_allow_failed_cancelled_error_propagates():
+async def test_unit_run_tasks_allow_failed_cancelled_error_becomes_failed_response():
     tasks = [
         partial(_slow_success_request, content="1"),
         partial(_cancelled_request),
         partial(_slow_success_request, content="3"),
     ]
 
-    with pytest.raises(asyncio.CancelledError):
-        await run_tasks(tasks, allow_failed=True)
+    responses = await run_tasks(tasks, allow_failed=True)
+
+    assert [response.status_code for _, response in responses] == [200, 500, 200]
+    assert isinstance(responses[1][1].extensions["transport_exception"], asyncio.CancelledError)
 
 
 @pytest.mark.asyncio
@@ -1123,10 +1144,9 @@ async def test_unit_sdk_hooks_before_request_async_runs_sync_hooks_off_loop():
 
 
 @pytest.mark.asyncio
-async def test_unit_sdk_hooks_before_request_async_allows_sync_hooks_to_overlap():
+async def test_unit_sdk_hooks_before_request_async_serializes_same_sync_hook_instance():
     release_hooks = threading.Event()
     first_hook_started = threading.Event()
-    both_hooks_started = threading.Event()
     active_lock = threading.Lock()
     active_hooks = 0
     max_active_hooks = 0
@@ -1140,8 +1160,6 @@ async def test_unit_sdk_hooks_before_request_async_allows_sync_hooks_to_overlap(
                 max_active_hooks = max(max_active_hooks, active_hooks)
                 if active_hooks == 1:
                     first_hook_started.set()
-                if active_hooks == 2:
-                    both_hooks_started.set()
             try:
                 release_hooks.wait(timeout=1)
                 request.headers["X-Sync-Before-Hook"] = "called"
@@ -1159,7 +1177,8 @@ async def test_unit_sdk_hooks_before_request_async_allows_sync_hooks_to_overlap(
     first_task = asyncio.create_task(hooks.before_request_async(hook_ctx, first_request))
     await asyncio.to_thread(first_hook_started.wait, 1)
     second_task = asyncio.create_task(hooks.before_request_async(hook_ctx, second_request))
-    assert await asyncio.to_thread(both_hooks_started.wait, 1)
+    await asyncio.sleep(0.01)
+    assert max_active_hooks == 1
     release_hooks.set()
 
     returned_first, returned_second = await asyncio.gather(first_task, second_task)
@@ -1168,7 +1187,7 @@ async def test_unit_sdk_hooks_before_request_async_allows_sync_hooks_to_overlap(
     assert returned_second is second_request
     assert first_request.headers["X-Sync-Before-Hook"] == "called"
     assert second_request.headers["X-Sync-Before-Hook"] == "called"
-    assert max_active_hooks == 2
+    assert max_active_hooks == 1
 
 
 @pytest.mark.asyncio
@@ -1280,40 +1299,94 @@ def test_unit_pdfium_new_document_closes_when_cached_split_fails(tmp_path: Path)
 
 
 @pytest.mark.asyncio
-async def test_unit_do_request_async_cancellation_during_before_request_cleans_up_later():
+async def test_unit_split_pdf_before_request_async_cancellation_cleans_prepared_state():
     setup_started = threading.Event()
     release_setup = threading.Event()
-    cleanup_called = asyncio.Event()
-    cancellation_is_asyncio_cancelled_error = []
     operation_id = "cancelled-during-setup"
+    tempdir = MagicMock()
+    hook = SplitPdfHook()
+
+    def slow_setup(hook_ctx, request):
+        del hook_ctx, request
+        setup_started.set()
+        release_setup.wait(timeout=1)
+        hook.coroutines_to_execute[operation_id] = []
+        hook.pending_operation_ids[operation_id] = operation_id
+        hook.tempdirs[operation_id] = tempdir
+        return httpx.Request(
+            "GET",
+            "http://localhost:8888/general/docs",
+            headers={"operation_id": operation_id},
+            extensions={"split_pdf_operation_id": operation_id},
+        )
+
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    hook_ctx.operation_id = "partition"
+    request = httpx.Request("POST", "http://localhost:8888/general/v0/general")
+
+    with patch.object(hook, "_before_request_unlocked", side_effect=slow_setup):
+        task = asyncio.create_task(hook.before_request_async(hook_ctx, request))
+        await asyncio.to_thread(setup_started.wait, 1)
+        task.cancel()
+        release_setup.set()
+
+        with pytest.raises(asyncio.CancelledError):
+            await asyncio.wait_for(task, timeout=1)
+
+    assert operation_id not in hook.coroutines_to_execute
+    assert operation_id not in hook.pending_operation_ids
+    assert operation_id not in hook.tempdirs
+    tempdir.cleanup.assert_called_once()
+
+    with patch.object(hook, "_before_request_unlocked", return_value=request):
+        assert await asyncio.wait_for(hook.before_request_async(hook_ctx, request), timeout=1) is request
+
+
+@pytest.mark.asyncio
+async def test_unit_split_pdf_before_request_async_cancellation_before_admission_does_not_queue():
+    setup_started = threading.Event()
+    release_setup = threading.Event()
+    hook = SplitPdfHook()
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    hook_ctx.operation_id = "partition"
+    request = httpx.Request("POST", "http://localhost:8888/general/v0/general")
+
+    def slow_setup(hook_ctx_arg, request_arg):
+        del hook_ctx_arg
+        setup_started.set()
+        release_setup.wait(timeout=1)
+        return request_arg
+
+    with patch.object(hook, "_before_request_unlocked", side_effect=slow_setup) as mock_setup:
+        first_task = asyncio.create_task(hook.before_request_async(hook_ctx, request))
+        await asyncio.to_thread(setup_started.wait, 1)
+        second_task = asyncio.create_task(hook.before_request_async(hook_ctx, request))
+        await asyncio.sleep(0)
+
+        second_task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await second_task
+
+        release_setup.set()
+        assert await asyncio.wait_for(first_task, timeout=1) is request
+
+    assert mock_setup.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_unit_do_request_async_cancellation_during_before_request_cancels_setup():
+    setup_started = threading.Event()
+    release_setup = threading.Event()
 
     class SlowBeforeRequestHook:
         def before_request(self, hook_ctx, request):
             del hook_ctx, request
             setup_started.set()
             release_setup.wait(timeout=1)
-            return httpx.Request(
-                "GET",
-                "http://localhost:8888/general/docs",
-                headers={"operation_id": operation_id},
-                extensions={"split_pdf_operation_id": operation_id},
-            )
-
-    class CancellationObserverHook:
-        async def after_error_async(self, hook_ctx, response, error):
-            del hook_ctx, response
-            cancellation_is_asyncio_cancelled_error.append(
-                isinstance(error, asyncio.CancelledError)
-            )
-            cleanup_called.set()
-            return None, error
-
-        def after_error(self, hook_ctx, response, error):  # pragma: no cover - dispatch guard
-            raise AssertionError("async hook should be awaited")
+            return httpx.Request("GET", "http://localhost:8888/general/docs")
 
     hooks = SDKHooks()
     hooks.before_request_hooks = [SlowBeforeRequestHook()]  # type: ignore[list-item]
-    hooks.after_error_hooks = [CancellationObserverHook()]  # type: ignore[list-item]
 
     client = _BlockingAsyncClient()
     config = SDKConfiguration(
@@ -1335,15 +1408,11 @@ async def test_unit_do_request_async_cancellation_during_before_request_cleans_u
 
     await asyncio.to_thread(setup_started.wait, 1)
     task.cancel()
+
     with pytest.raises(asyncio.CancelledError):
         await asyncio.wait_for(task, timeout=0.05)
 
-    assert not cleanup_called.is_set()
-
     release_setup.set()
-    await asyncio.wait_for(cleanup_called.wait(), timeout=1)
-
-    assert cancellation_is_asyncio_cancelled_error == [True]
 
 
 def test_unit_before_request_uses_hook_ctx_timeout_when_request_timeout_missing():

@@ -203,7 +203,15 @@ async def _collect_task_responses(
                     )
                 )
             elif isinstance(result, asyncio.CancelledError):
-                raise result
+                logger.error(
+                    "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
+                    operation_id,
+                    index,
+                    type(result).__name__,
+                    result,
+                    exc_info=result,
+                )
+                normalized_responses.append((index, _create_transport_error_response(result)))
             elif isinstance(result, BaseException):
                 logger.error(
                     "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
@@ -344,11 +352,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         max_workers=1,
         thread_name_prefix="split-pdf-setup",
     )
+    _split_pdf_setup_gate = threading.BoundedSemaphore(value=1)
+    _split_pdf_setup_poll_interval_seconds = 0.01
     _split_pdf_setup_state = threading.local()
 
     def __init__(self) -> None:
         self.client: Optional[HttpClient] = None
-        self.partition_base_url: Optional[str] = None
         self.async_client: Optional[AsyncHttpClient] = None
         self.coroutines_to_execute: dict[
             str, list[partial[Coroutine[Any, Any, httpx.Response]]]
@@ -501,11 +510,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         #         # Otherwise, pass the request to the default transport
         #         return await self.base_transport.handle_async_request(request)
 
-        # Instead, save the base url so we can use it for our dummy request
-        # As this can be overwritten with Platform API URL, we need to get it again in
-        # `before_request` hook from the request object as the real URL is not available here.
-        self.partition_base_url = base_url
-
         # Explicit cast to httpx.Client to avoid a typing error
         httpx_client = cast(httpx.Client, client)
         # async_httpx_client = cast(httpx.AsyncClient, async_client)
@@ -524,19 +528,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self, hook_ctx: BeforeRequestContext, request: httpx.Request
     ) -> Union[httpx.Request, Exception]:
         """If `splitPdfPage` is set to `true` in the request, the PDF file is split into
-        separate pages. Each page is sent as a separate request in parallel. The last
-        page request is returned by this method. It will return the original request
-        when: `splitPdfPage` is set to `false`, the file is not a PDF, or the HTTP
+        chunks and the chunk requests are prepared for later execution. The split
+        path returns a synthetic request carrying the split operation ID so
+        after_success can collect chunk results. It returns the original request
+        when `splitPdfPage` is `false`, the file is not a PDF, or the HTTP client
         has not been initialized.
 
         Args:
             hook_ctx (BeforeRequestContext): The hook context containing information about
             the operation.
-            request (httpx.PreparedRequest): The request object.
+            request (httpx.Request): The request object.
 
         Returns:
-            Union[httpx.PreparedRequest, Exception]: If `splitPdfPage` is set to `true`,
-            the last page request; otherwise, the original request.
+            Union[httpx.Request, Exception]: If `splitPdfPage` is set to `true`,
+            the synthetic collection request; otherwise, the original request.
         """
 
         # Actually the general.partition operation overwrites the default client's base url (as
@@ -750,14 +755,56 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     async def before_request_async(
             self, hook_ctx: BeforeRequestContext, request: httpx.Request
     ) -> Union[httpx.Request, Exception]:
-        # Keep pypdfium setup off the event loop while routing all async callers through one worker.
+        # Keep pypdfium setup off the event loop while preserving a single process-wide
+        # admission lane. pypdfium is not thread-safe, so cancelled callers must not
+        # leave queued setup work piling up behind the worker.
+        await self._acquire_split_pdf_setup_slot()
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
+        setup_future = loop.run_in_executor(
             self._split_pdf_setup_executor,
             self.before_request,
             hook_ctx,
             request,
         )
+        try:
+            return await asyncio.shield(setup_future)
+        except asyncio.CancelledError:
+            result = await self._finish_cancelled_split_setup(setup_future)
+            if isinstance(result, httpx.Request):
+                self._clear_prepared_split_request(result)
+            raise
+        finally:
+            self._split_pdf_setup_gate.release()
+
+    @classmethod
+    async def _acquire_split_pdf_setup_slot(cls) -> None:
+        while not cls._split_pdf_setup_gate.acquire(blocking=False):
+            await asyncio.sleep(cls._split_pdf_setup_poll_interval_seconds)
+
+    async def _finish_cancelled_split_setup(
+        self,
+        setup_future: asyncio.Future[Union[httpx.Request, Exception]],
+    ) -> Optional[Union[httpx.Request, Exception]]:
+        while True:
+            try:
+                return await asyncio.shield(setup_future)
+            except asyncio.CancelledError:
+                if setup_future.cancelled():
+                    return None
+                continue
+            except Exception:
+                logger.debug("Cancelled split-PDF setup failed before cleanup", exc_info=True)
+                return None
+
+    def _clear_prepared_split_request(self, request: httpx.Request) -> None:
+        operation_id = self._get_operation_id_from_request(request)
+        if operation_id is None:
+            return
+        logger.warning(
+            "split_pdf event=before_request_cancel_cleanup operation_id=%s",
+            operation_id,
+        )
+        self._clear_operation(operation_id)
 
     async def call_api_partial(
             self,
@@ -876,8 +923,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_end: Optional[int] = None
     ) -> list[Tuple[BinaryIO, int]]:
         """Reads given bytes of a pdf file and split it into n pdf-chunks, each
-        with `split_size` pages. The chunks are written into temporary files in
-        a temporary directory corresponding to the operation_id.
+        with `split_size` pages. The chunks are returned as in-memory buffers.
 
         Args:
             file_content: Content of the PDF file.
@@ -888,7 +934,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_end: If provided, split up to and including this page number
 
         Returns:
-            The list of temporary file paths.
+            The list of chunk buffers and their zero-based page offsets.
         """
         self._assert_split_pdf_setup_locked()
 
@@ -1368,7 +1414,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             operation_id (str): The ID of the operation to clear.
         """
-        self.coroutines_to_execute.pop(operation_id, None)
+        tasks = self.coroutines_to_execute.pop(operation_id, None)
+        closed_chunk_files = self._close_unconsumed_chunk_files(tasks)
         self.api_successful_responses.pop(operation_id, None)
         self.api_failed_responses.pop(operation_id, None)
         self.concurrency_level.pop(operation_id, None)
@@ -1383,12 +1430,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         executor = self.executors.pop(operation_id, None)
         tempdir = self.tempdirs.pop(operation_id, None)
         logger.debug(
-            "split_pdf event=clear_operation operation_id=%s has_future=%s future_done=%s has_executor=%s has_tempdir=%s",
+            "split_pdf event=clear_operation operation_id=%s has_future=%s future_done=%s has_executor=%s has_tempdir=%s closed_chunk_files=%d",
             operation_id,
             future is not None,
             future.done() if future is not None else None,
             executor is not None,
             tempdir is not None,
+            closed_chunk_files,
         )
         if future is not None and not future.done():
             loop = loop_holder.get("loop") if loop_holder is not None else None
@@ -1411,3 +1459,28 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
             return
         self._finalize_operation_resources(executor, tempdir, operation_id)
+
+    @staticmethod
+    def _close_unconsumed_chunk_files(
+        tasks: Optional[list[partial[Coroutine[Any, Any, httpx.Response]]]],
+    ) -> int:
+        if tasks is None:
+            return 0
+
+        closed_count = 0
+        seen_files: set[int] = set()
+        for task in tasks:
+            keywords = getattr(task, "keywords", None) or {}
+            pdf_chunk_file = keywords.get("pdf_chunk_file")
+            if pdf_chunk_file is None or id(pdf_chunk_file) in seen_files:
+                continue
+            seen_files.add(id(pdf_chunk_file))
+            close = getattr(pdf_chunk_file, "close", None)
+            if close is None or getattr(pdf_chunk_file, "closed", False) is True:
+                continue
+            try:
+                close()
+                closed_count += 1
+            except Exception:
+                logger.debug("Failed to close split-PDF chunk file during cleanup", exc_info=True)
+        return closed_count

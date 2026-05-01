@@ -2,6 +2,7 @@
 
 import asyncio
 import inspect
+import threading
 from typing import Any, Awaitable, Callable, List, Optional, Tuple
 
 import httpx
@@ -37,7 +38,28 @@ class SDKHooks(Hooks):
         self.before_request_hooks: List[BeforeRequestHook] = []
         self.after_success_hooks: List[AfterSuccessHook] = []
         self.after_error_hooks: List[AfterErrorHook] = []
+        self._sync_hook_locks_guard = threading.Lock()
+        self._sync_hook_locks: dict[int, threading.Lock] = {}
         init_hooks(self)
+
+    def _get_sync_hook_lock(self, hook: object) -> threading.Lock:
+        hook_id = id(hook)
+        with self._sync_hook_locks_guard:
+            lock = self._sync_hook_locks.get(hook_id)
+            if lock is None:
+                lock = threading.Lock()
+                self._sync_hook_locks[hook_id] = lock
+            return lock
+
+    def _run_sync_hook_method(
+        self,
+        hook: object,
+        method_name: str,
+        *args: object,
+    ) -> Any:
+        method = getattr(hook, method_name)
+        with self._get_sync_hook_lock(hook):
+            return method(*args)
 
     def register_sdk_init_hook(self, hook: SDKInitHook) -> None:
         self.sdk_init_hooks.append(hook)
@@ -75,7 +97,13 @@ class SDKHooks(Hooks):
             if async_method is not None:
                 out = await async_method(hook_ctx, request)
             else:
-                out = await asyncio.to_thread(hook.before_request, hook_ctx, request)
+                out = await asyncio.to_thread(
+                    self._run_sync_hook_method,
+                    hook,
+                    "before_request",
+                    hook_ctx,
+                    request,
+                )
             if isinstance(out, Exception):
                 raise out
             request = out
@@ -100,7 +128,13 @@ class SDKHooks(Hooks):
             if async_method is not None:
                 out = await async_method(hook_ctx, response)
             else:
-                out = await asyncio.to_thread(hook.after_success, hook_ctx, response)
+                out = await asyncio.to_thread(
+                    self._run_sync_hook_method,
+                    hook,
+                    "after_success",
+                    hook_ctx,
+                    response,
+                )
             if isinstance(out, Exception):
                 raise out
             response = out
@@ -130,7 +164,14 @@ class SDKHooks(Hooks):
             if async_method is not None:
                 result = await async_method(hook_ctx, response, error)
             else:
-                result = await asyncio.to_thread(hook.after_error, hook_ctx, response, error)
+                result = await asyncio.to_thread(
+                    self._run_sync_hook_method,
+                    hook,
+                    "after_error",
+                    hook_ctx,
+                    response,
+                    error,
+                )
             if isinstance(result, Exception):
                 raise result
             response, error = result
