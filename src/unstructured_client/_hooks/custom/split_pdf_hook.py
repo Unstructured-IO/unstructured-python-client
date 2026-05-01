@@ -10,7 +10,7 @@ import os
 import tempfile
 import threading
 import uuid
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Iterable
 from concurrent import futures
 from functools import partial
 from pathlib import Path
@@ -652,6 +652,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             pdf_bytes = pdf.stream.read()
 
             temp_dir_path = None
+            pdf_chunks: Iterable[Tuple[BinaryIO, int]]
             if cache_tmp_data_feature:
                 pdf_chunk_paths = self._get_pdf_chunk_paths(
                     pdf_bytes,
