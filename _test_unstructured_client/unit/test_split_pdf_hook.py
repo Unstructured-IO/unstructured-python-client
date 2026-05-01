@@ -1039,9 +1039,10 @@ async def test_unit_sdk_hooks_before_request_async_runs_sync_hooks_off_loop():
 
 
 @pytest.mark.asyncio
-async def test_unit_sdk_hooks_before_request_async_serializes_sync_hooks():
-    release_first_hook = threading.Event()
+async def test_unit_sdk_hooks_before_request_async_allows_sync_hooks_to_overlap():
+    release_hooks = threading.Event()
     first_hook_started = threading.Event()
+    both_hooks_started = threading.Event()
     active_lock = threading.Lock()
     active_hooks = 0
     max_active_hooks = 0
@@ -1055,8 +1056,10 @@ async def test_unit_sdk_hooks_before_request_async_serializes_sync_hooks():
                 max_active_hooks = max(max_active_hooks, active_hooks)
                 if active_hooks == 1:
                     first_hook_started.set()
+                if active_hooks == 2:
+                    both_hooks_started.set()
             try:
-                release_first_hook.wait(timeout=1)
+                release_hooks.wait(timeout=1)
                 request.headers["X-Sync-Before-Hook"] = "called"
                 return request
             finally:
@@ -1072,8 +1075,8 @@ async def test_unit_sdk_hooks_before_request_async_serializes_sync_hooks():
     first_task = asyncio.create_task(hooks.before_request_async(hook_ctx, first_request))
     await asyncio.to_thread(first_hook_started.wait, 1)
     second_task = asyncio.create_task(hooks.before_request_async(hook_ctx, second_request))
-    await asyncio.sleep(0.01)
-    release_first_hook.set()
+    assert await asyncio.to_thread(both_hooks_started.wait, 1)
+    release_hooks.set()
 
     returned_first, returned_second = await asyncio.gather(first_task, second_task)
 
@@ -1081,7 +1084,115 @@ async def test_unit_sdk_hooks_before_request_async_serializes_sync_hooks():
     assert returned_second is second_request
     assert first_request.headers["X-Sync-Before-Hook"] == "called"
     assert second_request.headers["X-Sync-Before-Hook"] == "called"
-    assert max_active_hooks == 1
+    assert max_active_hooks == 2
+
+
+@pytest.mark.asyncio
+async def test_unit_split_pdf_before_request_async_serializes_setup():
+    release_first_setup = threading.Event()
+    first_setup_started = threading.Event()
+    active_lock = threading.Lock()
+    active_setups = 0
+    max_active_setups = 0
+    hook = SplitPdfHook()
+
+    def slow_setup(hook_ctx, request):
+        nonlocal active_setups, max_active_setups
+        del hook_ctx
+        with active_lock:
+            active_setups += 1
+            max_active_setups = max(max_active_setups, active_setups)
+            if active_setups == 1:
+                first_setup_started.set()
+        try:
+            release_first_setup.wait(timeout=1)
+            return request
+        finally:
+            with active_lock:
+                active_setups -= 1
+
+    hook_ctx = MagicMock(spec=BeforeRequestContext)
+    first_request = httpx.Request("GET", "http://localhost/first")
+    second_request = httpx.Request("GET", "http://localhost/second")
+
+    with patch.object(hook, "_before_request_unlocked", side_effect=slow_setup):
+        first_task = asyncio.create_task(hook.before_request_async(hook_ctx, first_request))
+        await asyncio.to_thread(first_setup_started.wait, 1)
+        second_task = asyncio.create_task(hook.before_request_async(hook_ctx, second_request))
+        await asyncio.sleep(0.01)
+        release_first_setup.set()
+
+        returned_first, returned_second = await asyncio.gather(first_task, second_task)
+
+    assert returned_first is first_request
+    assert returned_second is second_request
+    assert max_active_setups == 1
+
+
+def test_unit_pdfium_helpers_require_split_setup_lock(tmp_path: Path):
+    hook = SplitPdfHook()
+
+    with pytest.raises(RuntimeError, match="pypdfium split setup must run"):
+        hook._get_pdf_chunks_in_memory(b"%PDF", split_size=1)
+
+    with pytest.raises(RuntimeError, match="pypdfium split setup must run"):
+        hook._get_pdf_chunk_paths(
+            b"%PDF",
+            operation_id="operation-id",
+            cache_tmp_data_dir=str(tmp_path),
+            split_size=1,
+        )
+
+
+def test_unit_pdfium_new_document_closes_when_in_memory_split_fails():
+    hook = SplitPdfHook()
+    new_pdf = MagicMock()
+    new_pdf.import_pages.side_effect = RuntimeError("import failed")
+    pdf_document = MagicMock()
+    pdf_document.__enter__.return_value = [MagicMock()]
+    pdf_document.__exit__.return_value = None
+    pdf_document_factory = MagicMock(return_value=pdf_document)
+    pdf_document_factory.new.return_value = new_pdf
+
+    hook._split_pdf_setup_state.locked = True
+    try:
+        with patch(
+            "unstructured_client._hooks.custom.split_pdf_hook.pdfium.PdfDocument",
+            pdf_document_factory,
+        ), pytest.raises(RuntimeError, match="import failed"):
+            hook._get_pdf_chunks_in_memory(b"%PDF", split_size=1)
+    finally:
+        hook._split_pdf_setup_state.locked = False
+
+    new_pdf.close.assert_called_once_with()
+
+
+def test_unit_pdfium_new_document_closes_when_cached_split_fails(tmp_path: Path):
+    hook = SplitPdfHook()
+    new_pdf = MagicMock()
+    new_pdf.save.side_effect = RuntimeError("save failed")
+    pdf_document = MagicMock()
+    pdf_document.__enter__.return_value = [MagicMock()]
+    pdf_document.__exit__.return_value = None
+    pdf_document_factory = MagicMock(return_value=pdf_document)
+    pdf_document_factory.new.return_value = new_pdf
+
+    hook._split_pdf_setup_state.locked = True
+    try:
+        with patch(
+            "unstructured_client._hooks.custom.split_pdf_hook.pdfium.PdfDocument",
+            pdf_document_factory,
+        ), pytest.raises(RuntimeError, match="save failed"):
+            hook._get_pdf_chunk_paths(
+                b"%PDF",
+                operation_id="operation-id",
+                cache_tmp_data_dir=str(tmp_path),
+                split_size=1,
+            )
+    finally:
+        hook._split_pdf_setup_state.locked = False
+
+    new_pdf.close.assert_called_once_with()
 
 
 @pytest.mark.asyncio

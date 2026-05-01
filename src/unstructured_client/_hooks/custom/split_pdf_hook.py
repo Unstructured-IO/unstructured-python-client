@@ -8,6 +8,7 @@ import math
 import time
 import os
 import tempfile
+import threading
 import uuid
 from collections.abc import Awaitable
 from concurrent import futures
@@ -337,6 +338,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     1. Create an instance of the `SplitPdfHook` class.
     2. Register SDK Init, Before Request, After Success and After Error hooks.
     """
+    _split_pdf_setup_lock = threading.Lock()
+    _split_pdf_setup_executor = futures.ThreadPoolExecutor(
+        max_workers=1,
+        thread_name_prefix="split-pdf-setup",
+    )
+    _split_pdf_setup_state = threading.local()
 
     def __init__(self) -> None:
         self.client: Optional[HttpClient] = None
@@ -512,7 +519,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return base_url, self.client
 
     # pylint: disable=too-many-return-statements
-    def before_request(
+    def _before_request_unlocked(
             self, hook_ctx: BeforeRequestContext, request: httpx.Request
     ) -> Union[httpx.Request, Exception]:
         """If `splitPdfPage` is set to `true` in the request, the PDF file is split into
@@ -727,13 +734,28 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             self._clear_operation(operation_id)
             raise
 
+    def before_request(
+            self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        # pypdfium is process-global and not thread-safe; serialize split setup across clients.
+        with self._split_pdf_setup_lock:
+            self._split_pdf_setup_state.locked = True
+            try:
+                return self._before_request_unlocked(hook_ctx, request)
+            finally:
+                self._split_pdf_setup_state.locked = False
+
     async def before_request_async(
             self, hook_ctx: BeforeRequestContext, request: httpx.Request
     ) -> Union[httpx.Request, Exception]:
-        # PDFium is not thread-safe, so split setup must not be pushed into the
-        # default executor. Keep this path synchronous; only response reassembly
-        # is offloaded from the event loop.
-        return self.before_request(hook_ctx, request)
+        # Keep pypdfium setup off the event loop while routing all async callers through one worker.
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(
+            self._split_pdf_setup_executor,
+            self.before_request,
+            hook_ctx,
+            request,
+        )
 
     async def call_api_partial(
             self,
@@ -850,7 +872,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             split_size: int = 1,
             page_start: int = 1,
             page_end: Optional[int] = None
-    ) -> Generator[Tuple[BinaryIO, int], None, None]:
+    ) -> list[Tuple[BinaryIO, int]]:
         """Reads given bytes of a pdf file and split it into n pdf-chunks, each
         with `split_size` pages. The chunks are written into temporary files in
         a temporary directory corresponding to the operation_id.
@@ -866,31 +888,31 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             The list of temporary file paths.
         """
+        self._assert_split_pdf_setup_locked()
 
+        pdf_chunks: list[Tuple[BinaryIO, int]] = []
         with pdfium.PdfDocument(pdf_bytes) as pdf:
-
             offset = page_start - 1
             offset_end = page_end if page_end else len(pdf)
 
             while offset < offset_end:
                 end = min(offset + split_size, offset_end)
 
-                # Create new PDF
                 new_pdf = pdfium.PdfDocument.new()
+                try:
+                    page_indices = list(range(offset, end))
+                    new_pdf.import_pages(pdf, pages=page_indices)
 
-                # Import pages
-                page_indices = list(range(offset, end))
-                new_pdf.import_pages(pdf, pages=page_indices)
+                    chunk_buffer = io.BytesIO()
+                    new_pdf.save(chunk_buffer)
+                    chunk_buffer.seek(0)
+                finally:
+                    new_pdf.close()
 
-                # Save to buffer
-                chunk_buffer = io.BytesIO()
-                new_pdf.save(chunk_buffer)
-                chunk_buffer.seek(0)
-
-                new_pdf.close()
-
-                yield chunk_buffer, offset
+                pdf_chunks.append((chunk_buffer, offset))
                 offset += split_size
+
+        return pdf_chunks
 
     def _get_pdf_chunk_paths(
         self,
@@ -916,6 +938,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             The list of temporary file paths.
         """
+        self._assert_split_pdf_setup_locked()
 
         # Create temporary directory
         tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
@@ -936,20 +959,24 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 chunk_no += 1
                 end = min(offset + split_size, offset_end)
 
-                # Create new PDF with selected pages
                 new_pdf = pdfium.PdfDocument.new()
-                page_indices = list(range(offset, end))
-                new_pdf.import_pages(pdf, pages=page_indices)
+                try:
+                    page_indices = list(range(offset, end))
+                    new_pdf.import_pages(pdf, pages=page_indices)
 
-                # Save to file
-                chunk_path = tempdir_path / f"chunk_{chunk_no}.pdf"
-                new_pdf.save(str(chunk_path))  # Convert Path to string
-                new_pdf.close()
+                    chunk_path = tempdir_path / f"chunk_{chunk_no}.pdf"
+                    new_pdf.save(str(chunk_path))  # Convert Path to string
+                finally:
+                    new_pdf.close()
 
                 pdf_chunk_paths.append((chunk_path, offset))
                 offset += split_size
 
         return pdf_chunk_paths
+
+    def _assert_split_pdf_setup_locked(self) -> None:
+        if not getattr(self._split_pdf_setup_state, "locked", False):
+            raise RuntimeError("pypdfium split setup must run under the split-PDF setup lock")
 
     def _get_pdf_chunk_files(
         self, pdf_chunks: list[Tuple[Path, int]]

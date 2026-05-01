@@ -37,7 +37,6 @@ class SDKHooks(Hooks):
         self.before_request_hooks: List[BeforeRequestHook] = []
         self.after_success_hooks: List[AfterSuccessHook] = []
         self.after_error_hooks: List[AfterErrorHook] = []
-        self._sync_hook_lock = asyncio.Lock()
         init_hooks(self)
 
     def register_sdk_init_hook(self, hook: SDKInitHook) -> None:
@@ -76,8 +75,7 @@ class SDKHooks(Hooks):
             if async_method is not None:
                 out = await async_method(hook_ctx, request)
             else:
-                async with self._sync_hook_lock:
-                    out = await asyncio.to_thread(hook.before_request, hook_ctx, request)
+                out = await asyncio.to_thread(hook.before_request, hook_ctx, request)
             if isinstance(out, Exception):
                 raise out
             request = out
