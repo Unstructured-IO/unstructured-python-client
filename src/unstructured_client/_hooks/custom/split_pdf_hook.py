@@ -8,8 +8,10 @@ import math
 import time
 import os
 import tempfile
+import threading
 import uuid
-from collections.abc import Awaitable
+from collections import deque
+from collections.abc import Awaitable, Iterable
 from concurrent import futures
 from functools import partial
 from pathlib import Path
@@ -71,6 +73,67 @@ class ChunkExecutionError(Exception):
         self.inner = inner
 
 
+class _AsyncThreadSafeBoundedSemaphore:
+    """A cancellable async gate that can be shared across event loops."""
+
+    def __init__(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError("Semaphore value must be greater than zero")
+        self._initial_value = value
+        self._value = value
+        self._waiters: deque[asyncio.Future[None]] = deque()
+        self._lock = threading.Lock()
+
+    async def acquire(self) -> None:
+        loop = asyncio.get_running_loop()
+        waiter: Optional[asyncio.Future[None]] = None
+        with self._lock:
+            if self._value > 0:
+                self._value -= 1
+                return
+            waiter = loop.create_future()
+            self._waiters.append(waiter)
+
+        try:
+            await waiter
+        except asyncio.CancelledError:
+            release_transferred_slot = False
+            with self._lock:
+                try:
+                    self._waiters.remove(waiter)
+                except ValueError:
+                    release_transferred_slot = waiter.done() and not waiter.cancelled()
+            if release_transferred_slot:
+                self.release()
+            raise
+
+    def release(self) -> None:
+        while True:
+            with self._lock:
+                while self._waiters:
+                    waiter = self._waiters.popleft()
+                    if not waiter.cancelled():
+                        break
+                else:
+                    if self._value >= self._initial_value:
+                        raise ValueError("Semaphore released too many times")
+                    self._value += 1
+                    return
+
+            def _wake_waiter() -> None:
+                if waiter.cancelled():
+                    self.release()
+                else:
+                    waiter.set_result(None)
+
+            try:
+                waiter.get_loop().call_soon_threadsafe(_wake_waiter)
+                return
+            except RuntimeError:
+                # The waiting loop closed before it could receive the slot.
+                continue
+
+
 def _get_request_timeout_seconds(request: httpx.Request) -> Optional[float]:
     timeout = request.extensions.get("timeout")
     if timeout is None:
@@ -107,6 +170,8 @@ def _run_coroutines_in_separate_thread(
 async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Response]:
     try:
         response = await coro
+    except asyncio.CancelledError:
+        raise
     except BaseException as exc:
         raise ChunkExecutionError(index, exc) from exc
     return index, response
@@ -151,84 +216,123 @@ async def run_tasks(
 
     async with httpx.AsyncClient(timeout=client_timeout) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
-        if allow_failed:
-            responses = await asyncio.gather(*armed_coroutines, return_exceptions=True)
-            normalized_responses: list[tuple[int, httpx.Response]] = []
-            for index, result in enumerate(responses, 1):
-                if isinstance(result, ChunkExecutionError):
-                    logger.error(
-                        "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
-                        operation_id,
-                        result.index,
-                        type(result.inner).__name__,
-                        result.inner,
-                        exc_info=result.inner,
-                    )
-                    normalized_responses.append(
-                        (
-                            result.index,
-                            _create_transport_error_response(result.inner),
-                        )
-                    )
-                elif isinstance(result, BaseException):
-                    logger.error(
-                        "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
-                        operation_id,
-                        index,
-                        type(result).__name__,
-                        result,
-                        exc_info=result,
-                    )
-                    normalized_responses.append((index, _create_transport_error_response(result)))
-                else:
-                    normalized_responses.append((index, cast(httpx.Response, result)))
-            return normalized_responses
-        # TODO: replace with asyncio.TaskGroup for python >3.11 # pylint: disable=fixme
-        tasks = [asyncio.create_task(_order_keeper(index, coro))
-                 for index, coro in enumerate(armed_coroutines, 1)]
-        results = []
-        remaining_tasks = dict(enumerate(tasks, 1))
-        for future in asyncio.as_completed(tasks):
-            try:
-                index, response = await future
-            except ChunkExecutionError as exc:
+        tasks = [
+            asyncio.create_task(_order_keeper(index, coro))
+            for index, coro in enumerate(armed_coroutines, 1)
+        ]
+        try:
+            return await _collect_task_responses(
+                tasks,
+                allow_failed=allow_failed,
+                operation_id=operation_id,
+            )
+        except asyncio.CancelledError:
+            for task in tasks:
+                task.cancel()
+            remaining_tasks = sum(1 for task in tasks if not task.done())
+            await asyncio.gather(*tasks, return_exceptions=True)
+            logger.warning(
+                "split_pdf event=batch_cancel_remaining operation_id=%s reason=caller_cancelled remaining_tasks=%d",
+                operation_id,
+                remaining_tasks,
+            )
+            raise
+
+
+async def _collect_task_responses(
+    tasks: list[asyncio.Task[Tuple[int, httpx.Response]]],
+    *,
+    allow_failed: bool,
+    operation_id: Optional[str],
+) -> list[tuple[int, httpx.Response]]:
+    if allow_failed:
+        responses = await asyncio.gather(*tasks, return_exceptions=True)
+        normalized_responses: list[tuple[int, httpx.Response]] = []
+        for index, result in enumerate(responses, 1):
+            if isinstance(result, ChunkExecutionError):
                 logger.error(
                     "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
                     operation_id,
-                    exc.index,
-                    type(exc.inner).__name__,
-                    exc.inner,
-                    exc_info=exc.inner,
+                    result.index,
+                    type(result.inner).__name__,
+                    result.inner,
+                    exc_info=result.inner,
                 )
-                for remaining_task in remaining_tasks.values():
-                    remaining_task.cancel()
-                logger.warning(
-                    "split_pdf event=batch_cancel_remaining operation_id=%s reason=transport_exception failed_chunk_index=%d remaining_tasks=%d",
-                    operation_id,
-                    exc.index,
-                    len(remaining_tasks),
+                normalized_responses.append(
+                    (
+                        result.index,
+                        _create_transport_error_response(result.inner),
+                    )
                 )
-                if isinstance(exc.inner, Exception):
-                    raise exc.inner
-                raise RuntimeError("Split PDF chunk cancelled") from exc.inner
-            if response.status_code != 200:
-                # cancel all remaining tasks
-                for remaining_task in remaining_tasks.values():
-                    remaining_task.cancel()
-                logger.warning(
-                    "split_pdf event=batch_cancel_remaining operation_id=%s reason=http_error failed_chunk_index=%d status_code=%d remaining_tasks=%d",
+            elif isinstance(result, asyncio.CancelledError):
+                logger.error(
+                    "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
                     operation_id,
                     index,
-                    response.status_code,
-                    len(remaining_tasks),
+                    type(result).__name__,
+                    result,
+                    exc_info=result,
                 )
-                results.append((index, response))
-                break
+                normalized_responses.append((index, _create_transport_error_response(result)))
+            elif isinstance(result, BaseException):
+                logger.error(
+                    "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
+                    operation_id,
+                    index,
+                    type(result).__name__,
+                    result,
+                    exc_info=result,
+                )
+                normalized_responses.append((index, _create_transport_error_response(result)))
+            else:
+                normalized_responses.append(cast(tuple[int, httpx.Response], result))
+        return normalized_responses
+
+    results = []
+    remaining_tasks = dict(enumerate(tasks, 1))
+    for future in asyncio.as_completed(tasks):
+        try:
+            index, response = await future
+        except ChunkExecutionError as exc:
+            logger.error(
+                "split_pdf event=chunk_transport_error operation_id=%s chunk_index=%d error_type=%s error=%s",
+                operation_id,
+                exc.index,
+                type(exc.inner).__name__,
+                exc.inner,
+                exc_info=exc.inner,
+            )
+            for remaining_task in remaining_tasks.values():
+                remaining_task.cancel()
+            logger.warning(
+                "split_pdf event=batch_cancel_remaining operation_id=%s reason=transport_exception failed_chunk_index=%d remaining_tasks=%d",
+                operation_id,
+                exc.index,
+                len(remaining_tasks),
+            )
+            await asyncio.gather(*remaining_tasks.values(), return_exceptions=True)
+            if isinstance(exc.inner, Exception):
+                raise exc.inner
+            raise RuntimeError("Split PDF chunk cancelled") from exc.inner
+        if response.status_code != 200:
+            # cancel all remaining tasks
+            for remaining_task in remaining_tasks.values():
+                remaining_task.cancel()
+            logger.warning(
+                "split_pdf event=batch_cancel_remaining operation_id=%s reason=http_error failed_chunk_index=%d status_code=%d remaining_tasks=%d",
+                operation_id,
+                index,
+                response.status_code,
+                len(remaining_tasks),
+            )
+            await asyncio.gather(*remaining_tasks.values(), return_exceptions=True)
             results.append((index, response))
-            # remove task from remaining_tasks that should be cancelled in case of failure
-            del remaining_tasks[index]
-        # return results in the original order
-        return sorted(results, key=lambda x: x[0])
+            break
+        results.append((index, response))
+        # remove task from remaining_tasks that should be cancelled in case of failure
+        del remaining_tasks[index]
+    # return results in the original order
+    return sorted(results, key=lambda x: x[0])
 
 
 def _create_transport_error_response(error: BaseException) -> httpx.Response:
@@ -257,6 +361,8 @@ def _request_task_cancellation(
     if loop is None:
         return False
     try:
+        # This loop is private to the split-PDF worker thread, so all_tasks()
+        # only targets chunk requests for the current split operation.
         loop.call_soon_threadsafe(_cancel_running_tasks)
         return True
     except RuntimeError as exc:
@@ -303,10 +409,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
     1. Create an instance of the `SplitPdfHook` class.
     2. Register SDK Init, Before Request, After Success and After Error hooks.
     """
+    _split_pdf_setup_lock = threading.Lock()
+    _split_pdf_setup_executor = futures.ThreadPoolExecutor(
+        max_workers=1,
+        thread_name_prefix="split-pdf-setup",
+    )
+    _split_pdf_setup_gate = _AsyncThreadSafeBoundedSemaphore(value=1)
+    # Thread-local flag shared by all hook instances to prove pypdfium work is under the setup lock.
+    _split_pdf_setup_state = threading.local()
 
     def __init__(self) -> None:
         self.client: Optional[HttpClient] = None
-        self.partition_base_url: Optional[str] = None
         self.async_client: Optional[AsyncHttpClient] = None
         self.coroutines_to_execute: dict[
             str, list[partial[Coroutine[Any, Any, httpx.Response]]]
@@ -459,11 +572,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         #         # Otherwise, pass the request to the default transport
         #         return await self.base_transport.handle_async_request(request)
 
-        # Instead, save the base url so we can use it for our dummy request
-        # As this can be overwritten with Platform API URL, we need to get it again in
-        # `before_request` hook from the request object as the real URL is not available here.
-        self.partition_base_url = base_url
-
         # Explicit cast to httpx.Client to avoid a typing error
         httpx_client = cast(httpx.Client, client)
         # async_httpx_client = cast(httpx.AsyncClient, async_client)
@@ -478,30 +586,31 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         return base_url, self.client
 
     # pylint: disable=too-many-return-statements
-    def before_request(
+    def _before_request_unlocked(
             self, hook_ctx: BeforeRequestContext, request: httpx.Request
     ) -> Union[httpx.Request, Exception]:
         """If `splitPdfPage` is set to `true` in the request, the PDF file is split into
-        separate pages. Each page is sent as a separate request in parallel. The last
-        page request is returned by this method. It will return the original request
-        when: `splitPdfPage` is set to `false`, the file is not a PDF, or the HTTP
+        chunks and the chunk requests are prepared for later execution. The split
+        path returns a synthetic request carrying the split operation ID so
+        after_success can collect chunk results. It returns the original request
+        when `splitPdfPage` is `false`, the file is not a PDF, or the HTTP client
         has not been initialized.
 
         Args:
             hook_ctx (BeforeRequestContext): The hook context containing information about
             the operation.
-            request (httpx.PreparedRequest): The request object.
+            request (httpx.Request): The request object.
 
         Returns:
-            Union[httpx.PreparedRequest, Exception]: If `splitPdfPage` is set to `true`,
-            the last page request; otherwise, the original request.
+            Union[httpx.Request, Exception]: If `splitPdfPage` is set to `true`,
+            the synthetic collection request; otherwise, the original request.
         """
 
         # Actually the general.partition operation overwrites the default client's base url (as
         # the platform operations do). Here we need to get the base url from the request object.
         if hook_ctx.operation_id != "partition":
             return request
-        self.partition_base_url = get_base_url(request.url)
+        partition_base_url = get_base_url(request.url)
 
         if self.client is None:
             logger.warning("HTTP client not accessible! Continuing without splitting.")
@@ -588,11 +697,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
 
+        if operation_id in self.coroutines_to_execute:
+            raise RuntimeError(f"Split PDF operation ID already in use: {operation_id}")
+
         self.allow_failed[operation_id] = allow_failed
         self.cache_tmp_data_feature[operation_id] = cache_tmp_data_feature
         self.cache_tmp_data_dir[operation_id] = cache_tmp_data_dir
         self.concurrency_level[operation_id] = concurrency_level
-        self.executors[operation_id] = futures.ThreadPoolExecutor(max_workers=1)
 
         timeout_seconds = _get_request_timeout_seconds(request)
         if timeout_seconds is None and hook_ctx.config.timeout_ms is not None:
@@ -611,6 +722,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             pdf_bytes = pdf.stream.read()
 
             temp_dir_path = None
+            pdf_chunks: Iterable[Tuple[BinaryIO, int]]
             if cache_tmp_data_feature:
                 pdf_chunk_paths = self._get_pdf_chunk_paths(
                     pdf_bytes,
@@ -686,13 +798,82 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             dummy_request_extensions[OPERATION_ID_EXTENSION_KEY] = operation_id
             return httpx.Request(
                 "GET",
-                f"{self.partition_base_url}/general/docs",
+                f"{partition_base_url}/general/docs",
                 headers={"operation_id": operation_id},
                 extensions=dummy_request_extensions,
             )
         except Exception:
             self._clear_operation(operation_id)
             raise
+
+    def before_request(
+            self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        # pypdfium is process-global and not thread-safe; serialize split setup across clients.
+        with self._split_pdf_setup_lock:
+            self._split_pdf_setup_state.locked = True
+            try:
+                return self._before_request_unlocked(hook_ctx, request)
+            finally:
+                self._split_pdf_setup_state.locked = False
+
+    async def before_request_async(
+            self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        # Keep pypdfium setup off the event loop while preserving a single process-wide
+        # admission lane. pypdfium is not thread-safe, so cancelled callers must not
+        # leave queued setup work piling up behind the worker.
+        await self._acquire_split_pdf_setup_slot()
+        loop = asyncio.get_running_loop()
+        setup_future = loop.run_in_executor(
+            self._split_pdf_setup_executor,
+            self.before_request,
+            hook_ctx,
+            request,
+        )
+        try:
+            return await asyncio.shield(setup_future)
+        except asyncio.CancelledError:
+            result = await self._finish_cancelled_split_setup(setup_future)
+            if isinstance(result, httpx.Request):
+                self._clear_prepared_split_request(result)
+            raise
+        finally:
+            self._split_pdf_setup_gate.release()
+
+    @classmethod
+    async def _acquire_split_pdf_setup_slot(cls) -> None:
+        await cls._split_pdf_setup_gate.acquire()
+
+    async def _finish_cancelled_split_setup(
+        self,
+        setup_future: asyncio.Future[Union[httpx.Request, Exception]],
+    ) -> Optional[Union[httpx.Request, Exception]]:
+        """Finish setup after caller cancellation so prepared state can be cleaned.
+
+        Non-cancellation failures mean setup failed before returning a prepared
+        request, so there is no operation ID to clear here.
+        """
+        while True:
+            try:
+                return await asyncio.shield(setup_future)
+            except asyncio.CancelledError:
+                if setup_future.cancelled():
+                    return None
+                continue
+            except Exception:
+                logger.debug("Cancelled split-PDF setup failed before cleanup", exc_info=True)
+                return None
+
+    def _clear_prepared_split_request(self, request: httpx.Request) -> None:
+        operation_id = self._get_operation_id_from_request(request)
+        if operation_id is None:
+            return
+        logger.warning(
+            "split_pdf event=before_request_cancel_cleanup operation_id=%s",
+            operation_id,
+        )
+        self._clear_operation(operation_id)
 
     async def call_api_partial(
             self,
@@ -725,11 +906,6 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_number=page_number,
         )
 
-        # Immediately delete request to save memory
-        del response._request  # pylint: disable=protected-access
-        response._request = None  # pylint: disable=protected-access
-
-
         if response.status_code == 200:
             if cache_tmp_data_feature:
                 if temp_dir_path is None:
@@ -749,6 +925,26 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     page_number,
                     Path(temp_file_name).name,
                 )
+                response = httpx.Response(
+                    status_code=response.status_code,
+                    headers=response.headers,
+                    content=temp_file_name.encode(),
+                    extensions=response.extensions,
+                )
+            else:
+                response = httpx.Response(
+                    status_code=response.status_code,
+                    headers=response.headers,
+                    content=response.content,
+                    extensions=response.extensions,
+                )
+        else:
+            response = httpx.Response(
+                status_code=response.status_code,
+                headers=response.headers,
+                content=response.content,
+                extensions=response.extensions,
+            )
 
         logger.debug(
             "split_pdf event=chunk_complete operation_id=%s chunk_index=%d page_number=%d status_code=%d",
@@ -794,10 +990,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             split_size: int = 1,
             page_start: int = 1,
             page_end: Optional[int] = None
-    ) -> Generator[Tuple[BinaryIO, int], None, None]:
+    ) -> list[Tuple[BinaryIO, int]]:
         """Reads given bytes of a pdf file and split it into n pdf-chunks, each
-        with `split_size` pages. The chunks are written into temporary files in
-        a temporary directory corresponding to the operation_id.
+        with `split_size` pages. The chunks are returned as in-memory buffers.
 
         Args:
             file_content: Content of the PDF file.
@@ -808,33 +1003,33 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_end: If provided, split up to and including this page number
 
         Returns:
-            The list of temporary file paths.
+            The list of chunk buffers and their zero-based page offsets.
         """
+        self._assert_split_pdf_setup_locked()
 
+        pdf_chunks: list[Tuple[BinaryIO, int]] = []
         with pdfium.PdfDocument(pdf_bytes) as pdf:
-
             offset = page_start - 1
             offset_end = page_end if page_end else len(pdf)
 
             while offset < offset_end:
                 end = min(offset + split_size, offset_end)
 
-                # Create new PDF
                 new_pdf = pdfium.PdfDocument.new()
+                try:
+                    page_indices = list(range(offset, end))
+                    new_pdf.import_pages(pdf, pages=page_indices)
 
-                # Import pages
-                page_indices = list(range(offset, end))
-                new_pdf.import_pages(pdf, pages=page_indices)
+                    chunk_buffer = io.BytesIO()
+                    new_pdf.save(chunk_buffer)
+                    chunk_buffer.seek(0)
+                finally:
+                    new_pdf.close()
 
-                # Save to buffer
-                chunk_buffer = io.BytesIO()
-                new_pdf.save(chunk_buffer)
-                chunk_buffer.seek(0)
-
-                new_pdf.close()
-
-                yield chunk_buffer, offset
+                pdf_chunks.append((chunk_buffer, offset))
                 offset += split_size
+
+        return pdf_chunks
 
     def _get_pdf_chunk_paths(
         self,
@@ -860,40 +1055,45 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Returns:
             The list of temporary file paths.
         """
+        self._assert_split_pdf_setup_locked()
 
+        # Create temporary directory
+        tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
+            dir=cache_tmp_data_dir,
+            prefix="unstructured_client_"
+        )
+        self.tempdirs[operation_id] = tempdir
+        tempdir_path = Path(tempdir.name)
+
+        pdf_chunk_paths: list[Tuple[Path, int]] = []
         with pdfium.PdfDocument(pdf_bytes) as pdf:
             offset = page_start - 1
             offset_end = page_end if page_end else len(pdf)
 
-            # Create temporary directory
-            tempdir = tempfile.TemporaryDirectory(  # pylint: disable=consider-using-with
-                dir=cache_tmp_data_dir,
-                prefix="unstructured_client_"
-            )
-            self.tempdirs[operation_id] = tempdir
-            tempdir_path = Path(tempdir.name)
-
-            pdf_chunk_paths: list[Tuple[Path, int]] = []
             chunk_no = 0
 
             while offset < offset_end:
                 chunk_no += 1
                 end = min(offset + split_size, offset_end)
 
-                # Create new PDF with selected pages
                 new_pdf = pdfium.PdfDocument.new()
-                page_indices = list(range(offset, end))
-                new_pdf.import_pages(pdf, pages=page_indices)
+                try:
+                    page_indices = list(range(offset, end))
+                    new_pdf.import_pages(pdf, pages=page_indices)
 
-                # Save to file
-                chunk_path = tempdir_path / f"chunk_{chunk_no}.pdf"
-                new_pdf.save(str(chunk_path))  # Convert Path to string
-                new_pdf.close()
+                    chunk_path = tempdir_path / f"chunk_{chunk_no}.pdf"
+                    new_pdf.save(str(chunk_path))  # Convert Path to string
+                finally:
+                    new_pdf.close()
 
                 pdf_chunk_paths.append((chunk_path, offset))
                 offset += split_size
 
-            return pdf_chunk_paths
+        return pdf_chunk_paths
+
+    def _assert_split_pdf_setup_locked(self) -> None:
+        if not getattr(self._split_pdf_setup_state, "locked", False):
+            raise RuntimeError("pypdfium split setup must run under the split-PDF setup lock")
 
     def _get_pdf_chunk_files(
         self, pdf_chunks: list[Tuple[Path, int]]
@@ -958,10 +1158,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         # sending the coroutines to a separate thread to avoid blocking the current event loop
-        # this operation should be removed when the SDK is updated to support async hooks
         executor = self.executors.get(operation_id)
         if executor is None:
-            raise RuntimeError("Executor not found for operation_id")
+            executor = futures.ThreadPoolExecutor(max_workers=1)
+            self.executors[operation_id] = executor
         loop_holder: dict[str, Optional[asyncio.AbstractEventLoop]] = {"loop": None}
         self.operation_loops[operation_id] = loop_holder
         try:
@@ -1018,6 +1218,73 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if task_responses is None:
             return None
 
+        return self._elements_from_task_responses(
+            operation_id,
+            task_responses,
+            started_at=started_at,
+        )
+
+    async def _await_elements_async(self, operation_id: str) -> Optional[list]:
+        tasks = self.coroutines_to_execute.get(operation_id)
+        if tasks is None:
+            return None
+
+        started_at = time.perf_counter()
+        concurrency_level = self.concurrency_level.get(operation_id, DEFAULT_CONCURRENCY_LEVEL)
+        timeout_seconds = self.operation_timeouts.get(operation_id)
+        client_timeout = httpx.Timeout(timeout_seconds) if timeout_seconds is not None else None
+        allow_failed = self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+        coroutines = run_tasks(
+            tasks,
+            allow_failed=allow_failed,
+            concurrency_level=concurrency_level,
+            client_timeout=client_timeout,
+            operation_id=operation_id,
+        )
+        num_waves = max(1, math.ceil(len(tasks) / concurrency_level))
+        per_chunk = timeout_seconds or DEFAULT_FUTURE_TIMEOUT_MINUTES * 60
+        future_timeout = per_chunk * num_waves + TIMEOUT_BUFFER_SECONDS
+        logger.info(
+            "split_pdf event=batch_start operation_id=%s chunk_count=%d concurrency=%d allow_failed=%s client_timeout_seconds=%s future_timeout_seconds=%s num_waves=%d",
+            operation_id,
+            len(tasks),
+            concurrency_level,
+            allow_failed,
+            timeout_seconds,
+            future_timeout,
+            num_waves,
+        )
+        try:
+            task_responses = await asyncio.wait_for(coroutines, timeout=future_timeout)
+        except TimeoutError:
+            logger.error(
+                "split_pdf event=batch_timeout operation_id=%s chunk_count=%d concurrency=%d allow_failed=%s client_timeout_seconds=%s future_timeout_seconds=%s",
+                operation_id,
+                len(tasks),
+                concurrency_level,
+                allow_failed,
+                timeout_seconds,
+                future_timeout,
+            )
+            raise
+
+        return await asyncio.to_thread(
+            self._elements_from_task_responses,
+            operation_id,
+            task_responses,
+            started_at=started_at,
+        )
+
+    def _elements_from_task_responses(
+        self,
+        operation_id: str,
+        task_responses: list[tuple[int, httpx.Response]],
+        *,
+        started_at: float,
+    ) -> Optional[list]:
+        if task_responses is None:
+            return None
+
         successful_responses = []
         failed_responses: list[tuple[int, httpx.Response]] = []
         transport_failure_count = 0
@@ -1062,7 +1329,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             len(failed_responses),
             transport_failure_count,
             elapsed_ms,
-            allow_failed,
+            self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED),
         )
         for failed_chunk_index, response in failed_responses:
             self._annotate_failure_response(
@@ -1075,6 +1342,39 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
+
+    def _build_after_success_response(
+        self,
+        operation_id: str,
+        response: httpx.Response,
+        elements: Optional[list],
+    ) -> httpx.Response:
+        # if fails are disallowed, return the first failed response
+        if (
+            not self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+            and self.api_failed_responses.get(operation_id)
+        ):
+            logger.warning(
+                "split_pdf event=top_level_failure operation_id=%s mode=strict failed_response_selected=true",
+                operation_id,
+            )
+            return self.api_failed_responses[operation_id][0]
+
+        if (
+            self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
+            and not self.api_successful_responses.get(operation_id)
+            and self.api_failed_responses.get(operation_id)
+        ):
+            logger.warning(
+                "split_pdf event=top_level_failure operation_id=%s mode=allow_failed reason=no_successful_chunks",
+                operation_id,
+            )
+            return self.api_failed_responses[operation_id][0]
+
+        if elements is None:
+            return response
+
+        return request_utils.create_response(elements)
 
     @staticmethod
     def _finalize_operation_resources(
@@ -1122,33 +1422,32 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         try:
             elements = self._await_elements(operation_id)
+            return self._build_after_success_response(operation_id, response, elements)
+        finally:
+            if operation_id is not None:
+                self._clear_operation(operation_id)
 
-            # if fails are disallowed, return the first failed response
-            if (
-                not self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
-                and self.api_failed_responses.get(operation_id)
-            ):
-                logger.warning(
-                    "split_pdf event=top_level_failure operation_id=%s mode=strict failed_response_selected=true",
-                    operation_id,
-                )
-                return self.api_failed_responses[operation_id][0]
+    async def after_success_async(
+            self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> Union[httpx.Response, Exception]:
+        """Async equivalent of `after_success` for `partition_async`.
 
-            if (
-                self.allow_failed.get(operation_id, DEFAULT_ALLOW_FAILED)
-                and not self.api_successful_responses.get(operation_id)
-                and self.api_failed_responses.get(operation_id)
-            ):
-                logger.warning(
-                    "split_pdf event=top_level_failure operation_id=%s mode=allow_failed reason=no_successful_chunks",
-                    operation_id,
-                )
-                return self.api_failed_responses[operation_id][0]
+        This path awaits split chunk requests directly on the caller's event loop
+        instead of creating a nested event loop in a worker thread.
+        """
+        del hook_ctx
+        operation_id = self._get_operation_id(response=response)
+        if operation_id is None or operation_id not in self.coroutines_to_execute:
+            return response
 
-            if elements is None:
-                return response
-
-            return request_utils.create_response(elements)
+        try:
+            elements = await self._await_elements_async(operation_id)
+            return await asyncio.to_thread(
+                self._build_after_success_response,
+                operation_id,
+                response,
+                elements,
+            )
         finally:
             if operation_id is not None:
                 self._clear_operation(operation_id)
@@ -1184,7 +1483,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Args:
             operation_id (str): The ID of the operation to clear.
         """
-        self.coroutines_to_execute.pop(operation_id, None)
+        tasks = self.coroutines_to_execute.pop(operation_id, None)
+        closed_chunk_files = self._close_unconsumed_chunk_files(tasks)
         self.api_successful_responses.pop(operation_id, None)
         self.api_failed_responses.pop(operation_id, None)
         self.concurrency_level.pop(operation_id, None)
@@ -1199,12 +1499,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         executor = self.executors.pop(operation_id, None)
         tempdir = self.tempdirs.pop(operation_id, None)
         logger.debug(
-            "split_pdf event=clear_operation operation_id=%s has_future=%s future_done=%s has_executor=%s has_tempdir=%s",
+            "split_pdf event=clear_operation operation_id=%s has_future=%s future_done=%s has_executor=%s has_tempdir=%s closed_chunk_files=%d",
             operation_id,
             future is not None,
             future.done() if future is not None else None,
             executor is not None,
             tempdir is not None,
+            closed_chunk_files,
         )
         if future is not None and not future.done():
             loop = loop_holder.get("loop") if loop_holder is not None else None
@@ -1227,3 +1528,28 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
             return
         self._finalize_operation_resources(executor, tempdir, operation_id)
+
+    @staticmethod
+    def _close_unconsumed_chunk_files(
+        tasks: Optional[list[partial[Coroutine[Any, Any, httpx.Response]]]],
+    ) -> int:
+        if tasks is None:
+            return 0
+
+        closed_count = 0
+        seen_files: set[int] = set()
+        for task in tasks:
+            keywords = getattr(task, "keywords", None) or {}
+            pdf_chunk_file = keywords.get("pdf_chunk_file")
+            if pdf_chunk_file is None or id(pdf_chunk_file) in seen_files:
+                continue
+            seen_files.add(id(pdf_chunk_file))
+            close = getattr(pdf_chunk_file, "close", None)
+            if close is None or getattr(pdf_chunk_file, "closed", False) is True:
+                continue
+            try:
+                close()
+                closed_count += 1
+            except Exception:
+                logger.debug("Failed to close split-PDF chunk file during cleanup", exc_info=True)
+        return closed_count

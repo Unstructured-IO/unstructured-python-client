@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 import httpx
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Protocol, Tuple, Union
 from unstructured_client.httpclient import HttpClient
 from unstructured_client.sdkconfiguration import SDKConfiguration
 
@@ -76,6 +76,13 @@ class BeforeRequestHook(ABC):
         pass
 
 
+class AsyncBeforeRequestHook(Protocol):
+    async def before_request_async(
+        self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> Union[httpx.Request, Exception]:
+        pass
+
+
 class AfterSuccessHook(ABC):
     @abstractmethod
     def after_success(
@@ -84,9 +91,26 @@ class AfterSuccessHook(ABC):
         pass
 
 
+class AsyncAfterSuccessHook(Protocol):
+    async def after_success_async(
+        self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> Union[httpx.Response, Exception]:
+        pass
+
+
 class AfterErrorHook(ABC):
     @abstractmethod
     def after_error(
+        self,
+        hook_ctx: AfterErrorContext,
+        response: Optional[httpx.Response],
+        error: Optional[Exception],
+    ) -> Union[Tuple[Optional[httpx.Response], Optional[Exception]], Exception]:
+        pass
+
+
+class AsyncAfterErrorHook(Protocol):
+    async def after_error_async(
         self,
         hook_ctx: AfterErrorContext,
         response: Optional[httpx.Response],
@@ -110,4 +134,25 @@ class Hooks(ABC):
 
     @abstractmethod
     def register_after_error_hook(self, hook: AfterErrorHook):
+        pass
+
+    @abstractmethod
+    async def before_request_async(
+        self, hook_ctx: BeforeRequestContext, request: httpx.Request
+    ) -> httpx.Request:
+        pass
+
+    @abstractmethod
+    async def after_success_async(
+        self, hook_ctx: AfterSuccessContext, response: httpx.Response
+    ) -> httpx.Response:
+        pass
+
+    @abstractmethod
+    async def after_error_async(
+        self,
+        hook_ctx: AfterErrorContext,
+        response: Optional[httpx.Response],
+        error: Optional[Exception],
+    ) -> Tuple[Optional[httpx.Response], Optional[Exception]]:
         pass
