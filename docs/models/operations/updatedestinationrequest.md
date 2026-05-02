@@ -1,0 +1,10 @@
+# UpdateDestinationRequest
+
+
+## Fields
+
+| Field                                                                                  | Type                                                                                   | Required                                                                               | Description                                                                            |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `update_destination_connector`                                                         | [shared.UpdateDestinationConnector](../../models/shared/updatedestinationconnector.md) | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `destination_id`                                                                       | *str*                                                                                  | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `unstructured_api_key`                                                                 | *OptionalNullable[str]*                                                                | :heavy_minus_sign:                                                                     | N/A                                                                                    |
