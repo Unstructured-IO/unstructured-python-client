@@ -6,6 +6,7 @@
 
 ### Fixes
 * Route split-PDF `partition_async()` result collection through awaited async hook dispatch instead of creating a nested event loop in a worker thread.
+  Sync-only hooks on the async path now run on a worker thread, so hook code that depends on event-loop-thread `contextvars` or thread-local state should pass that state explicitly.
 * Add cancellation cleanup for in-flight split-PDF chunk tasks and preserve existing sync `partition()` split-PDF behavior with lazy executor creation.
 
 ## 0.43.2

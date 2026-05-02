@@ -4,17 +4,17 @@ import asyncio
 import io
 import logging
 import threading
-from asyncio import Task
 from collections import Counter
 from concurrent import futures
 from functools import partial
 from pathlib import Path
+from typing import Any, Coroutine
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-import requests
-from requests_toolbelt import MultipartDecoder
+import requests  # type: ignore[import-untyped]
+from requests_toolbelt import MultipartDecoder  # type: ignore[import-untyped]
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
 from unstructured_client._hooks.custom.form_utils import (
@@ -438,7 +438,7 @@ async def _request_mock(
 @pytest.mark.asyncio
 async def test_unit_disallow_failed_coroutines(
         allow_failed: bool,
-        tasks: list[Task],
+        tasks: list[partial[Coroutine[Any, Any, httpx.Response]]],
         expected_responses: list[str],
 ):
     """Test disallow failed coroutines method properly sets the flag to False."""
@@ -824,6 +824,70 @@ async def test_unit_do_request_async_cancellation_logs_cancelled_cleanup(
     assert "Cancellation cleanup cancelled" in caplog.text
 
 
+@pytest.mark.asyncio
+async def test_unit_do_request_async_secondary_cancellation_waits_for_cleanup():
+    cleanup_started = asyncio.Event()
+    release_cleanup = asyncio.Event()
+    cleanup_finished = asyncio.Event()
+
+    class PreparedRequestHook:
+        def before_request(self, hook_ctx, request):
+            del hook_ctx, request
+            return httpx.Request(
+                "GET",
+                "http://localhost:8888/general/docs",
+                headers={"operation_id": "secondary-cancel-cleanup"},
+                extensions={"split_pdf_operation_id": "secondary-cancel-cleanup"},
+            )
+
+    class SlowCleanupHook:
+        async def after_error_async(self, hook_ctx, response, error):
+            del hook_ctx, response, error
+            cleanup_started.set()
+            await release_cleanup.wait()
+            cleanup_finished.set()
+            return None, None
+
+        def after_error(self, hook_ctx, response, error):  # pragma: no cover - dispatch guard
+            raise AssertionError("async hook should be awaited")
+
+    hooks = SDKHooks()
+    hooks.before_request_hooks = [PreparedRequestHook()]  # type: ignore[list-item]
+    hooks.after_error_hooks = [SlowCleanupHook()]  # type: ignore[list-item]
+
+    client = _BlockingAsyncClient()
+    config = SDKConfiguration(
+        client=None,
+        client_supplied=False,
+        async_client=client,  # type: ignore[arg-type]
+        async_client_supplied=True,
+        debug_logger=logging.getLogger("test"),
+    )
+    config.__dict__["_hooks"] = hooks
+    sdk = BaseSDK(config)
+    task = asyncio.create_task(
+        sdk.do_request_async(
+            _make_sdk_hook_context(),
+            httpx.Request("POST", "http://localhost:8888/general/v0/general"),
+            error_status_codes=[],
+        )
+    )
+
+    await client.started.wait()
+    task.cancel()
+    await cleanup_started.wait()
+    task.cancel()
+    await asyncio.sleep(0)
+
+    assert not task.done()
+
+    release_cleanup.set()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert cleanup_finished.is_set()
+
+
 def test_before_request_returns_dummy_with_timeout_and_operation_id():
     hook, mock_hook_ctx, result = _make_hook_with_split_request()
     operation_id = result.headers["operation_id"]
@@ -834,6 +898,17 @@ def test_before_request_returns_dummy_with_timeout_and_operation_id():
     assert result.extensions["timeout"]["read"] == 12.0
     assert result.extensions["split_pdf_operation_id"] == operation_id
     assert operation_id in hook.pending_operation_ids
+
+
+def test_before_request_rejects_reused_operation_id():
+    hook = SplitPdfHook()
+    hook.coroutines_to_execute["reused-operation-id"] = []
+
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.uuid.uuid4",
+        return_value="reused-operation-id",
+    ), pytest.raises(RuntimeError, match="Split PDF operation ID already in use"):
+        _make_hook_with_split_request(hook=hook)
 
 
 def test_before_request_logs_split_plan(caplog: pytest.LogCaptureFixture):
@@ -1784,7 +1859,8 @@ def test_unit_allow_failed_partial_results(caplog: pytest.LogCaptureFixture):
     hook.concurrency_level[operation_id] = 3
     hook.allow_failed[operation_id] = True
     hook.cache_tmp_data_feature[operation_id] = False
-    hook.executors[operation_id] = MagicMock()
+    executor = MagicMock()
+    hook.executors[operation_id] = executor
 
     fake_future = MagicMock()
     fake_future.result.return_value = [
@@ -1792,7 +1868,7 @@ def test_unit_allow_failed_partial_results(caplog: pytest.LogCaptureFixture):
         (2, _httpx_response("boom", status_code=500)),
         (3, _httpx_json_response([{"page_number": 3}])),
     ]
-    hook.executors[operation_id].submit.return_value = fake_future
+    executor.submit.return_value = fake_future
 
     elements = hook._await_elements(operation_id)
 

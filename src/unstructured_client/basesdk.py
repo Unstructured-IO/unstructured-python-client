@@ -21,6 +21,8 @@ from urllib.parse import parse_qs, urlparse
 
 
 class _RequestBoundCancelledError(asyncio.CancelledError):
+    """Cancellation wrapper that exposes the request to after-error hooks."""
+
     def __init__(self, request: httpx.Request, cancellation: asyncio.CancelledError):
         super().__init__(str(cancellation) or "Request cancelled")
         self.request = request
@@ -317,16 +319,25 @@ class BaseSDK:
             if cleanup_request is None and response is not None:
                 cleanup_request = response.request
             assert cleanup_request is not None
-            try:
-                await hooks.after_error_async(
+            cleanup_task = asyncio.create_task(
+                hooks.after_error_async(
                     AfterErrorContext(hook_ctx),
                     response,
                     _RequestBoundCancelledError(cleanup_request, cancellation),
                 )
-            except asyncio.CancelledError:
-                logger.debug("Cancellation cleanup cancelled", exc_info=True)
-            except Exception:
-                logger.debug("Cancellation cleanup failed", exc_info=True)
+            )
+            while True:
+                try:
+                    await asyncio.shield(cleanup_task)
+                    return
+                except asyncio.CancelledError:
+                    if cleanup_task.done():
+                        logger.debug("Cancellation cleanup cancelled", exc_info=True)
+                        return
+                    logger.debug("Cancellation cleanup still running after cancellation")
+                except BaseException:
+                    logger.debug("Cancellation cleanup failed", exc_info=True)
+                    return
 
         async def do():
             http_res = None

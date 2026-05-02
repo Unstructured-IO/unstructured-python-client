@@ -110,7 +110,7 @@ def _make_sdk_split_task(
 
 @pytest.mark.asyncio
 async def test_partition_async_split_collects_chunks_in_order_without_executor():
-    operation_id = "integration-happy"
+    operation_id = "unit-happy"
     split_hook = SplitPdfHook()
     active_chunks = 0
     max_active_chunks = 0
@@ -191,7 +191,7 @@ async def test_partition_async_split_collects_chunks_in_order_without_executor()
 
 @pytest.mark.asyncio
 async def test_partition_async_cancellation_cleans_split_state_and_tempdir():
-    operation_id = "integration-cancel"
+    operation_id = "unit-cancel"
     split_hook = SplitPdfHook()
     started = asyncio.Event()
     cancelled_counter = Counter()
@@ -236,7 +236,7 @@ async def test_partition_async_cancellation_cleans_split_state_and_tempdir():
 
 @pytest.mark.asyncio
 async def test_partition_async_strict_failure_drains_sibling_chunks_before_close():
-    operation_id = "integration-strict-failure"
+    operation_id = "unit-strict-failure"
     split_hook = SplitPdfHook()
     sibling_started = asyncio.Event()
     sibling_cancelled = asyncio.Event()
@@ -370,7 +370,7 @@ async def test_async_hook_chain_runs_sync_fallback_without_blocking_loop():
 
 @pytest.mark.asyncio
 async def test_partition_async_reassembly_does_not_block_event_loop():
-    operation_id = "integration-offload"
+    operation_id = "unit-offload"
     split_hook = SplitPdfHook()
     reassembly_started = threading.Event()
     reassembly_released = threading.Event()

@@ -10,6 +10,7 @@ import os
 import tempfile
 import threading
 import uuid
+from collections import deque
 from collections.abc import Awaitable, Iterable
 from concurrent import futures
 from functools import partial
@@ -70,6 +71,67 @@ class ChunkExecutionError(Exception):
         super().__init__(str(inner))
         self.index = index
         self.inner = inner
+
+
+class _AsyncThreadSafeBoundedSemaphore:
+    """A cancellable async gate that can be shared across event loops."""
+
+    def __init__(self, value: int) -> None:
+        if value <= 0:
+            raise ValueError("Semaphore value must be greater than zero")
+        self._initial_value = value
+        self._value = value
+        self._waiters: deque[asyncio.Future[None]] = deque()
+        self._lock = threading.Lock()
+
+    async def acquire(self) -> None:
+        loop = asyncio.get_running_loop()
+        waiter: Optional[asyncio.Future[None]] = None
+        with self._lock:
+            if self._value > 0:
+                self._value -= 1
+                return
+            waiter = loop.create_future()
+            self._waiters.append(waiter)
+
+        try:
+            await waiter
+        except asyncio.CancelledError:
+            release_transferred_slot = False
+            with self._lock:
+                try:
+                    self._waiters.remove(waiter)
+                except ValueError:
+                    release_transferred_slot = waiter.done() and not waiter.cancelled()
+            if release_transferred_slot:
+                self.release()
+            raise
+
+    def release(self) -> None:
+        while True:
+            with self._lock:
+                while self._waiters:
+                    waiter = self._waiters.popleft()
+                    if not waiter.cancelled():
+                        break
+                else:
+                    if self._value >= self._initial_value:
+                        raise ValueError("Semaphore released too many times")
+                    self._value += 1
+                    return
+
+            def _wake_waiter() -> None:
+                if waiter.cancelled():
+                    self.release()
+                else:
+                    waiter.set_result(None)
+
+            try:
+                waiter.get_loop().call_soon_threadsafe(_wake_waiter)
+                return
+            except RuntimeError:
+                # The waiting loop closed before it could receive the slot.
+                continue
 
 
 def _get_request_timeout_seconds(request: httpx.Request) -> Optional[float]:
@@ -352,8 +414,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         max_workers=1,
         thread_name_prefix="split-pdf-setup",
     )
-    _split_pdf_setup_gate = threading.BoundedSemaphore(value=1)
-    _split_pdf_setup_poll_interval_seconds = 0.01
+    _split_pdf_setup_gate = _AsyncThreadSafeBoundedSemaphore(value=1)
+    # Thread-local flag shared by all hook instances to prove pypdfium work is under the setup lock.
     _split_pdf_setup_state = threading.local()
 
     def __init__(self) -> None:
@@ -635,6 +697,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_size >= page_count and page_count == len(pdf.pages):
             return request
 
+        if operation_id in self.coroutines_to_execute:
+            raise RuntimeError(f"Split PDF operation ID already in use: {operation_id}")
+
         self.allow_failed[operation_id] = allow_failed
         self.cache_tmp_data_feature[operation_id] = cache_tmp_data_feature
         self.cache_tmp_data_dir[operation_id] = cache_tmp_data_dir
@@ -778,13 +843,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
     @classmethod
     async def _acquire_split_pdf_setup_slot(cls) -> None:
-        while not cls._split_pdf_setup_gate.acquire(blocking=False):
-            await asyncio.sleep(cls._split_pdf_setup_poll_interval_seconds)
+        await cls._split_pdf_setup_gate.acquire()
 
     async def _finish_cancelled_split_setup(
         self,
         setup_future: asyncio.Future[Union[httpx.Request, Exception]],
     ) -> Optional[Union[httpx.Request, Exception]]:
+        """Finish setup after caller cancellation so prepared state can be cleaned.
+
+        Non-cancellation failures mean setup failed before returning a prepared
+        request, so there is no operation ID to clear here.
+        """
         while True:
             try:
                 return await asyncio.shield(setup_future)
