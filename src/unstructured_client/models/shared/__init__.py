@@ -5,38 +5,6 @@ from importlib import import_module
 import builtins
 
 if TYPE_CHECKING:
-    from .astradbconnectorconfig import (
-        AstraDBConnectorConfig,
-        AstraDBConnectorConfigTypedDict,
-    )
-    from .astradbconnectorconfiginput import (
-        AstraDBConnectorConfigInput,
-        AstraDBConnectorConfigInputTypedDict,
-    )
-    from .azureaisearchconnectorconfig import (
-        AzureAISearchConnectorConfig,
-        AzureAISearchConnectorConfigTypedDict,
-    )
-    from .azureaisearchconnectorconfiginput import (
-        AzureAISearchConnectorConfigInput,
-        AzureAISearchConnectorConfigInputTypedDict,
-    )
-    from .azuredestinationconnectorconfig import (
-        AzureDestinationConnectorConfig,
-        AzureDestinationConnectorConfigTypedDict,
-    )
-    from .azuredestinationconnectorconfiginput import (
-        AzureDestinationConnectorConfigInput,
-        AzureDestinationConnectorConfigInputTypedDict,
-    )
-    from .azuresourceconnectorconfig import (
-        AzureSourceConnectorConfig,
-        AzureSourceConnectorConfigTypedDict,
-    )
-    from .azuresourceconnectorconfiginput import (
-        AzureSourceConnectorConfigInput,
-        AzureSourceConnectorConfigInputTypedDict,
-    )
     from .body_create_job import (
         BodyCreateJob,
         BodyCreateJobTypedDict,
@@ -49,39 +17,7 @@ if TYPE_CHECKING:
         BodyRunWorkflowInputFilesTypedDict,
         BodyRunWorkflowTypedDict,
     )
-    from .boxsourceconnectorconfig import (
-        BoxSourceConnectorConfig,
-        BoxSourceConnectorConfigTypedDict,
-    )
-    from .boxsourceconnectorconfiginput import (
-        BoxSourceConnectorConfigInput,
-        BoxSourceConnectorConfigInputTypedDict,
-    )
-    from .confluencesourceconnectorconfig import (
-        ConfluenceSourceConnectorConfig,
-        ConfluenceSourceConnectorConfigTypedDict,
-    )
-    from .confluencesourceconnectorconfiginput import (
-        ConfluenceSourceConnectorConfigInput,
-        ConfluenceSourceConnectorConfigInputTypedDict,
-    )
     from .connectioncheckstatus import ConnectionCheckStatus
-    from .couchbasedestinationconnectorconfig import (
-        CouchbaseDestinationConnectorConfig,
-        CouchbaseDestinationConnectorConfigTypedDict,
-    )
-    from .couchbasedestinationconnectorconfiginput import (
-        CouchbaseDestinationConnectorConfigInput,
-        CouchbaseDestinationConnectorConfigInputTypedDict,
-    )
-    from .couchbasesourceconnectorconfig import (
-        CouchbaseSourceConnectorConfig,
-        CouchbaseSourceConnectorConfigTypedDict,
-    )
-    from .couchbasesourceconnectorconfiginput import (
-        CouchbaseSourceConnectorConfigInput,
-        CouchbaseSourceConnectorConfigInputTypedDict,
-    )
     from .createdestinationconnector import (
         Config,
         ConfigTypedDict,
@@ -100,30 +36,6 @@ if TYPE_CHECKING:
         DagNodeConnectionCheck,
         DagNodeConnectionCheckTypedDict,
     )
-    from .databricksvdtdestinationconnectorconfig import (
-        DatabricksVDTDestinationConnectorConfig,
-        DatabricksVDTDestinationConnectorConfigTypedDict,
-    )
-    from .databricksvdtdestinationconnectorconfiginput import (
-        DatabricksVDTDestinationConnectorConfigInput,
-        DatabricksVDTDestinationConnectorConfigInputTypedDict,
-    )
-    from .databricksvolumesconnectorconfig import (
-        DatabricksVolumesConnectorConfig,
-        DatabricksVolumesConnectorConfigTypedDict,
-    )
-    from .databricksvolumesconnectorconfiginput import (
-        DatabricksVolumesConnectorConfigInput,
-        DatabricksVolumesConnectorConfigInputTypedDict,
-    )
-    from .deltatableconnectorconfig import (
-        DeltaTableConnectorConfig,
-        DeltaTableConnectorConfigTypedDict,
-    )
-    from .deltatableconnectorconfiginput import (
-        DeltaTableConnectorConfigInput,
-        DeltaTableConnectorConfigInputTypedDict,
-    )
     from .destinationconnectorinformation import (
         DestinationConnectorInformation,
         DestinationConnectorInformationConfig,
@@ -131,147 +43,15 @@ if TYPE_CHECKING:
         DestinationConnectorInformationTypedDict,
     )
     from .destinationconnectortype import DestinationConnectorType
-    from .dropboxsourceconnectorconfig import (
-        DropboxSourceConnectorConfig,
-        DropboxSourceConnectorConfigTypedDict,
-    )
-    from .dropboxsourceconnectorconfiginput import (
-        DropboxSourceConnectorConfigInput,
-        DropboxSourceConnectorConfigInputTypedDict,
-    )
-    from .elasticsearchconnectorconfig import (
-        ElasticsearchConnectorConfig,
-        ElasticsearchConnectorConfigTypedDict,
-    )
-    from .elasticsearchconnectorconfiginput import (
-        ElasticsearchConnectorConfigInput,
-        ElasticsearchConnectorConfigInputTypedDict,
-    )
     from .encryptiontype import EncryptionType
     from .failedfile import FailedFile, FailedFileTypedDict
-    from .gcsdestinationconnectorconfig import (
-        GCSDestinationConnectorConfig,
-        GCSDestinationConnectorConfigTypedDict,
-    )
-    from .gcsdestinationconnectorconfiginput import (
-        GCSDestinationConnectorConfigInput,
-        GCSDestinationConnectorConfigInputTypedDict,
-    )
-    from .gcssourceconnectorconfig import (
-        GCSSourceConnectorConfig,
-        GCSSourceConnectorConfigTypedDict,
-    )
-    from .gcssourceconnectorconfiginput import (
-        GCSSourceConnectorConfigInput,
-        GCSSourceConnectorConfigInputTypedDict,
-    )
-    from .googledrivesourceconnectorconfig import (
-        GoogleDriveSourceConnectorConfig,
-        GoogleDriveSourceConnectorConfigTypedDict,
-        ServiceAccountKey,
-        ServiceAccountKeyTypedDict,
-    )
-    from .googledrivesourceconnectorconfiginput import (
-        GoogleDriveSourceConnectorConfigInput,
-        GoogleDriveSourceConnectorConfigInputServiceAccountKey,
-        GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict,
-        GoogleDriveSourceConnectorConfigInputTypedDict,
-    )
-    from .ibmwatsonxs3destinationconnectorconfig import (
-        IBMWatsonxS3DestinationConnectorConfig,
-        IBMWatsonxS3DestinationConnectorConfigTypedDict,
-    )
-    from .ibmwatsonxs3destinationconnectorconfiginput import (
-        IBMWatsonxS3DestinationConnectorConfigInput,
-        IBMWatsonxS3DestinationConnectorConfigInputTypedDict,
-    )
-    from .jirasourceconnectorconfig import (
-        JiraSourceConnectorConfig,
-        JiraSourceConnectorConfigTypedDict,
-    )
-    from .jirasourceconnectorconfiginput import (
-        JiraSourceConnectorConfigInput,
-        JiraSourceConnectorConfigInputTypedDict,
-    )
     from .jobdetails import JobDetails, JobDetailsTypedDict
     from .jobfailedfiles import JobFailedFiles, JobFailedFilesTypedDict
     from .jobinformation import JobInformation, JobInformationTypedDict
     from .jobnodedetails import JobNodeDetails, JobNodeDetailsTypedDict
     from .jobprocessingstatus import JobProcessingStatus
     from .jobstatus import JobStatus
-    from .kafkaclouddestinationconnectorconfig import (
-        KafkaCloudDestinationConnectorConfig,
-        KafkaCloudDestinationConnectorConfigTypedDict,
-    )
-    from .kafkaclouddestinationconnectorconfiginput import (
-        KafkaCloudDestinationConnectorConfigInput,
-        KafkaCloudDestinationConnectorConfigInputTypedDict,
-    )
-    from .kafkacloudsourceconnectorconfig import (
-        KafkaCloudSourceConnectorConfig,
-        KafkaCloudSourceConnectorConfigTypedDict,
-    )
-    from .kafkacloudsourceconnectorconfiginput import (
-        KafkaCloudSourceConnectorConfigInput,
-        KafkaCloudSourceConnectorConfigInputTypedDict,
-    )
-    from .milvusdestinationconnectorconfig import (
-        MilvusDestinationConnectorConfig,
-        MilvusDestinationConnectorConfigTypedDict,
-    )
-    from .milvusdestinationconnectorconfiginput import (
-        MilvusDestinationConnectorConfigInput,
-        MilvusDestinationConnectorConfigInputTypedDict,
-    )
-    from .mongodbconnectorconfig import (
-        MongoDBConnectorConfig,
-        MongoDBConnectorConfigTypedDict,
-    )
-    from .mongodbconnectorconfiginput import (
-        MongoDBConnectorConfigInput,
-        MongoDBConnectorConfigInputTypedDict,
-    )
-    from .neo4jdestinationconnectorconfig import (
-        Neo4jDestinationConnectorConfig,
-        Neo4jDestinationConnectorConfigTypedDict,
-    )
-    from .neo4jdestinationconnectorconfiginput import (
-        Neo4jDestinationConnectorConfigInput,
-        Neo4jDestinationConnectorConfigInputTypedDict,
-    )
     from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
-    from .onedrivedestinationconnectorconfig import (
-        OneDriveDestinationConnectorConfig,
-        OneDriveDestinationConnectorConfigTypedDict,
-    )
-    from .onedrivedestinationconnectorconfiginput import (
-        OneDriveDestinationConnectorConfigInput,
-        OneDriveDestinationConnectorConfigInputTypedDict,
-    )
-    from .onedrivesourceconnectorconfig import (
-        OneDriveSourceConnectorConfig,
-        OneDriveSourceConnectorConfigTypedDict,
-    )
-    from .onedrivesourceconnectorconfiginput import (
-        OneDriveSourceConnectorConfigInput,
-        OneDriveSourceConnectorConfigInputTypedDict,
-    )
-    from .opensearchconnectorconfig import (
-        OpenSearchConnectorConfig,
-        OpenSearchConnectorConfigTypedDict,
-    )
-    from .opensearchconnectorconfiginput import (
-        OpenSearchConnectorConfigInput,
-        OpenSearchConnectorConfigInputTypedDict,
-    )
-    from .outlooksourceconnectorconfig import (
-        OutlookSourceConnectorConfig,
-        OutlookSourceConnectorConfigTypedDict,
-    )
-    from .outlooksourceconnectorconfiginput import (
-        OutlookSourceConnectorConfigInput,
-        OutlookSourceConnectorConfigInputTypedDict,
-    )
     from .partition_parameters import (
         Files,
         FilesTypedDict,
@@ -281,96 +61,8 @@ if TYPE_CHECKING:
         Strategy,
         VLMModelProvider,
     )
-    from .pineconedestinationconnectorconfig import (
-        PineconeDestinationConnectorConfig,
-        PineconeDestinationConnectorConfigTypedDict,
-    )
-    from .pineconedestinationconnectorconfiginput import (
-        PineconeDestinationConnectorConfigInput,
-        PineconeDestinationConnectorConfigInputTypedDict,
-    )
-    from .postgresdestinationconnectorconfig import (
-        PostgresDestinationConnectorConfig,
-        PostgresDestinationConnectorConfigTypedDict,
-    )
-    from .postgresdestinationconnectorconfiginput import (
-        PostgresDestinationConnectorConfigInput,
-        PostgresDestinationConnectorConfigInputTypedDict,
-    )
-    from .postgressourceconnectorconfig import (
-        PostgresSourceConnectorConfig,
-        PostgresSourceConnectorConfigTypedDict,
-    )
-    from .postgressourceconnectorconfiginput import (
-        PostgresSourceConnectorConfigInput,
-        PostgresSourceConnectorConfigInputTypedDict,
-    )
-    from .qdrantclouddestinationconnectorconfig import (
-        QdrantCloudDestinationConnectorConfig,
-        QdrantCloudDestinationConnectorConfigTypedDict,
-    )
-    from .qdrantclouddestinationconnectorconfiginput import (
-        QdrantCloudDestinationConnectorConfigInput,
-        QdrantCloudDestinationConnectorConfigInputTypedDict,
-    )
-    from .redisdestinationconnectorconfig import (
-        RedisDestinationConnectorConfig,
-        RedisDestinationConnectorConfigTypedDict,
-    )
-    from .redisdestinationconnectorconfiginput import (
-        RedisDestinationConnectorConfigInput,
-        RedisDestinationConnectorConfigInputTypedDict,
-    )
-    from .s3destinationconnectorconfig import (
-        S3DestinationConnectorConfig,
-        S3DestinationConnectorConfigTypedDict,
-    )
-    from .s3destinationconnectorconfiginput import (
-        S3DestinationConnectorConfigInput,
-        S3DestinationConnectorConfigInputTypedDict,
-    )
-    from .s3sourceconnectorconfig import (
-        S3SourceConnectorConfig,
-        S3SourceConnectorConfigTypedDict,
-    )
-    from .s3sourceconnectorconfiginput import (
-        S3SourceConnectorConfigInput,
-        S3SourceConnectorConfigInputTypedDict,
-    )
-    from .salesforcesourceconnectorconfig import (
-        SalesforceSourceConnectorConfig,
-        SalesforceSourceConnectorConfigTypedDict,
-    )
-    from .salesforcesourceconnectorconfiginput import (
-        SalesforceSourceConnectorConfigInput,
-        SalesforceSourceConnectorConfigInputTypedDict,
-    )
     from .secretreference import SecretReference, SecretReferenceTypedDict
     from .security import Security, SecurityTypedDict
-    from .sharepointsourceconnectorconfig import (
-        SharePointSourceConnectorConfig,
-        SharePointSourceConnectorConfigTypedDict,
-    )
-    from .sharepointsourceconnectorconfiginput import (
-        SharePointSourceConnectorConfigInput,
-        SharePointSourceConnectorConfigInputTypedDict,
-    )
-    from .snowflakedestinationconnectorconfig import (
-        SnowflakeDestinationConnectorConfig,
-        SnowflakeDestinationConnectorConfigTypedDict,
-    )
-    from .snowflakedestinationconnectorconfiginput import (
-        SnowflakeDestinationConnectorConfigInput,
-        SnowflakeDestinationConnectorConfigInputTypedDict,
-    )
-    from .snowflakesourceconnectorconfig import (
-        SnowflakeSourceConnectorConfig,
-        SnowflakeSourceConnectorConfigTypedDict,
-    )
-    from .snowflakesourceconnectorconfiginput import (
-        SnowflakeSourceConnectorConfigInput,
-        SnowflakeSourceConnectorConfigInputTypedDict,
-    )
     from .sortdirection import SortDirection
     from .sourceconnectorinformation import (
         SourceConnectorInformation,
@@ -405,71 +97,23 @@ if TYPE_CHECKING:
         ValidationError,
         ValidationErrorTypedDict,
     )
-    from .weaviatedestinationconnectorconfig import (
-        WeaviateDestinationConnectorConfig,
-        WeaviateDestinationConnectorConfigTypedDict,
-    )
-    from .weaviatedestinationconnectorconfiginput import (
-        WeaviateDestinationConnectorConfigInput,
-        WeaviateDestinationConnectorConfigInputTypedDict,
-    )
     from .workflowinformation import WorkflowInformation, WorkflowInformationTypedDict
     from .workflowjobtype import WorkflowJobType
     from .workflownode import WorkflowNode, WorkflowNodeTypedDict
     from .workflowschedule import WorkflowSchedule, WorkflowScheduleTypedDict
     from .workflowstate import WorkflowState
     from .workflowtype import WorkflowType
-    from .zendesksourceconnectorconfig import (
-        ZendeskSourceConnectorConfig,
-        ZendeskSourceConnectorConfigTypedDict,
-    )
-    from .zendesksourceconnectorconfiginput import (
-        ZendeskSourceConnectorConfigInput,
-        ZendeskSourceConnectorConfigInputTypedDict,
-    )
 
 __all__ = [
-    "AstraDBConnectorConfig",
-    "AstraDBConnectorConfigInput",
-    "AstraDBConnectorConfigInputTypedDict",
-    "AstraDBConnectorConfigTypedDict",
-    "AzureAISearchConnectorConfig",
-    "AzureAISearchConnectorConfigInput",
-    "AzureAISearchConnectorConfigInputTypedDict",
-    "AzureAISearchConnectorConfigTypedDict",
-    "AzureDestinationConnectorConfig",
-    "AzureDestinationConnectorConfigInput",
-    "AzureDestinationConnectorConfigInputTypedDict",
-    "AzureDestinationConnectorConfigTypedDict",
-    "AzureSourceConnectorConfig",
-    "AzureSourceConnectorConfigInput",
-    "AzureSourceConnectorConfigInputTypedDict",
-    "AzureSourceConnectorConfigTypedDict",
     "BodyCreateJob",
     "BodyCreateJobTypedDict",
     "BodyRunWorkflow",
     "BodyRunWorkflowInputFiles",
     "BodyRunWorkflowInputFilesTypedDict",
     "BodyRunWorkflowTypedDict",
-    "BoxSourceConnectorConfig",
-    "BoxSourceConnectorConfigInput",
-    "BoxSourceConnectorConfigInputTypedDict",
-    "BoxSourceConnectorConfigTypedDict",
     "Config",
     "ConfigTypedDict",
-    "ConfluenceSourceConnectorConfig",
-    "ConfluenceSourceConnectorConfigInput",
-    "ConfluenceSourceConnectorConfigInputTypedDict",
-    "ConfluenceSourceConnectorConfigTypedDict",
     "ConnectionCheckStatus",
-    "CouchbaseDestinationConnectorConfig",
-    "CouchbaseDestinationConnectorConfigInput",
-    "CouchbaseDestinationConnectorConfigInputTypedDict",
-    "CouchbaseDestinationConnectorConfigTypedDict",
-    "CouchbaseSourceConnectorConfig",
-    "CouchbaseSourceConnectorConfigInput",
-    "CouchbaseSourceConnectorConfigInputTypedDict",
-    "CouchbaseSourceConnectorConfigTypedDict",
     "CreateDestinationConnector",
     "CreateDestinationConnectorTypedDict",
     "CreateSourceConnector",
@@ -482,60 +126,18 @@ __all__ = [
     "CronTabEntryTypedDict",
     "DagNodeConnectionCheck",
     "DagNodeConnectionCheckTypedDict",
-    "DatabricksVDTDestinationConnectorConfig",
-    "DatabricksVDTDestinationConnectorConfigInput",
-    "DatabricksVDTDestinationConnectorConfigInputTypedDict",
-    "DatabricksVDTDestinationConnectorConfigTypedDict",
-    "DatabricksVolumesConnectorConfig",
-    "DatabricksVolumesConnectorConfigInput",
-    "DatabricksVolumesConnectorConfigInputTypedDict",
-    "DatabricksVolumesConnectorConfigTypedDict",
-    "DeltaTableConnectorConfig",
-    "DeltaTableConnectorConfigInput",
-    "DeltaTableConnectorConfigInputTypedDict",
-    "DeltaTableConnectorConfigTypedDict",
     "DestinationConnectorInformation",
     "DestinationConnectorInformationConfig",
     "DestinationConnectorInformationConfigTypedDict",
     "DestinationConnectorInformationTypedDict",
     "DestinationConnectorType",
-    "DropboxSourceConnectorConfig",
-    "DropboxSourceConnectorConfigInput",
-    "DropboxSourceConnectorConfigInputTypedDict",
-    "DropboxSourceConnectorConfigTypedDict",
-    "ElasticsearchConnectorConfig",
-    "ElasticsearchConnectorConfigInput",
-    "ElasticsearchConnectorConfigInputTypedDict",
-    "ElasticsearchConnectorConfigTypedDict",
     "EncryptionType",
     "FailedFile",
     "FailedFileTypedDict",
     "Files",
     "FilesTypedDict",
-    "GCSDestinationConnectorConfig",
-    "GCSDestinationConnectorConfigInput",
-    "GCSDestinationConnectorConfigInputTypedDict",
-    "GCSDestinationConnectorConfigTypedDict",
-    "GCSSourceConnectorConfig",
-    "GCSSourceConnectorConfigInput",
-    "GCSSourceConnectorConfigInputTypedDict",
-    "GCSSourceConnectorConfigTypedDict",
-    "GoogleDriveSourceConnectorConfig",
-    "GoogleDriveSourceConnectorConfigInput",
-    "GoogleDriveSourceConnectorConfigInputServiceAccountKey",
-    "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict",
-    "GoogleDriveSourceConnectorConfigInputTypedDict",
-    "GoogleDriveSourceConnectorConfigTypedDict",
-    "IBMWatsonxS3DestinationConnectorConfig",
-    "IBMWatsonxS3DestinationConnectorConfigInput",
-    "IBMWatsonxS3DestinationConnectorConfigInputTypedDict",
-    "IBMWatsonxS3DestinationConnectorConfigTypedDict",
     "InputFiles",
     "InputFilesTypedDict",
-    "JiraSourceConnectorConfig",
-    "JiraSourceConnectorConfigInput",
-    "JiraSourceConnectorConfigInputTypedDict",
-    "JiraSourceConnectorConfigTypedDict",
     "JobDetails",
     "JobDetailsTypedDict",
     "JobFailedFiles",
@@ -546,100 +148,18 @@ __all__ = [
     "JobNodeDetailsTypedDict",
     "JobProcessingStatus",
     "JobStatus",
-    "KafkaCloudDestinationConnectorConfig",
-    "KafkaCloudDestinationConnectorConfigInput",
-    "KafkaCloudDestinationConnectorConfigInputTypedDict",
-    "KafkaCloudDestinationConnectorConfigTypedDict",
-    "KafkaCloudSourceConnectorConfig",
-    "KafkaCloudSourceConnectorConfigInput",
-    "KafkaCloudSourceConnectorConfigInputTypedDict",
-    "KafkaCloudSourceConnectorConfigTypedDict",
     "Loc",
     "LocTypedDict",
-    "MilvusDestinationConnectorConfig",
-    "MilvusDestinationConnectorConfigInput",
-    "MilvusDestinationConnectorConfigInputTypedDict",
-    "MilvusDestinationConnectorConfigTypedDict",
-    "MongoDBConnectorConfig",
-    "MongoDBConnectorConfigInput",
-    "MongoDBConnectorConfigInputTypedDict",
-    "MongoDBConnectorConfigTypedDict",
-    "Neo4jDestinationConnectorConfig",
-    "Neo4jDestinationConnectorConfigInput",
-    "Neo4jDestinationConnectorConfigInputTypedDict",
-    "Neo4jDestinationConnectorConfigTypedDict",
     "NodeFileMetadata",
     "NodeFileMetadataTypedDict",
-    "OneDriveDestinationConnectorConfig",
-    "OneDriveDestinationConnectorConfigInput",
-    "OneDriveDestinationConnectorConfigInputTypedDict",
-    "OneDriveDestinationConnectorConfigTypedDict",
-    "OneDriveSourceConnectorConfig",
-    "OneDriveSourceConnectorConfigInput",
-    "OneDriveSourceConnectorConfigInputTypedDict",
-    "OneDriveSourceConnectorConfigTypedDict",
-    "OpenSearchConnectorConfig",
-    "OpenSearchConnectorConfigInput",
-    "OpenSearchConnectorConfigInputTypedDict",
-    "OpenSearchConnectorConfigTypedDict",
-    "OutlookSourceConnectorConfig",
-    "OutlookSourceConnectorConfigInput",
-    "OutlookSourceConnectorConfigInputTypedDict",
-    "OutlookSourceConnectorConfigTypedDict",
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
-    "PineconeDestinationConnectorConfig",
-    "PineconeDestinationConnectorConfigInput",
-    "PineconeDestinationConnectorConfigInputTypedDict",
-    "PineconeDestinationConnectorConfigTypedDict",
-    "PostgresDestinationConnectorConfig",
-    "PostgresDestinationConnectorConfigInput",
-    "PostgresDestinationConnectorConfigInputTypedDict",
-    "PostgresDestinationConnectorConfigTypedDict",
-    "PostgresSourceConnectorConfig",
-    "PostgresSourceConnectorConfigInput",
-    "PostgresSourceConnectorConfigInputTypedDict",
-    "PostgresSourceConnectorConfigTypedDict",
-    "QdrantCloudDestinationConnectorConfig",
-    "QdrantCloudDestinationConnectorConfigInput",
-    "QdrantCloudDestinationConnectorConfigInputTypedDict",
-    "QdrantCloudDestinationConnectorConfigTypedDict",
-    "RedisDestinationConnectorConfig",
-    "RedisDestinationConnectorConfigInput",
-    "RedisDestinationConnectorConfigInputTypedDict",
-    "RedisDestinationConnectorConfigTypedDict",
-    "S3DestinationConnectorConfig",
-    "S3DestinationConnectorConfigInput",
-    "S3DestinationConnectorConfigInputTypedDict",
-    "S3DestinationConnectorConfigTypedDict",
-    "S3SourceConnectorConfig",
-    "S3SourceConnectorConfigInput",
-    "S3SourceConnectorConfigInputTypedDict",
-    "S3SourceConnectorConfigTypedDict",
-    "SalesforceSourceConnectorConfig",
-    "SalesforceSourceConnectorConfigInput",
-    "SalesforceSourceConnectorConfigInputTypedDict",
-    "SalesforceSourceConnectorConfigTypedDict",
     "Schedule",
     "SecretReference",
     "SecretReferenceTypedDict",
     "Security",
     "SecurityTypedDict",
-    "ServiceAccountKey",
-    "ServiceAccountKeyTypedDict",
-    "SharePointSourceConnectorConfig",
-    "SharePointSourceConnectorConfigInput",
-    "SharePointSourceConnectorConfigInputTypedDict",
-    "SharePointSourceConnectorConfigTypedDict",
-    "SnowflakeDestinationConnectorConfig",
-    "SnowflakeDestinationConnectorConfigInput",
-    "SnowflakeDestinationConnectorConfigInputTypedDict",
-    "SnowflakeDestinationConnectorConfigTypedDict",
-    "SnowflakeSourceConnectorConfig",
-    "SnowflakeSourceConnectorConfigInput",
-    "SnowflakeSourceConnectorConfigInputTypedDict",
-    "SnowflakeSourceConnectorConfigTypedDict",
     "SortDirection",
     "SourceConnectorInformation",
     "SourceConnectorInformationConfig",
@@ -667,10 +187,6 @@ __all__ = [
     "VLMModelProvider",
     "ValidationError",
     "ValidationErrorTypedDict",
-    "WeaviateDestinationConnectorConfig",
-    "WeaviateDestinationConnectorConfigInput",
-    "WeaviateDestinationConnectorConfigInputTypedDict",
-    "WeaviateDestinationConnectorConfigTypedDict",
     "WorkflowInformation",
     "WorkflowInformationTypedDict",
     "WorkflowJobType",
@@ -680,29 +196,9 @@ __all__ = [
     "WorkflowScheduleTypedDict",
     "WorkflowState",
     "WorkflowType",
-    "ZendeskSourceConnectorConfig",
-    "ZendeskSourceConnectorConfigInput",
-    "ZendeskSourceConnectorConfigInputTypedDict",
-    "ZendeskSourceConnectorConfigTypedDict",
 ]
 
 _dynamic_imports: dict[str, str] = {
-    "AstraDBConnectorConfig": ".astradbconnectorconfig",
-    "AstraDBConnectorConfigTypedDict": ".astradbconnectorconfig",
-    "AstraDBConnectorConfigInput": ".astradbconnectorconfiginput",
-    "AstraDBConnectorConfigInputTypedDict": ".astradbconnectorconfiginput",
-    "AzureAISearchConnectorConfig": ".azureaisearchconnectorconfig",
-    "AzureAISearchConnectorConfigTypedDict": ".azureaisearchconnectorconfig",
-    "AzureAISearchConnectorConfigInput": ".azureaisearchconnectorconfiginput",
-    "AzureAISearchConnectorConfigInputTypedDict": ".azureaisearchconnectorconfiginput",
-    "AzureDestinationConnectorConfig": ".azuredestinationconnectorconfig",
-    "AzureDestinationConnectorConfigTypedDict": ".azuredestinationconnectorconfig",
-    "AzureDestinationConnectorConfigInput": ".azuredestinationconnectorconfiginput",
-    "AzureDestinationConnectorConfigInputTypedDict": ".azuredestinationconnectorconfiginput",
-    "AzureSourceConnectorConfig": ".azuresourceconnectorconfig",
-    "AzureSourceConnectorConfigTypedDict": ".azuresourceconnectorconfig",
-    "AzureSourceConnectorConfigInput": ".azuresourceconnectorconfiginput",
-    "AzureSourceConnectorConfigInputTypedDict": ".azuresourceconnectorconfiginput",
     "BodyCreateJob": ".body_create_job",
     "BodyCreateJobTypedDict": ".body_create_job",
     "InputFiles": ".body_create_job",
@@ -711,23 +207,7 @@ _dynamic_imports: dict[str, str] = {
     "BodyRunWorkflowInputFiles": ".body_run_workflow",
     "BodyRunWorkflowInputFilesTypedDict": ".body_run_workflow",
     "BodyRunWorkflowTypedDict": ".body_run_workflow",
-    "BoxSourceConnectorConfig": ".boxsourceconnectorconfig",
-    "BoxSourceConnectorConfigTypedDict": ".boxsourceconnectorconfig",
-    "BoxSourceConnectorConfigInput": ".boxsourceconnectorconfiginput",
-    "BoxSourceConnectorConfigInputTypedDict": ".boxsourceconnectorconfiginput",
-    "ConfluenceSourceConnectorConfig": ".confluencesourceconnectorconfig",
-    "ConfluenceSourceConnectorConfigTypedDict": ".confluencesourceconnectorconfig",
-    "ConfluenceSourceConnectorConfigInput": ".confluencesourceconnectorconfiginput",
-    "ConfluenceSourceConnectorConfigInputTypedDict": ".confluencesourceconnectorconfiginput",
     "ConnectionCheckStatus": ".connectioncheckstatus",
-    "CouchbaseDestinationConnectorConfig": ".couchbasedestinationconnectorconfig",
-    "CouchbaseDestinationConnectorConfigTypedDict": ".couchbasedestinationconnectorconfig",
-    "CouchbaseDestinationConnectorConfigInput": ".couchbasedestinationconnectorconfiginput",
-    "CouchbaseDestinationConnectorConfigInputTypedDict": ".couchbasedestinationconnectorconfiginput",
-    "CouchbaseSourceConnectorConfig": ".couchbasesourceconnectorconfig",
-    "CouchbaseSourceConnectorConfigTypedDict": ".couchbasesourceconnectorconfig",
-    "CouchbaseSourceConnectorConfigInput": ".couchbasesourceconnectorconfiginput",
-    "CouchbaseSourceConnectorConfigInputTypedDict": ".couchbasesourceconnectorconfiginput",
     "Config": ".createdestinationconnector",
     "ConfigTypedDict": ".createdestinationconnector",
     "CreateDestinationConnector": ".createdestinationconnector",
@@ -743,58 +223,14 @@ _dynamic_imports: dict[str, str] = {
     "CronTabEntryTypedDict": ".crontabentry",
     "DagNodeConnectionCheck": ".dagnodeconnectioncheck",
     "DagNodeConnectionCheckTypedDict": ".dagnodeconnectioncheck",
-    "DatabricksVDTDestinationConnectorConfig": ".databricksvdtdestinationconnectorconfig",
-    "DatabricksVDTDestinationConnectorConfigTypedDict": ".databricksvdtdestinationconnectorconfig",
-    "DatabricksVDTDestinationConnectorConfigInput": ".databricksvdtdestinationconnectorconfiginput",
-    "DatabricksVDTDestinationConnectorConfigInputTypedDict": ".databricksvdtdestinationconnectorconfiginput",
-    "DatabricksVolumesConnectorConfig": ".databricksvolumesconnectorconfig",
-    "DatabricksVolumesConnectorConfigTypedDict": ".databricksvolumesconnectorconfig",
-    "DatabricksVolumesConnectorConfigInput": ".databricksvolumesconnectorconfiginput",
-    "DatabricksVolumesConnectorConfigInputTypedDict": ".databricksvolumesconnectorconfiginput",
-    "DeltaTableConnectorConfig": ".deltatableconnectorconfig",
-    "DeltaTableConnectorConfigTypedDict": ".deltatableconnectorconfig",
-    "DeltaTableConnectorConfigInput": ".deltatableconnectorconfiginput",
-    "DeltaTableConnectorConfigInputTypedDict": ".deltatableconnectorconfiginput",
     "DestinationConnectorInformation": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfig": ".destinationconnectorinformation",
     "DestinationConnectorInformationConfigTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorInformationTypedDict": ".destinationconnectorinformation",
     "DestinationConnectorType": ".destinationconnectortype",
-    "DropboxSourceConnectorConfig": ".dropboxsourceconnectorconfig",
-    "DropboxSourceConnectorConfigTypedDict": ".dropboxsourceconnectorconfig",
-    "DropboxSourceConnectorConfigInput": ".dropboxsourceconnectorconfiginput",
-    "DropboxSourceConnectorConfigInputTypedDict": ".dropboxsourceconnectorconfiginput",
-    "ElasticsearchConnectorConfig": ".elasticsearchconnectorconfig",
-    "ElasticsearchConnectorConfigTypedDict": ".elasticsearchconnectorconfig",
-    "ElasticsearchConnectorConfigInput": ".elasticsearchconnectorconfiginput",
-    "ElasticsearchConnectorConfigInputTypedDict": ".elasticsearchconnectorconfiginput",
     "EncryptionType": ".encryptiontype",
     "FailedFile": ".failedfile",
     "FailedFileTypedDict": ".failedfile",
-    "GCSDestinationConnectorConfig": ".gcsdestinationconnectorconfig",
-    "GCSDestinationConnectorConfigTypedDict": ".gcsdestinationconnectorconfig",
-    "GCSDestinationConnectorConfigInput": ".gcsdestinationconnectorconfiginput",
-    "GCSDestinationConnectorConfigInputTypedDict": ".gcsdestinationconnectorconfiginput",
-    "GCSSourceConnectorConfig": ".gcssourceconnectorconfig",
-    "GCSSourceConnectorConfigTypedDict": ".gcssourceconnectorconfig",
-    "GCSSourceConnectorConfigInput": ".gcssourceconnectorconfiginput",
-    "GCSSourceConnectorConfigInputTypedDict": ".gcssourceconnectorconfiginput",
-    "GoogleDriveSourceConnectorConfig": ".googledrivesourceconnectorconfig",
-    "GoogleDriveSourceConnectorConfigTypedDict": ".googledrivesourceconnectorconfig",
-    "ServiceAccountKey": ".googledrivesourceconnectorconfig",
-    "ServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfig",
-    "GoogleDriveSourceConnectorConfigInput": ".googledrivesourceconnectorconfiginput",
-    "GoogleDriveSourceConnectorConfigInputServiceAccountKey": ".googledrivesourceconnectorconfiginput",
-    "GoogleDriveSourceConnectorConfigInputServiceAccountKeyTypedDict": ".googledrivesourceconnectorconfiginput",
-    "GoogleDriveSourceConnectorConfigInputTypedDict": ".googledrivesourceconnectorconfiginput",
-    "IBMWatsonxS3DestinationConnectorConfig": ".ibmwatsonxs3destinationconnectorconfig",
-    "IBMWatsonxS3DestinationConnectorConfigTypedDict": ".ibmwatsonxs3destinationconnectorconfig",
-    "IBMWatsonxS3DestinationConnectorConfigInput": ".ibmwatsonxs3destinationconnectorconfiginput",
-    "IBMWatsonxS3DestinationConnectorConfigInputTypedDict": ".ibmwatsonxs3destinationconnectorconfiginput",
-    "JiraSourceConnectorConfig": ".jirasourceconnectorconfig",
-    "JiraSourceConnectorConfigTypedDict": ".jirasourceconnectorconfig",
-    "JiraSourceConnectorConfigInput": ".jirasourceconnectorconfiginput",
-    "JiraSourceConnectorConfigInputTypedDict": ".jirasourceconnectorconfiginput",
     "JobDetails": ".jobdetails",
     "JobDetailsTypedDict": ".jobdetails",
     "JobFailedFiles": ".jobfailedfiles",
@@ -805,44 +241,8 @@ _dynamic_imports: dict[str, str] = {
     "JobNodeDetailsTypedDict": ".jobnodedetails",
     "JobProcessingStatus": ".jobprocessingstatus",
     "JobStatus": ".jobstatus",
-    "KafkaCloudDestinationConnectorConfig": ".kafkaclouddestinationconnectorconfig",
-    "KafkaCloudDestinationConnectorConfigTypedDict": ".kafkaclouddestinationconnectorconfig",
-    "KafkaCloudDestinationConnectorConfigInput": ".kafkaclouddestinationconnectorconfiginput",
-    "KafkaCloudDestinationConnectorConfigInputTypedDict": ".kafkaclouddestinationconnectorconfiginput",
-    "KafkaCloudSourceConnectorConfig": ".kafkacloudsourceconnectorconfig",
-    "KafkaCloudSourceConnectorConfigTypedDict": ".kafkacloudsourceconnectorconfig",
-    "KafkaCloudSourceConnectorConfigInput": ".kafkacloudsourceconnectorconfiginput",
-    "KafkaCloudSourceConnectorConfigInputTypedDict": ".kafkacloudsourceconnectorconfiginput",
-    "MilvusDestinationConnectorConfig": ".milvusdestinationconnectorconfig",
-    "MilvusDestinationConnectorConfigTypedDict": ".milvusdestinationconnectorconfig",
-    "MilvusDestinationConnectorConfigInput": ".milvusdestinationconnectorconfiginput",
-    "MilvusDestinationConnectorConfigInputTypedDict": ".milvusdestinationconnectorconfiginput",
-    "MongoDBConnectorConfig": ".mongodbconnectorconfig",
-    "MongoDBConnectorConfigTypedDict": ".mongodbconnectorconfig",
-    "MongoDBConnectorConfigInput": ".mongodbconnectorconfiginput",
-    "MongoDBConnectorConfigInputTypedDict": ".mongodbconnectorconfiginput",
-    "Neo4jDestinationConnectorConfig": ".neo4jdestinationconnectorconfig",
-    "Neo4jDestinationConnectorConfigTypedDict": ".neo4jdestinationconnectorconfig",
-    "Neo4jDestinationConnectorConfigInput": ".neo4jdestinationconnectorconfiginput",
-    "Neo4jDestinationConnectorConfigInputTypedDict": ".neo4jdestinationconnectorconfiginput",
     "NodeFileMetadata": ".nodefilemetadata",
     "NodeFileMetadataTypedDict": ".nodefilemetadata",
-    "OneDriveDestinationConnectorConfig": ".onedrivedestinationconnectorconfig",
-    "OneDriveDestinationConnectorConfigTypedDict": ".onedrivedestinationconnectorconfig",
-    "OneDriveDestinationConnectorConfigInput": ".onedrivedestinationconnectorconfiginput",
-    "OneDriveDestinationConnectorConfigInputTypedDict": ".onedrivedestinationconnectorconfiginput",
-    "OneDriveSourceConnectorConfig": ".onedrivesourceconnectorconfig",
-    "OneDriveSourceConnectorConfigTypedDict": ".onedrivesourceconnectorconfig",
-    "OneDriveSourceConnectorConfigInput": ".onedrivesourceconnectorconfiginput",
-    "OneDriveSourceConnectorConfigInputTypedDict": ".onedrivesourceconnectorconfiginput",
-    "OpenSearchConnectorConfig": ".opensearchconnectorconfig",
-    "OpenSearchConnectorConfigTypedDict": ".opensearchconnectorconfig",
-    "OpenSearchConnectorConfigInput": ".opensearchconnectorconfiginput",
-    "OpenSearchConnectorConfigInputTypedDict": ".opensearchconnectorconfiginput",
-    "OutlookSourceConnectorConfig": ".outlooksourceconnectorconfig",
-    "OutlookSourceConnectorConfigTypedDict": ".outlooksourceconnectorconfig",
-    "OutlookSourceConnectorConfigInput": ".outlooksourceconnectorconfiginput",
-    "OutlookSourceConnectorConfigInputTypedDict": ".outlooksourceconnectorconfiginput",
     "Files": ".partition_parameters",
     "FilesTypedDict": ".partition_parameters",
     "OutputFormat": ".partition_parameters",
@@ -850,54 +250,10 @@ _dynamic_imports: dict[str, str] = {
     "PartitionParametersTypedDict": ".partition_parameters",
     "Strategy": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
-    "PineconeDestinationConnectorConfig": ".pineconedestinationconnectorconfig",
-    "PineconeDestinationConnectorConfigTypedDict": ".pineconedestinationconnectorconfig",
-    "PineconeDestinationConnectorConfigInput": ".pineconedestinationconnectorconfiginput",
-    "PineconeDestinationConnectorConfigInputTypedDict": ".pineconedestinationconnectorconfiginput",
-    "PostgresDestinationConnectorConfig": ".postgresdestinationconnectorconfig",
-    "PostgresDestinationConnectorConfigTypedDict": ".postgresdestinationconnectorconfig",
-    "PostgresDestinationConnectorConfigInput": ".postgresdestinationconnectorconfiginput",
-    "PostgresDestinationConnectorConfigInputTypedDict": ".postgresdestinationconnectorconfiginput",
-    "PostgresSourceConnectorConfig": ".postgressourceconnectorconfig",
-    "PostgresSourceConnectorConfigTypedDict": ".postgressourceconnectorconfig",
-    "PostgresSourceConnectorConfigInput": ".postgressourceconnectorconfiginput",
-    "PostgresSourceConnectorConfigInputTypedDict": ".postgressourceconnectorconfiginput",
-    "QdrantCloudDestinationConnectorConfig": ".qdrantclouddestinationconnectorconfig",
-    "QdrantCloudDestinationConnectorConfigTypedDict": ".qdrantclouddestinationconnectorconfig",
-    "QdrantCloudDestinationConnectorConfigInput": ".qdrantclouddestinationconnectorconfiginput",
-    "QdrantCloudDestinationConnectorConfigInputTypedDict": ".qdrantclouddestinationconnectorconfiginput",
-    "RedisDestinationConnectorConfig": ".redisdestinationconnectorconfig",
-    "RedisDestinationConnectorConfigTypedDict": ".redisdestinationconnectorconfig",
-    "RedisDestinationConnectorConfigInput": ".redisdestinationconnectorconfiginput",
-    "RedisDestinationConnectorConfigInputTypedDict": ".redisdestinationconnectorconfiginput",
-    "S3DestinationConnectorConfig": ".s3destinationconnectorconfig",
-    "S3DestinationConnectorConfigTypedDict": ".s3destinationconnectorconfig",
-    "S3DestinationConnectorConfigInput": ".s3destinationconnectorconfiginput",
-    "S3DestinationConnectorConfigInputTypedDict": ".s3destinationconnectorconfiginput",
-    "S3SourceConnectorConfig": ".s3sourceconnectorconfig",
-    "S3SourceConnectorConfigTypedDict": ".s3sourceconnectorconfig",
-    "S3SourceConnectorConfigInput": ".s3sourceconnectorconfiginput",
-    "S3SourceConnectorConfigInputTypedDict": ".s3sourceconnectorconfiginput",
-    "SalesforceSourceConnectorConfig": ".salesforcesourceconnectorconfig",
-    "SalesforceSourceConnectorConfigTypedDict": ".salesforcesourceconnectorconfig",
-    "SalesforceSourceConnectorConfigInput": ".salesforcesourceconnectorconfiginput",
-    "SalesforceSourceConnectorConfigInputTypedDict": ".salesforcesourceconnectorconfiginput",
     "SecretReference": ".secretreference",
     "SecretReferenceTypedDict": ".secretreference",
     "Security": ".security",
     "SecurityTypedDict": ".security",
-    "SharePointSourceConnectorConfig": ".sharepointsourceconnectorconfig",
-    "SharePointSourceConnectorConfigTypedDict": ".sharepointsourceconnectorconfig",
-    "SharePointSourceConnectorConfigInput": ".sharepointsourceconnectorconfiginput",
-    "SharePointSourceConnectorConfigInputTypedDict": ".sharepointsourceconnectorconfiginput",
-    "SnowflakeDestinationConnectorConfig": ".snowflakedestinationconnectorconfig",
-    "SnowflakeDestinationConnectorConfigTypedDict": ".snowflakedestinationconnectorconfig",
-    "SnowflakeDestinationConnectorConfigInput": ".snowflakedestinationconnectorconfiginput",
-    "SnowflakeDestinationConnectorConfigInputTypedDict": ".snowflakedestinationconnectorconfiginput",
-    "SnowflakeSourceConnectorConfig": ".snowflakesourceconnectorconfig",
-    "SnowflakeSourceConnectorConfigTypedDict": ".snowflakesourceconnectorconfig",
-    "SnowflakeSourceConnectorConfigInput": ".snowflakesourceconnectorconfiginput",
-    "SnowflakeSourceConnectorConfigInputTypedDict": ".snowflakesourceconnectorconfiginput",
     "SortDirection": ".sortdirection",
     "SourceConnectorInformation": ".sourceconnectorinformation",
     "SourceConnectorInformationConfig": ".sourceconnectorinformation",
@@ -925,10 +281,6 @@ _dynamic_imports: dict[str, str] = {
     "LocTypedDict": ".validationerror",
     "ValidationError": ".validationerror",
     "ValidationErrorTypedDict": ".validationerror",
-    "WeaviateDestinationConnectorConfig": ".weaviatedestinationconnectorconfig",
-    "WeaviateDestinationConnectorConfigTypedDict": ".weaviatedestinationconnectorconfig",
-    "WeaviateDestinationConnectorConfigInput": ".weaviatedestinationconnectorconfiginput",
-    "WeaviateDestinationConnectorConfigInputTypedDict": ".weaviatedestinationconnectorconfiginput",
     "WorkflowInformation": ".workflowinformation",
     "WorkflowInformationTypedDict": ".workflowinformation",
     "WorkflowJobType": ".workflowjobtype",
@@ -938,10 +290,6 @@ _dynamic_imports: dict[str, str] = {
     "WorkflowScheduleTypedDict": ".workflowschedule",
     "WorkflowState": ".workflowstate",
     "WorkflowType": ".workflowtype",
-    "ZendeskSourceConnectorConfig": ".zendesksourceconnectorconfig",
-    "ZendeskSourceConnectorConfigTypedDict": ".zendesksourceconnectorconfig",
-    "ZendeskSourceConnectorConfigInput": ".zendesksourceconnectorconfiginput",
-    "ZendeskSourceConnectorConfigInputTypedDict": ".zendesksourceconnectorconfiginput",
 }
 
 
