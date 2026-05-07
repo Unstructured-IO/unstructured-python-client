@@ -1,6 +1,7 @@
 """Registration of custom, human-written hooks."""
 
 from .custom import (
+    AuthHeaderBeforeRequestHook,
     CleanServerUrlSDKInitHook,
     LoggerHook,
     SplitPdfHook,
@@ -21,6 +22,7 @@ def init_hooks(hooks: Hooks):
     """
 
     # Initialize custom hooks
+    auth_header_hook = AuthHeaderBeforeRequestHook()
     clean_server_url_hook = CleanServerUrlSDKInitHook()
     logger_hook = LoggerHook()
     split_pdf_hook = SplitPdfHook()
@@ -33,7 +35,11 @@ def init_hooks(hooks: Hooks):
     hooks.register_sdk_init_hook(logger_hook)
     hooks.register_sdk_init_hook(split_pdf_hook)
 
-    # Register Before Request hooks
+    # Register Before Request hooks.
+    # `auth_header_hook` MUST run first so subsequent before-request hooks
+    # (e.g. `split_pdf_hook`) see the final `Authorization` header when the
+    # caller is using a ClientCredentials / LegacyKeyExchange callable.
+    hooks.register_before_request_hook(auth_header_hook)
     hooks.register_before_request_hook(split_pdf_hook)
 
     # Register After Error hooks
@@ -42,4 +48,5 @@ def init_hooks(hooks: Hooks):
 
     # Register After Error hooks
     hooks.register_after_error_hook(split_pdf_hook)
-    hooks.register_after_error_hook(logger_hook)  
+    hooks.register_after_error_hook(logger_hook)
+
