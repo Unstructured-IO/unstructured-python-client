@@ -1,3 +1,8 @@
+## 0.44.0
+
+### Breaking changes
+* Removed deprecated connector config models from the SDK (e.g. `S3SourceConnectorConfig`, `AzureDestinationConnectorConfig`). Pass connector configs as plain dicts with arbitrary fields. The SDK is no longer coupled to backend connector schemas — new fields work without an SDK upgrade.
+
 ## 0.43.4
 
 ### Enhancements
