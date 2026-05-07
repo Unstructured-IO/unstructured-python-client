@@ -50,7 +50,7 @@ def test_list_destinations(
     assert destination.id == "0c363dec-3c70-45ee-8041-481044a6e1cc"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert isinstance(destination.config, shared.S3DestinationConnectorConfig)
+    assert isinstance(destination.config, dict)
     assert destination.created_at == datetime.fromisoformat(
         "2025-08-22T08:47:29.802+00:00"
     )
@@ -151,7 +151,7 @@ def test_get_destination(httpx_mock, platform_client: UnstructuredClient, platfo
     assert destination.id == "0c363dec-3c70-45ee-8041-481044a6e1cc"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert isinstance(destination.config, shared.S3DestinationConnectorConfig)
+    assert isinstance(destination.config, dict)
     assert destination.created_at == datetime.fromisoformat(
         "2025-08-22T08:47:29.802+00:00"
     )
@@ -229,7 +229,7 @@ def test_create_destination(
     assert destination.id == "b25d4161-77a0-4e08-b65e-86f398ce15ad"
     assert destination.name == "test_destination_name"
     assert destination.type == "s3"
-    assert isinstance(destination.config, shared.S3DestinationConnectorConfig)
+    assert isinstance(destination.config, dict)
     assert destination.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
@@ -284,7 +284,7 @@ def test_update_destination(
     assert updated_destination.id == "b25d4161-77a0-4e08-b65e-86f398ce15ad"
     assert updated_destination.name == "test_destination_name"
     assert updated_destination.type == "s3"
-    assert isinstance(updated_destination.config, shared.S3DestinationConnectorConfig)
+    assert isinstance(updated_destination.config, dict)
     assert updated_destination.created_at == datetime.fromisoformat(
         "2023-09-15T01:06:53.146+00:00"
     )
