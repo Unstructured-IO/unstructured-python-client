@@ -13,6 +13,8 @@ class BackoffStrategy:
     max_interval: int
     exponent: float
     max_elapsed_time: int
+    min_attempts: int
+    absolute_max_elapsed_time_ms: int | None
 
     def __init__(
         self,
@@ -20,11 +22,57 @@ class BackoffStrategy:
         max_interval: int,
         exponent: float,
         max_elapsed_time: int,
+        min_attempts: int = 0,
+        absolute_max_elapsed_time_ms: int | None = None,
     ):
+        # `min_attempts`: minimum number of RETRY attempts (NOT counting
+        # the initial attempt) that must fire before `max_elapsed_time`
+        # is honored. Despite the name, this counts retries only:
+        # `min_attempts=2` permits the initial attempt PLUS at least 2
+        # retries (3 total attempts) before the soft elapsed-time budget
+        # can cut the loop. Default `0` preserves prior behavior (budget
+        # honored from the first failed attempt). The field is named
+        # `min_attempts` for symmetry with the existing public-API
+        # vocabulary; the docstring is the contract.
+        # Exists to close the short-circuit where a single slow first
+        # attempt blows the soft budget and silently disables retries on
+        # subsequent transient errors. See FS-1988.
+        #
+        # `absolute_max_elapsed_time_ms`: cap on when a new retry can
+        # START. When set, no new retry attempt will be started past
+        # this elapsed time, regardless of `min_attempts`. In-flight
+        # `func()` calls are NOT interrupted — an attempt that begins
+        # just before the cap may run to its per-attempt timeout (e.g.
+        # the httpx client timeout) and exceed the cap. Worst-case
+        # wall-clock under this cap is therefore
+        # `absolute_max_elapsed_time_ms + per_attempt_timeout`, not
+        # `absolute_max_elapsed_time_ms`. To bound the true wall-clock,
+        # pair this with a per-attempt timeout no larger than the
+        # acceptable additional headroom past the cap.
+        # Default `None` preserves prior behavior (no cap on retry
+        # start; `min_attempts` and `max_elapsed_time` alone gate the
+        # loop). See FS-1988 PLAN.md "Worst-case wall-clock" section.
+        if min_attempts < 0:
+            raise ValueError(
+                f"min_attempts must be >= 0, got {min_attempts}"
+            )
+        if absolute_max_elapsed_time_ms is not None:
+            if absolute_max_elapsed_time_ms <= 0:
+                raise ValueError(
+                    "absolute_max_elapsed_time_ms must be > 0, "
+                    f"got {absolute_max_elapsed_time_ms}"
+                )
+            if absolute_max_elapsed_time_ms < max_elapsed_time:
+                raise ValueError(
+                    "absolute_max_elapsed_time_ms must be >= max_elapsed_time "
+                    f"({max_elapsed_time}), got {absolute_max_elapsed_time_ms}"
+                )
         self.initial_interval = initial_interval
         self.max_interval = max_interval
         self.exponent = exponent
         self.max_elapsed_time = max_elapsed_time
+        self.min_attempts = min_attempts
+        self.absolute_max_elapsed_time_ms = absolute_max_elapsed_time_ms
 
 
 class RetryConfig:
@@ -102,6 +150,8 @@ def retry(func, retries: Retries):
             retries.config.backoff.max_interval,
             retries.config.backoff.exponent,
             retries.config.backoff.max_elapsed_time,
+            retries.config.backoff.min_attempts,
+            retries.config.backoff.absolute_max_elapsed_time_ms,
         )
 
     return func()
@@ -146,9 +196,45 @@ async def retry_async(func, retries: Retries):
             retries.config.backoff.max_interval,
             retries.config.backoff.exponent,
             retries.config.backoff.max_elapsed_time,
+            retries.config.backoff.min_attempts,
+            retries.config.backoff.absolute_max_elapsed_time_ms,
         )
 
     return await func()
+
+
+def _cap_hit_after_attempt(
+    elapsed_ms,
+    retries,
+    min_attempts,
+    max_elapsed_time,
+    absolute_max_elapsed_time_ms,
+):
+    """Return True if either the soft or hard cap is already exceeded.
+
+    Called after an attempt fails, before deciding to sleep. Soft cap is
+    only honored once the `min_attempts` retry floor is satisfied; hard
+    cap (if set) is honored unconditionally.
+    """
+    soft_cap_hit = retries >= min_attempts and elapsed_ms > max_elapsed_time
+    hard_cap_hit = (
+        absolute_max_elapsed_time_ms is not None
+        and elapsed_ms > absolute_max_elapsed_time_ms
+    )
+    return soft_cap_hit or hard_cap_hit
+
+
+def _raise_or_return_after_cap(exception, elapsed_ms, retries, reason):
+    """Final handling when a cap is hit. Mirrors the original behavior
+    of returning the TemporaryError's response for retryable status codes
+    so the caller sees the last response rather than a stack trace."""
+    if isinstance(exception, TemporaryError):
+        return exception.response
+    elapsed_seconds = elapsed_ms / 1000
+    raise type(exception)(
+        f"{type(exception).__name__} after {retries + 1} attempts "
+        f"over {elapsed_seconds:.1f}s{reason}: {exception}"
+    ) from exception
 
 
 def retry_with_backoff(
@@ -157,6 +243,8 @@ def retry_with_backoff(
     max_interval=60000,
     exponent=1.5,
     max_elapsed_time=3600000,
+    min_attempts=0,
+    absolute_max_elapsed_time_ms=None,
 ):
     start = round(time.time() * 1000)
     retries = 0
@@ -168,18 +256,61 @@ def retry_with_backoff(
             raise exception.inner
         except Exception as exception:  # pylint: disable=broad-exception-caught
             now = round(time.time() * 1000)
-            if now - start > max_elapsed_time:
-                if isinstance(exception, TemporaryError):
-                    return exception.response
+            elapsed = now - start
 
-                elapsed_seconds = (now - start) / 1000
-                raise type(exception)(
-                    f"{type(exception).__name__} after {retries + 1} attempts "
-                    f"over {elapsed_seconds:.1f}s: {exception}"
-                ) from exception
-            sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
-            sleep = min(sleep, max_interval / 1000)
-            time.sleep(sleep)
+            # Post-attempt cap check: either cap exceeded by the attempt
+            # that just finished -> stop the loop.
+            if _cap_hit_after_attempt(
+                elapsed,
+                retries,
+                min_attempts,
+                max_elapsed_time,
+                absolute_max_elapsed_time_ms,
+            ):
+                result = _raise_or_return_after_cap(
+                    exception, elapsed, retries, ""
+                )
+                return result
+
+            sleep_seconds = (
+                (initial_interval / 1000) * exponent**retries
+                + random.uniform(0, 1)
+            )
+            sleep_seconds = min(sleep_seconds, max_interval / 1000)
+
+            # Pre-emptive hard-cap check: if the sleep alone would push us
+            # past the hard cap, no point sleeping into a doomed retry.
+            # Note: this prevents STARTING a new attempt past the cap, it
+            # does NOT interrupt an in-flight func() -- see docstring on
+            # BackoffStrategy.absolute_max_elapsed_time_ms.
+            if absolute_max_elapsed_time_ms is not None:
+                projected_elapsed = elapsed + int(sleep_seconds * 1000)
+                if projected_elapsed >= absolute_max_elapsed_time_ms:
+                    result = _raise_or_return_after_cap(
+                        exception,
+                        elapsed,
+                        retries,
+                        " (hard cap would be exceeded during backoff)",
+                    )
+                    return result
+
+            time.sleep(sleep_seconds)
+
+            # Post-sleep verification: belt-and-suspenders against late
+            # wakeups (OS scheduling) and rounding errors in the
+            # pre-sleep projection. If the actual elapsed time after the
+            # sleep is past the hard cap, do not start the next attempt.
+            if absolute_max_elapsed_time_ms is not None:
+                actual_elapsed = round(time.time() * 1000) - start
+                if actual_elapsed >= absolute_max_elapsed_time_ms:
+                    result = _raise_or_return_after_cap(
+                        exception,
+                        actual_elapsed,
+                        retries,
+                        " (hard cap reached during backoff sleep)",
+                    )
+                    return result
+
             retries += 1
 
 
@@ -189,6 +320,8 @@ async def retry_with_backoff_async(
     max_interval=60000,
     exponent=1.5,
     max_elapsed_time=3600000,
+    min_attempts=0,
+    absolute_max_elapsed_time_ms=None,
 ):
     start = round(time.time() * 1000)
     retries = 0
@@ -200,16 +333,53 @@ async def retry_with_backoff_async(
             raise exception.inner
         except Exception as exception:  # pylint: disable=broad-exception-caught
             now = round(time.time() * 1000)
-            if now - start > max_elapsed_time:
-                if isinstance(exception, TemporaryError):
-                    return exception.response
+            elapsed = now - start
 
-                elapsed_seconds = (now - start) / 1000
-                raise type(exception)(
-                    f"{type(exception).__name__} after {retries + 1} attempts "
-                    f"over {elapsed_seconds:.1f}s: {exception}"
-                ) from exception
-            sleep = (initial_interval / 1000) * exponent**retries + random.uniform(0, 1)
-            sleep = min(sleep, max_interval / 1000)
-            await asyncio.sleep(sleep)
+            if _cap_hit_after_attempt(
+                elapsed,
+                retries,
+                min_attempts,
+                max_elapsed_time,
+                absolute_max_elapsed_time_ms,
+            ):
+                result = _raise_or_return_after_cap(
+                    exception, elapsed, retries, ""
+                )
+                return result
+
+            sleep_seconds = (
+                (initial_interval / 1000) * exponent**retries
+                + random.uniform(0, 1)
+            )
+            sleep_seconds = min(sleep_seconds, max_interval / 1000)
+
+            if absolute_max_elapsed_time_ms is not None:
+                projected_elapsed = elapsed + int(sleep_seconds * 1000)
+                if projected_elapsed >= absolute_max_elapsed_time_ms:
+                    result = _raise_or_return_after_cap(
+                        exception,
+                        elapsed,
+                        retries,
+                        " (hard cap would be exceeded during backoff)",
+                    )
+                    return result
+
+            await asyncio.sleep(sleep_seconds)
+
+            # Post-sleep verification: belt-and-suspenders against late
+            # wakeups (event loop scheduling, asyncio.sleep imprecision)
+            # and rounding errors in the pre-sleep projection. If the
+            # actual elapsed time after the sleep is past the hard cap,
+            # do not start the next attempt.
+            if absolute_max_elapsed_time_ms is not None:
+                actual_elapsed = round(time.time() * 1000) - start
+                if actual_elapsed >= absolute_max_elapsed_time_ms:
+                    result = _raise_or_return_after_cap(
+                        exception,
+                        actual_elapsed,
+                        retries,
+                        " (hard cap reached during backoff sleep)",
+                    )
+                    return result
+
             retries += 1

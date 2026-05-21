@@ -19,3 +19,16 @@ src/unstructured_client/users.py
 #  - Adjust the custom url snippets in the file
 #  - Bring back the ignore line and commit
 src/unstructured_client/general.py
+
+# Ignore retries.py so we can carry the `min_attempts` and
+# `absolute_max_elapsed_time_ms` fields on BackoffStrategy plus the
+# soft/hard cap logic in retry_with_backoff{,_async}. Filed in FS-1988.
+# Speakeasy regen would otherwise wipe these fields. To pick up upstream
+# fixes to the generated retry runtime:
+#  - Comment out this ignore line
+#  - Generate locally
+#  - Manually re-merge the FS-1988 additions
+#  - Re-add the ignore line and commit
+# Long-term: push these fields upstream to Speakeasy templates so this
+# ignore can be removed.
+src/unstructured_client/utils/retries.py

@@ -813,3 +813,79 @@ async def test_split_pdf_transport_errors_still_retry_when_sdk_disables_connecti
     assert number_of_transport_failures == 0
     assert mock_endpoint_called
     assert res.status_code == 200
+
+
+def test_split_pdf_cache_tmp_data_chunk_request_stream_is_replay_safe(tmp_path):
+    """Regression test for FS-1988: when split_pdf_cache_tmp_data=True
+    is set, chunks are loaded as opened file objects (not BytesIO) and
+    handed to `create_pdf_chunk_request`. The resulting `httpx.Request`
+    must be replay-safe — i.e. its body stream can be iterated more
+    than once, returning identical bytes each time.
+
+    Body replay is what makes SDK-level retries on transient errors
+    (ReadTimeout, ConnectError, etc.) actually deliver the original
+    multipart payload to the server. A future Speakeasy template
+    change or refactor of `serialize_request_body` that produced a
+    single-consumption stream (e.g. an `Iterable[bytes]` over an open
+    file handle) would silently break retries: the server would see
+    an empty body on the second attempt.
+
+    The invariant is pinned by iterating `request.stream` twice
+    directly — NOT via `request.read()`, which caches into
+    `Request._content` and would paper over a non-replayable stream
+    after the first call. This is the actual transport-level path
+    httpcore uses when `AsyncClient.send` retries a request.
+    """
+    from unstructured_client._hooks.custom.request_utils import (
+        create_pdf_chunk_request,
+    )
+
+    # Drive `create_pdf_chunk_request` directly with a file-object
+    # chunk — the cache_tmp_data=True branch in `_get_pdf_chunk_files`.
+    chunk_path = tmp_path / "chunk.pdf"
+    src_bytes = Path("_sample_docs/layout-parser-paper.pdf").read_bytes()
+    chunk_path.write_bytes(src_bytes)
+
+    pdf_chunk_file = open(chunk_path, "rb")  # noqa: SIM115 -- closed manually
+    try:
+        form_data = {
+            "files": (chunk_path.name, src_bytes, "application/pdf"),
+            "strategy": "fast",
+        }
+        original_request = httpx.Request(
+            method="POST",
+            url="http://localhost:8000/general/v0/general",
+            headers={
+                "Content-Type": "multipart/form-data; boundary=test",
+                "User-Agent": "test",
+            },
+            content=b"",
+        )
+
+        chunk_request = create_pdf_chunk_request(
+            form_data=form_data,
+            pdf_chunk=(pdf_chunk_file, 1),
+            original_request=original_request,
+            filename=chunk_path.name,
+        )
+
+        # Iterate the body stream twice. If the underlying stream is
+        # not replayable (e.g. an open file handle that's exhausted
+        # after the first pass), the second iteration yields empty
+        # or partial bytes and the assert below fails.
+        first_pass = b"".join(chunk_request.stream)
+        second_pass = b"".join(chunk_request.stream)
+
+        assert len(first_pass) > 1000, (
+            f"First iteration produced too-small body ({len(first_pass)} "
+            "bytes); a real PDF chunk multipart envelope should be at "
+            "least kilobytes."
+        )
+        assert first_pass == second_pass, (
+            "Body stream not replay-safe: second iteration of "
+            "chunk_request.stream returned different bytes than the "
+            "first. SDK retries on transient errors would silently "
+            "send a truncated or empty body to the server."
+        )
+    finally:
+        pdf_chunk_file.close()
