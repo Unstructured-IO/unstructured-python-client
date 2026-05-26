@@ -1,6 +1,3 @@
-"""Tests for retry logic covering all TransportError subclasses
-and the FS-1988 min_attempts / absolute_max_elapsed_time_ms semantics."""
-
 import asyncio
 import time as time_module
 from unittest.mock import MagicMock
@@ -20,29 +17,7 @@ from unstructured_client.utils.retries import (
 )
 
 
-# -----------------------------------------------------------------
-# FS-1988 fake-clock harness
-#
-# `retries.py` reads `time.time()` and calls `time.sleep()` /
-# `asyncio.sleep()`. The retries module imports `time` and `asyncio`
-# at module scope, so we patch those module attributes. Each test
-# starts the clock at 0ms and advances it explicitly:
-#   - `time.sleep(s)` advances the fake clock by s*1000 ms
-#   - `asyncio.sleep(s)` advances the fake clock by s*1000 ms
-#   - the test `func` callable advances the clock by its own simulated
-#     attempt duration before raising / returning
-# -----------------------------------------------------------------
-
-
 class FakeClock:
-    """Mutable monotonic clock for retry loop tests.
-
-    Tracks elapsed milliseconds since fixture creation. `now_ms` is
-    incremented by patched sleep functions and by test func() bodies.
-    `time()` returns a float seconds value compatible with
-    `round(time.time() * 1000)` patterns in retries.py.
-    """
-
     def __init__(self):
         self.now_ms = 0
 
@@ -69,10 +44,7 @@ def fake_clock(monkeypatch):
     monkeypatch.setattr(retries_module.time, "time", fake_time)
     monkeypatch.setattr(retries_module.time, "sleep", fake_sync_sleep)
     monkeypatch.setattr(retries_module.asyncio, "sleep", fake_async_sleep)
-    # Strip jitter so backoff durations are exactly reproducible.
-    monkeypatch.setattr(
-        retries_module.random, "uniform", lambda a, b: 0.0
-    )
+    monkeypatch.setattr(retries_module.random, "uniform", lambda a, b: 0.0)
     return clock
 
 
@@ -126,7 +98,6 @@ def _make_retries(retry_connection_errors: bool) -> Retries:
     )
 
 
-# All TransportError subclasses that should be retried
 TRANSPORT_ERRORS = [
     (httpx.ConnectError, "Connection refused"),
     (httpx.RemoteProtocolError, "Server disconnected without sending a response."),
@@ -138,7 +109,6 @@ TRANSPORT_ERRORS = [
 
 
 class TestTransportErrorRetry:
-    """All httpx.TransportError subclasses should be retried when retry_connection_errors=True."""
 
     @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
     def test_transport_error_retried_when_enabled(self, exc_class, msg):
@@ -172,7 +142,6 @@ class TestTransportErrorRetry:
 
 
 class TestTransportErrorRetryAsync:
-    """Async: All httpx.TransportError subclasses should be retried."""
 
     @pytest.mark.parametrize("exc_class,msg", TRANSPORT_ERRORS)
     def test_transport_error_retried_async(self, exc_class, msg):
@@ -203,12 +172,6 @@ class TestTransportErrorRetryAsync:
 
         with pytest.raises(exc_class):
             asyncio.run(retry_async(func, retries_config))
-
-
-# -----------------------------------------------------------------
-# FS-1988 tests: BackoffStrategy validation (T12-T14)
-# These do not need the fake-clock harness.
-# -----------------------------------------------------------------
 
 
 class TestBackoffStrategyValidation:
@@ -262,11 +225,6 @@ class TestBackoffStrategyValidation:
             max_elapsed_time=5_000,
             absolute_max_elapsed_time_ms=5_000,
         )
-
-
-# -----------------------------------------------------------------
-# FS-1988 tests: T1, T2 -- backward compatibility (min_attempts=0)
-# -----------------------------------------------------------------
 
 
 class TestBackwardCompat:
@@ -327,16 +285,8 @@ class TestBackwardCompat:
         assert call_count == 2
 
 
-# -----------------------------------------------------------------
-# FS-1988 tests: T3 -- the v1 reproducer.
-# Attempt 1 takes longer than the soft cap; the min_attempts floor
-# must permit attempt 2 to fire, which then succeeds.
-# -----------------------------------------------------------------
-
-
 class TestSoftCapFloor:
     def test_t3_slow_first_attempt_then_success_sync(self, fake_clock):
-        # Soft cap 5s, attempt 1 takes 6s, min_attempts=2.
         retries_config = _retries(
             max_elapsed_time=5_000,
             min_attempts=2,
@@ -375,9 +325,6 @@ class TestSoftCapFloor:
         assert call_count == 2
 
     def test_t3_baseline_pre_fix_behavior(self, fake_clock):
-        """Without the min_attempts floor (min_attempts=0), the same
-        scenario short-circuits with no retries -- this is the pre-fix
-        regression. Documents the bug class we are closing."""
         retries_config = _retries(
             max_elapsed_time=5_000,
             min_attempts=0,
@@ -399,15 +346,8 @@ class TestSoftCapFloor:
         assert call_count == 1
 
 
-# -----------------------------------------------------------------
-# FS-1988 tests: T4, T5 -- floor is NOT a ceiling.
-# -----------------------------------------------------------------
-
-
 class TestFloorIsNotCeiling:
     def test_t4_floor_does_not_cap_attempts_sync(self, fake_clock):
-        """min_attempts=2 with 5 transient failures + budget should
-        produce 6 total attempts, NOT 3."""
         retries_config = _retries(
             initial_interval=100,
             max_interval=200,
@@ -429,9 +369,6 @@ class TestFloorIsNotCeiling:
         assert call_count == 6
 
     def test_t5_floor_then_soft_cap_sync(self, fake_clock):
-        """With min_attempts=2 and all attempts failing fast, the
-        loop must fire AT LEAST 3 total attempts (initial + 2 retries)
-        before the soft cap can cut in."""
         retries_config = _retries(
             initial_interval=100,
             max_interval=200,
@@ -444,26 +381,16 @@ class TestFloorIsNotCeiling:
         def func():
             nonlocal call_count
             call_count += 1
-            # Each attempt itself is instantaneous; only the backoff
             # sleep advances the fake clock.
             raise httpx.ConnectError("transient")
 
         with pytest.raises(httpx.ConnectError):
             retry(func, retries_config)
-        # 3 = initial + 2 retries (the min_attempts floor)
         assert call_count >= 3
-
-
-# -----------------------------------------------------------------
-# FS-1988 tests: T6, T7 -- hard cap overrides the floor; sleep
-# truncation prevents sleeping into a doomed retry.
-# -----------------------------------------------------------------
 
 
 class TestHardCap:
     def test_t6_hard_cap_overrides_floor_sync(self, fake_clock):
-        """min_attempts=2 but attempt 1 takes longer than the hard
-        cap. Hard cap must fire even though the floor is unsatisfied."""
         retries_config = _retries(
             max_elapsed_time=5_000,
             min_attempts=2,
@@ -481,7 +408,6 @@ class TestHardCap:
 
         with pytest.raises(httpx.ReadTimeout):
             retry(func, retries_config)
-        # Hard cap fires after attempt 1; no further attempts.
         assert call_count == 1
 
     def test_t6_hard_cap_overrides_floor_async(self, fake_clock):
@@ -505,10 +431,6 @@ class TestHardCap:
         assert call_count == 1
 
     def test_t7_sleep_truncation_prevents_doomed_retry_sync(self, fake_clock):
-        """Hard cap pre-emptive check: if the sleep alone would push
-        past the cap, raise immediately rather than sleeping into a
-        retry that can never start."""
-        # Soft cap 5s, hard cap 10s, attempt 1 takes 9.95s.
         # Sleep starts at 100ms * 1.5^0 = 100ms (no jitter in tests),
         # but we want to assert the sleep+elapsed > hard_cap path
         # fires. Use larger initial_interval to make the calculation
@@ -538,16 +460,8 @@ class TestHardCap:
         assert call_count == 1
 
 
-# -----------------------------------------------------------------
-# FS-1988 tests: T8, T9, T10 -- TemporaryError (retryable 5xx)
-# early-return behavior under soft and hard cap exhaustion.
-# -----------------------------------------------------------------
-
-
 class TestTemporaryErrorEarlyReturn:
     def test_t8_soft_cap_5xx_returns_last_response_sync(self, fake_clock):
-        """min_attempts=0, retryable 5xx, soft cap exhausted: returns
-        the last 5xx response (existing behavior)."""
         retries_config = _retries(
             initial_interval=100,
             max_interval=200,
@@ -562,11 +476,9 @@ class TestTemporaryErrorEarlyReturn:
         def func():
             nonlocal call_count
             call_count += 1
-            # Each attempt itself is instant; backoff sleep accumulates.
             return bad_response
 
         result = retry(func, retries_config)
-        # Should return the last 5xx response, not raise.
         assert result.status_code == 503
         assert call_count >= 1
 
@@ -589,12 +501,9 @@ class TestTemporaryErrorEarlyReturn:
 
         result = retry(func, retries_config)
         assert result.status_code == 503
-        # Floor enforced: at least initial + 2 retries before soft cap.
         assert call_count >= 3
 
     def test_t10_hard_cap_5xx_returns_last_response_sync(self, fake_clock):
-        """Hard cap fires; TemporaryError still returns the response,
-        not a raised exception."""
         retries_config = _retries(
             initial_interval=100,
             max_interval=200,
@@ -619,18 +528,7 @@ class TestTemporaryErrorEarlyReturn:
         assert call_count == 1
 
 
-# -----------------------------------------------------------------
-# FS-1988 tests: T11 -- PermanentError unaffected by min_attempts.
-# -----------------------------------------------------------------
-
-
 class TestPermanentErrorShortCircuit:
-    """A non-transport, non-status-code exception raised from func() is
-    wrapped by retry/retry_async's inner do_request closure in a
-    PermanentError. The outer retry_with_backoff{,_async} catches
-    PermanentError and re-raises `.inner`, which short-circuits the loop
-    regardless of min_attempts. Verifies the floor does NOT force retries
-    on permanent failures."""
 
     def test_t11_permanent_error_one_attempt_sync(self, fake_clock):
         retries_config = _retries(min_attempts=10)
@@ -643,7 +541,6 @@ class TestPermanentErrorShortCircuit:
 
         with pytest.raises(ValueError, match="permanent"):
             retry(func, retries_config)
-        # Even with min_attempts=10, PermanentError short-circuits.
         assert call_count == 1
 
     def test_t11_permanent_error_one_attempt_async(self, fake_clock):
