@@ -3,6 +3,9 @@
 ### Breaking changes
 * Removed deprecated connector config models from the SDK (e.g. `S3SourceConnectorConfig`, `AzureDestinationConnectorConfig`). Pass connector configs as plain dicts with arbitrary fields. The SDK is no longer coupled to backend connector schemas — new fields work without an SDK upgrade.
 
+### Features
+* Add `min_attempts` and `absolute_max_elapsed_time_ms` fields to `BackoffStrategy`. `min_attempts` is the minimum number of retry attempts that must fire before `max_elapsed_time` is honored; defaults to `0` (preserves existing behavior). `absolute_max_elapsed_time_ms` caps when a new retry can start (does not interrupt in-flight requests); defaults to `None`. Together these close a short-circuit where a single slow first attempt could exhaust the retry budget before any retry fired. See FS-1988.
+
 ## 0.43.4
 
 ### Enhancements

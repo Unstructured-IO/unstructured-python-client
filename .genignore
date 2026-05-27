@@ -19,3 +19,7 @@ src/unstructured_client/users.py
 #  - Adjust the custom url snippets in the file
 #  - Bring back the ignore line and commit
 src/unstructured_client/general.py
+
+# Custom min_attempts / absolute_max_elapsed_time_ms fields on BackoffStrategy.
+# Push upstream to Speakeasy templates to remove this entry.
+src/unstructured_client/utils/retries.py

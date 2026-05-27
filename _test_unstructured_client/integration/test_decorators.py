@@ -813,3 +813,45 @@ async def test_split_pdf_transport_errors_still_retry_when_sdk_disables_connecti
     assert number_of_transport_failures == 0
     assert mock_endpoint_called
     assert res.status_code == 200
+
+
+def test_split_pdf_cache_tmp_data_chunk_request_stream_is_replay_safe(tmp_path):
+    from unstructured_client._hooks.custom.request_utils import (
+        create_pdf_chunk_request,
+    )
+
+    chunk_path = tmp_path / "chunk.pdf"
+    src_bytes = Path("_sample_docs/layout-parser-paper.pdf").read_bytes()
+    chunk_path.write_bytes(src_bytes)
+
+    pdf_chunk_file = open(chunk_path, "rb")  # noqa: SIM115
+    try:
+        form_data = {
+            "files": (chunk_path.name, src_bytes, "application/pdf"),
+            "strategy": "fast",
+        }
+        original_request = httpx.Request(
+            method="POST",
+            url="http://localhost:8000/general/v0/general",
+            headers={
+                "Content-Type": "multipart/form-data; boundary=test",
+                "User-Agent": "test",
+            },
+            content=b"",
+        )
+
+        chunk_request = create_pdf_chunk_request(
+            form_data=form_data,
+            pdf_chunk=(pdf_chunk_file, 1),
+            original_request=original_request,
+            filename=chunk_path.name,
+        )
+
+        # Iterate twice without request.read() to bypass _content caching.
+        first_pass = b"".join(chunk_request.stream)
+        second_pass = b"".join(chunk_request.stream)
+
+        assert len(first_pass) > 1000
+        assert first_pass == second_pass
+    finally:
+        pdf_chunk_file.close()
