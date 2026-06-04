@@ -482,6 +482,44 @@ async def test_remaining_tasks_cancelled_when_fails_disallowed():
     assert len(tasks) > cancelled_counter["cancelled"] > 0
 
 
+@pytest.mark.asyncio
+async def test_unit_run_tasks_pool_limits_configurable_via_env(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Env vars override the httpx.AsyncClient connection-pool limits.
+
+    Operators running the SDK in a Kubernetes Deployment with
+    connect-time-only load balancing (kube-proxy ClusterIP, meshless)
+    need to be able to shrink the keepalive pool so connections recycle
+    frequently and redistribute across backend pods.
+    """
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_MAX_CONNECTIONS", "7")
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_MAX_KEEPALIVE_CONNECTIONS", "1")
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_KEEPALIVE_EXPIRY", "30.0")
+
+    captured: dict[str, httpx.Limits] = {}
+    real_async_client = httpx.AsyncClient
+
+    def _capturing_async_client(*args, **kwargs):
+        captured["limits"] = kwargs.get("limits")
+        return real_async_client(*args, **kwargs)
+
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.httpx.AsyncClient",
+        side_effect=_capturing_async_client,
+    ):
+        await run_tasks(
+            [partial(_request_mock, fails=False, content="ok")],
+            allow_failed=True,
+        )
+
+    limits = captured["limits"]
+    assert isinstance(limits, httpx.Limits)
+    assert limits.max_connections == 7
+    assert limits.max_keepalive_connections == 1
+    assert limits.keepalive_expiry == 30.0
+
+
 @patch("unstructured_client._hooks.custom.form_utils.Path")
 def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path: MagicMock):
     """Test get_split_pdf_cache_tmp_data_dir uses the directory from the form data."""
