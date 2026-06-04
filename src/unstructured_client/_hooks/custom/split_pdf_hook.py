@@ -199,6 +199,71 @@ def _resolve_pool_limits() -> httpx.Limits:
     )
 
 
+def _resolve_tls_config() -> tuple[Union[bool, str], Optional[Union[str, tuple[str, str]]]]:
+    """Resolve httpx TLS server-verification and client-certificate config
+    from environment variables.
+
+    Returns a (verify, cert) tuple suitable for `httpx.AsyncClient(verify=..., cert=...)`.
+
+    Server verification (`verify`):
+    - `UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE` (path): use this CA bundle file
+      instead of the system trust store. Typical use: custom internal CA.
+    - `UNSTRUCTURED_CLIENT_TLS_VERIFY` (`"false"`, `"0"`, `"no"`, `"off"`):
+      disable certificate verification entirely. Intended for local dev
+      against self-signed test endpoints; **do not use in production**.
+    - Otherwise: `True` (httpx default — use system trust store).
+
+    Client certificate (`cert`, for mTLS):
+    - `UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT` (path): PEM file. By default
+      httpx will read the private key from the same file.
+    - `UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY` (path, optional): use this
+      separate key file. Required only if cert and key are split.
+    - Otherwise: `None`.
+
+    Defaults match httpx's built-in defaults so behavior is unchanged for
+    callers that don't set any of these variables.
+    """
+    verify: Union[bool, str]
+    if ca_bundle := os.getenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE"):
+        verify = ca_bundle
+    elif (verify_env := os.getenv("UNSTRUCTURED_CLIENT_TLS_VERIFY")) is not None:
+        verify = verify_env.strip().lower() not in ("false", "0", "no", "off", "")
+    else:
+        verify = True
+
+    cert: Optional[Union[str, tuple[str, str]]] = None
+    if client_cert := os.getenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT"):
+        if client_key := os.getenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY"):
+            cert = (client_cert, client_key)
+        else:
+            cert = client_cert
+
+    return verify, cert
+
+
+def _describe_tls_config(
+    verify: Union[bool, str], cert: Optional[Union[str, tuple[str, str]]]
+) -> str:
+    """Short human-readable summary of the TLS config, safe for log output.
+    Emits "system-trust" / "no-verify" / "ca-bundle" rather than the actual
+    file path, so logs don't leak filesystem layout."""
+    if verify is False:
+        verify_desc = "no-verify"
+    elif verify is True:
+        verify_desc = "system-trust"
+    else:
+        verify_desc = "custom-ca-bundle"
+
+    if cert is None:
+        cert_desc = "none"
+    elif isinstance(cert, tuple):
+        cert_desc = "cert+key"
+    else:
+        cert_desc = "cert-only"
+
+    return f"verify={verify_desc} client_cert={cert_desc}"
+
+
 async def run_tasks(
     coroutines: list[partial[Coroutine[Any, Any, httpx.Response]]],
     allow_failed: bool = False,
@@ -228,9 +293,10 @@ async def run_tasks(
         client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
     limits = _resolve_pool_limits()
+    verify, cert = _resolve_tls_config()
 
     logger.debug(
-        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s",
+        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s",
         operation_id,
         len(coroutines),
         concurrency_level,
@@ -239,9 +305,12 @@ async def run_tasks(
         limits.max_connections,
         limits.max_keepalive_connections,
         limits.keepalive_expiry,
+        _describe_tls_config(verify, cert),
     )
 
-    async with httpx.AsyncClient(timeout=client_timeout, limits=limits) as client:
+    async with httpx.AsyncClient(
+        timeout=client_timeout, limits=limits, verify=verify, cert=cert
+    ) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
         tasks = [
             asyncio.create_task(_order_keeper(index, coro))
@@ -798,8 +867,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 self.coroutines_to_execute[operation_id].append(coroutine)
 
             plan_limits = _resolve_pool_limits()
+            plan_verify, plan_cert = _resolve_tls_config()
             logger.info(
-                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs",
+                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s",
                 operation_id,
                 Path(pdf_file_meta["filename"]).name,
                 form_data.get("strategy"),
@@ -821,6 +891,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 plan_limits.max_connections,
                 plan_limits.max_keepalive_connections,
                 plan_limits.keepalive_expiry,
+                _describe_tls_config(plan_verify, plan_cert),
             )
 
             self.pending_operation_ids[operation_id] = operation_id
