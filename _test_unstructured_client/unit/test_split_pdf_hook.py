@@ -482,6 +482,184 @@ async def test_remaining_tasks_cancelled_when_fails_disallowed():
     assert len(tasks) > cancelled_counter["cancelled"] > 0
 
 
+@pytest.mark.asyncio
+async def test_unit_run_tasks_pool_limits_configurable_via_env(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Env vars override the httpx.AsyncClient connection-pool limits.
+
+    Operators running the SDK in a Kubernetes Deployment with
+    connect-time-only load balancing (kube-proxy ClusterIP, meshless)
+    need to be able to shrink the keepalive pool so connections recycle
+    frequently and redistribute across backend pods.
+    """
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_MAX_CONNECTIONS", "7")
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_MAX_KEEPALIVE_CONNECTIONS", "1")
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_KEEPALIVE_EXPIRY", "30.0")
+
+    captured: dict[str, httpx.Limits] = {}
+    real_async_client = httpx.AsyncClient
+
+    def _capturing_async_client(*args, **kwargs):
+        captured["limits"] = kwargs.get("limits")
+        return real_async_client(*args, **kwargs)
+
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.httpx.AsyncClient",
+        side_effect=_capturing_async_client,
+    ):
+        await run_tasks(
+            [partial(_request_mock, fails=False, content="ok")],
+            allow_failed=True,
+        )
+
+    limits = captured["limits"]
+    assert isinstance(limits, httpx.Limits)
+    assert limits.max_connections == 7
+    assert limits.max_keepalive_connections == 1
+    assert limits.keepalive_expiry == 30.0
+
+
+_TLS_ENV_VARS = (
+    "SSL_CERT_FILE",
+    "REQUESTS_CA_BUNDLE",
+    "UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT",
+    "UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY",
+)
+
+
+def test_unit_resolve_tls_config_defaults_unchanged_without_env(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """No env vars set → verify=True, cert=None (httpx defaults). Backward
+    compatibility check — callers that don't opt into TLS config see no
+    behavior change."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    for var in _TLS_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+    verify, cert = _resolve_tls_config()
+    assert verify is True
+    assert cert is None
+
+
+def test_unit_resolve_tls_config_ssl_cert_file_from_env(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
+    """SSL_CERT_FILE (stdlib ssl convention) → verify=<path>. Use case:
+    internal CA bundle shared with other Python tooling."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    for var in _TLS_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+    ca_bundle = tmp_path / "custom-ca.pem"
+    ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
+    monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
+
+    verify, cert = _resolve_tls_config()
+    assert verify == str(ca_bundle)
+    assert cert is None
+
+
+def test_unit_resolve_tls_config_requests_ca_bundle_from_env(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
+    """REQUESTS_CA_BUNDLE (requests/httpx-ecosystem convention) → verify=<path>."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    for var in _TLS_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+    ca_bundle = tmp_path / "custom-ca.pem"
+    ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", str(ca_bundle))
+
+    verify, cert = _resolve_tls_config()
+    assert verify == str(ca_bundle)
+    assert cert is None
+
+
+def test_unit_resolve_tls_config_ssl_cert_file_wins_over_requests_ca_bundle(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """If both standard env vars are set, SSL_CERT_FILE takes precedence —
+    it's the lower-level stdlib convention."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    monkeypatch.setenv("SSL_CERT_FILE", "/etc/ssl/stdlib-ca.pem")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/etc/ssl/requests-ca.pem")
+
+    verify, _ = _resolve_tls_config()
+    assert verify == "/etc/ssl/stdlib-ca.pem"
+
+
+def test_unit_resolve_tls_config_client_cert_only(monkeypatch: pytest.MonkeyPatch):
+    """UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT alone → cert=<path>. httpx will
+    read the private key from the same PEM file."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.pem")
+    monkeypatch.delenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY", raising=False)
+
+    verify, cert = _resolve_tls_config()
+    assert cert == "/etc/ssl/client.pem"
+
+
+def test_unit_resolve_tls_config_client_cert_and_key_split(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Both _CLIENT_CERT and _CLIENT_KEY → cert=(cert_path, key_path). For
+    PKI setups where cert and key live in separate files."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.crt")
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY", "/etc/ssl/client.key")
+
+    verify, cert = _resolve_tls_config()
+    assert cert == ("/etc/ssl/client.crt", "/etc/ssl/client.key")
+
+
+@pytest.mark.asyncio
+async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_client(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+):
+    """run_tasks() actually wires verify+cert into httpx.AsyncClient(). End-to-
+    end check that _resolve_tls_config is called and its result reaches the
+    client construction. AsyncClient is fully mocked so we don't have to feed
+    httpx a real cert chain."""
+    ca_bundle = tmp_path / "ca.pem"
+    ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
+    monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.pem")
+
+    captured: dict = {}
+
+    class _MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            captured["verify"] = kwargs.get("verify")
+            captured["cert"] = kwargs.get("cert")
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.httpx.AsyncClient",
+        new=_MockAsyncClient,
+    ):
+        await run_tasks(
+            [partial(_request_mock, fails=False, content="ok")],
+            allow_failed=True,
+        )
+
+    assert captured["verify"] == str(ca_bundle)
+    assert captured["cert"] == "/etc/ssl/client.pem"
+
+
 @patch("unstructured_client._hooks.custom.form_utils.Path")
 def test_unit_get_split_pdf_cache_tmp_data_dir_uses_dir_from_form_data(mock_path: MagicMock):
     """Test get_split_pdf_cache_tmp_data_dir uses the directory from the form data."""

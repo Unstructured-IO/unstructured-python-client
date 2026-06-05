@@ -177,6 +177,84 @@ async def _order_keeper(index: int, coro: Awaitable) -> Tuple[int, httpx.Respons
     return index, response
 
 
+def _resolve_pool_limits() -> httpx.Limits:
+    """Resolve httpx connection-pool limits from environment variables.
+
+    Defaults match httpx's built-in defaults (max_connections=100,
+    max_keepalive_connections=20, keepalive_expiry=5.0) so behavior is
+    unchanged for callers that do not set the env vars. Operators running
+    the SDK inside a Kubernetes Deployment that load-balances only at
+    TCP-connect time (e.g. kube-proxy ClusterIP, no service mesh) can
+    lower these values to force frequent reconnects and redistribute
+    traffic across backend pods.
+    """
+    return httpx.Limits(
+        max_connections=int(os.getenv("UNSTRUCTURED_CLIENT_MAX_CONNECTIONS", "100")),
+        max_keepalive_connections=int(
+            os.getenv("UNSTRUCTURED_CLIENT_MAX_KEEPALIVE_CONNECTIONS", "20")
+        ),
+        keepalive_expiry=float(
+            os.getenv("UNSTRUCTURED_CLIENT_KEEPALIVE_EXPIRY", "5.0")
+        ),
+    )
+
+
+def _resolve_tls_config() -> tuple[Union[bool, str], Optional[Union[str, tuple[str, str]]]]:
+    """Resolve httpx TLS trust-store and mTLS client-certificate config
+    from environment variables.
+
+    Returns a (verify, cert) tuple suitable for `httpx.AsyncClient(verify=..., cert=...)`.
+
+    Trust store (`verify`) — honors the same standard env vars other
+    libraries use, so a single env-var setting applies uniformly across
+    tools:
+    - `SSL_CERT_FILE` (path): stdlib `ssl` convention.
+    - `REQUESTS_CA_BUNDLE` (path): `requests` / `httpx`-ecosystem
+      convention. Checked if `SSL_CERT_FILE` is unset.
+    - Otherwise: `True` (httpx default — use system trust store).
+
+    mTLS client certificate (`cert`):
+    - `UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT` (path): PEM file. By default
+      httpx will read the private key from the same file.
+    - `UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY` (path, optional): use this
+      separate key file. Required only if cert and key are split.
+    - Otherwise: `None`.
+
+    Defaults match httpx's built-in defaults so behavior is unchanged for
+    callers that don't set any of these variables.
+    """
+    verify: Union[bool, str] = (
+        os.getenv("SSL_CERT_FILE") or os.getenv("REQUESTS_CA_BUNDLE") or True
+    )
+
+    cert: Optional[Union[str, tuple[str, str]]] = None
+    if client_cert := os.getenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT"):
+        if client_key := os.getenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY"):
+            cert = (client_cert, client_key)
+        else:
+            cert = client_cert
+
+    return verify, cert
+
+
+def _describe_tls_config(
+    verify: Union[bool, str], cert: Optional[Union[str, tuple[str, str]]]
+) -> str:
+    """Short human-readable summary of the TLS config, safe for log output.
+    Emits "system-trust" / "custom-ca-bundle" rather than the actual file
+    path, so logs don't leak filesystem layout."""
+    verify_desc = "system-trust" if verify is True else "custom-ca-bundle"
+
+    if cert is None:
+        cert_desc = "none"
+    elif isinstance(cert, tuple):
+        cert_desc = "cert+key"
+    else:
+        cert_desc = "cert-only"
+
+    return f"trust_store={verify_desc} mtls_cert={cert_desc}"
+
+
 async def run_tasks(
     coroutines: list[partial[Coroutine[Any, Any, httpx.Response]]],
     allow_failed: bool = False,
@@ -205,16 +283,25 @@ async def run_tasks(
             client_timeout_minutes = int(timeout_var)
         client_timeout = httpx.Timeout(60 * client_timeout_minutes)
 
+    limits = _resolve_pool_limits()
+    verify, cert = _resolve_tls_config()
+
     logger.debug(
-        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s",
+        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s",
         operation_id,
         len(coroutines),
         concurrency_level,
         client_timeout,
         allow_failed,
+        limits.max_connections,
+        limits.max_keepalive_connections,
+        limits.keepalive_expiry,
+        _describe_tls_config(verify, cert),
     )
 
-    async with httpx.AsyncClient(timeout=client_timeout) as client:
+    async with httpx.AsyncClient(
+        timeout=client_timeout, limits=limits, verify=verify, cert=cert
+    ) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
         tasks = [
             asyncio.create_task(_order_keeper(index, coro))
@@ -770,8 +857,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 )
                 self.coroutines_to_execute[operation_id].append(coroutine)
 
+            plan_limits = _resolve_pool_limits()
+            plan_verify, plan_cert = _resolve_tls_config()
             logger.info(
-                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s",
+                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s",
                 operation_id,
                 Path(pdf_file_meta["filename"]).name,
                 form_data.get("strategy"),
@@ -790,6 +879,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 self._retry_config_observability_mode(
                     self.operation_retry_configs.get(operation_id),
                 ),
+                plan_limits.max_connections,
+                plan_limits.max_keepalive_connections,
+                plan_limits.keepalive_expiry,
+                _describe_tls_config(plan_verify, plan_cert),
             )
 
             self.pending_operation_ids[operation_id] = operation_id

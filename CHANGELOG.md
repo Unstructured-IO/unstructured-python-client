@@ -1,3 +1,11 @@
+## 0.45.0
+
+### Features
+* Make the split-PDF `httpx.AsyncClient` connection-pool limits configurable via env vars: `UNSTRUCTURED_CLIENT_MAX_CONNECTIONS` (default `100`), `UNSTRUCTURED_CLIENT_MAX_KEEPALIVE_CONNECTIONS` (default `20`), and `UNSTRUCTURED_CLIENT_KEEPALIVE_EXPIRY` (default `5.0`s). Defaults match httpx, so behavior is unchanged unless set. Useful when deploying behind a connect-time-only load balancer (e.g. Kubernetes ClusterIP without a mesh) where shorter keepalives force connections to redistribute across backend pods.
+* Honor the standard `SSL_CERT_FILE` / `REQUESTS_CA_BUNDLE` env vars to point the split-PDF `httpx.AsyncClient` at a custom trust store, so a single env-var setting applies uniformly across Python tooling.
+* Add `UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT` and `UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY` env vars to wire an mTLS client certificate into the split-PDF `httpx.AsyncClient` (single PEM, or split cert + key files).
+* Extend the split-PDF `event=plan_created` log to include the resolved pool limits and trust-store / mTLS mode so the active config is visible in production logs.
+
 ## 0.44.1
 
 ### Features
