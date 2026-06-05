@@ -520,6 +520,14 @@ async def test_unit_run_tasks_pool_limits_configurable_via_env(
     assert limits.keepalive_expiry == 30.0
 
 
+_TLS_ENV_VARS = (
+    "SSL_CERT_FILE",
+    "REQUESTS_CA_BUNDLE",
+    "UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT",
+    "UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY",
+)
+
+
 def test_unit_resolve_tls_config_defaults_unchanged_without_env(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -528,12 +536,7 @@ def test_unit_resolve_tls_config_defaults_unchanged_without_env(
     behavior change."""
     from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
 
-    for var in (
-        "UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE",
-        "UNSTRUCTURED_CLIENT_TLS_VERIFY",
-        "UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT",
-        "UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY",
-    ):
+    for var in _TLS_ENV_VARS:
         monkeypatch.delenv(var, raising=False)
 
     verify, cert = _resolve_tls_config()
@@ -541,66 +544,55 @@ def test_unit_resolve_tls_config_defaults_unchanged_without_env(
     assert cert is None
 
 
-def test_unit_resolve_tls_config_ca_bundle_from_env(
+def test_unit_resolve_tls_config_ssl_cert_file_from_env(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
-    """UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE → verify=<path>. Use case: internal
-    CA bundle for a corporate proxy."""
+    """SSL_CERT_FILE (stdlib ssl convention) → verify=<path>. Use case:
+    internal CA bundle shared with other Python tooling."""
     from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    for var in _TLS_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
 
     ca_bundle = tmp_path / "custom-ca.pem"
     ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE", str(ca_bundle))
+    monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
 
     verify, cert = _resolve_tls_config()
     assert verify == str(ca_bundle)
     assert cert is None
 
 
-@pytest.mark.parametrize("value", ["false", "False", "0", "no", "off", "FALSE"])
-def test_unit_resolve_tls_config_verify_disabled_via_env(
-    monkeypatch: pytest.MonkeyPatch, value: str
-):
-    """UNSTRUCTURED_CLIENT_TLS_VERIFY=<falsy string> → verify=False. CA bundle
-    env takes precedence if both are set, but on its own this disables server
-    cert validation entirely. Dev-only path."""
-    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
-
-    monkeypatch.delenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE", raising=False)
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_VERIFY", value)
-
-    verify, cert = _resolve_tls_config()
-    assert verify is False
-
-
-@pytest.mark.parametrize("value", ["true", "1", "yes", "on", "anything else"])
-def test_unit_resolve_tls_config_verify_truthy_values_keep_verification(
-    monkeypatch: pytest.MonkeyPatch, value: str
-):
-    """Any non-falsy value of UNSTRUCTURED_CLIENT_TLS_VERIFY keeps verification on."""
-    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
-
-    monkeypatch.delenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE", raising=False)
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_VERIFY", value)
-
-    verify, cert = _resolve_tls_config()
-    assert verify is True
-
-
-def test_unit_resolve_tls_config_ca_bundle_wins_over_verify_flag(
+def test_unit_resolve_tls_config_requests_ca_bundle_from_env(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
-    """If both are set, the CA bundle path is used and the verify flag is
-    ignored — explicit trust store takes precedence over "disable verify"."""
+    """REQUESTS_CA_BUNDLE (requests/httpx-ecosystem convention) → verify=<path>."""
     from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
 
-    ca_bundle = tmp_path / "ca.pem"
-    ca_bundle.write_text("...")
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE", str(ca_bundle))
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_VERIFY", "false")
+    for var in _TLS_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+    ca_bundle = tmp_path / "custom-ca.pem"
+    ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", str(ca_bundle))
 
     verify, cert = _resolve_tls_config()
     assert verify == str(ca_bundle)
+    assert cert is None
+
+
+def test_unit_resolve_tls_config_ssl_cert_file_wins_over_requests_ca_bundle(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """If both standard env vars are set, SSL_CERT_FILE takes precedence —
+    it's the lower-level stdlib convention."""
+    from unstructured_client._hooks.custom.split_pdf_hook import _resolve_tls_config
+
+    monkeypatch.setenv("SSL_CERT_FILE", "/etc/ssl/stdlib-ca.pem")
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", "/etc/ssl/requests-ca.pem")
+
+    verify, _ = _resolve_tls_config()
+    assert verify == "/etc/ssl/stdlib-ca.pem"
 
 
 def test_unit_resolve_tls_config_client_cert_only(monkeypatch: pytest.MonkeyPatch):
@@ -637,7 +629,10 @@ async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_client(
     end check that _resolve_tls_config is called and its result reaches the
     client construction. AsyncClient is fully mocked so we don't have to feed
     httpx a real cert chain."""
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_VERIFY", "false")
+    ca_bundle = tmp_path / "ca.pem"
+    ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
+    monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.pem")
 
     captured: dict = {}
 
@@ -661,8 +656,8 @@ async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_client(
             allow_failed=True,
         )
 
-    assert captured["verify"] is False
-    assert captured["cert"] is None
+    assert captured["verify"] == str(ca_bundle)
+    assert captured["cert"] == "/etc/ssl/client.pem"
 
 
 @patch("unstructured_client._hooks.custom.form_utils.Path")

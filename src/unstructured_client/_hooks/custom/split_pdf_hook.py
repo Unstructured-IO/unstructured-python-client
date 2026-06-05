@@ -200,20 +200,20 @@ def _resolve_pool_limits() -> httpx.Limits:
 
 
 def _resolve_tls_config() -> tuple[Union[bool, str], Optional[Union[str, tuple[str, str]]]]:
-    """Resolve httpx TLS server-verification and client-certificate config
+    """Resolve httpx TLS trust-store and mTLS client-certificate config
     from environment variables.
 
     Returns a (verify, cert) tuple suitable for `httpx.AsyncClient(verify=..., cert=...)`.
 
-    Server verification (`verify`):
-    - `UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE` (path): use this CA bundle file
-      instead of the system trust store. Typical use: custom internal CA.
-    - `UNSTRUCTURED_CLIENT_TLS_VERIFY` (`"false"`, `"0"`, `"no"`, `"off"`):
-      disable certificate verification entirely. Intended for local dev
-      against self-signed test endpoints; **do not use in production**.
+    Trust store (`verify`) — honors the same standard env vars other
+    libraries use, so a single env-var setting applies uniformly across
+    tools:
+    - `SSL_CERT_FILE` (path): stdlib `ssl` convention.
+    - `REQUESTS_CA_BUNDLE` (path): `requests` / `httpx`-ecosystem
+      convention. Checked if `SSL_CERT_FILE` is unset.
     - Otherwise: `True` (httpx default — use system trust store).
 
-    Client certificate (`cert`, for mTLS):
+    mTLS client certificate (`cert`):
     - `UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT` (path): PEM file. By default
       httpx will read the private key from the same file.
     - `UNSTRUCTURED_CLIENT_TLS_CLIENT_KEY` (path, optional): use this
@@ -223,13 +223,9 @@ def _resolve_tls_config() -> tuple[Union[bool, str], Optional[Union[str, tuple[s
     Defaults match httpx's built-in defaults so behavior is unchanged for
     callers that don't set any of these variables.
     """
-    verify: Union[bool, str]
-    if ca_bundle := os.getenv("UNSTRUCTURED_CLIENT_TLS_CA_BUNDLE"):
-        verify = ca_bundle
-    elif (verify_env := os.getenv("UNSTRUCTURED_CLIENT_TLS_VERIFY")) is not None:
-        verify = verify_env.strip().lower() not in ("false", "0", "no", "off", "")
-    else:
-        verify = True
+    verify: Union[bool, str] = (
+        os.getenv("SSL_CERT_FILE") or os.getenv("REQUESTS_CA_BUNDLE") or True
+    )
 
     cert: Optional[Union[str, tuple[str, str]]] = None
     if client_cert := os.getenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT"):
@@ -245,14 +241,9 @@ def _describe_tls_config(
     verify: Union[bool, str], cert: Optional[Union[str, tuple[str, str]]]
 ) -> str:
     """Short human-readable summary of the TLS config, safe for log output.
-    Emits "system-trust" / "no-verify" / "ca-bundle" rather than the actual
-    file path, so logs don't leak filesystem layout."""
-    if verify is False:
-        verify_desc = "no-verify"
-    elif verify is True:
-        verify_desc = "system-trust"
-    else:
-        verify_desc = "custom-ca-bundle"
+    Emits "system-trust" / "custom-ca-bundle" rather than the actual file
+    path, so logs don't leak filesystem layout."""
+    verify_desc = "system-trust" if verify is True else "custom-ca-bundle"
 
     if cert is None:
         cert_desc = "none"
@@ -261,7 +252,7 @@ def _describe_tls_config(
     else:
         cert_desc = "cert-only"
 
-    return f"verify={verify_desc} client_cert={cert_desc}"
+    return f"trust_store={verify_desc} mtls_cert={cert_desc}"
 
 
 async def run_tasks(
