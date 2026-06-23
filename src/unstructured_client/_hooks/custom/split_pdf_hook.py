@@ -23,7 +23,7 @@ from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
 import pypdfium2 as pdfium  # type: ignore[import-untyped]
 
-from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
+from unstructured_client._hooks.custom import form_utils, pdf_utils, pptx_utils, request_utils
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
@@ -720,21 +720,34 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if split_pdf_page is None or split_pdf_page == "false":
             return request
 
-        pdf_file_meta = form_data.get(PARTITION_FORM_FILES_KEY)
+        file_meta = form_data.get(PARTITION_FORM_FILES_KEY)
         if (
-                pdf_file_meta is None or not all(metadata in pdf_file_meta for metadata in
+                file_meta is None or not all(metadata in file_meta for metadata in
                                             ["filename", "content_type", "file"])
         ):
             return request
-        pdf_file = pdf_file_meta.get("file")
-        if pdf_file is None:
+        input_file = file_meta.get("file")
+        if input_file is None:
             return request
 
-        pdf = pdf_utils.read_pdf(pdf_file)
-        if pdf is None:
-            return request
-
-        pdf = pdf_utils.check_pdf(pdf)
+        # Determine the document type. PDFs split for any strategy; PPTX decks
+        # only split for hi_res (where per-slide OCR makes the round trips worth
+        # it). Anything else continues unsplit.
+        pdf = pdf_utils.read_pdf(input_file)
+        pptx_bytes: Optional[bytes] = None
+        if pdf is not None:
+            pdf = pdf_utils.check_pdf(pdf)
+            file_type = "pdf"
+            num_pages = pdf.get_num_pages()
+        else:
+            pptx_bytes = self._read_input_file_bytes(input_file)
+            if (
+                form_data.get("strategy") != HI_RES_STRATEGY
+                or not pptx_utils.is_pptx(pptx_bytes)
+            ):
+                return request
+            file_type = "pptx"
+            num_pages = pptx_utils.get_pptx_slide_count(pptx_bytes)
 
         starting_page_number = form_utils.get_starting_page_number(
             form_data,
@@ -770,7 +783,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         page_range_start, page_range_end = form_utils.get_page_range(
             form_data,
             key=PARTITION_FORM_PAGE_RANGE_KEY.replace("[]", ""),
-            max_pages=pdf.get_num_pages(),
+            max_pages=num_pages,
         )
 
         page_count = page_range_end - page_range_start + 1
@@ -781,7 +794,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
         # If the doc is small enough, and we aren't slicing it with a page range:
         # do not split, just continue with the original request
-        if split_size >= page_count and page_count == len(pdf.pages):
+        if split_size >= page_count and page_count == num_pages:
             return request
 
         if operation_id in self.coroutines_to_execute:
@@ -803,45 +816,78 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         try:
-            pdf = self._trim_large_pages(pdf, form_data)
-
-            pdf.stream.seek(0)
-            pdf_bytes = pdf.stream.read()
-
             temp_dir_path = None
-            pdf_chunks: Iterable[Tuple[BinaryIO, int]]
-            if cache_tmp_data_feature:
-                pdf_chunk_paths = self._get_pdf_chunk_paths(
-                    pdf_bytes,
-                    operation_id=operation_id,
-                    cache_tmp_data_dir=cache_tmp_data_dir,
-                    split_size=split_size,
-                    page_start=page_range_start,
-                    page_end=page_range_end
-                )
-                temp_dir = self.tempdirs.get(operation_id)
-                temp_dir_path = temp_dir.name if temp_dir is not None else None
-                # force free PDF object memory
-                del pdf
-                pdf_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
+            doc_chunks: Iterable[Tuple[BinaryIO, int]]
+            if file_type == "pptx":
+                # PPTX splitting uses stdlib zip/xml, so it doesn't need the
+                # pypdfium memory dance below.
+                pptx_content = cast(bytes, pptx_bytes)
+                if cache_tmp_data_feature:
+                    tempdir, pptx_chunk_paths = pptx_utils.get_pptx_chunk_paths(
+                        pptx_content,
+                        cache_tmp_data_dir=cache_tmp_data_dir,
+                        split_size=split_size,
+                        page_start=page_range_start,
+                        page_end=page_range_end,
+                    )
+                    self.tempdirs[operation_id] = tempdir
+                    temp_dir_path = tempdir.name
+                    doc_chunks = self._get_pdf_chunk_files(pptx_chunk_paths)
+                else:
+                    doc_chunks = pptx_utils.get_pptx_chunks_in_memory(
+                        pptx_content,
+                        split_size=split_size,
+                        page_start=page_range_start,
+                        page_end=page_range_end,
+                    )
             else:
-                pdf_chunks = self._get_pdf_chunks_in_memory(
-                    pdf_bytes,
-                    split_size=split_size,
-                    page_start=page_range_start,
-                    page_end=page_range_end
-                )
+                assert pdf is not None  # narrowed by file_type == "pdf"
+                pdf = self._trim_large_pages(pdf, form_data)
+
+                pdf.stream.seek(0)
+                pdf_bytes = pdf.stream.read()
+
+                if cache_tmp_data_feature:
+                    pdf_chunk_paths = self._get_pdf_chunk_paths(
+                        pdf_bytes,
+                        operation_id=operation_id,
+                        cache_tmp_data_dir=cache_tmp_data_dir,
+                        split_size=split_size,
+                        page_start=page_range_start,
+                        page_end=page_range_end
+                    )
+                    temp_dir = self.tempdirs.get(operation_id)
+                    temp_dir_path = temp_dir.name if temp_dir is not None else None
+                    # force free PDF object memory
+                    del pdf
+                    doc_chunks = self._get_pdf_chunk_files(pdf_chunk_paths)
+                else:
+                    doc_chunks = self._get_pdf_chunks_in_memory(
+                        pdf_bytes,
+                        split_size=split_size,
+                        page_start=page_range_start,
+                        page_end=page_range_end
+                    )
 
             self.coroutines_to_execute[operation_id] = []
-            for pdf_chunk_file, page_index in pdf_chunks:
+            for chunk_file, page_index in doc_chunks:
                 chunk_index = len(self.coroutines_to_execute[operation_id]) + 1
                 page_number = page_index + starting_page_number
-                pdf_chunk_request = request_utils.create_pdf_chunk_request(
-                    form_data=form_data,
-                    pdf_chunk=(pdf_chunk_file, page_number),
-                    filename=pdf_file_meta["filename"],
-                    original_request=request,
-                )
+                if file_type == "pptx":
+                    chunk_request = request_utils.create_document_chunk_request(
+                        form_data=form_data,
+                        document_chunk=(chunk_file, page_number),
+                        original_request=request,
+                        filename=file_meta["filename"],
+                        content_type=pptx_utils.PPTX_CONTENT_TYPE,
+                    )
+                else:
+                    chunk_request = request_utils.create_pdf_chunk_request(
+                        form_data=form_data,
+                        pdf_chunk=(chunk_file, page_number),
+                        filename=file_meta["filename"],
+                        original_request=request,
+                    )
                 # using partial as the shared client parameter must be passed in `run_tasks` function
                 # in `after_success`.
                 coroutine = partial(
@@ -849,8 +895,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     _operation_id=operation_id,
                     chunk_index=chunk_index,
                     page_number=page_number,
-                    pdf_chunk_request=pdf_chunk_request,
-                    pdf_chunk_file=pdf_chunk_file,
+                    pdf_chunk_request=chunk_request,
+                    pdf_chunk_file=chunk_file,
                     retry_config=self.operation_retry_configs.get(operation_id),
                     cache_tmp_data_feature=cache_tmp_data_feature,
                     temp_dir_path=temp_dir_path,
@@ -862,7 +908,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             logger.info(
                 "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s",
                 operation_id,
-                Path(pdf_file_meta["filename"]).name,
+                Path(file_meta["filename"]).name,
                 form_data.get("strategy"),
                 page_range_start,
                 page_range_end,
@@ -1048,6 +1094,17 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         )
 
         return response
+
+    @staticmethod
+    def _read_input_file_bytes(input_file: Union[BinaryIO, bytes]) -> bytes:
+        """Return the full bytes of the uploaded file, restoring the read
+        position so downstream consumers see an unconsumed stream."""
+        if isinstance(input_file, bytes):
+            return input_file
+        input_file.seek(0)
+        content = input_file.read()
+        input_file.seek(0)
+        return content
 
     def _trim_large_pages(self, pdf: PdfReader, form_data: dict[str, Any]) -> PdfReader:
         if form_data.get("strategy") != HI_RES_STRATEGY:
