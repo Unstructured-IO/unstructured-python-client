@@ -747,7 +747,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             ):
                 return request
             file_type = "pptx"
-            num_pages = pptx_utils.get_pptx_slide_count(pptx_bytes)
+            try:
+                num_pages = pptx_utils.get_pptx_slide_count(pptx_bytes)
+            except Exception:  # pylint: disable=broad-except
+                # Never let a splitting problem fail the request: if the deck
+                # can't be read, send the whole document unsplit.
+                logger.warning(
+                    "split_pptx event=slide_count_failed reason=fallback_whole_document",
+                    exc_info=True,
+                )
+                return request
 
         starting_page_number = form_utils.get_starting_page_number(
             form_data,
@@ -943,6 +952,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             )
         except Exception:
             self._clear_operation(operation_id)
+            if file_type == "pptx":
+                # PPTX splitting is best-effort: if building the slide-chunks
+                # fails for any reason, fall back to sending the whole deck
+                # unsplit rather than failing the partition request.
+                logger.warning(
+                    "split_pptx event=split_failed operation_id=%s reason=fallback_whole_document",
+                    operation_id,
+                    exc_info=True,
+                )
+                return request
             raise
 
     def before_request(

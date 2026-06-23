@@ -385,6 +385,29 @@ def test_hook_does_not_split_pptx_when_flag_false():
     assert not _is_split(result)
 
 
+def test_hook_falls_back_to_whole_doc_when_slide_count_fails():
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.pptx_utils.get_pptx_slide_count",
+        side_effect=ValueError("boom"),
+    ):
+        hook, result = _run_before_request(HI_RES_STRATEGY, "true", num_slides=30)
+    # The original request is returned unchanged (whole deck sent unsplit).
+    assert not _is_split(result)
+    assert hook.coroutines_to_execute == {}
+
+
+def test_hook_falls_back_to_whole_doc_when_chunking_fails():
+    with patch(
+        "unstructured_client._hooks.custom.split_pdf_hook.pptx_utils.get_pptx_chunks_in_memory",
+        side_effect=RuntimeError("bad package"),
+    ):
+        hook, result = _run_before_request(HI_RES_STRATEGY, "true", num_slides=30)
+    assert not _is_split(result)
+    # Operation state is cleaned up after the fallback.
+    assert hook.coroutines_to_execute == {}
+    assert hook.allow_failed == {}
+
+
 def test_hook_chunk_request_uses_pptx_content_type():
     hook, result = _run_before_request(HI_RES_STRATEGY, "true", num_slides=30)
     operation_id = result.headers["operation_id"]
