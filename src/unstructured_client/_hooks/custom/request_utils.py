@@ -277,6 +277,82 @@ def create_response(elements: list) -> httpx.Response:
     return response
 
 
+ELEMENTS_FILE_HEADER = "x-unstructured-elements-file"
+NDJSON_MEDIA_TYPE = "application/x-ndjson"
+
+
+def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
+    """Combine per-chunk split-PDF response files into one NDJSON file on disk.
+
+    This is the whole point of the elements-file path: the split-PDF hook already streams
+    each chunk response to a temp file without reading it into memory
+    (`call_api_async`), but recombining them used to build a list per chunk, a flattened
+    list, a `json.dumps` blob, and then the SDK re-parsed that blob -- four full copies of
+    the document. Concatenating on disk keeps peak memory at ~one chunk.
+
+    Each chunk file is either a JSON array (a server that returns
+    `application/json`) or already NDJSON (a server that honors
+    `application/x-ndjson`). The first non-whitespace byte tells us which, so the
+    fast path -- byte-level concatenation with no parsing at all -- is taken whenever both
+    ends speak NDJSON, and the JSON-array path still works against an older server.
+
+    Returns the number of elements written.
+    """
+    total = 0
+    with open(out_path, "w", encoding="utf-8") as out:
+        for chunk_path in chunk_paths:
+            with open(chunk_path, "r", encoding="utf-8") as chunk:
+                first_char = ""
+                while True:
+                    char = chunk.read(1)
+                    if char == "":
+                        break
+                    if not char.isspace():
+                        first_char = char
+                        break
+                if first_char == "":
+                    # Empty chunk file; nothing to append.
+                    continue
+                chunk.seek(0)
+
+                if first_char == "[":
+                    # JSON array: bounded by one chunk (20 pages by default), so a plain
+                    # load is fine and avoids taking on a streaming-parser dependency.
+                    for element in json.load(chunk):
+                        out.write(json.dumps(element, ensure_ascii=False))
+                        out.write("\n")
+                        total += 1
+                else:
+                    # Already NDJSON: copy through, no parsing.
+                    for line in chunk:
+                        line = line.strip()
+                        if line:
+                            out.write(line)
+                            out.write("\n")
+                            total += 1
+    return total
+
+
+def create_elements_file_response(elements_file: str) -> httpx.Response:
+    """Synthetic 200 whose payload is a path to an NDJSON file of elements.
+
+    Mirrors the existing convention in the split hook, where a cached chunk response
+    carries its temp-file path as the body. The path is also exposed as a header so the
+    SDK can distinguish this from a real NDJSON body streamed from the server.
+    """
+    content = elements_file.encode()
+    response = httpx.Response(
+        status_code=200,
+        headers={
+            "Content-Type": NDJSON_MEDIA_TYPE,
+            "Content-Length": str(len(content)),
+            ELEMENTS_FILE_HEADER: elements_file,
+        },
+    )
+    setattr(response, "_content", content)
+    return response
+
+
 def get_base_url(url: str | URL) -> str:
     """Extracts the base URL from the given URL.
 

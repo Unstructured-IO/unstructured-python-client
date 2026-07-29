@@ -78,6 +78,10 @@ class PartitionResponseTypedDict(TypedDict):
     r"""Successful Response"""
     elements: NotRequired[List[Dict[str, Any]]]
     r"""Successful Response"""
+    elements_file: NotRequired[str]
+    r"""Path to an NDJSON file of elements, one per line. Set instead of `elements` when
+    `application/x-ndjson` was requested, so a large document never has to be held in
+    memory as a parsed list."""
 
 
 class PartitionResponse(BaseModel):
@@ -95,3 +99,8 @@ class PartitionResponse(BaseModel):
 
     elements: Optional[List[Dict[str, Any]]] = None
     r"""Successful Response"""
+
+    elements_file: Optional[str] = None
+    r"""Path to an NDJSON file of elements, one per line. Set instead of `elements` when
+    `application/x-ndjson` was requested, so a large document never has to be held in
+    memory as a parsed list. The caller owns the file and should delete it when done."""

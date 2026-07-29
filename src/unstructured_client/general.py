@@ -14,6 +14,53 @@ from unstructured_client.utils.unmarshal_json_response import unmarshal_json_res
 class PartitionAcceptEnum(str, Enum):
     APPLICATION_JSON = "application/json"
     TEXT_CSV = "text/csv"
+    APPLICATION_X_NDJSON = "application/x-ndjson"
+    r"""Elements as NDJSON, one per line. The response is written to a temp file and
+    returned as `PartitionResponse.elements_file` rather than parsed into `elements`, so
+    the caller can stream a large document instead of holding it in memory."""
+
+
+def _ndjson_elements_file(http_res) -> str:
+    """Resolve an NDJSON response to a path on disk, without parsing the elements.
+
+    Two shapes arrive here. When the split-PDF hook ran, it has already combined the
+    per-chunk temp files into one NDJSON file and passes the path through
+    `ELEMENTS_FILE_HEADER` -- nothing to do but read the header, so the document is never
+    materialized. Otherwise this is a real body from the server, which is written to a
+    temp file in bounded chunks.
+    """
+    import tempfile
+
+    from unstructured_client._hooks.custom.request_utils import ELEMENTS_FILE_HEADER
+
+    existing_path = http_res.headers.get(ELEMENTS_FILE_HEADER)
+    if existing_path:
+        return existing_path
+
+    with tempfile.NamedTemporaryFile(
+        mode="wb", prefix="unst_elements_", suffix=".ndjson", delete=False
+    ) as out:
+        for byte_chunk in http_res.iter_bytes():
+            out.write(byte_chunk)
+        return out.name
+
+
+async def _ndjson_elements_file_async(http_res) -> str:
+    """Async counterpart of `_ndjson_elements_file`."""
+    import tempfile
+
+    from unstructured_client._hooks.custom.request_utils import ELEMENTS_FILE_HEADER
+
+    existing_path = http_res.headers.get(ELEMENTS_FILE_HEADER)
+    if existing_path:
+        return existing_path
+
+    with tempfile.NamedTemporaryFile(
+        mode="wb", prefix="unst_elements_", suffix=".ndjson", delete=False
+    ) as out:
+        async for byte_chunk in http_res.aiter_bytes():
+            out.write(byte_chunk)
+        return out.name
 
 
 class General(BaseSDK):
@@ -124,6 +171,13 @@ class General(BaseSDK):
         if utils.match_response(http_res, "200", "text/csv"):
             return operations.PartitionResponse(
                 csv_elements=http_res.text,
+                status_code=http_res.status_code,
+                content_type=http_res.headers.get("Content-Type") or "",
+                raw_response=http_res,
+            )
+        if utils.match_response(http_res, "200", "application/x-ndjson"):
+            return operations.PartitionResponse(
+                elements_file=_ndjson_elements_file(http_res),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
                 raw_response=http_res,
@@ -249,6 +303,13 @@ class General(BaseSDK):
         if utils.match_response(http_res, "200", "text/csv"):
             return operations.PartitionResponse(
                 csv_elements=http_res.text,
+                status_code=http_res.status_code,
+                content_type=http_res.headers.get("Content-Type") or "",
+                raw_response=http_res,
+            )
+        if utils.match_response(http_res, "200", "application/x-ndjson"):
+            return operations.PartitionResponse(
+                elements_file=await _ndjson_elements_file_async(http_res),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
                 raw_response=http_res,
