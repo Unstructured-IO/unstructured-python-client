@@ -796,11 +796,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.cache_tmp_data_feature[operation_id] = cache_tmp_data_feature
         self.cache_tmp_data_dir[operation_id] = cache_tmp_data_dir
         self.concurrency_level[operation_id] = concurrency_level
-        # Elements-file mode requires the per-chunk temp files, so it is only available
-        # when chunk caching is on; otherwise fall back to the in-memory recombination.
+        # Depends ONLY on what the caller asked for. It must NOT also depend on
+        # cache_tmp_data: the Accept header is chosen by the caller while cache_tmp_data is
+        # a separate setting, so gating on both lets them disagree -- and when they do, the
+        # server returns NDJSON while the hook takes the JSON path and `res.json()` blows up
+        # on a body this very client requested. Both caching modes are handled below.
         self.ndjson_mode[operation_id] = (
             request_utils.NDJSON_MEDIA_TYPE in request.headers.get("Accept", "")
-            and cache_tmp_data_feature
         )
 
         timeout_seconds = _get_request_timeout_seconds(request)
@@ -1404,9 +1406,21 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 )
                 successful_responses.append(res)
                 if ndjson_mode:
-                    # Record the cached temp-file path only. Nothing is parsed here --
-                    # that is what keeps peak memory at ~one chunk during recombination.
-                    chunk_paths.append(res.text)
+                    # Nothing is parsed here either way -- that is what keeps peak memory at
+                    # ~one chunk during recombination.
+                    if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
+                        # Cached: the body was already streamed to a temp file and `res.text`
+                        # holds that path.
+                        chunk_paths.append(res.text)
+                    else:
+                        # Not cached: the body is in memory. Spill it verbatim so the combine
+                        # step is uniform; peak stays at ~one chunk body, the same order as
+                        # the JSON path's `res.json()` would have cost.
+                        chunk_paths.append(
+                            request_utils.write_chunk_body_to_temp(
+                                res, self.cache_tmp_data_dir.get(operation_id)
+                            )
+                        )
                 elif self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
                     elements.append(load_elements_from_response(res))
                 else:

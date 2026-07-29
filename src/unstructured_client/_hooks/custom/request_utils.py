@@ -4,6 +4,8 @@ import asyncio
 import io
 import json
 import logging
+import os
+import tempfile
 from typing import Tuple, Any, BinaryIO, Optional
 from urllib.parse import urlparse
 
@@ -331,6 +333,19 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
                             out.write("\n")
                             total += 1
     return total
+
+
+def write_chunk_body_to_temp(response: httpx.Response, dir_: Optional[str] = None) -> str:
+    """Spill an in-memory chunk response body to a temp file, returning its path.
+
+    Needed for elements-file mode when `cache_tmp_data` is OFF: there is no cached file to
+    reference, so the body is written out verbatim (no parsing) to give
+    `combine_chunk_files_to_ndjson` the same uniform input it gets in the cached case.
+    """
+    fd, path = tempfile.mkstemp(suffix=".ndjson", dir=dir_ or tempfile.gettempdir())
+    with os.fdopen(fd, "wb") as f:
+        f.write(response.content)
+    return path
 
 
 def create_elements_file_response(elements_file: str) -> httpx.Response:

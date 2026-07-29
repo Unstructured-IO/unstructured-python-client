@@ -12,10 +12,13 @@ import json
 
 import pytest
 
+import httpx
+
 from unstructured_client._hooks.custom.request_utils import (
     ELEMENTS_FILE_HEADER,
     combine_chunk_files_to_ndjson,
     create_elements_file_response,
+    write_chunk_body_to_temp,
 )
 
 
@@ -146,6 +149,35 @@ def test_non_ascii_is_preserved(tmp_path):
     combine_chunk_files_to_ndjson([str(chunk)], str(out))
 
     assert _read_ndjson(out)[0]["text"] == "日本語 café ✓"
+
+
+def test_write_chunk_body_to_temp_roundtrips(tmp_path):
+    """The cache_tmp_data=OFF path: an in-memory NDJSON body must spill verbatim.
+
+    Regression guard. `ndjson_mode` used to also require cache_tmp_data, so with caching off
+    the server returned NDJSON while the hook took the JSON path and `res.json()` raised on a
+    body this client had itself requested.
+    """
+    elements = _elements("x", 3)
+    body = "".join(json.dumps(e) + "\n" for e in elements).encode()
+    response = httpx.Response(status_code=200, content=body)
+
+    path = write_chunk_body_to_temp(response, str(tmp_path))
+    assert _read_ndjson(path) == elements
+
+
+def test_combine_accepts_bodies_spilled_without_caching(tmp_path):
+    """End-to-end of the uncached path: spill two bodies, then combine them."""
+    a, b = _elements("a", 2), _elements("b", 3)
+    ra = httpx.Response(200, content="".join(json.dumps(e) + "\n" for e in a).encode())
+    rb = httpx.Response(200, content="".join(json.dumps(e) + "\n" for e in b).encode())
+    paths = [write_chunk_body_to_temp(r, str(tmp_path)) for r in (ra, rb)]
+
+    out = tmp_path / "combined.ndjson"
+    written = combine_chunk_files_to_ndjson(paths, str(out))
+
+    assert written == 5
+    assert _read_ndjson(out) == a + b
 
 
 def test_elements_file_response_carries_path_in_header_and_body(tmp_path):
