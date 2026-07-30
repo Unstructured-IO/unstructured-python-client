@@ -1413,14 +1413,19 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                         # holds that path.
                         chunk_paths.append(res.text)
                     else:
-                        # Not cached: the body is in memory. Spill it verbatim so the combine
-                        # step is uniform; peak stays at ~one chunk body, the same order as
-                        # the JSON path's `res.json()` would have cost.
-                        chunk_paths.append(
-                            request_utils.write_chunk_body_to_temp(
-                                res, self.cache_tmp_data_dir.get(operation_id)
-                            )
+                        # Not cached: the body is in memory. Spill it verbatim (no parsing)
+                        # and then RELEASE it -- every response object is retained in
+                        # `successful_responses` for failure bookkeeping, so without this the
+                        # spilled bodies stay resident and the whole document accumulates
+                        # anyway (125 chunks x 32 MB = 4 GB observed). Overwriting `_content`
+                        # with the path mirrors what the cached branch already does at the
+                        # point of caching, so downstream `res.text` means the same thing in
+                        # both branches.
+                        spilled = request_utils.write_chunk_body_to_temp(
+                            res, self.cache_tmp_data_dir.get(operation_id)
                         )
+                        res._content = spilled.encode()  # pylint: disable=protected-access
+                        chunk_paths.append(spilled)
                 elif self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
                     elements.append(load_elements_from_response(res))
                 else:

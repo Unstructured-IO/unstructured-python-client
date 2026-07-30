@@ -180,6 +180,28 @@ def test_combine_accepts_bodies_spilled_without_caching(tmp_path):
     assert _read_ndjson(out) == a + b
 
 
+def test_spilled_body_is_released_from_the_response(tmp_path):
+    """After spilling, the response must no longer hold the body.
+
+    Regression guard for the real failure mode: every chunk response is retained in
+    `api_successful_responses` for failure bookkeeping, so spilling to disk without
+    releasing `_content` still accumulates the whole document in memory (125 chunks x
+    32 MB = 4 GB observed on a 2500-page split).
+    """
+    elements = _elements("a", 3)
+    body = "".join(json.dumps(e) + "\n" for e in elements).encode()
+    response = httpx.Response(status_code=200, content=body)
+    assert len(response.content) == len(body)
+
+    path = write_chunk_body_to_temp(response, str(tmp_path))
+    response._content = path.encode()
+
+    # The body is on disk, and the response now costs a path rather than a payload.
+    assert _read_ndjson(path) == elements
+    assert response.text == path
+    assert len(response.content) < 512
+
+
 def test_elements_file_response_carries_path_in_header_and_body(tmp_path):
     path = str(tmp_path / "combined.ndjson")
     response = create_elements_file_response(path)
