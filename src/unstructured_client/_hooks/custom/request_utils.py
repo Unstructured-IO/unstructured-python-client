@@ -4,7 +4,9 @@ import asyncio
 import io
 import json
 import logging
-from typing import Tuple, Any, BinaryIO, Optional
+import os
+import tempfile
+from typing import Tuple, Any, BinaryIO, Optional, TextIO
 from urllib.parse import urlparse
 
 import httpx
@@ -273,6 +275,113 @@ def create_response(elements: list) -> httpx.Response:
     content = json.dumps(elements).encode()
     content_length = str(len(content))
     response.headers.update({"Content-Length": content_length})
+    setattr(response, "_content", content)
+    return response
+
+
+ELEMENTS_FILE_HEADER = "x-unstructured-elements-file"
+NDJSON_MEDIA_TYPE = "application/x-ndjson"
+
+_SNIFF_BLOCK_SIZE = 64
+
+
+def _first_non_space_char(stream: TextIO) -> str:
+    """Return the first non-whitespace character in `stream`, or "" if there is none."""
+    while True:
+        block = stream.read(_SNIFF_BLOCK_SIZE)
+        if not block:
+            return ""
+        stripped = block.lstrip()
+        if stripped:
+            return stripped[0]
+
+
+def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
+    """Combine per-chunk split-PDF response files into one NDJSON file on disk.
+
+    Recombining chunks by parsing them builds four full copies of the document (a list
+    per chunk, a flattened list, a `json.dumps` blob, and the SDK's re-parse of that
+    blob). Concatenating on disk keeps peak memory at roughly one chunk instead.
+
+    A chunk file is either a JSON array (server returned `application/json`) or already
+    NDJSON (server honored `application/x-ndjson`); the first non-whitespace character
+    says which. NDJSON chunks are copied through without parsing.
+
+    Args:
+        chunk_paths: Per-chunk response files, in element order.
+        out_path: File to write the combined NDJSON to.
+
+    Returns:
+        The number of elements written.
+    """
+    total = 0
+    with open(out_path, "w", encoding="utf-8") as out:
+        for chunk_path in chunk_paths:
+            with open(chunk_path, "r", encoding="utf-8") as chunk:
+                first_char = _first_non_space_char(chunk)
+                if not first_char:
+                    continue
+                chunk.seek(0)
+
+                if first_char == "[":
+                    # A chunk is bounded (20 pages by default), so a plain load avoids
+                    # taking on a streaming-parser dependency.
+                    for element in json.load(chunk):
+                        out.write(json.dumps(element, ensure_ascii=False))
+                        out.write("\n")
+                        total += 1
+                else:
+                    for line in chunk:
+                        line = line.strip()
+                        if line:
+                            out.write(line)
+                            out.write("\n")
+                            total += 1
+    return total
+
+
+def write_chunk_body_to_temp(response: httpx.Response, dir_: Optional[str] = None) -> str:
+    """Spill an in-memory chunk response body to a temp file, returning its path.
+
+    Used by elements-file mode when `cache_tmp_data` is off and there is no cached file
+    to reference. The body is written verbatim so that `combine_chunk_files_to_ndjson`
+    gets the same input it does in the cached case.
+
+    Args:
+        response: The chunk response whose body should be spilled.
+        dir_: Directory to create the file in. Defaults to the system temp directory.
+
+    Returns:
+        The path to the spilled file. The caller owns deleting it.
+    """
+    fd, path = tempfile.mkstemp(suffix=".ndjson", dir=dir_ or tempfile.gettempdir())
+    with os.fdopen(fd, "wb") as f:
+        f.write(response.content)
+    return path
+
+
+def create_elements_file_response(elements_file: str) -> httpx.Response:
+    """Create a synthetic 200 response whose payload is a path to an NDJSON file.
+
+    Mirrors the split hook's existing convention of a cached chunk response carrying its
+    temp-file path as the body. The path is also set as a header so the SDK can tell this
+    apart from a real NDJSON body streamed from the server.
+
+    Args:
+        elements_file: Path to the combined NDJSON file of elements.
+
+    Returns:
+        The synthetic response.
+    """
+    content = elements_file.encode()
+    response = httpx.Response(
+        status_code=200,
+        headers={
+            "Content-Type": NDJSON_MEDIA_TYPE,
+            "Content-Length": str(len(content)),
+            ELEMENTS_FILE_HEADER: elements_file,
+        },
+    )
     setattr(response, "_content", content)
     return response
 

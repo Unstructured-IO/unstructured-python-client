@@ -487,6 +487,23 @@ def load_elements_from_response(response: httpx.Response) -> list[dict]:
         return json.load(file)
 
 
+def _unlink_quietly(paths: Iterable[str]) -> None:
+    """Delete temp files, logging rather than raising if one cannot be removed.
+
+    Cleanup runs on the success path, so a failure to unlink must never turn a completed
+    partition into an error.
+    """
+    for path in paths:
+        try:
+            os.unlink(path)
+        except OSError as exc:
+            logger.warning(
+                "split_pdf event=temp_file_cleanup_failed file=%s error=%s",
+                Path(path).name,
+                exc,
+            )
+
+
 class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorHook):
     """
     A hook class that splits a PDF file into multiple pages and sends each page as
@@ -524,6 +541,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.allow_failed: dict[str, bool] = {}
         self.cache_tmp_data_feature: dict[str, bool] = {}
         self.cache_tmp_data_dir: dict[str, str] = {}
+        # NDJSON elements-file mode: when the caller asks for application/x-ndjson the
+        # per-chunk temp files are concatenated on disk instead of being parsed and
+        # re-serialized, and the combined path is handed back via the response header.
+        self.ndjson_mode: dict[str, bool] = {}
+        self.ndjson_output_path: dict[str, str] = {}
 
     @staticmethod
     def _get_operation_id_from_request(request: Optional[httpx.Request]) -> Optional[str]:
@@ -791,6 +813,15 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.cache_tmp_data_feature[operation_id] = cache_tmp_data_feature
         self.cache_tmp_data_dir[operation_id] = cache_tmp_data_dir
         self.concurrency_level[operation_id] = concurrency_level
+        # Depends only on what the caller asked for, never on cache_tmp_data. The Accept
+        # header is chosen by the caller while cache_tmp_data is a separate split-PDF
+        # setting, so gating on both lets them disagree: the server would return NDJSON
+        # while the hook took the JSON path and `res.json()` raised on a body this client
+        # had itself requested. Both caching modes are handled in
+        # `_elements_from_task_responses`.
+        self.ndjson_mode[operation_id] = (
+            request_utils.NDJSON_MEDIA_TYPE in request.headers.get("Accept", "")
+        )
 
         timeout_seconds = _get_request_timeout_seconds(request)
         if timeout_seconds is None and hook_ctx.config.timeout_ms is not None:
@@ -1382,6 +1413,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         failed_responses: list[tuple[int, httpx.Response]] = []
         transport_failure_count = 0
         elements = []
+        ndjson_mode = self.ndjson_mode.get(operation_id, False)
+        chunk_paths: list[str] = []
+        # Subset of `chunk_paths` this method created itself, and so must clean up. The
+        # rest belong to the operation's tempdir and are removed with it.
+        spilled_chunk_paths: list[str] = []
         for response_number, res in task_responses:
             if res.status_code == 200:
                 logger.debug(
@@ -1390,7 +1426,27 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     response_number,
                 )
                 successful_responses.append(res)
-                if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
+                if ndjson_mode:
+                    # Neither branch parses the body; that is what keeps peak memory at
+                    # roughly one chunk during recombination.
+                    if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
+                        # The body was already streamed to a temp file owned by the
+                        # operation's tempdir, and `res.text` holds that path.
+                        chunk_paths.append(res.text)
+                    else:
+                        # The body is in memory, so spill it verbatim and then release it:
+                        # every response stays in `successful_responses` for failure
+                        # bookkeeping, so leaving `_content` set would keep the whole
+                        # document resident anyway. Overwriting it with the path matches
+                        # what the cached branch does, so `res.text` means the same thing
+                        # in both.
+                        spilled = request_utils.write_chunk_body_to_temp(
+                            res, self._operation_tempdir_path(operation_id)
+                        )
+                        res._content = spilled.encode()  # pylint: disable=protected-access
+                        spilled_chunk_paths.append(spilled)
+                        chunk_paths.append(spilled)
+                elif self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
                     elements.append(load_elements_from_response(res))
                 else:
                     elements.append(res.json())
@@ -1433,8 +1489,56 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 total_chunks=len(task_responses),
                 response=response,
             )
+        if ndjson_mode:
+            try:
+                if chunk_paths:
+                    self._combine_chunks_to_ndjson(operation_id, chunk_paths)
+            finally:
+                # These are ours; the cached chunk files belong to the operation tempdir.
+                _unlink_quietly(spilled_chunk_paths)
+            return []
+
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
+
+    def _combine_chunks_to_ndjson(self, operation_id: str, chunk_paths: list[str]) -> None:
+        """Concatenate the per-chunk files into one NDJSON file and record its path.
+
+        `_build_after_success_response` turns the recorded path into the response. The
+        combined file goes in the cache *parent* directory rather than the operation's
+        TemporaryDirectory, because `_clear_operation` cleans that directory up as soon as
+        after_success returns, which would delete the file before the caller could read
+        it. The combined file therefore outlives the operation and the caller owns
+        deleting it (see `PartitionResponse.elements_file`).
+        """
+        temp_dir_path = self.cache_tmp_data_dir.get(operation_id) or tempfile.gettempdir()
+        out_path = f"{temp_dir_path}/{uuid.uuid4()}.ndjson"
+        written = request_utils.combine_chunk_files_to_ndjson(chunk_paths, out_path)
+        self.ndjson_output_path[operation_id] = out_path
+        logger.info(
+            "split_pdf event=ndjson_combined operation_id=%s chunk_count=%d element_count=%d out_file=%s",
+            operation_id,
+            len(chunk_paths),
+            written,
+            Path(out_path).name,
+        )
+
+    def _operation_tempdir_path(self, operation_id: str) -> Optional[str]:
+        """Directory to spill chunk bodies into, preferring the operation's own tempdir."""
+        tempdir = self.tempdirs.get(operation_id)
+        if tempdir is not None:
+            return tempdir.name
+        return self.cache_tmp_data_dir.get(operation_id)
+
+    def _discard_ndjson_output(self, operation_id: str) -> None:
+        """Delete the combined NDJSON file when it will not be handed to the caller.
+
+        Once we return a failure response instead, nothing downstream learns the path, so
+        without this the combined file is leaked for the lifetime of the host.
+        """
+        out_path = self.ndjson_output_path.pop(operation_id, None)
+        if out_path is not None:
+            _unlink_quietly([out_path])
 
     def _build_after_success_response(
         self,
@@ -1451,6 +1555,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 "split_pdf event=top_level_failure operation_id=%s mode=strict failed_response_selected=true",
                 operation_id,
             )
+            self._discard_ndjson_output(operation_id)
             return self.api_failed_responses[operation_id][0]
 
         if (
@@ -1462,7 +1567,21 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 "split_pdf event=top_level_failure operation_id=%s mode=allow_failed reason=no_successful_chunks",
                 operation_id,
             )
+            self._discard_ndjson_output(operation_id)
             return self.api_failed_responses[operation_id][0]
+
+        # Elements-file mode: hand back the combined NDJSON path instead of a body. Checked
+        # before the `elements is None` guard because `elements` is intentionally empty
+        # here -- nothing was parsed.
+        if self.ndjson_mode.get(operation_id, False):
+            ndjson_path = self.ndjson_output_path.get(operation_id)
+            if ndjson_path is None:
+                logger.warning(
+                    "split_pdf event=ndjson_missing_output operation_id=%s falling_back=true",
+                    operation_id,
+                )
+                return response
+            return request_utils.create_elements_file_response(ndjson_path)
 
         if elements is None:
             return response
@@ -1586,6 +1705,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.allow_failed.pop(operation_id, None)
         self.cache_tmp_data_feature.pop(operation_id, None)
         self.cache_tmp_data_dir.pop(operation_id, None)
+        self.ndjson_mode.pop(operation_id, None)
+        self.ndjson_output_path.pop(operation_id, None)
         self.pending_operation_ids.pop(operation_id, None)
         future = self.operation_futures.pop(operation_id, None)
         loop_holder = self.operation_loops.pop(operation_id, None)
