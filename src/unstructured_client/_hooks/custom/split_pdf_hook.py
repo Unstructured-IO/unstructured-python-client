@@ -1510,10 +1510,23 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         after_success returns, which would delete the file before the caller could read
         it. The combined file therefore outlives the operation and the caller owns
         deleting it (see `PartitionResponse.elements_file`).
+
+        Recombination writes to a staging file that is renamed into place only once it
+        completes. A malformed chunk makes the parse raise partway through, and since the
+        combined file is the one thing here nothing else owns, a partial one would survive
+        the failed operation as an orphan under the final name.
         """
         temp_dir_path = self.cache_tmp_data_dir.get(operation_id) or tempfile.gettempdir()
         out_path = f"{temp_dir_path}/{uuid.uuid4()}.ndjson"
-        written = request_utils.combine_chunk_files_to_ndjson(chunk_paths, out_path)
+        fd, staging_path = tempfile.mkstemp(suffix=".ndjson.partial", dir=temp_dir_path)
+        os.close(fd)
+        try:
+            written = request_utils.combine_chunk_files_to_ndjson(chunk_paths, staging_path)
+            # Same directory, so this is atomic; the caller never sees a partial file.
+            os.replace(staging_path, out_path)
+        except BaseException:
+            _unlink_quietly([staging_path])
+            raise
         self.ndjson_output_path[operation_id] = out_path
         logger.info(
             "split_pdf event=ndjson_combined operation_id=%s chunk_count=%d element_count=%d out_file=%s",

@@ -279,7 +279,12 @@ def create_response(elements: list) -> httpx.Response:
     return response
 
 
-ELEMENTS_FILE_HEADER = "x-unstructured-elements-file"
+# Marks a response this client synthesized, whose body is a path to a local file rather
+# than elements. It is deliberately an httpx extension and NOT a response header: a
+# header is wire-controlled, so a server could name any local path and have the SDK hand
+# it to the caller, who then opens and (per the documented usage) deletes it. Extensions
+# are populated by the transport, so a remote server cannot set this key.
+ELEMENTS_FILE_EXTENSION_KEY = "unstructured_elements_file"
 NDJSON_MEDIA_TYPE = "application/x-ndjson"
 
 _SNIFF_BLOCK_SIZE = 64
@@ -364,8 +369,9 @@ def create_elements_file_response(elements_file: str) -> httpx.Response:
     """Create a synthetic 200 response whose payload is a path to an NDJSON file.
 
     Mirrors the split hook's existing convention of a cached chunk response carrying its
-    temp-file path as the body. The path is also set as a header so the SDK can tell this
-    apart from a real NDJSON body streamed from the server.
+    temp-file path as the body. The path is also recorded in `ELEMENTS_FILE_EXTENSION_KEY`
+    so the SDK can tell this apart from a real NDJSON body streamed from the server
+    without trusting anything that came off the wire.
 
     Args:
         elements_file: Path to the combined NDJSON file of elements.
@@ -379,8 +385,8 @@ def create_elements_file_response(elements_file: str) -> httpx.Response:
         headers={
             "Content-Type": NDJSON_MEDIA_TYPE,
             "Content-Length": str(len(content)),
-            ELEMENTS_FILE_HEADER: elements_file,
         },
+        extensions={ELEMENTS_FILE_EXTENSION_KEY: elements_file},
     )
     setattr(response, "_content", content)
     return response

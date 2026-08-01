@@ -18,12 +18,13 @@ import pytest
 import httpx
 
 from unstructured_client._hooks.custom.request_utils import (
-    ELEMENTS_FILE_HEADER,
+    ELEMENTS_FILE_EXTENSION_KEY,
     combine_chunk_files_to_ndjson,
     create_elements_file_response,
     write_chunk_body_to_temp,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import SplitPdfHook
+from unstructured_client.general import _ndjson_elements_file
 
 
 def _elements(prefix, count):
@@ -205,15 +206,41 @@ def test_spilled_body_is_released_from_the_response(tmp_path):
     assert len(response.content) < 512
 
 
-def test_elements_file_response_carries_path_in_header_and_body(tmp_path):
+def test_elements_file_response_carries_path_in_extension_and_body(tmp_path):
     path = str(tmp_path / "combined.ndjson")
     response = create_elements_file_response(path)
 
     assert response.status_code == 200
-    assert response.headers[ELEMENTS_FILE_HEADER] == path
+    assert response.extensions[ELEMENTS_FILE_EXTENSION_KEY] == path
     assert response.headers["Content-Type"] == "application/x-ndjson"
     # Body-as-path mirrors the existing cached-chunk convention in the split hook.
     assert response.text == path
+
+
+def test_server_cannot_name_a_local_file_via_a_response_header(tmp_path):
+    """The elements-file marker must not be reachable from the wire.
+
+    Callers are documented to open `elements_file` and then delete it, so trusting a
+    server-supplied path would hand a hostile server an arbitrary local file to destroy.
+    A header must be ignored and the body copied to a file this client created.
+    """
+    victim = tmp_path / "victim"
+    victim.write_text("do not touch", encoding="utf-8")
+    response = httpx.Response(
+        200,
+        headers={
+            "content-type": "application/x-ndjson",
+            "x-unstructured-elements-file": str(victim),
+        },
+        content=b'{"safe": true}\n',
+    )
+
+    resolved = _ndjson_elements_file(response)
+
+    assert resolved != str(victim)
+    assert victim.read_text(encoding="utf-8") == "do not touch"
+    assert _read_ndjson(resolved) == [{"safe": True}]
+    os.unlink(resolved)
 
 
 # --- hook-level temp-file lifecycle ------------------------------------------------
@@ -282,7 +309,7 @@ def test_combined_file_is_returned_on_success(tmp_path):
     )
     response = hook._build_after_success_response(operation_id, httpx.Response(200), [])
 
-    combined = response.headers[ELEMENTS_FILE_HEADER]
+    combined = response.extensions[ELEMENTS_FILE_EXTENSION_KEY]
     assert os.path.exists(combined)
     assert _read_ndjson(combined) == elements
 
@@ -309,6 +336,25 @@ def test_combined_file_is_discarded_when_a_failure_response_is_returned(tmp_path
     assert response.status_code == 500
     assert not os.path.exists(combined)
     assert _ndjson_files_in(tmp_path) == []
+
+
+def test_malformed_chunk_leaves_no_partial_output_behind(tmp_path):
+    """Regression guard: recombination that raises must not orphan a partial file.
+
+    The combined file is the one artifact here that no temp directory owns, so a partial
+    one would outlive the failed operation.
+    """
+    operation_id = "op-malformed"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+
+    with pytest.raises(json.JSONDecodeError):
+        hook._elements_from_task_responses(
+            operation_id, [(0, httpx.Response(200, content=b"[not-json"))], started_at=0.0
+        )
+
+    assert operation_id not in hook.ndjson_output_path
+    assert _ndjson_files_in(tmp_path) == []
+    assert list(Path(tmp_path).glob("*.partial")) == []
 
 
 def test_no_combined_file_is_created_when_every_chunk_failed(tmp_path):
