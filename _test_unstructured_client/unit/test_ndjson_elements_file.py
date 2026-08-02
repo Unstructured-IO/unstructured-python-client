@@ -9,14 +9,18 @@ make (per-chunk list, flattened list, json.dumps blob, SDK re-parse). It must:
   - leave no temp files behind other than the combined file the caller owns
 """
 
+import errno
 import json
 import os
+import tempfile
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
 import httpx
 
+from unstructured_client._hooks.custom import request_utils
 from unstructured_client._hooks.custom.request_utils import (
     ELEMENTS_FILE_EXTENSION_KEY,
     combine_chunk_files_to_ndjson,
@@ -24,7 +28,10 @@ from unstructured_client._hooks.custom.request_utils import (
     write_chunk_body_to_temp,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import SplitPdfHook
-from unstructured_client.general import _ndjson_elements_file
+from unstructured_client.general import (
+    _ndjson_elements_file,
+    _ndjson_elements_file_async,
+)
 
 
 def _elements(prefix, count):
@@ -169,6 +176,83 @@ def test_write_chunk_body_to_temp_roundtrips(tmp_path):
 
     path = write_chunk_body_to_temp(response, str(tmp_path))
     assert _read_ndjson(path) == elements
+
+
+def test_spill_failure_leaves_no_orphan_file(tmp_path):
+    """A write that fails partway must take its own temp file with it.
+
+    The caller only registers the returned path for cleanup once this function returns,
+    so an orphan here is permanent -- and a full disk, the likeliest cause, is exactly
+    the failure that repeats on every retry.
+    """
+    real_fdopen = os.fdopen
+
+    class _FailingWriter:
+        """Wraps the real handle so the fd is still closed, but the write blows up."""
+
+        def __init__(self, handle):
+            self._handle = handle
+
+        def write(self, _data):
+            raise OSError(errno.ENOSPC, "No space left on device")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_exc):
+            self._handle.close()
+            return False
+
+    def _failing_fdopen(fd, mode):
+        return _FailingWriter(real_fdopen(fd, mode))
+
+    response = httpx.Response(status_code=200, content=b'{"type": "Table"}\n')
+
+    with mock.patch.object(request_utils.os, "fdopen", _failing_fdopen):
+        with pytest.raises(OSError) as excinfo:
+            write_chunk_body_to_temp(response, str(tmp_path))
+
+    assert excinfo.value.errno == errno.ENOSPC
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_elements_file_copy_failure_leaves_no_orphan(tmp_path, monkeypatch):
+    """A body that dies mid-copy must not leave the partial file behind.
+
+    The destination is created with delete=False so it can outlive the helper, which is
+    exactly what makes an interrupted copy leak.
+    """
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+
+    class _FailingResponse:
+        extensions: dict = {}
+
+        def iter_bytes(self):
+            yield b'{"type": "Table"}\n'
+            raise httpx.ReadError("connection dropped")
+
+    with pytest.raises(httpx.ReadError):
+        _ndjson_elements_file(_FailingResponse())
+
+    assert list(tmp_path.glob("unst_elements_*")) == []
+
+
+@pytest.mark.asyncio
+async def test_elements_file_copy_failure_leaves_no_orphan_async(tmp_path, monkeypatch):
+    """Async counterpart of `test_elements_file_copy_failure_leaves_no_orphan`."""
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+
+    class _FailingResponse:
+        extensions: dict = {}
+
+        async def aiter_bytes(self):
+            yield b'{"type": "Table"}\n'
+            raise httpx.ReadError("connection dropped")
+
+    with pytest.raises(httpx.ReadError):
+        await _ndjson_elements_file_async(_FailingResponse())
+
+    assert list(tmp_path.glob("unst_elements_*")) == []
 
 
 def test_combine_accepts_bodies_spilled_without_caching(tmp_path):
