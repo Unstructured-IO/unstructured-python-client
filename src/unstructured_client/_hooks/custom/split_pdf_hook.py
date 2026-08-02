@@ -543,9 +543,13 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.cache_tmp_data_dir: dict[str, str] = {}
         # NDJSON elements-file mode: when the caller asks for application/x-ndjson the
         # per-chunk temp files are concatenated on disk instead of being parsed and
-        # re-serialized, and the combined path is handed back via the response header.
+        # re-serialized, and the combined path is handed back on the response.
         self.ndjson_mode: dict[str, bool] = {}
         self.ndjson_output_path: dict[str, str] = {}
+        # Guards publishing the combined file against concurrent operation teardown.
+        # Recombination runs in a worker thread that a cancelled operation cannot stop, so
+        # it can still be running when `_clear_operation` fires on the event-loop thread.
+        self._ndjson_lock = threading.Lock()
 
     @staticmethod
     def _get_operation_id_from_request(request: Optional[httpx.Request]) -> Optional[str]:
@@ -1515,6 +1519,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         completes. A malformed chunk makes the parse raise partway through, and since the
         combined file is the one thing here nothing else owns, a partial one would survive
         the failed operation as an orphan under the final name.
+
+        Publishing is also gated on the operation still being live. This runs in a worker
+        thread that cancellation cannot interrupt, so `_clear_operation` may already have
+        torn the operation down by the time we finish; recording the path then would both
+        resurrect a cleared dict entry and orphan the file, since nothing downstream will
+        ever read it.
         """
         temp_dir_path = self.cache_tmp_data_dir.get(operation_id) or tempfile.gettempdir()
         out_path = f"{temp_dir_path}/{uuid.uuid4()}.ndjson"
@@ -1527,7 +1537,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         except BaseException:
             _unlink_quietly([staging_path])
             raise
-        self.ndjson_output_path[operation_id] = out_path
+
+        with self._ndjson_lock:
+            if operation_id not in self.pending_operation_ids:
+                _unlink_quietly([out_path])
+                logger.warning(
+                    "split_pdf event=ndjson_output_discarded operation_id=%s reason=operation_cleared",
+                    operation_id,
+                )
+                return
+            self.ndjson_output_path[operation_id] = out_path
         logger.info(
             "split_pdf event=ndjson_combined operation_id=%s chunk_count=%d element_count=%d out_file=%s",
             operation_id,
@@ -1549,9 +1568,20 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         Once we return a failure response instead, nothing downstream learns the path, so
         without this the combined file is leaked for the lifetime of the host.
         """
-        out_path = self.ndjson_output_path.pop(operation_id, None)
+        with self._ndjson_lock:
+            out_path = self.ndjson_output_path.pop(operation_id, None)
         if out_path is not None:
             _unlink_quietly([out_path])
+
+    def _claim_ndjson_output(self, operation_id: str) -> Optional[str]:
+        """Take the combined file's path, transferring ownership of it to the caller.
+
+        Removing it from `ndjson_output_path` is what makes cleanup unambiguous: a path
+        still recorded when the operation is torn down is one the caller never received,
+        so `_clear_operation` can delete it without risking the file it just handed over.
+        """
+        with self._ndjson_lock:
+            return self.ndjson_output_path.pop(operation_id, None)
 
     def _build_after_success_response(
         self,
@@ -1587,7 +1617,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         # before the `elements is None` guard because `elements` is intentionally empty
         # here -- nothing was parsed.
         if self.ndjson_mode.get(operation_id, False):
-            ndjson_path = self.ndjson_output_path.get(operation_id)
+            ndjson_path = self._claim_ndjson_output(operation_id)
             if ndjson_path is None:
                 logger.warning(
                     "split_pdf event=ndjson_missing_output operation_id=%s falling_back=true",
@@ -1718,9 +1748,16 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         self.allow_failed.pop(operation_id, None)
         self.cache_tmp_data_feature.pop(operation_id, None)
         self.cache_tmp_data_dir.pop(operation_id, None)
-        self.ndjson_mode.pop(operation_id, None)
-        self.ndjson_output_path.pop(operation_id, None)
-        self.pending_operation_ids.pop(operation_id, None)
+        with self._ndjson_lock:
+            self.ndjson_mode.pop(operation_id, None)
+            # Anything still recorded here was never claimed by the caller -- the
+            # operation was torn down first -- so this is ours to delete. Dropping
+            # `pending_operation_ids` under the same lock is what stops a recombination
+            # worker still running in a thread from publishing after this point.
+            undelivered_ndjson = self.ndjson_output_path.pop(operation_id, None)
+            self.pending_operation_ids.pop(operation_id, None)
+        if undelivered_ndjson is not None:
+            _unlink_quietly([undelivered_ndjson])
         future = self.operation_futures.pop(operation_id, None)
         loop_holder = self.operation_loops.pop(operation_id, None)
         executor = self.executors.pop(operation_id, None)

@@ -3,6 +3,7 @@
 from .basesdk import BaseSDK
 from enum import Enum
 import httpx
+import os
 import tempfile
 from typing import Any, Dict, List, Mapping, Optional, Union, cast
 from unstructured_client import utils
@@ -31,6 +32,18 @@ def _new_elements_file():
     )
 
 
+def _discard_elements_file(path: str) -> None:
+    """Remove a partially written elements file, ignoring a failure to do so.
+
+    The copy is created with delete=False so it can outlive this function, which means a
+    body that fails or is cancelled partway through would otherwise leave the file behind.
+    """
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
+
+
 def _ndjson_elements_file(http_res: httpx.Response) -> str:
     """Resolve an NDJSON response to a path on disk, without parsing the elements.
 
@@ -46,10 +59,15 @@ def _ndjson_elements_file(http_res: httpx.Response) -> str:
     if existing_path:
         return existing_path
 
-    with _new_elements_file() as out:
-        for byte_chunk in http_res.iter_bytes():
-            out.write(byte_chunk)
-        return out.name
+    out = _new_elements_file()
+    try:
+        with out:
+            for byte_chunk in http_res.iter_bytes():
+                out.write(byte_chunk)
+    except BaseException:
+        _discard_elements_file(out.name)
+        raise
+    return out.name
 
 
 async def _ndjson_elements_file_async(http_res: httpx.Response) -> str:
@@ -58,10 +76,15 @@ async def _ndjson_elements_file_async(http_res: httpx.Response) -> str:
     if existing_path:
         return existing_path
 
-    with _new_elements_file() as out:
-        async for byte_chunk in http_res.aiter_bytes():
-            out.write(byte_chunk)
-        return out.name
+    out = _new_elements_file()
+    try:
+        with out:
+            async for byte_chunk in http_res.aiter_bytes():
+                out.write(byte_chunk)
+    except BaseException:
+        _discard_elements_file(out.name)
+        raise
+    return out.name
 
 
 class General(BaseSDK):

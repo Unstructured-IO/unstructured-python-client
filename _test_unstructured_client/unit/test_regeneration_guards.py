@@ -98,8 +98,14 @@ def test_partition_response_keeps_elements_file():
     for path in (
         "src/unstructured_client/general.py",
         "src/unstructured_client/models/operations/partition.py",
+        "docs/models/operations/partitionresponse.md",
     ):
         assert path in genignore, f"{path} carries custom code and must stay in .genignore"
+
+    # The docs row is generated from the spec too, so the daily generation workflow would
+    # drop it without the .genignore entry above.
+    response_docs = (REPO_ROOT / "docs/models/operations/partitionresponse.md").read_text()
+    assert "elements_file" in response_docs
 
 
 def test_body_create_job_input_files_are_serialized_as_multipart_files():

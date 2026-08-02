@@ -30,3 +30,7 @@ src/unstructured_client/utils/retries.py
 # response field, follow the same procedure as general.py above.
 # See test_regeneration_guards.py::test_partition_response_keeps_elements_file.
 src/unstructured_client/models/operations/partition.py
+
+# Docs for that same custom elements_file field. This file is generated from the spec
+# and the daily generation workflow would otherwise drop the row on its next run.
+docs/models/operations/partitionresponse.md

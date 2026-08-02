@@ -433,10 +433,13 @@ For very large documents, the parsed element list can dominate the client's memo
 
 **You own the returned file and are responsible for deleting it.**
 
+> [!NOTE]
+> The memory saving applies to the split-PDF path, i.e. a PDF with `split_pdf_page=True` (the default). For unsplit inputs — a non-PDF file, or `split_pdf_page=False` — the response body is still read fully into memory before being written to disk, so peak memory can reach roughly twice the body size. You still get `elements_file` either way.
+
 Example:
 ```python
 import json
-import os
+from pathlib import Path
 
 from unstructured_client.general import PartitionAcceptEnum
 
@@ -451,7 +454,8 @@ try:
             element = json.loads(line)
             ...
 finally:
-    os.unlink(res.elements_file)
+    # missing_ok so a failure to open the file isn't masked by the cleanup.
+    Path(res.elements_file).unlink(missing_ok=True)
 ```
 
 <!-- Start File uploads [file-upload] -->

@@ -360,8 +360,18 @@ def write_chunk_body_to_temp(response: httpx.Response, dir_: Optional[str] = Non
         The path to the spilled file. The caller owns deleting it.
     """
     fd, path = tempfile.mkstemp(suffix=".ndjson", dir=dir_ or tempfile.gettempdir())
-    with os.fdopen(fd, "wb") as f:
-        f.write(response.content)
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(response.content)
+    except BaseException:
+        # The caller only registers this path for cleanup once we return, so a failed
+        # write (a full disk, most likely) has to clean up after itself or the file is
+        # orphaned -- and a full disk is exactly the case that repeats.
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        raise
     return path
 
 

@@ -186,24 +186,32 @@ def test_combine_accepts_bodies_spilled_without_caching(tmp_path):
 
 
 def test_spilled_body_is_released_from_the_response(tmp_path):
-    """After spilling, the response must no longer hold the body.
+    """After spilling, the chunk response must no longer hold the body.
 
-    Regression guard: every chunk response is retained in `api_successful_responses` for
-    failure bookkeeping, so spilling to disk without releasing `_content` still
-    accumulates the whole document in memory, defeating the point of spilling.
+    Regression guard for the release step in `_elements_from_task_responses`: every chunk
+    response stays in `api_successful_responses` for failure bookkeeping, so spilling to
+    disk without clearing `_content` still accumulates the whole document in memory,
+    defeating the point of spilling.
+
+    Driven through the hook on purpose. The release happens there, not in
+    `write_chunk_body_to_temp`, so a test that clears `_content` itself would still pass
+    if the hook ever stopped doing it.
     """
-    elements = _elements("a", 3)
-    body = "".join(json.dumps(e) + "\n" for e in elements).encode()
-    response = httpx.Response(status_code=200, content=body)
-    assert len(response.content) == len(body)
+    operation_id = "op-release"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+    elements = [
+        {"type": "Table", "text": f"t{i}", "metadata": {"image_base64": "A" * 2000}}
+        for i in range(3)
+    ]
+    response = _ndjson_response(elements)
+    assert len(response.content) > 512
 
-    path = write_chunk_body_to_temp(response, str(tmp_path))
-    response._content = path.encode()
+    hook._elements_from_task_responses(operation_id, [(0, response)], started_at=0.0)
 
-    # The body is on disk, and the response now costs a path rather than a payload.
-    assert _read_ndjson(path) == elements
-    assert response.text == path
+    # The response now costs a path rather than a payload...
     assert len(response.content) < 512
+    # ...and the elements still made it into the combined output.
+    assert _read_ndjson(hook.ndjson_output_path[operation_id]) == elements
 
 
 def test_elements_file_response_carries_path_in_extension_and_body(tmp_path):
@@ -258,6 +266,8 @@ def _hook_in_ndjson_mode(operation_id, tmp_path):
     hook.cache_tmp_data_feature[operation_id] = False
     hook.cache_tmp_data_dir[operation_id] = str(tmp_path)
     hook.allow_failed[operation_id] = False
+    # Marks the operation live; `_clear_operation` removing it is what signals teardown.
+    hook.pending_operation_ids[operation_id] = operation_id
     return hook
 
 
@@ -336,6 +346,59 @@ def test_combined_file_is_discarded_when_a_failure_response_is_returned(tmp_path
     assert response.status_code == 500
     assert not os.path.exists(combined)
     assert _ndjson_files_in(tmp_path) == []
+
+
+def test_output_is_discarded_when_the_operation_was_cleared_mid_recombination(tmp_path):
+    """Recombination runs in a thread that cancellation cannot interrupt.
+
+    If `_clear_operation` tears the operation down first, publishing the path would both
+    resurrect a cleared dict entry and orphan the file, since nothing will ever read it.
+    """
+    operation_id = "op-cancelled"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+    # `before_request` registers this; `_clear_operation` removing it is what marks the
+    # operation dead. Simulate the teardown having already happened.
+    hook.pending_operation_ids.pop(operation_id, None)
+
+    hook._elements_from_task_responses(
+        operation_id, [(0, _ndjson_response(_elements("a", 2)))], started_at=0.0
+    )
+
+    assert operation_id not in hook.ndjson_output_path
+    assert _ndjson_files_in(tmp_path) == []
+
+
+def test_clear_operation_deletes_an_unclaimed_output_file(tmp_path):
+    """A path still recorded at teardown was never handed to the caller, so it is ours."""
+    operation_id = "op-unclaimed"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+
+    hook._elements_from_task_responses(
+        operation_id, [(0, _ndjson_response(_elements("a", 2)))], started_at=0.0
+    )
+    combined = hook.ndjson_output_path[operation_id]
+    assert os.path.exists(combined)
+
+    hook._clear_operation(operation_id)
+
+    assert not os.path.exists(combined)
+
+
+def test_clear_operation_keeps_an_output_file_the_caller_claimed(tmp_path):
+    """The success path hands the path over, so teardown must not delete it."""
+    operation_id = "op-claimed"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+
+    hook._elements_from_task_responses(
+        operation_id, [(0, _ndjson_response(_elements("a", 2)))], started_at=0.0
+    )
+    response = hook._build_after_success_response(operation_id, httpx.Response(200), [])
+    combined = response.extensions[ELEMENTS_FILE_EXTENSION_KEY]
+
+    hook._clear_operation(operation_id)
+
+    assert os.path.exists(combined)
+    assert len(_read_ndjson(combined)) == 2
 
 
 def test_malformed_chunk_leaves_no_partial_output_behind(tmp_path):
