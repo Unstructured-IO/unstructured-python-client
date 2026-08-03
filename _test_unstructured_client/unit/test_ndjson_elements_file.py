@@ -13,6 +13,7 @@ import errno
 import json
 import os
 import tempfile
+import threading
 from pathlib import Path
 from unittest import mock
 
@@ -35,7 +36,7 @@ from unstructured_client.general import (
     _ndjson_elements_file,
     _ndjson_elements_file_async,
 )
-from unstructured_client.models import operations, shared
+from unstructured_client.models import errors, operations, shared
 
 
 def _elements(prefix, count):
@@ -606,7 +607,8 @@ def test_partition_sets_elements_file_when_server_ignores_the_accept_header():
     try:
         assert _read_ndjson(res.elements_file) == elements
     finally:
-        os.unlink(res.elements_file)
+        # missing_ok so a failed assertion above is not masked by the cleanup.
+        Path(res.elements_file).unlink(missing_ok=True)
 
 
 def test_partition_sets_elements_file_when_server_returns_ndjson():
@@ -629,7 +631,8 @@ def test_partition_sets_elements_file_when_server_returns_ndjson():
     try:
         assert _read_ndjson(res.elements_file) == elements
     finally:
-        os.unlink(res.elements_file)
+        # missing_ok so a failed assertion above is not masked by the cleanup.
+        Path(res.elements_file).unlink(missing_ok=True)
 
 
 def test_partition_without_the_override_still_returns_elements():
@@ -646,3 +649,106 @@ def test_partition_without_the_override_still_returns_elements():
 
     assert res.elements == elements
     assert res.elements_file is None
+
+
+def test_partition_sets_elements_file_when_accept_set_via_http_headers():
+    """`http_headers` can replace Accept too, and must behave the same as the override.
+
+    Regression guard: this used to key off `accept_header_override` alone, so the split
+    hook (which reads the request header) and the unsplit path disagreed for one caller.
+    """
+    elements = [{"type": "Table", "text": "t0"}]
+
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, json=elements
+        )
+
+    client = _mock_client(handler)
+    res = client.general.partition(
+        request=_text_request(),
+        http_headers={"Accept": "application/x-ndjson"},
+    )
+
+    assert res.elements is None
+    try:
+        assert _read_ndjson(res.elements_file) == elements
+    finally:
+        Path(res.elements_file).unlink(missing_ok=True)
+
+
+def test_partition_ndjson_rejects_a_non_list_json_body():
+    """A malformed 200 must fail the same way it would on the `elements` path.
+
+    Iterating the raw JSON would write a dict's *keys* out as elements, so a
+    `{"detail": ...}` body became a one-element document reading `"detail"`.
+    """
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, json={"detail": "oops"}
+        )
+
+    client = _mock_client(handler)
+    with pytest.raises(errors.ResponseValidationError):
+        client.general.partition(
+            request=_text_request(),
+            accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+        )
+
+
+def test_partition_ndjson_handles_a_null_json_body():
+    """`null` used to raise TypeError from iterating None; it now yields an empty file."""
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, content=b"null"
+        )
+
+    client = _mock_client(handler)
+    res = client.general.partition(
+        request=_text_request(),
+        accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+    )
+
+    try:
+        assert _read_ndjson(res.elements_file) == []
+    finally:
+        Path(res.elements_file).unlink(missing_ok=True)
+
+
+@pytest.mark.asyncio
+async def test_partition_async_ndjson_does_not_block_on_conversion():
+    """The async path must offload the parse-and-write, not run it on the event loop."""
+    elements = [{"type": "Table", "text": "t0"}]
+
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, json=elements
+        )
+
+    client = UnstructuredClient(
+        api_key_auth="x",
+        server_url="http://localhost:8000",
+        async_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+    )
+    # Assert on the thread the conversion actually ran on. Patching `asyncio.to_thread`
+    # and checking `.called` proves nothing -- other SDK internals use it during the same
+    # call, so that assertion passes even with the offload removed.
+    event_loop_thread = threading.get_ident()
+    ran_on = {}
+    real_convert = general._json_body_to_elements_file
+
+    def _spy(http_res):
+        ran_on["thread"] = threading.get_ident()
+        return real_convert(http_res)
+
+    with mock.patch.object(general, "_json_body_to_elements_file", _spy):
+        res = await client.general.partition_async(
+            request=_text_request(),
+            accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+        )
+
+    assert ran_on["thread"] != event_loop_thread, "conversion ran on the event loop"
+    try:
+        assert _read_ndjson(res.elements_file) == elements
+    finally:
+        Path(res.elements_file).unlink(missing_ok=True)

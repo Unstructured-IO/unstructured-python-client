@@ -1509,7 +1509,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """Concatenate the per-chunk files into one NDJSON file and record its path.
 
         `_build_after_success_response` turns the recorded path into the response. The
-        The combined file goes in the cache *parent* directory rather than the operation's
+        combined file goes in the cache *parent* directory rather than the operation's
         TemporaryDirectory, which `_clear_operation` removes as soon as after_success
         returns. It therefore outlives the operation and the caller owns deleting it (see
         `PartitionResponse.elements_file`).
