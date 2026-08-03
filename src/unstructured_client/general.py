@@ -52,11 +52,13 @@ def _ndjson_requested(request: httpx.Request) -> bool:
 def _json_body_to_elements_file(http_res: httpx.Response) -> str:
     """Write a JSON-array body out as NDJSON, so `elements_file` is set either way.
 
-    The deployed API does not offer `application/x-ndjson`: its spec declares only
-    `application/json` and `text/csv`, so a request that skips the split-PDF hook comes
-    back as JSON no matter what was asked for. Without this, opting into NDJSON would
-    silently populate `elements` instead and leave `elements_file` as None, forcing every
-    caller to handle both shapes for one flag.
+    The deployed API does not offer `application/x-ndjson`, and does not in fact negotiate
+    the response format on `Accept` at all -- it reads the `output_format` form field, and
+    only consults `Accept` to select `multipart/mixed` and to reject conflicting media
+    types on multi-file uploads. So a request that skips the split-PDF hook comes back as
+    JSON no matter what was asked for. Without this, opting into NDJSON would silently
+    populate `elements` instead and leave `elements_file` as None, forcing every caller to
+    handle both shapes for one flag.
 
     This does not bound memory -- the body is already fully read by the time we get here,
     and parsing it adds the element list on top. It exists to keep the contract uniform.
