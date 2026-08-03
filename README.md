@@ -434,7 +434,7 @@ For very large documents, the parsed element list can dominate the client's memo
 **You own the returned file and are responsible for deleting it.**
 
 > [!NOTE]
-> The memory saving applies to the split-PDF path, i.e. a PDF with `split_pdf_page=True` (the default). For unsplit inputs — a non-PDF file, or `split_pdf_page=False` — the response body is still read fully into memory before being written to disk, so peak memory can reach roughly twice the body size. You still get `elements_file` either way.
+> `elements_file` is always set when you pass this header, but the **memory saving** only applies to the split-PDF path. An input is only split when it is a PDF, `split_pdf_page=True` (the default), and it has more than two pages — `split_size` is floored at 2, so one- and two-page PDFs are sent whole. For those, and for non-PDFs, the response body is read fully into memory before being written to disk, so peak memory can reach roughly twice the body size.
 
 Example:
 ```python

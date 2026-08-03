@@ -1509,22 +1509,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         """Concatenate the per-chunk files into one NDJSON file and record its path.
 
         `_build_after_success_response` turns the recorded path into the response. The
-        combined file goes in the cache *parent* directory rather than the operation's
-        TemporaryDirectory, because `_clear_operation` cleans that directory up as soon as
-        after_success returns, which would delete the file before the caller could read
-        it. The combined file therefore outlives the operation and the caller owns
-        deleting it (see `PartitionResponse.elements_file`).
+        The combined file goes in the cache *parent* directory rather than the operation's
+        TemporaryDirectory, which `_clear_operation` removes as soon as after_success
+        returns. It therefore outlives the operation and the caller owns deleting it (see
+        `PartitionResponse.elements_file`).
 
-        Recombination writes to a staging file that is renamed into place only once it
-        completes. A malformed chunk makes the parse raise partway through, and since the
-        combined file is the one thing here nothing else owns, a partial one would survive
-        the failed operation as an orphan under the final name.
-
-        Publishing is also gated on the operation still being live. This runs in a worker
-        thread that cancellation cannot interrupt, so `_clear_operation` may already have
-        torn the operation down by the time we finish; recording the path then would both
-        resurrect a cleared dict entry and orphan the file, since nothing downstream will
-        ever read it.
+        Writing to a staging file and renaming keeps a partial file from surviving under
+        the final name if a malformed chunk makes the parse raise. Publishing is gated on
+        the operation still being live; see `_ndjson_lock`.
         """
         temp_dir_path = self.cache_tmp_data_dir.get(operation_id) or tempfile.gettempdir()
         out_path = f"{temp_dir_path}/{uuid.uuid4()}.ndjson"

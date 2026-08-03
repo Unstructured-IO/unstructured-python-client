@@ -310,7 +310,11 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
 
     A chunk file is either a JSON array (server returned `application/json`) or already
     NDJSON (server honored `application/x-ndjson`); the first non-whitespace character
-    says which. NDJSON chunks are copied through without parsing.
+    says which. A leading `[` is treated as an array, and anything else is assumed to be
+    one JSON value per line -- an assumption, not a check, so a pretty-printed multi-line
+    object would be split into invalid lines. No endpoint returns that today.
+
+    NDJSON chunks are copied through without parsing.
 
     Args:
         chunk_paths: Per-chunk response files, in element order.
@@ -325,6 +329,13 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
             with open(chunk_path, "r", encoding="utf-8") as chunk:
                 first_char = _first_non_space_char(chunk)
                 if not first_char:
+                    # A 200 with an empty body. Log it, because otherwise the document is
+                    # silently short and the element count cannot be reconciled against
+                    # the chunk count.
+                    logger.warning(
+                        "split_pdf event=ndjson_empty_chunk file=%s",
+                        os.path.basename(chunk_path),
+                    )
                     continue
                 chunk.seek(0)
 

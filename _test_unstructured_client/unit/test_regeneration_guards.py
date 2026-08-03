@@ -86,6 +86,10 @@ def test_partition_response_keeps_elements_file():
 
     Both the model and the enum value that selects it live in generated files; the
     .genignore entries are the only thing keeping them.
+
+    Note: SDK generation is currently blocked at the Speakeasy account level, so this
+    guards a path that cannot execute today. Whether it is worth keeping is a live
+    question -- see the discussion on PR #347.
     """
     from unstructured_client.general import PartitionAcceptEnum
     from unstructured_client.models import operations
@@ -102,8 +106,8 @@ def test_partition_response_keeps_elements_file():
     ):
         assert path in genignore, f"{path} carries custom code and must stay in .genignore"
 
-    # The docs row is generated from the spec too, so the daily generation workflow would
-    # drop it without the .genignore entry above.
+    # The docs row is generated from the spec too, so a regeneration would drop it
+    # without the .genignore entry above.
     response_docs = (REPO_ROOT / "docs/models/operations/partitionresponse.md").read_text()
     assert "elements_file" in response_docs
 

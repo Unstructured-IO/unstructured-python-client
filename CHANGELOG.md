@@ -1,7 +1,7 @@
 ## 0.46.0
 
 ### Features
-* Add an NDJSON elements-file mode to `partition()`. Pass `accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON` to get `PartitionResponse.elements_file` — a path to an NDJSON file with one element per line — instead of `PartitionResponse.elements`. On the split-PDF path the per-chunk temp files are concatenated on disk rather than parsed, flattened, re-serialized with `json.dumps` and re-parsed by the SDK, which held four copies of the document in memory at once. Peak memory becomes roughly one chunk instead of the whole document. **The caller owns the returned file and is responsible for deleting it.** Requesting `application/json` (the default) is unchanged.
+* Add an NDJSON elements-file mode to `partition()`. Pass `accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON` to get `PartitionResponse.elements_file` — a path to an NDJSON file with one element per line — instead of `PartitionResponse.elements`. On the split-PDF path the per-chunk temp files are concatenated on disk rather than parsed, flattened, re-serialized with `json.dumps` and re-parsed by the SDK, which held four copies of the document in memory at once; peak memory becomes roughly one chunk instead of the whole document. `elements_file` is set for every input, including ones that are not split and responses from a server that ignores the `Accept` header, so callers need only one code path — but the memory saving itself applies only to split PDFs (a PDF of more than two pages, with `split_pdf_page=True`). **The caller owns the returned file and is responsible for deleting it.** Requesting `application/json` (the default) is unchanged.
 
 ## 0.45.0
 

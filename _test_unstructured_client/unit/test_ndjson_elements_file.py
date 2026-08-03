@@ -29,10 +29,13 @@ from unstructured_client._hooks.custom.request_utils import (
     write_chunk_body_to_temp,
 )
 from unstructured_client._hooks.custom.split_pdf_hook import SplitPdfHook
+from unstructured_client import UnstructuredClient
 from unstructured_client.general import (
+    PartitionAcceptEnum,
     _ndjson_elements_file,
     _ndjson_elements_file_async,
 )
+from unstructured_client.models import operations, shared
 
 
 def _elements(prefix, count):
@@ -547,3 +550,99 @@ def test_no_combined_file_is_created_when_every_chunk_failed(tmp_path):
 
     assert operation_id not in hook.ndjson_output_path
     assert _ndjson_files_in(tmp_path) == []
+
+
+# --- end to end through partition() -----------------------------------------------
+#
+# The gap these close: every other test here is helper- or hook-level, so nothing
+# exercised the response dispatch in `general.py`. That is where the media-type branches
+# are chosen, and it is where NDJSON mode silently fell back to `elements`.
+
+
+def _mock_client(handler):
+    """Build a client over a mock transport.
+
+    Callers must hold the returned client for the duration of the call: `sdk.py` registers
+    a `weakref.finalize` that closes the underlying httpx client, so chaining off a
+    temporary tears the transport down mid-request.
+    """
+    return UnstructuredClient(
+        api_key_auth="x",
+        server_url="http://localhost:8000",
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+
+def _text_request():
+    """A non-PDF input, so the split-PDF hook does not engage."""
+    return operations.PartitionRequest(
+        partition_parameters=shared.PartitionParameters(
+            files=shared.Files(content=b"hello", file_name="doc.txt"),
+        )
+    )
+
+
+def test_partition_sets_elements_file_when_server_ignores_the_accept_header():
+    """The deployed API only offers application/json, so this is the live unsplit path.
+
+    Regression guard: the JSON branch used to be matched first and win, populating
+    `elements` and leaving `elements_file` None even though NDJSON was requested.
+    """
+    elements = [{"type": "Table", "text": "t0"}, {"type": "NarrativeText", "text": "t1"}]
+
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, json=elements
+        )
+
+    client = _mock_client(handler)
+    res = client.general.partition(
+        request=_text_request(),
+        accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+    )
+
+    assert res.elements_file is not None
+    assert res.elements is None
+    try:
+        assert _read_ndjson(res.elements_file) == elements
+    finally:
+        os.unlink(res.elements_file)
+
+
+def test_partition_sets_elements_file_when_server_returns_ndjson():
+    """The path that becomes live if the API ever honors the Accept header."""
+    elements = [{"type": "Table", "text": "t0"}]
+    body = "".join(json.dumps(e) + "\n" for e in elements).encode()
+
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/x-ndjson"}, content=body
+        )
+
+    client = _mock_client(handler)
+    res = client.general.partition(
+        request=_text_request(),
+        accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+    )
+
+    assert res.elements is None
+    try:
+        assert _read_ndjson(res.elements_file) == elements
+    finally:
+        os.unlink(res.elements_file)
+
+
+def test_partition_without_the_override_still_returns_elements():
+    """The default must be untouched: no elements_file, elements populated as before."""
+    elements = [{"type": "Table", "text": "t0"}]
+
+    def handler(_request):
+        return httpx.Response(
+            200, headers={"Content-Type": "application/json"}, json=elements
+        )
+
+    client = _mock_client(handler)
+    res = client.general.partition(request=_text_request())
+
+    assert res.elements == elements
+    assert res.elements_file is None

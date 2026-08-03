@@ -3,6 +3,7 @@
 from .basesdk import BaseSDK
 from enum import Enum
 import httpx
+import json
 import os
 import tempfile
 from typing import Any, Dict, List, Mapping, Optional, Union, cast
@@ -30,6 +31,36 @@ def _new_elements_file():
     return tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
         mode="wb", prefix="unst_elements_", suffix=".ndjson", delete=False
     )
+
+
+def _ndjson_requested(accept_header_override: Optional[PartitionAcceptEnum]) -> bool:
+    return accept_header_override == PartitionAcceptEnum.APPLICATION_X_NDJSON
+
+
+def _json_body_to_elements_file(http_res: httpx.Response) -> str:
+    """Write a JSON-array body out as NDJSON, so `elements_file` is set either way.
+
+    The deployed API does not offer `application/x-ndjson`: its spec declares only
+    `application/json` and `text/csv`, so a request that skips the split-PDF hook comes
+    back as JSON no matter what was asked for. Without this, opting into NDJSON would
+    silently populate `elements` instead and leave `elements_file` as None, forcing every
+    caller to handle both shapes for one flag.
+
+    This does not bound memory -- the body is already fully read by the time we get here,
+    and parsing it adds the element list on top. It exists to keep the contract uniform.
+    The memory win comes from the split-PDF path, where the hook concatenates chunk files
+    on disk and this function is never reached.
+    """
+    out = _new_elements_file()
+    try:
+        with out:
+            for element in http_res.json():
+                out.write(json.dumps(element, ensure_ascii=False).encode())
+                out.write(b"\n")
+    except BaseException:
+        _discard_elements_file(out.name)
+        raise
+    return out.name
 
 
 def _discard_elements_file(path: str) -> None:
@@ -183,7 +214,21 @@ class General(BaseSDK):
         )
 
         response_data: Any = None
+        if utils.match_response(http_res, "200", "application/x-ndjson"):
+            return operations.PartitionResponse(
+                elements_file=_ndjson_elements_file(http_res),
+                status_code=http_res.status_code,
+                content_type=http_res.headers.get("Content-Type") or "",
+                raw_response=http_res,
+            )
         if utils.match_response(http_res, "200", "application/json"):
+            if _ndjson_requested(accept_header_override):
+                return operations.PartitionResponse(
+                    elements_file=_json_body_to_elements_file(http_res),
+                    status_code=http_res.status_code,
+                    content_type=http_res.headers.get("Content-Type") or "",
+                    raw_response=http_res,
+                )
             return operations.PartitionResponse(
                 elements=unmarshal_json_response(
                     Optional[List[Dict[str, Any]]], http_res
@@ -195,13 +240,6 @@ class General(BaseSDK):
         if utils.match_response(http_res, "200", "text/csv"):
             return operations.PartitionResponse(
                 csv_elements=http_res.text,
-                status_code=http_res.status_code,
-                content_type=http_res.headers.get("Content-Type") or "",
-                raw_response=http_res,
-            )
-        if utils.match_response(http_res, "200", "application/x-ndjson"):
-            return operations.PartitionResponse(
-                elements_file=_ndjson_elements_file(http_res),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
                 raw_response=http_res,
@@ -315,7 +353,21 @@ class General(BaseSDK):
         )
 
         response_data: Any = None
+        if utils.match_response(http_res, "200", "application/x-ndjson"):
+            return operations.PartitionResponse(
+                elements_file=await _ndjson_elements_file_async(http_res),
+                status_code=http_res.status_code,
+                content_type=http_res.headers.get("Content-Type") or "",
+                raw_response=http_res,
+            )
         if utils.match_response(http_res, "200", "application/json"):
+            if _ndjson_requested(accept_header_override):
+                return operations.PartitionResponse(
+                    elements_file=_json_body_to_elements_file(http_res),
+                    status_code=http_res.status_code,
+                    content_type=http_res.headers.get("Content-Type") or "",
+                    raw_response=http_res,
+                )
             return operations.PartitionResponse(
                 elements=unmarshal_json_response(
                     Optional[List[Dict[str, Any]]], http_res
@@ -327,13 +379,6 @@ class General(BaseSDK):
         if utils.match_response(http_res, "200", "text/csv"):
             return operations.PartitionResponse(
                 csv_elements=http_res.text,
-                status_code=http_res.status_code,
-                content_type=http_res.headers.get("Content-Type") or "",
-                raw_response=http_res,
-            )
-        if utils.match_response(http_res, "200", "application/x-ndjson"):
-            return operations.PartitionResponse(
-                elements_file=await _ndjson_elements_file_async(http_res),
                 status_code=http_res.status_code,
                 content_type=http_res.headers.get("Content-Type") or "",
                 raw_response=http_res,
