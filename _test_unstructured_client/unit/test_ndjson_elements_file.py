@@ -15,7 +15,6 @@ import json
 import os
 import tempfile
 import threading
-import time
 from pathlib import Path
 from unittest import mock
 
@@ -39,6 +38,9 @@ from unstructured_client.general import (
     _ndjson_elements_file_async,
 )
 from unstructured_client.models import errors, operations, shared
+
+# Deadlock guard for the event handshakes below, never a value the tests wait out.
+TIMEOUT = 10
 
 
 def _elements(prefix, count):
@@ -763,31 +765,47 @@ async def test_async_conversion_cleans_up_when_cancelled(tmp_path, monkeypatch):
     Regression guard for the cost of the offload: a thread cannot be cancelled, so the
     conversion runs to completion regardless, and a plain `await asyncio.to_thread(...)`
     discards the path it returned -- leaving nothing that could delete the file.
+
+    Sequenced with events rather than sleeps. Timing the cancellation against a fixed
+    sleep would race on a loaded runner: if the conversion finished first there would be
+    nothing to cancel and the test would fail spuriously. The timeouts here are only
+    deadlocks guards, never the thing being waited on.
     """
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
     created = _record_created_paths(monkeypatch, general, "_new_elements_file")
-    real_convert = general._json_body_to_elements_file
 
-    def _slow_convert(http_res):
-        time.sleep(0.3)
+    conversion_started = threading.Event()
+    allow_conversion = threading.Event()
+    cleanup_done = threading.Event()
+    real_convert = general._json_body_to_elements_file
+    real_discard = general._discard_elements_file
+
+    def _blocked_convert(http_res):
+        conversion_started.set()
+        assert allow_conversion.wait(TIMEOUT), "test never released the conversion"
         return real_convert(http_res)
 
-    monkeypatch.setattr(general, "_json_body_to_elements_file", _slow_convert)
+    def _observed_discard(path):
+        real_discard(path)
+        cleanup_done.set()
+
+    monkeypatch.setattr(general, "_json_body_to_elements_file", _blocked_convert)
+    monkeypatch.setattr(general, "_discard_elements_file", _observed_discard)
     response = httpx.Response(
         200, headers={"Content-Type": "application/json"}, json=[{"type": "Table"}]
     )
 
     task = asyncio.ensure_future(general._json_body_to_elements_file_async(response))
-    await asyncio.sleep(0.05)
+
+    # Waiting in a worker thread keeps the event loop free to run the task.
+    assert await asyncio.to_thread(conversion_started.wait, TIMEOUT), "conversion never ran"
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task
 
-    # Let the shielded thread finish and its cleanup callback run.
-    for _ in range(200):
-        await asyncio.sleep(0.02)
-        if created and not os.path.exists(created[0]):
-            break
+    # Only now let the conversion complete, so it necessarily finishes post-cancellation.
+    allow_conversion.set()
+    assert await asyncio.to_thread(cleanup_done.wait, TIMEOUT), "cleanup never ran"
 
     # Non-vacuous: a file really was created, and it is now gone.
     assert len(created) == 1
