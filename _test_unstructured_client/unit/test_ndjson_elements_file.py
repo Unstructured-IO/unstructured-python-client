@@ -20,6 +20,7 @@ import pytest
 
 import httpx
 
+from unstructured_client import general
 from unstructured_client._hooks.custom import request_utils
 from unstructured_client._hooks.custom.request_utils import (
     ELEMENTS_FILE_EXTENSION_KEY,
@@ -178,7 +179,27 @@ def test_write_chunk_body_to_temp_roundtrips(tmp_path):
     assert _read_ndjson(path) == elements
 
 
-def test_spill_failure_leaves_no_orphan_file(tmp_path):
+def _record_created_paths(monkeypatch, module, attr):
+    """Spy on a temp-file factory, recording every path it hands out.
+
+    Asserting on an empty directory only proves cleanup if the file landed in that
+    directory in the first place. Recording what production actually created keeps the
+    assertion honest even if the destination moves.
+    """
+    created: list[str] = []
+    real = getattr(module, attr)
+
+    def _spy(*args, **kwargs):
+        result = real(*args, **kwargs)
+        # mkstemp returns (fd, path); NamedTemporaryFile returns a handle with .name.
+        created.append(result[1] if isinstance(result, tuple) else result.name)
+        return result
+
+    monkeypatch.setattr(module, attr, _spy)
+    return created
+
+
+def test_spill_failure_leaves_no_orphan_file(tmp_path, monkeypatch):
     """A write that fails partway must take its own temp file with it.
 
     The caller only registers the returned path for cleanup once this function returns,
@@ -207,13 +228,18 @@ def test_spill_failure_leaves_no_orphan_file(tmp_path):
         return _FailingWriter(real_fdopen(fd, mode))
 
     response = httpx.Response(status_code=200, content=b'{"type": "Table"}\n')
+    created = _record_created_paths(monkeypatch, request_utils.tempfile, "mkstemp")
 
     with mock.patch.object(request_utils.os, "fdopen", _failing_fdopen):
         with pytest.raises(OSError) as excinfo:
             write_chunk_body_to_temp(response, str(tmp_path))
 
     assert excinfo.value.errno == errno.ENOSPC
-    assert list(tmp_path.iterdir()) == []
+    # Assert against the path production actually created, so the check cannot pass
+    # vacuously if the file ever stops landing where the test expects.
+    assert len(created) == 1
+    assert Path(created[0]).parent == tmp_path
+    assert not os.path.exists(created[0])
 
 
 def test_elements_file_copy_failure_leaves_no_orphan(tmp_path, monkeypatch):
@@ -223,6 +249,7 @@ def test_elements_file_copy_failure_leaves_no_orphan(tmp_path, monkeypatch):
     exactly what makes an interrupted copy leak.
     """
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    created = _record_created_paths(monkeypatch, general, "_new_elements_file")
 
     class _FailingResponse:
         extensions: dict = {}
@@ -234,13 +261,18 @@ def test_elements_file_copy_failure_leaves_no_orphan(tmp_path, monkeypatch):
     with pytest.raises(httpx.ReadError):
         _ndjson_elements_file(_FailingResponse())
 
-    assert list(tmp_path.glob("unst_elements_*")) == []
+    # The recorded path is the one production created, so this cannot pass vacuously if
+    # the helper ever stops routing through the global tempdir.
+    assert len(created) == 1
+    assert Path(created[0]).parent == tmp_path
+    assert not os.path.exists(created[0])
 
 
 @pytest.mark.asyncio
 async def test_elements_file_copy_failure_leaves_no_orphan_async(tmp_path, monkeypatch):
     """Async counterpart of `test_elements_file_copy_failure_leaves_no_orphan`."""
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    created = _record_created_paths(monkeypatch, general, "_new_elements_file")
 
     class _FailingResponse:
         extensions: dict = {}
@@ -252,7 +284,9 @@ async def test_elements_file_copy_failure_leaves_no_orphan_async(tmp_path, monke
     with pytest.raises(httpx.ReadError):
         await _ndjson_elements_file_async(_FailingResponse())
 
-    assert list(tmp_path.glob("unst_elements_*")) == []
+    assert len(created) == 1
+    assert Path(created[0]).parent == tmp_path
+    assert not os.path.exists(created[0])
 
 
 def test_combine_accepts_bodies_spilled_without_caching(tmp_path):
