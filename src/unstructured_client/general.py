@@ -83,6 +83,33 @@ def _json_body_to_elements_file(http_res: httpx.Response) -> str:
     return out.name
 
 
+async def _json_body_to_elements_file_async(http_res: httpx.Response) -> str:
+    """Run the conversion off the event loop, cleaning up if the caller gives up.
+
+    The work is offloaded so it does not block the loop, but a thread cannot be cancelled:
+    on cancellation the conversion still runs to completion and creates its file, and a
+    plain `await asyncio.to_thread(...)` discards the returned path, so nothing is left
+    that could delete it. Shielding keeps a handle on the thread's result so the finished
+    file can be removed once the caller has stopped waiting for it.
+    """
+    task = asyncio.ensure_future(asyncio.to_thread(_json_body_to_elements_file, http_res))
+    try:
+        return await asyncio.shield(task)
+    except BaseException:
+        task.add_done_callback(_discard_abandoned_elements_file)
+        raise
+
+
+def _discard_abandoned_elements_file(task: "asyncio.Future[str]") -> None:
+    """Delete the file a conversion produced after its caller stopped waiting."""
+    if task.cancelled():
+        return
+    if task.exception() is not None:
+        # The conversion raised, and it already removed its own partial file.
+        return
+    _discard_elements_file(task.result())
+
+
 def _discard_elements_file(path: str) -> None:
     """Remove a partially written elements file, ignoring a failure to do so.
 
@@ -383,9 +410,7 @@ class General(BaseSDK):
         if utils.match_response(http_res, "200", "application/json"):
             if _ndjson_requested(req):
                 return operations.PartitionResponse(
-                    elements_file=await asyncio.to_thread(
-                        _json_body_to_elements_file, http_res
-                    ),
+                    elements_file=await _json_body_to_elements_file_async(http_res),
                     status_code=http_res.status_code,
                     content_type=http_res.headers.get("Content-Type") or "",
                     raw_response=http_res,

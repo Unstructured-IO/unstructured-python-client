@@ -9,11 +9,13 @@ make (per-chunk list, flattened list, json.dumps blob, SDK re-parse). It must:
   - leave no temp files behind other than the combined file the caller owns
 """
 
+import asyncio
 import errno
 import json
 import os
 import tempfile
 import threading
+import time
 from pathlib import Path
 from unittest import mock
 
@@ -752,3 +754,41 @@ async def test_partition_async_ndjson_does_not_block_on_conversion():
         assert _read_ndjson(res.elements_file) == elements
     finally:
         Path(res.elements_file).unlink(missing_ok=True)
+
+
+@pytest.mark.asyncio
+async def test_async_conversion_cleans_up_when_cancelled(tmp_path, monkeypatch):
+    """A cancelled conversion must not orphan the file its thread went on to create.
+
+    Regression guard for the cost of the offload: a thread cannot be cancelled, so the
+    conversion runs to completion regardless, and a plain `await asyncio.to_thread(...)`
+    discards the path it returned -- leaving nothing that could delete the file.
+    """
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    created = _record_created_paths(monkeypatch, general, "_new_elements_file")
+    real_convert = general._json_body_to_elements_file
+
+    def _slow_convert(http_res):
+        time.sleep(0.3)
+        return real_convert(http_res)
+
+    monkeypatch.setattr(general, "_json_body_to_elements_file", _slow_convert)
+    response = httpx.Response(
+        200, headers={"Content-Type": "application/json"}, json=[{"type": "Table"}]
+    )
+
+    task = asyncio.ensure_future(general._json_body_to_elements_file_async(response))
+    await asyncio.sleep(0.05)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    # Let the shielded thread finish and its cleanup callback run.
+    for _ in range(200):
+        await asyncio.sleep(0.02)
+        if created and not os.path.exists(created[0]):
+            break
+
+    # Non-vacuous: a file really was created, and it is now gone.
+    assert len(created) == 1
+    assert not os.path.exists(created[0])
