@@ -118,12 +118,16 @@ def test_mixed_chunk_formats(tmp_path):
 
 
 @pytest.mark.parametrize("body", ["", "   ", "\n\n"])
-def test_empty_chunk_files_raise(tmp_path, body):
-    """An empty 200 body must fail, not be skipped.
+@pytest.mark.parametrize("media_type", [None, "application/json", "application/json; charset=utf-8"])
+def test_empty_json_chunk_files_raise(tmp_path, body, media_type):
+    """An empty 200 body from a JSON chunk must fail, not be skipped.
 
-    Skipping it made the document silently short: this function returns only a path and an
-    element count, so nothing downstream could tell a truncated document from a complete
-    one. `split_pdf_allow_failed` does not cover it either -- the chunk reported success.
+    JSON has no empty document -- a chunk with no elements is `[]` -- so this is a
+    malformed response. Skipping it made the document silently short: this function returns
+    only a path and an element count, so nothing downstream could tell a truncated document
+    from a complete one. `split_pdf_allow_failed` does not cover it either -- the chunk
+    reported success. An unset `Content-Type` is treated as JSON, which is what the
+    deployed API returns.
     """
     chunk_a = tmp_path / "a.json"
     chunk_empty = tmp_path / "empty.json"
@@ -132,7 +136,18 @@ def test_empty_chunk_files_raise(tmp_path, body):
 
     out = tmp_path / "combined.ndjson"
     with pytest.raises(request_utils.EmptyChunkResponseError, match="empty.json"):
-        combine_chunk_files_to_ndjson([str(chunk_a), str(chunk_empty)], str(out))
+        combine_chunk_files_to_ndjson(
+            [str(chunk_a), str(chunk_empty)], str(out), ["application/json", media_type]
+        )
+
+
+def test_empty_chunk_media_types_default_to_json_when_not_passed(tmp_path):
+    """Callers that cannot supply media types must still get the strict reading."""
+    chunk_empty = tmp_path / "empty.json"
+    chunk_empty.write_text("", encoding="utf-8")
+
+    with pytest.raises(request_utils.EmptyChunkResponseError):
+        combine_chunk_files_to_ndjson([str(chunk_empty)], str(tmp_path / "combined.ndjson"))
 
 
 def test_empty_chunk_error_is_a_value_error(tmp_path):
@@ -141,14 +156,59 @@ def test_empty_chunk_error_is_a_value_error(tmp_path):
     chunk_empty.write_text("", encoding="utf-8")
 
     with pytest.raises(ValueError):
-        combine_chunk_files_to_ndjson([str(chunk_empty)], str(tmp_path / "combined.ndjson"))
+        combine_chunk_files_to_ndjson(
+            [str(chunk_empty)], str(tmp_path / "combined.ndjson"), ["application/json"]
+        )
+
+
+@pytest.mark.parametrize("body", ["", "   ", "\n\n"])
+@pytest.mark.parametrize(
+    "media_type", ["application/x-ndjson", "application/x-ndjson; charset=utf-8", "APPLICATION/X-NDJSON"]
+)
+def test_empty_ndjson_chunk_is_zero_records(tmp_path, body, media_type):
+    """NDJSON spells zero records as zero lines, so an empty body is well formed.
+
+    The counterpart to `test_empty_json_chunk_files_raise`: the same empty file on disk is
+    a defect from a JSON chunk and a legitimate result from an NDJSON one, and the declared
+    media type is the only thing that separates them. Failing here would break a split
+    whose pages are blank.
+    """
+    chunk_a = tmp_path / "a.ndjson"
+    chunk_empty = tmp_path / "empty.ndjson"
+    elements_a = _elements("a", 2)
+    _write_ndjson(chunk_a, elements_a)
+    chunk_empty.write_text(body, encoding="utf-8")
+
+    out = tmp_path / "combined.ndjson"
+    written = combine_chunk_files_to_ndjson(
+        [str(chunk_a), str(chunk_empty)], str(out), ["application/x-ndjson", media_type]
+    )
+
+    assert written == 2
+    assert _read_ndjson(out) == elements_a
+
+
+def test_every_ndjson_chunk_empty_yields_an_empty_output(tmp_path):
+    """A document whose every chunk produced no elements is empty, not an error."""
+    chunk_a = tmp_path / "a.ndjson"
+    chunk_b = tmp_path / "b.ndjson"
+    chunk_a.write_text("", encoding="utf-8")
+    chunk_b.write_text("", encoding="utf-8")
+
+    out = tmp_path / "combined.ndjson"
+    written = combine_chunk_files_to_ndjson(
+        [str(chunk_a), str(chunk_b)], str(out), ["application/x-ndjson"] * 2
+    )
+
+    assert written == 0
+    assert out.read_text(encoding="utf-8") == ""
 
 
 def test_empty_array_chunk_contributes_nothing(tmp_path):
     """A chunk that legitimately produced no elements (e.g. blank pages).
 
-    The counterpart to `test_empty_chunk_files_raise`: `[]` and an empty body are
-    different responses on the wire, and only the latter is a defect.
+    The JSON counterpart to `test_empty_ndjson_chunk_is_zero_records`: `[]` and an empty
+    body are different responses on the wire, and only the latter is a defect.
     """
     chunk_a = tmp_path / "a.json"
     chunk_b = tmp_path / "b.json"
@@ -396,16 +456,31 @@ def test_server_cannot_name_a_local_file_via_a_response_header(tmp_path):
 # --- hook-level temp-file lifecycle ------------------------------------------------
 
 
-def _ndjson_response(elements):
+def _ndjson_response(elements, media_type="application/x-ndjson"):
     body = "".join(json.dumps(e) + "\n" for e in elements).encode()
-    return httpx.Response(status_code=200, content=body)
+    headers = {"content-type": media_type} if media_type else {}
+    return httpx.Response(status_code=200, headers=headers, content=body)
 
 
-def _hook_in_ndjson_mode(operation_id, tmp_path):
+def _cached_chunk_response(path, media_type="application/x-ndjson"):
+    """What the cached path leaves behind: the body replaced by its temp-file path.
+
+    Mirrors `_await_elements`' cached branch, which streams the body to disk and rebuilds
+    the response with `content=temp_file_name` and the server's original headers -- so the
+    declared media type still describes the file's contents, not the path in the body.
+    """
+    return httpx.Response(
+        status_code=200,
+        headers={"content-type": media_type} if media_type else {},
+        content=str(path).encode(),
+    )
+
+
+def _hook_in_ndjson_mode(operation_id, tmp_path, cache_tmp_data=False):
     """A hook set up as `before_request` would leave it for an uncached NDJSON run."""
     hook = SplitPdfHook()
     hook.ndjson_mode[operation_id] = True
-    hook.cache_tmp_data_feature[operation_id] = False
+    hook.cache_tmp_data_feature[operation_id] = cache_tmp_data
     hook.cache_tmp_data_dir[operation_id] = str(tmp_path)
     hook.allow_failed[operation_id] = False
     # Marks the operation live; `_clear_operation` removing it is what signals teardown.
@@ -562,8 +637,9 @@ def test_malformed_chunk_leaves_no_partial_output_behind(tmp_path):
     assert list(Path(tmp_path).glob("*.partial")) == []
 
 
-def test_empty_chunk_response_fails_the_operation(tmp_path):
-    """An empty 200 chunk must fail the whole partition, as the buffered path does.
+@pytest.mark.parametrize("media_type", ["application/json", None])
+def test_empty_json_chunk_response_fails_the_operation(tmp_path, media_type):
+    """An empty 200 JSON chunk must fail the whole partition, as the buffered path does.
 
     Driven through the hook because that is where the consequence lives: previously the
     chunk was skipped and `_build_after_success_response` handed back a combined file that
@@ -572,9 +648,10 @@ def test_empty_chunk_response_fails_the_operation(tmp_path):
     """
     operation_id = "op-empty-chunk"
     hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+    headers = {"content-type": media_type} if media_type else {}
     responses = [
         (0, _ndjson_response(_elements("a", 2))),
-        (1, httpx.Response(status_code=200, content=b"")),
+        (1, httpx.Response(status_code=200, headers=headers, content=b"")),
     ]
 
     with pytest.raises(request_utils.EmptyChunkResponseError):
@@ -583,6 +660,51 @@ def test_empty_chunk_response_fails_the_operation(tmp_path):
     assert operation_id not in hook.ndjson_output_path
     assert _ndjson_files_in(tmp_path) == []
     assert list(Path(tmp_path).glob("*.partial")) == []
+
+
+def test_empty_ndjson_chunk_response_is_accepted_in_memory_mode(tmp_path):
+    """A zero-record NDJSON chunk is a valid result and must not fail the partition.
+
+    The default path (`cache_tmp_data` off): the empty body is spilled to disk, so the
+    media type carried by the response is the only thing that distinguishes it from the
+    malformed JSON case above.
+    """
+    operation_id = "op-empty-ndjson-memory"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+    elements_a, elements_c = _elements("a", 2), _elements("c", 3)
+    responses = [
+        (0, _ndjson_response(elements_a)),
+        (1, _ndjson_response([])),  # a chunk of blank pages
+        (2, _ndjson_response(elements_c)),
+    ]
+
+    hook._elements_from_task_responses(operation_id, responses, started_at=0.0)
+
+    combined = hook.ndjson_output_path[operation_id]
+    assert _read_ndjson(combined) == elements_a + elements_c
+    # The spilled chunk files are gone; only the combined output survives.
+    assert _ndjson_files_in(tmp_path) == [Path(combined).name]
+
+
+def test_empty_ndjson_chunk_response_is_accepted_in_cached_mode(tmp_path):
+    """Cached counterpart: the chunk file on disk is empty and the body is its path."""
+    operation_id = "op-empty-ndjson-cached"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path, cache_tmp_data=True)
+    # Cached chunk files live in the operation's tempdir, kept out of the directory the
+    # combined file lands in so the assertion below stays unambiguous.
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    elements_a = _elements("a", 2)
+    chunk_a, chunk_empty = cache_dir / "a.json", cache_dir / "empty.json"
+    _write_ndjson(chunk_a, elements_a)
+    chunk_empty.write_text("", encoding="utf-8")
+    responses = [(0, _cached_chunk_response(chunk_a)), (1, _cached_chunk_response(chunk_empty))]
+
+    hook._elements_from_task_responses(operation_id, responses, started_at=0.0)
+
+    combined = hook.ndjson_output_path[operation_id]
+    assert _read_ndjson(combined) == elements_a
+    assert _ndjson_files_in(tmp_path) == [Path(combined).name]
 
 
 def test_no_combined_file_is_created_when_every_chunk_failed(tmp_path):

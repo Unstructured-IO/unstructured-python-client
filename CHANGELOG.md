@@ -1,7 +1,7 @@
 ## 0.46.1
 
 ### Fixes
-* Fail loudly when a split-PDF chunk returns HTTP 200 with an empty body in NDJSON elements-file mode. The chunk used to be logged and skipped, so the combined `elements_file` was silently short by those pages while the call still returned 200 — and `split_pdf_allow_failed=False` did not catch it, because an empty 200 counts as a successful chunk. Recombination now raises `EmptyChunkResponseError` (a `ValueError`), matching the buffered path, which raises `JSONDecodeError` on the same response. A chunk that legitimately produced no elements returns an empty JSON array and is still accepted.
+* Fail loudly when a split-PDF chunk returns HTTP 200 with an empty JSON body in NDJSON elements-file mode. The chunk used to be logged and skipped, so the combined `elements_file` was silently short by those pages while the call still returned 200 — and `split_pdf_allow_failed=False` did not catch it, because an empty 200 counts as a successful chunk. Recombination now raises `EmptyChunkResponseError` (a `ValueError`), matching the buffered path, which raises `JSONDecodeError` on the same response. Emptiness is judged against the chunk's own `Content-Type`: JSON has no empty document (a chunk with no elements is `[]`), while `application/x-ndjson` encodes zero records as zero lines, so an empty NDJSON chunk is well formed and still contributes nothing.
 
 ## 0.46.0
 
