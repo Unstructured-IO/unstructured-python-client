@@ -290,6 +290,19 @@ NDJSON_MEDIA_TYPE = "application/x-ndjson"
 _SNIFF_BLOCK_SIZE = 64
 
 
+class EmptyChunkResponseError(ValueError):
+    """A split-PDF chunk returned HTTP 200 with a body that holds no elements at all.
+
+    An empty body is not the same wire response as an empty JSON array: `[]` is a chunk
+    that legitimately produced no elements (blank pages) and is accepted, while nothing
+    at all is a defect. Skipping it would make the document silently short, and
+    `split_pdf_allow_failed` cannot catch it because the chunk reports success.
+
+    Subclasses `ValueError` so that it lands where the buffered path's `JSONDecodeError`
+    (also a `ValueError`) already does for callers that guard the parse.
+    """
+
+
 def _first_non_space_char(stream: TextIO) -> str:
     """Return the first non-whitespace character in `stream`, or "" if there is none."""
     while True:
@@ -322,6 +335,9 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
 
     Returns:
         The number of elements written.
+
+    Raises:
+        EmptyChunkResponseError: A chunk returned 200 with an empty body.
     """
     total = 0
     with open(out_path, "w", encoding="utf-8") as out:
@@ -329,14 +345,21 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
             with open(chunk_path, "r", encoding="utf-8") as chunk:
                 first_char = _first_non_space_char(chunk)
                 if not first_char:
-                    # A 200 with an empty body. Log it, because otherwise the document is
-                    # silently short and the element count cannot be reconciled against
-                    # the chunk count.
-                    logger.warning(
+                    # A 200 with an empty body. Fail loudly: skipping it makes the document
+                    # silently short with no way for the caller to notice, since this
+                    # function's only output is the combined path. The buffered path raises
+                    # `JSONDecodeError` on the same response, so NDJSON mode must not turn
+                    # a hard failure into truncation.
+                    logger.error(
                         "split_pdf event=ndjson_empty_chunk file=%s",
                         os.path.basename(chunk_path),
                     )
-                    continue
+                    raise EmptyChunkResponseError(
+                        "A split-PDF chunk returned HTTP 200 with an empty body "
+                        f"({os.path.basename(chunk_path)}); its elements would be missing "
+                        "from the combined output. An empty result must be an empty JSON "
+                        "array."
+                    )
                 chunk.seek(0)
 
                 if first_char == "[":

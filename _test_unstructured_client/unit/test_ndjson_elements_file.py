@@ -118,22 +118,38 @@ def test_mixed_chunk_formats(tmp_path):
 
 
 @pytest.mark.parametrize("body", ["", "   ", "\n\n"])
-def test_empty_chunk_files_are_skipped(tmp_path, body):
+def test_empty_chunk_files_raise(tmp_path, body):
+    """An empty 200 body must fail, not be skipped.
+
+    Skipping it made the document silently short: this function returns only a path and an
+    element count, so nothing downstream could tell a truncated document from a complete
+    one. `split_pdf_allow_failed` does not cover it either -- the chunk reported success.
+    """
     chunk_a = tmp_path / "a.json"
     chunk_empty = tmp_path / "empty.json"
-    elements_a = _elements("a", 2)
-    _write_json_array(chunk_a, elements_a)
+    _write_json_array(chunk_a, _elements("a", 2))
     chunk_empty.write_text(body, encoding="utf-8")
 
     out = tmp_path / "combined.ndjson"
-    written = combine_chunk_files_to_ndjson([str(chunk_a), str(chunk_empty)], str(out))
+    with pytest.raises(request_utils.EmptyChunkResponseError, match="empty.json"):
+        combine_chunk_files_to_ndjson([str(chunk_a), str(chunk_empty)], str(out))
 
-    assert written == 2
-    assert _read_ndjson(out) == elements_a
+
+def test_empty_chunk_error_is_a_value_error(tmp_path):
+    """Parity with the buffered path, which raises `JSONDecodeError` (a `ValueError`)."""
+    chunk_empty = tmp_path / "empty.json"
+    chunk_empty.write_text("", encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        combine_chunk_files_to_ndjson([str(chunk_empty)], str(tmp_path / "combined.ndjson"))
 
 
 def test_empty_array_chunk_contributes_nothing(tmp_path):
-    """A chunk that legitimately produced no elements (e.g. blank pages)."""
+    """A chunk that legitimately produced no elements (e.g. blank pages).
+
+    The counterpart to `test_empty_chunk_files_raise`: `[]` and an empty body are
+    different responses on the wire, and only the latter is a defect.
+    """
     chunk_a = tmp_path / "a.json"
     chunk_b = tmp_path / "b.json"
     _write_json_array(chunk_a, [])
@@ -540,6 +556,29 @@ def test_malformed_chunk_leaves_no_partial_output_behind(tmp_path):
         hook._elements_from_task_responses(
             operation_id, [(0, httpx.Response(200, content=b"[not-json"))], started_at=0.0
         )
+
+    assert operation_id not in hook.ndjson_output_path
+    assert _ndjson_files_in(tmp_path) == []
+    assert list(Path(tmp_path).glob("*.partial")) == []
+
+
+def test_empty_chunk_response_fails_the_operation(tmp_path):
+    """An empty 200 chunk must fail the whole partition, as the buffered path does.
+
+    Driven through the hook because that is where the consequence lives: previously the
+    chunk was skipped and `_build_after_success_response` handed back a combined file that
+    was short by those pages, with a 200 alongside it. Also asserts no partial or spilled
+    file survives, since the raise happens mid-recombination.
+    """
+    operation_id = "op-empty-chunk"
+    hook = _hook_in_ndjson_mode(operation_id, tmp_path)
+    responses = [
+        (0, _ndjson_response(_elements("a", 2))),
+        (1, httpx.Response(status_code=200, content=b"")),
+    ]
+
+    with pytest.raises(request_utils.EmptyChunkResponseError):
+        hook._elements_from_task_responses(operation_id, responses, started_at=0.0)
 
     assert operation_id not in hook.ndjson_output_path
     assert _ndjson_files_in(tmp_path) == []
