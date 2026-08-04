@@ -427,6 +427,37 @@ req = operations.PartitionRequest(
 )
 ```
 
+### Streaming elements to a file instead of memory
+
+For very large documents, the parsed element list can dominate the client's memory: the split-PDF path holds a list per chunk, a flattened list, a serialized blob and the SDK's re-parse of that blob. Request `application/x-ndjson` to skip all of it. The chunk responses are concatenated on disk and you get back a path in `elements_file` instead of a list in `elements`, which keeps peak memory at roughly one chunk.
+
+**You own the returned file and are responsible for deleting it.**
+
+> [!NOTE]
+> `elements_file` is always set when you pass this header, but the **memory saving** only applies to the split-PDF path. An input is only split when it is a PDF, `split_pdf_page=True` (the default), and it has more than two pages — `split_size` is floored at 2, so one- and two-page PDFs are sent whole. For those, and for non-PDFs, the response body is read fully into memory before being written to disk, so peak memory can reach roughly twice the body size.
+
+Example:
+```python
+import json
+from pathlib import Path
+
+from unstructured_client.general import PartitionAcceptEnum
+
+res = client.general.partition(
+    request=req,
+    accept_header_override=PartitionAcceptEnum.APPLICATION_X_NDJSON,
+)
+
+try:
+    with open(res.elements_file, encoding="utf-8") as f:
+        for line in f:
+            element = json.loads(line)
+            ...
+finally:
+    # missing_ok so a failure to open the file isn't masked by the cleanup.
+    Path(res.elements_file).unlink(missing_ok=True)
+```
+
 <!-- Start File uploads [file-upload] -->
 ## File uploads
 

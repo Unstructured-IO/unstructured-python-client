@@ -23,3 +23,19 @@ src/unstructured_client/general.py
 # Custom min_attempts / absolute_max_elapsed_time_ms fields on BackoffStrategy.
 # Push upstream to Speakeasy templates to remove this entry.
 src/unstructured_client/utils/retries.py
+
+# Custom elements_file field on PartitionResponse, for the NDJSON elements-file mode.
+# The field is client-side only - the server never returns it - so it cannot come from
+# the OpenAPI spec, and regenerating would drop it. If /general/v0/general gains a new
+# response field, follow the same procedure as general.py above.
+# See test_regeneration_guards.py::test_partition_response_keeps_elements_file.
+src/unstructured_client/models/operations/partition.py
+
+# Docs for that same custom elements_file field. Generated from the spec, so a
+# regeneration would drop the row.
+#
+# Note: SDK generation is currently blocked at the Speakeasy account level
+# ("generation access blocked"), so nothing can regenerate today and gen.lock has not
+# moved since 2026-01. These entries are insurance for when that is restored, not a
+# defence against an imminent run.
+docs/models/operations/partitionresponse.md
