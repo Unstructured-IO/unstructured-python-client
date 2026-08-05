@@ -16,11 +16,6 @@ install:
 	python scripts/prepare_readme.py
 	uv sync --locked
 
-## install-speakeasy-cli:			download the speakeasy cli tool
-.PHONY: install-speakeasy-cli
-install-speakeasy-cli:
-	curl -fsSL https://raw.githubusercontent.com/speakeasy-api/speakeasy/main/install.sh | sh
-
 #################
 # Test and Lint #
 #################
@@ -73,46 +68,6 @@ lint:
 	uv run pylint --rcfile=pylintrc src
 	uv run mypy src
 
-#############
-# Speakeasy #
-#############
-
-## download-openapi-specs:			         Download the openapi specs from the Serverless and Platform APIs
-.PHONY: download-openapi-specs
-download-openapi-specs:
-	wget -nv -q -O openapi_serverless.json https://api.unstructuredapp.io/general/openapi.json
-	wget -nv -q -O openapi_platform_api.json https://platform.unstructuredapp.io/openapi.json
-
-## client-merge-serverless-platform:		Merge the Serverless and Platform APIs specs into a single schema
-.PHONY: client-merge-serverless-platform
-client-merge-serverless-platform:
-	speakeasy merge -s ./openapi_platform_api.json -s ./openapi_serverless.json -o ./openapi_merged.yaml
-
-## client-apply-overlay:		            Apply overlay on the merged schema
-.PHONY: client-apply-overlay
-client-apply-overlay:
-	speakeasy overlay validate -o ./overlay_client.yaml
-	speakeasy overlay apply -s ./openapi_merged.yaml -o ./overlay_client.yaml > ./openapi_platform_serverless_client.yaml
-
-## client-generate-unified-sdk-local:		Generate the SDK from the merged schema
-.PHONY: client-generate-unified-sdk-local
-client-generate-unified-sdk-local:
-	speakeasy generate sdk -s ./openapi_platform_serverless_client.yaml -o ./ -l python
-
-## client-generate-sdk:			             Do all the steps to generate the SDK
-.PHONY: client-generate-sdk
-client-generate-sdk: download-openapi-specs client-merge-serverless-platform client-apply-overlay client-generate-unified-sdk-local
-
-
 .PHONY: publish
 publish:
 	./scripts/publish.sh
-
-###########
-# Jupyter #
-###########
-
-## run-jupyter:				starts jupyter notebook
-.PHONY: run-jupyter
-run-jupyter:
-	PYTHONPATH=$(realpath .) JUPYTER_PATH=$(realpath .) jupyter-notebook --NotebookApp.token='' --NotebookApp.password=''
