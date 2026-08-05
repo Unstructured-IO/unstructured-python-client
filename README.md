@@ -21,15 +21,9 @@ This is a HTTP client for the [Unstructured Platform API](https://docs.unstructu
 
 Please refer to the our documentation for a full guide on integrating the [Workflow Endpoint](https://docs.unstructured.io/platform-api/api/overview) and [Partition Endpoint](https://docs.unstructured.io/platform-api/partition-api/sdk-python) into your Python code.
 
-<!-- Start Summary [summary] -->
 ## Summary
 
-
-<!-- End Summary [summary] -->
-
-<!-- Start Table of Contents [toc] -->
 ## Table of Contents
-<!-- $toc-max-depth=2 -->
   * [SDK Installation](#sdk-installation)
   * [Retries](#retries)
   * [Error Handling](#error-handling)
@@ -41,9 +35,6 @@ Please refer to the our documentation for a full guide on integrating the [Workf
   * [Resource Management](#resource-management)
   * [Debugging](#debugging)
 
-<!-- End Table of Contents [toc] -->
-
-<!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
 > [!NOTE]
@@ -107,10 +98,7 @@ sdk = UnstructuredClient(
 
 Once that is saved to a file, you can run it with `uv run script.py` where
 `script.py` can be replaced with the actual file name.
-<!-- End SDK Installation [installation] -->
 
-
-<!-- Start Retries [retries] -->
 ## Retries
 
 Some of the endpoints in this SDK support retries. If you use the SDK without any configuration, it will fall back to the default retry strategy provided by the API. However, the default retry strategy can be overridden on a per-operation basis, or across the entire SDK.
@@ -155,10 +143,7 @@ with UnstructuredClient(
     print(res.dag_node_connection_check)
 
 ```
-<!-- End Retries [retries] -->
 
-
-<!-- Start Error Handling [errors] -->
 ## Error Handling
 
 [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py) is the base class for all HTTP error responses. It has the following properties:
@@ -219,7 +204,6 @@ with UnstructuredClient() as uc_client:
     * [`httpx.ConnectError`](https://www.python-httpx.org/exceptions/#httpx.ConnectError): HTTP client was unable to make a request to a server.
     * [`httpx.TimeoutException`](https://www.python-httpx.org/exceptions/#httpx.TimeoutException): HTTP request timed out.
 
-
 **Inherit from [`UnstructuredClientError`](./src/unstructured_client/models/errors/unstructuredclienterror.py)**:
 * [`ServerError`](./src/unstructured_client/models/errors/servererror.py): Server Error. Status code `5XX`. Applicable to 1 of 30 methods.*
 * [`ResponseValidationError`](./src/unstructured_client/models/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
@@ -227,9 +211,7 @@ with UnstructuredClient() as uc_client:
 </details>
 
 \* Check [the method documentation](#available-resources-and-operations) to see if the error is applicable.
-<!-- End Error Handling [errors] -->
 
-<!-- Start Custom HTTP Client [http-client] -->
 ## Custom HTTP Client
 
 The Python SDK makes API calls using the [httpx](https://www.python-httpx.org/) HTTP library.  In order to provide a convenient way to configure timeouts, cookies, proxies, custom headers, and other low-level configuration, you can initialize the SDK client with your own HTTP client instance.
@@ -308,9 +290,7 @@ class CustomClient(AsyncHttpClient):
 
 s = UnstructuredClient(async_client=CustomClient(httpx.AsyncClient()))
 ```
-<!-- End Custom HTTP Client [http-client] -->
 
-<!-- Start IDE Support [idesupport] -->
 ## IDE Support
 
 ### PyCharm
@@ -318,10 +298,7 @@ s = UnstructuredClient(async_client=CustomClient(httpx.AsyncClient()))
 Generally, the SDK will work well with most IDEs out of the box. However, when using PyCharm, you can enjoy much better integration with Pydantic by installing an additional plugin.
 
 - [PyCharm Pydantic Plugin](https://docs.pydantic.dev/latest/integrations/pycharm/)
-<!-- End IDE Support [idesupport] -->
 
-
-<!-- Start SDK Example Usage [usage] -->
 ## SDK Example Usage
 
 ### Example
@@ -366,10 +343,8 @@ async def main():
 
 asyncio.run(main())
 ```
-<!-- End SDK Example Usage [usage] -->
 
 Refer to the [API parameters page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all available parameters.
-
 
 ## Configuration
 
@@ -458,7 +433,6 @@ finally:
     Path(res.elements_file).unlink(missing_ok=True)
 ```
 
-<!-- Start File uploads [file-upload] -->
 ## File uploads
 
 Certain SDK methods accept file objects as part of a request body or multi-part request. It is possible and typically recommended to upload files as a stream rather than reading the entire contents into memory. This avoids excessive memory consumption and potentially crashing with out-of-memory errors when working with very large files. The following example demonstrates how to attach a file stream to a request.
@@ -486,9 +460,7 @@ with UnstructuredClient() as uc_client:
     print(res.job_information)
 
 ```
-<!-- End File uploads [file-upload] -->
 
-<!-- Start Resource Management [resource-management] -->
 ## Resource Management
 
 The `UnstructuredClient` class implements the context manager protocol and registers a finalizer function to close the underlying sync and async HTTPX clients it uses under the hood. This will close HTTP connections, release memory and free up other resources held by the SDK. In short-lived Python programs and notebooks that make a few SDK method calls, resource management may not be a concern. However, in longer-lived programs, it is beneficial to create a single SDK instance via a [context manager][context-manager] and reuse it across the application.
@@ -509,9 +481,7 @@ async def amain():
     async with UnstructuredClient() as uc_client:
         # Rest of application here...
 ```
-<!-- End Resource Management [resource-management] -->
 
-<!-- Start Debugging [debug] -->
 ## Debugging
 
 You can setup your SDK to emit debug logs for SDK requests and responses.
@@ -524,14 +494,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 ```
-<!-- End Debugging [debug] -->
-
-<!-- No SDK Available Operations -->
-<!-- No Pagination -->
-<!-- No Server Selection -->
-<!-- No Authentication -->
-
-<!-- Placeholder for Future Speakeasy SDK Sections -->
 
 ### Maturity
 
@@ -558,18 +520,6 @@ The following instructions are intended to help you get up and running with `uns
 
 ### Contributions
 
-While we value open-source contributions to this SDK, this library is generated programmatically by Speakeasy. In order to start working with this repo, you need to:
-1. Install Speakeasy client locally https://github.com/speakeasy-api/speakeasy#installation
-2. Run `speakeasy auth login`
-3. Run `make client-generate`. This allows to iterate development with python client.
-
-There are two important files used by `make client-generate`:
-1. `openapi.json` which is actually not stored here, [but fetched from unstructured-api](https://api.unstructured.io/general/openapi.json), represents the API that is supported on backend.
-2. `overlay_client.yaml` is a handcrafted diff that when applied over above, produces `openapi_client.json` which is used to generate SDK.
-
-Once PR with changes is merged, Github CI will autogenerate the Speakeasy client in a new PR, using
-the `openapi.json` and `overlay_client.yaml` You will have to manually bring back the human created lines in it.
+While we value open-source contributions to this SDK, this library is not accepting direct changes at this time.
 
 Feel free to open a PR or a Github issue as a proof of concept and we'll do our best to include it in a future release!
-
-### SDK Created by [Speakeasy](https://www.speakeasyapi.dev/docs/sdk-design/python/methodology-python)
