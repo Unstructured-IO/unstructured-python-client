@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import re
 from typing import Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
 from unstructured_client._hooks.types import SDKInitHook
 from unstructured_client.httpclient import HttpClient
+
+# A scheme is "<letter><letter|digit|+|-|.>* ://" (RFC 3986). Matching on the substring
+# "http" instead treats any host containing it, such as `myhttpd.local`, as already
+# schemed. Requiring "://" also keeps `localhost:8000` unschemed, which is why urlparse
+# is not used for this check: it reads `localhost` as the scheme.
+_URL_SCHEME_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.\-]*://")
 
 
 def clean_server_url(base_url: str | None) -> str:
@@ -14,7 +21,7 @@ def clean_server_url(base_url: str | None) -> str:
         return ""
 
     # add a url scheme if not present (urllib.parse does not work reliably without it)
-    if "http" not in base_url:
+    if not _URL_SCHEME_RE.match(base_url):
         base_url = "http://" + base_url
 
     parsed_url: ParseResult = urlparse(base_url)
