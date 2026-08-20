@@ -204,6 +204,11 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
         ("localhost:8000", "http://localhost:8000"),
         ("localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
         ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
+        # -- a host whose NAME contains "http" still needs a scheme added. Testing for a
+        # -- scheme with `"http" not in base_url` treats these as already schemed. --
+        ("myhttpd.local", "http://myhttpd.local"),
+        ("http2.example.com", "http://http2.example.com"),
+        ("myhttpserver.example.com/general/v0/general", "http://myhttpserver.example.com/general/v0/general"),
     ],
 )
 def test_unit_clean_server_url_fixes_non_unst_domain_url(server_url: str, expected_url: str):
