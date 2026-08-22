@@ -280,3 +280,54 @@ def test_platform_request_url_has_a_single_api_prefix(client_url, endpoint_url):
         client.jobs.list_jobs(request={})
 
     assert sent == ["https://platform-api.transform.unstructured.io/api/v1/jobs/"]
+
+
+@pytest.mark.parametrize(
+    "client_url,endpoint_url,expected_url",
+    [
+        # -- a self-hosted deployment at the root --
+        (
+            "http://localhost:8000",
+            None,
+            "http://localhost:8000/api/v1/jobs/",
+        ),
+        (
+            None,
+            "http://localhost:8000",
+            "http://localhost:8000/api/v1/jobs/",
+        ),
+        # -- and one behind a subpath, whose path must survive --
+        (
+            "http://localhost:8000/my/endpoint",
+            None,
+            "http://localhost:8000/my/endpoint/api/v1/jobs/",
+        ),
+        (
+            None,
+            "http://localhost:8000/my/endpoint",
+            "http://localhost:8000/my/endpoint/api/v1/jobs/",
+        ),
+    ],
+)
+def test_non_unstructured_host_keeps_its_path(client_url, endpoint_url, expected_url):
+    """A host that is not ours may legitimately serve the API beneath a subpath."""
+    import httpx
+
+    sent = []
+
+    def capture(request: httpx.Request) -> httpx.Response:
+        sent.append(str(request.url))
+        return httpx.Response(200, json=[])
+
+    client = UnstructuredClient(
+        api_key_auth="fake-key",
+        server_url=client_url,
+        client=httpx.Client(transport=httpx.MockTransport(capture)),
+    )
+
+    if endpoint_url:
+        client.jobs.list_jobs(request={}, server_url=endpoint_url)
+    else:
+        client.jobs.list_jobs(request={})
+
+    assert sent == [expected_url]
