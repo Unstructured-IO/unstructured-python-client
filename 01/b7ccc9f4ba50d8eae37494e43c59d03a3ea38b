@@ -1,0 +1,19 @@
+_test_unstructured_client/unit/test_server_urls.py
+  s_85bfad64933696::t_3a9d00ef9fcc74 283-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "01b7ccc9f4ba50d8eae37494e43c59d03a3ea38b",
+  "prompts": {},
+  "sessions": {
+    "s_85bfad64933696": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee59228a-a35c-4958-91a5-87df7d307994",
+        "model": "claude-opus-5"
+      },
+      "human_author": "paulkarayan <pk@unstructured.io>"
+    }
+  }
+}
