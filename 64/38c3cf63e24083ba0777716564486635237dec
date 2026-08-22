@@ -1,0 +1,33 @@
+_test_unstructured_client/unit/test_custom_hooks.py
+  s_85bfad64933696::t_f3ddf953fbce95 200-247
+src/unstructured_client/_version.py
+  s_85bfad64933696::t_257111599e15bf 6,9
+CHANGELOG.md
+  s_85bfad64933696::t_257111599e15bf 1-5
+RELEASES.md
+  s_85bfad64933696::t_257111599e15bf 1264-1273
+src/unstructured_client/_hooks/custom/clean_server_url_hook.py
+  s_85bfad64933696::t_2724be0fb78255 9-30,43-44,49,55
+src/unstructured_client/basesdk.py
+  s_85bfad64933696::t_1a99e6f65067ba 9-11,50-54
+_test_unstructured_client/unit/test_server_urls.py
+  s_85bfad64933696::t_0c9ececb37a519 164-169
+  s_85bfad64933696::t_3a861efc8866c9 244-282
+  s_85bfad64933696::t_eb6523e927153f 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "6438c3cf63e24083ba0777716564486635237dec",
+  "prompts": {},
+  "sessions": {
+    "s_85bfad64933696": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee59228a-a35c-4958-91a5-87df7d307994",
+        "model": "claude-opus-5"
+      },
+      "human_author": "paulkarayan <pk@unstructured.io>"
+    }
+  }
+}
