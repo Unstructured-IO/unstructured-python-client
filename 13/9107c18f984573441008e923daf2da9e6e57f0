@@ -1,0 +1,28 @@
+src/unstructured_client/_hooks/custom/clean_server_url_hook.py
+  s_85bfad64933696::t_a510c3ae6a86e2 19-21,26
+_test_unstructured_client/unit/test_regeneration_guards.py
+  s_85bfad64933696::t_d990e59949dca4 3
+  s_85bfad64933696::t_c3a6a80d8555b9 24,26,45-47,55-58,62-64,114-116,120-122,144,146
+  s_85bfad64933696::t_0409ffe1730880 126-143,145,147-148
+.genignore
+  s_85bfad64933696::t_a510c3ae6a86e2 23-34
+_test_unstructured_client/unit/test_custom_hooks.py
+  s_85bfad64933696::t_bd5f9c60cdfec3 237-260
+  s_85bfad64933696::t_b31c231e2a53fa 261-262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "139107c18f984573441008e923daf2da9e6e57f0",
+  "prompts": {},
+  "sessions": {
+    "s_85bfad64933696": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee59228a-a35c-4958-91a5-87df7d307994",
+        "model": "claude-opus-5"
+      },
+      "human_author": "paulkarayan <pk@unstructured.io>"
+    }
+  }
+}
