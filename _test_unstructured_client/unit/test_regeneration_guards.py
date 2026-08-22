@@ -1,10 +1,9 @@
 import re
-from pathlib import Path
 import tomllib
+from pathlib import Path
 
 from unstructured_client.models import shared
 from unstructured_client.utils.forms import serialize_multipart_form
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -22,8 +21,9 @@ def test_pyproject_invariants():
     assert project["requires-python"] == ">=3.11"
     assert "httpcore >=1.0.9" in project["dependencies"]
     assert "pydantic >=2.12.5" in project["dependencies"]
-    assert not any("cryptography" in d for d in project["dependencies"]), \
+    assert not any("cryptography" in d for d in project["dependencies"]), (
         "cryptography is unused and must not be a runtime dependency"
+    )
 
     dynamic_version = data["tool"]["setuptools"]["dynamic"]["version"]
     assert dynamic_version == {"attr": "unstructured_client._version.__version__"}
@@ -42,7 +42,9 @@ def test_publish_script_is_hardened():
 
 
 def test_release_workflow_uses_trusted_publishing():
-    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
+    workflow = (
+        REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml"
+    ).read_text()
 
     assert "release:" in workflow
     assert "pypa/gh-action-pypi-publish" in workflow
@@ -50,11 +52,16 @@ def test_release_workflow_uses_trusted_publishing():
     assert "upload-artifact" in workflow
     assert "download-artifact" in workflow
     assert re.search(r"publish:\n\s+needs: build", workflow)
-    assert re.search(r"publish:\n(?:.*\n)*?\s+permissions:\n\s+contents: read\n\s+id-token: write", workflow)
+    assert re.search(
+        r"publish:\n(?:.*\n)*?\s+permissions:\n\s+contents: read\n\s+id-token: write",
+        workflow,
+    )
 
 
 def test_release_workflow_keeps_oidc_out_of_build_job():
-    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
+    workflow = (
+        REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml"
+    ).read_text()
 
     build_job = workflow.split("\n  publish:\n", maxsplit=1)[0]
 
@@ -104,12 +111,39 @@ def test_partition_response_keeps_elements_file():
         "src/unstructured_client/models/operations/partition.py",
         "docs/models/operations/partitionresponse.md",
     ):
-        assert path in genignore, f"{path} carries custom code and must stay in .genignore"
+        assert path in genignore, (
+            f"{path} carries custom code and must stay in .genignore"
+        )
 
     # The docs row is generated from the spec too, so a regeneration would drop it
     # without the .genignore entry above.
-    response_docs = (REPO_ROOT / "docs/models/operations/partitionresponse.md").read_text()
+    response_docs = (
+        REPO_ROOT / "docs/models/operations/partitionresponse.md"
+    ).read_text()
     assert "elements_file" in response_docs
+
+
+def test_basesdk_keeps_cleaning_the_base_url():
+    """`_get_url` is the only point every operation's base URL passes through.
+
+    An operation-level `server_url=` override bypasses the SDK-init hook, so the
+    cleaning has to live in this generated file, and the .genignore entry is the only
+    thing keeping it through a regeneration. Without it a URL copied from the app
+    doubles its /api/v1 prefix again and every Platform call 404s.
+
+    Note: SDK generation is currently blocked at the Speakeasy account level, so this
+    guards a path that cannot execute today.
+    """
+    from unstructured_client import basesdk
+
+    source = (REPO_ROOT / "src/unstructured_client/basesdk.py").read_text()
+    assert "clean_server_url(utils.template_url(base_url, url_variables))" in source
+    assert basesdk.clean_server_url is not None
+
+    genignore = (REPO_ROOT / ".genignore").read_text()
+    assert "src/unstructured_client/basesdk.py" in genignore, (
+        "basesdk.py carries custom code and must stay in .genignore"
+    )
 
 
 def test_body_create_job_input_files_are_serialized_as_multipart_files():

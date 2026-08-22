@@ -16,12 +16,14 @@ def is_unstructured_domain(hostname: str | None) -> bool:
     """True if the hostname is one of Unstructured's own API domains, or a subdomain of one.
 
     Matched on domain boundaries, so a host that merely contains one of our domains
-    (`unstructuredapp.io.example.com`) is somebody else's and is left alone.
+    (`unstructuredapp.io.example.com`) is somebody else's and is left alone. A fully
+    qualified name carrying the terminal root dot (`api.unstructuredapp.io.`) is still
+    ours.
     """
     if not hostname:
         return False
 
-    hostname = hostname.lower()
+    hostname = hostname.lower().rstrip(".")
     return any(
         hostname == domain or hostname.endswith(f".{domain}")
         for domain in UNSTRUCTURED_DOMAINS

@@ -20,6 +20,18 @@ src/unstructured_client/users.py
 #  - Bring back the ignore line and commit
 src/unstructured_client/general.py
 
+# Ignore basesdk.py so _get_url keeps cleaning the base URL.
+# An operation-level `server_url=` override never reaches the SDK-init hook, and
+# _get_url is the single point every operation's base URL passes through, so the
+# cleaning has to live in this generated file. Without this entry a regeneration
+# drops it and a URL copied from the app doubles its /api/v1 prefix again.
+# Freezing this file also freezes the generated request/retry/hook plumbing, so if
+# a Speakeasy release changes any of that, follow the general.py procedure above:
+# comment out this line, generate locally, re-apply the _get_url snippet, restore
+# the line, commit.
+# See test_regeneration_guards.py::test_basesdk_keeps_cleaning_the_base_url.
+src/unstructured_client/basesdk.py
+
 # Custom min_attempts / absolute_max_elapsed_time_ms fields on BackoffStrategy.
 # Push upstream to Speakeasy templates to remove this entry.
 src/unstructured_client/utils/retries.py

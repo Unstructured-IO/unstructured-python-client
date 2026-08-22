@@ -237,6 +237,32 @@ def test_unit_clean_server_url_fixes_malformed_transform_platform_url(server_url
 @pytest.mark.parametrize(
     "server_url,expected_url",
     [
+        # -- the terminal root dot is a valid fully qualified name and still ours, so
+        # -- the path goes; the host is left exactly as the caller wrote it, because the
+        # -- dot is a deliberate DNS choice that changes the Host header and SNI --
+        (
+            "https://platform-api.transform.unstructured.io./api/v1",
+            "https://platform-api.transform.unstructured.io.",
+        ),
+        (
+            "https://unstructured-000mock.api.unstructuredapp.io./general/v0/general",
+            "https://unstructured-000mock.api.unstructuredapp.io.",
+        ),
+    ],
+)
+def test_unit_clean_server_url_handles_a_fully_qualified_host(
+    server_url: str, expected_url: str
+):
+    client = UnstructuredClient(
+        server_url=server_url,
+        api_key_auth=FAKE_KEY,
+    )
+    assert client.general.sdk_configuration.server_url == expected_url
+
+
+@pytest.mark.parametrize(
+    "server_url,expected_url",
+    [
         # -- a host that merely CONTAINS an Unstructured domain is not ours, so its
         # -- path and scheme are left alone --
         (
