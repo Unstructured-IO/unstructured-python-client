@@ -161,6 +161,13 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
             expected_url="http://localhost:8000/my/endpoint"
         ),
         URLTestCase(
+            description="transform platform client-level URL with the app's /api/v1 suffix",
+            sdk_endpoint_name="jobs.list_jobs",
+            client_url="https://platform-api.transform.unstructured.io/api/v1",
+            endpoint_url=None,
+            expected_url="https://platform-api.transform.unstructured.io"
+        ),
+        URLTestCase(
             description="partition client level with path",
             sdk_endpoint_name="general.partition",
             client_url="https://api.unstructuredapp.io/general/v0/general",
@@ -235,3 +242,41 @@ def test_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
         pytest.fail(
             f"{case.description}: Expected {case.expected_url}, got {e}"
         )
+
+@pytest.mark.parametrize(
+    "client_url,endpoint_url",
+    [
+        # -- the value the Transform Platform's API Keys page hands you, passed at the
+        # -- client level and at the operation level --
+        ("https://platform-api.transform.unstructured.io/api/v1", None),
+        (None, "https://platform-api.transform.unstructured.io/api/v1"),
+        # -- and the bare host, which must not regress --
+        ("https://platform-api.transform.unstructured.io", None),
+        (None, "https://platform-api.transform.unstructured.io"),
+    ],
+)
+def test_platform_request_url_has_a_single_api_prefix(client_url, endpoint_url):
+    """The operation path already carries /api/v1, so the base URL must not repeat it.
+
+    A doubled /api/v1/api/v1/jobs/ matches no route on the Platform API and 404s.
+    """
+    import httpx
+
+    sent = []
+
+    def capture(request: httpx.Request) -> httpx.Response:
+        sent.append(str(request.url))
+        return httpx.Response(200, json=[])
+
+    client = UnstructuredClient(
+        api_key_auth="fake-key",
+        server_url=client_url,
+        client=httpx.Client(transport=httpx.MockTransport(capture)),
+    )
+
+    if endpoint_url:
+        client.jobs.list_jobs(request={}, server_url=endpoint_url)
+    else:
+        client.jobs.list_jobs(request={})
+
+    assert sent == ["https://platform-api.transform.unstructured.io/api/v1/jobs/"]

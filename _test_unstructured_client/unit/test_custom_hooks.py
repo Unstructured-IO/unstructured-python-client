@@ -198,6 +198,54 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
 
 
 @pytest.mark.parametrize(
+    "server_url",
+    [
+        # -- the value the Transform Platform's API Keys page hands you --
+        "https://platform-api.transform.unstructured.io/api/v1",
+        "http://platform-api.transform.unstructured.io/api/v1",
+        "platform-api.transform.unstructured.io/api/v1",
+        # -- well-formed url --
+        "https://platform-api.transform.unstructured.io",
+        "platform-api.transform.unstructured.io",
+    ],
+)
+def test_unit_clean_server_url_fixes_malformed_transform_platform_url(server_url: str):
+    client = UnstructuredClient(
+        server_url=server_url,
+        api_key_auth=FAKE_KEY,
+    )
+    assert (
+        client.general.sdk_configuration.server_url
+        == "https://platform-api.transform.unstructured.io"
+    )
+
+
+@pytest.mark.parametrize(
+    "server_url,expected_url",
+    [
+        # -- a host that merely CONTAINS an Unstructured domain is not ours, so its
+        # -- path and scheme are left alone --
+        (
+            "http://unstructuredapp.io.example.com/api/v1",
+            "http://unstructuredapp.io.example.com/api/v1",
+        ),
+        (
+            "http://not-unstructured.io/api/v1",
+            "http://not-unstructured.io/api/v1",
+        ),
+    ],
+)
+def test_unit_clean_server_url_leaves_lookalike_domains_alone(
+    server_url: str, expected_url: str
+):
+    client = UnstructuredClient(
+        server_url=server_url,
+        api_key_auth=FAKE_KEY,
+    )
+    assert client.general.sdk_configuration.server_url == expected_url
+
+
+@pytest.mark.parametrize(
     "server_url,expected_url",
     [
         ("http://localhost:8000", "http://localhost:8000"),

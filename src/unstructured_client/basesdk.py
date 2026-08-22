@@ -6,6 +6,9 @@ from .sdkconfiguration import SDKConfiguration
 import httpx
 from typing import Callable, List, Mapping, Optional, Tuple
 from unstructured_client import utils
+from unstructured_client._hooks.custom.clean_server_url_hook import (
+    clean_server_url,
+)
 from unstructured_client._hooks import (
     AfterErrorContext,
     AfterSuccessContext,
@@ -44,7 +47,11 @@ class BaseSDK:
         if url_variables is None:
             url_variables = sdk_variables
 
-        return utils.template_url(base_url, url_variables)
+        # Note(pk): An operation-level `server_url=` override bypasses the SDK-init hook
+        # that normalizes the client-level URL, so clean here too -- this is the one point
+        # every operation's base URL passes through. Cleaning an already-clean URL is a
+        # no-op, so the client-level case is unaffected.
+        return clean_server_url(utils.template_url(base_url, url_variables))
 
     def _build_request_async(
         self,
