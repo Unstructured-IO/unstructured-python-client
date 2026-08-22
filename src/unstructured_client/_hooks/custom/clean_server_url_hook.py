@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
 from unstructured_client._hooks.types import SDKInitHook
@@ -45,7 +44,9 @@ def clean_server_url(base_url: str | None) -> str:
         if parsed_url.scheme != "https":
             parsed_url = parsed_url._replace(scheme="https")
         # We only want the base url for Unstructured domains
-        clean_url =  urlunparse(parsed_url._replace(path="", params="", query="", fragment=""))
+        clean_url = urlunparse(
+            parsed_url._replace(path="", params="", query="", fragment="")
+        )
 
     else:
         # For other domains, we want to keep the path
@@ -54,13 +55,10 @@ def clean_server_url(base_url: str | None) -> str:
     return clean_url.rstrip("/")
 
 
-
 class CleanServerUrlSDKInitHook(SDKInitHook):
     """Hook fixing common mistakes by users in defining `server_url` in the unstructured-client"""
 
-    def sdk_init(
-        self, base_url: str, client: HttpClient
-    ) -> Tuple[str, HttpClient]:
+    def sdk_init(self, base_url: str, client: HttpClient) -> tuple[str, HttpClient]:
         """Concrete implementation for SDKInitHook."""
         cleaned_url = clean_server_url(base_url)
 

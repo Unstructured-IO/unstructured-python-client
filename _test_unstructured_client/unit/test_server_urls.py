@@ -1,7 +1,9 @@
-import pytest
 from dataclasses import dataclass
+
+import pytest
+
 from unstructured_client import UnstructuredClient, utils
-from typing import Optional
+
 
 # Raise one of these from our mock to return to the test code
 class BaseUrlCorrect(Exception):
@@ -13,10 +15,7 @@ class BaseUrlIncorrect(Exception):
 
 
 def get_client_method_with_mock(
-        sdk_endpoint_name,
-        client_instance,
-        mocked_server_url,
-        monkeypatch
+    sdk_endpoint_name, client_instance, mocked_server_url, monkeypatch
 ):
     """
     Given an endpoint name, e.g. "general.partition", return a reference
@@ -26,6 +25,7 @@ def get_client_method_with_mock(
         Assert that the provided server_url is passed into _build_request.
         Raise a custom exception to get back to the test.
     """
+
     # Mock this to get past param validation
     def mock_unmarshal(*args, **kwargs):
         return {}
@@ -51,6 +51,7 @@ def get_client_method_with_mock(
 
     return endpoint_method
 
+
 @dataclass
 class URLTestCase:
     description: str
@@ -58,9 +59,10 @@ class URLTestCase:
     # expected url when actually making the HTTP request in build_request
     expected_url: str
     # url when you init the client (global for all endpoints)
-    client_url: Optional[str] = None
+    client_url: str | None = None
     # url when you init the SDK endpoint (vary per endpoint)
-    endpoint_url: Optional[str] = None  
+    endpoint_url: str | None = None
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
@@ -71,37 +73,37 @@ class URLTestCase:
             sdk_endpoint_name="general.partition_async",
             client_url="http://localhost:8000/",
             endpoint_url=None,
-            expected_url="http://localhost:8000"
+            expected_url="http://localhost:8000",
         ),
         URLTestCase(
             description="custom client-level URL, with path",
             sdk_endpoint_name="general.partition_async",
             client_url="http://localhost:8000/my/endpoint/",
             endpoint_url=None,
-            expected_url="http://localhost:8000/my/endpoint"
+            expected_url="http://localhost:8000/my/endpoint",
         ),
         URLTestCase(
             description="custom endpoint-level URL, no path",
             sdk_endpoint_name="general.partition_async",
             client_url=None,
             endpoint_url="http://localhost:8000/",
-            expected_url="http://localhost:8000"
+            expected_url="http://localhost:8000",
         ),
         URLTestCase(
             description="custom endpoint-level URL, with path",
             sdk_endpoint_name="general.partition_async",
             client_url=None,
             endpoint_url="http://localhost:8000/my/endpoint/",
-            expected_url="http://localhost:8000/my/endpoint"
+            expected_url="http://localhost:8000/my/endpoint",
         ),
         URLTestCase(
             description="default URL fallback",
             sdk_endpoint_name="general.partition_async",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://api.unstructuredapp.io"
+            expected_url="https://api.unstructuredapp.io",
         ),
-    ]
+    ],
 )
 async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
     if case.client_url:
@@ -110,10 +112,7 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
         s = UnstructuredClient()
 
     client_method = get_client_method_with_mock(
-        case.sdk_endpoint_name,
-        s,
-        case.expected_url,
-        monkeypatch
+        case.sdk_endpoint_name, s, case.expected_url, monkeypatch
     )
 
     try:
@@ -124,9 +123,7 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
     except BaseUrlCorrect:
         pass
     except BaseUrlIncorrect as e:
-        pytest.fail(
-            f"{case.description}: Expected {case.expected_url}, got {e}"
-        )
+        pytest.fail(f"{case.description}: Expected {case.expected_url}, got {e}")
 
 
 @pytest.mark.parametrize(
@@ -137,86 +134,86 @@ async def test_async_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
             sdk_endpoint_name="destinations.create_destination",
             client_url="http://localhost:8000/",
             endpoint_url=None,
-            expected_url="http://localhost:8000"
+            expected_url="http://localhost:8000",
         ),
         URLTestCase(
             description="custom client-level URL, with path",
             sdk_endpoint_name="sources.create_source",
             client_url="http://localhost:8000/my/endpoint/",
             endpoint_url=None,
-            expected_url="http://localhost:8000/my/endpoint"
+            expected_url="http://localhost:8000/my/endpoint",
         ),
         URLTestCase(
             description="custom endpoint-level URL, no path",
             sdk_endpoint_name="jobs.get_job",
             client_url=None,
             endpoint_url="http://localhost:8000",
-            expected_url="http://localhost:8000"
+            expected_url="http://localhost:8000",
         ),
         URLTestCase(
             description="custom endpoint-level URL, with path",
             sdk_endpoint_name="workflows.create_workflow",
             client_url=None,
             endpoint_url="http://localhost:8000/my/endpoint",
-            expected_url="http://localhost:8000/my/endpoint"
+            expected_url="http://localhost:8000/my/endpoint",
         ),
         URLTestCase(
             description="transform platform client-level URL with the app's /api/v1 suffix",
             sdk_endpoint_name="jobs.list_jobs",
             client_url="https://platform-api.transform.unstructured.io/api/v1",
             endpoint_url=None,
-            expected_url="https://platform-api.transform.unstructured.io"
+            expected_url="https://platform-api.transform.unstructured.io",
         ),
         URLTestCase(
             description="partition client level with path",
             sdk_endpoint_name="general.partition",
             client_url="https://api.unstructuredapp.io/general/v0/general",
             endpoint_url=None,
-            expected_url="https://api.unstructuredapp.io"
+            expected_url="https://api.unstructuredapp.io",
         ),
         URLTestCase(
             description="partition endpoint level with path",
             sdk_endpoint_name="general.partition",
             client_url=None,
             endpoint_url="https://api.unstructuredapp.io/general/v0/general",
-            expected_url="https://api.unstructuredapp.io"
+            expected_url="https://api.unstructuredapp.io",
         ),
         URLTestCase(
             description="partition default url",
             sdk_endpoint_name="general.partition",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://api.unstructuredapp.io"
+            expected_url="https://api.unstructuredapp.io",
         ),
         URLTestCase(
             description="default URL fallback",
             sdk_endpoint_name="destinations.create_destination",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://platform.unstructuredapp.io"
+            expected_url="https://platform.unstructuredapp.io",
         ),
         URLTestCase(
             description="default URL fallback",
             sdk_endpoint_name="sources.create_source",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://platform.unstructuredapp.io"
+            expected_url="https://platform.unstructuredapp.io",
         ),
         URLTestCase(
             description="default URL fallback",
             sdk_endpoint_name="jobs.get_job",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://platform.unstructuredapp.io"
+            expected_url="https://platform.unstructuredapp.io",
         ),
         URLTestCase(
             description="default URL fallback",
             sdk_endpoint_name="workflows.create_workflow",
             client_url=None,
             endpoint_url=None,
-            expected_url="https://platform.unstructuredapp.io"
+            expected_url="https://platform.unstructuredapp.io",
         ),
-    ]
+    ],
 )
 def test_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
     if case.client_url:
@@ -225,10 +222,7 @@ def test_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
         s = UnstructuredClient()
 
     client_method = get_client_method_with_mock(
-        case.sdk_endpoint_name,
-        s,
-        case.expected_url,
-        monkeypatch
+        case.sdk_endpoint_name, s, case.expected_url, monkeypatch
     )
 
     try:
@@ -239,9 +233,8 @@ def test_endpoint_uses_correct_url(monkeypatch, case: URLTestCase):
     except BaseUrlCorrect:
         pass
     except BaseUrlIncorrect as e:
-        pytest.fail(
-            f"{case.description}: Expected {case.expected_url}, got {e}"
-        )
+        pytest.fail(f"{case.description}: Expected {case.expected_url}, got {e}")
+
 
 @pytest.mark.parametrize(
     "client_url,endpoint_url",
