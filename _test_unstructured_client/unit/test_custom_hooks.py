@@ -10,6 +10,7 @@ from httpx import ConnectError, Response
 
 from _test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 from unstructured_client import UnstructuredClient
+from unstructured_client._hooks.custom.clean_server_url_hook import clean_server_url
 from unstructured_client.models import operations, shared
 from unstructured_client.models.errors import SDKError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
@@ -201,12 +202,8 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     ],
 )
 def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
     assert (
-        client.general.sdk_configuration.server_url
+        clean_server_url(server_url)
         == "https://unstructured-000mock.api.unstructuredapp.io"
     )
 
@@ -224,13 +221,8 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
     ],
 )
 def test_unit_clean_server_url_fixes_malformed_transform_platform_url(server_url: str):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
     assert (
-        client.general.sdk_configuration.server_url
-        == "https://platform-api.transform.unstructured.io"
+        clean_server_url(server_url) == "https://platform-api.transform.unstructured.io"
     )
 
 
@@ -253,11 +245,7 @@ def test_unit_clean_server_url_fixes_malformed_transform_platform_url(server_url
 def test_unit_clean_server_url_handles_a_fully_qualified_host(
     server_url: str, expected_url: str
 ):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
-    assert client.general.sdk_configuration.server_url == expected_url
+    assert clean_server_url(server_url) == expected_url
 
 
 @pytest.mark.parametrize(
@@ -278,11 +266,7 @@ def test_unit_clean_server_url_handles_a_fully_qualified_host(
 def test_unit_clean_server_url_leaves_lookalike_domains_alone(
     server_url: str, expected_url: str
 ):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
-    assert client.general.sdk_configuration.server_url == expected_url
+    assert clean_server_url(server_url) == expected_url
 
 
 @pytest.mark.parametrize(
@@ -303,11 +287,7 @@ def test_unit_clean_server_url_leaves_lookalike_domains_alone(
 def test_unit_clean_server_url_fixes_non_unst_domain_url(
     server_url: str, expected_url: str
 ):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
-    assert client.general.sdk_configuration.server_url == expected_url
+    assert clean_server_url(server_url) == expected_url
 
 
 @pytest.mark.parametrize(
@@ -322,9 +302,8 @@ def test_unit_clean_server_url_fixes_non_unst_domain_url(
 def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(
     server_url: str,
 ):
-    client = UnstructuredClient(FAKE_KEY, server_url=server_url)
     assert (
-        client.general.sdk_configuration.server_url
+        clean_server_url(server_url)
         == "https://unstructured-000mock.api.unstructuredapp.io"
     )
 

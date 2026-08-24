@@ -49,10 +49,12 @@ class BaseSDK:
         if url_variables is None:
             url_variables = sdk_variables
 
-        # Note(pk): An operation-level `server_url=` override bypasses the SDK-init hook
-        # that normalizes the client-level URL, so clean here too -- this is the one point
-        # every operation's base URL passes through. Cleaning an already-clean URL is a
-        # no-op, so the client-level case is unaffected.
+        # Note(pk): _get_url is the one point every operation's base URL passes through,
+        # so cleaning here normalizes both the client-level server_url and an
+        # operation-level `server_url=` override. There is no SDK-init hook doing this
+        # anymore, so `sdk_configuration.server_url` is stored raw -- only the request URL
+        # built here is cleaned. A caller reading that attribute directly sees the value
+        # exactly as it was passed.
         return clean_server_url(utils.template_url(base_url, url_variables))
 
     def _build_request_async(

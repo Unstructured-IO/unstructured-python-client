@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from urllib.parse import ParseResult, urlparse, urlunparse
 
-from unstructured_client._hooks.types import SDKInitHook
-from unstructured_client.httpclient import HttpClient
-
 # Domains Unstructured serves its APIs from. Every operation in this SDK already carries
 # its own path prefix (`/api/v1/...`, `/general/v0/general`), so a base URL under one of
 # these hosts must not carry a path of its own -- the app and the docs hand users a full
@@ -55,13 +52,3 @@ def clean_server_url(base_url: str | None) -> str:
         clean_url = urlunparse(parsed_url._replace(params="", query="", fragment=""))
 
     return clean_url.rstrip("/")
-
-
-class CleanServerUrlSDKInitHook(SDKInitHook):
-    """Hook fixing common mistakes by users in defining `server_url` in the unstructured-client"""
-
-    def sdk_init(self, base_url: str, client: HttpClient) -> tuple[str, HttpClient]:
-        """Concrete implementation for SDKInitHook."""
-        cleaned_url = clean_server_url(base_url)
-
-        return cleaned_url, client
