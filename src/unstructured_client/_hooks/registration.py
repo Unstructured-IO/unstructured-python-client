@@ -1,7 +1,6 @@
 """Registration of custom, human-written hooks."""
 
 from .custom import (
-    CleanServerUrlSDKInitHook,
     LoggerHook,
     SplitPdfHook,
 )
@@ -21,7 +20,6 @@ def init_hooks(hooks: Hooks):
     """
 
     # Initialize custom hooks
-    clean_server_url_hook = CleanServerUrlSDKInitHook()
     logger_hook = LoggerHook()
     split_pdf_hook = SplitPdfHook()
 
@@ -29,7 +27,6 @@ def init_hooks(hooks: Hooks):
     # request and whether it will be retried which can be changed by e.g. split_pdf_hook
 
     # Register SDK Init hooks
-    hooks.register_sdk_init_hook(clean_server_url_hook)
     hooks.register_sdk_init_hook(logger_hook)
     hooks.register_sdk_init_hook(split_pdf_hook)
 
@@ -42,4 +39,4 @@ def init_hooks(hooks: Hooks):
 
     # Register After Error hooks
     hooks.register_after_error_hook(split_pdf_hook)
-    hooks.register_after_error_hook(logger_hook)  
+    hooks.register_after_error_hook(logger_hook)

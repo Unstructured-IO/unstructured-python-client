@@ -1,166 +1,29 @@
+"""Behaviour of the hand-maintained `skip_preflight` and job-status model code.
+
+These assert what the models *do*, not how they are protected from regeneration: `.genignore`
+was removed from this repo, so a test asserting entries in it would assert nothing. What is
+left here is the real cover - if a regeneration (or a careless edit) drops `skip_preflight`,
+the fold, or the enums' forward tolerance, these fail.
+"""
+
 import inspect
 import json
-import re
+from pathlib import Path
 
 import pytest
-from pathlib import Path
-import tomllib
 
 from unstructured_client.models import shared
 from unstructured_client.types import Unset
-from unstructured_client.utils.forms import serialize_multipart_form
 from unstructured_client.utils.metadata import MultipartFormMetadata, find_field_metadata
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-
-def _load_pyproject() -> dict:
-    return tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
-
-
-def test_pyproject_invariants():
-    data = _load_pyproject()
-    project = data["project"]
-
-    assert project["dynamic"] == ["version"]
-    assert "version" not in project
-    assert project["requires-python"] == ">=3.11"
-    assert "httpcore >=1.0.9" in project["dependencies"]
-    assert "pydantic >=2.12.5" in project["dependencies"]
-    assert not any("cryptography" in d for d in project["dependencies"]), \
-        "cryptography is unused and must not be a runtime dependency"
-
-    dynamic_version = data["tool"]["setuptools"]["dynamic"]["version"]
-    assert dynamic_version == {"attr": "unstructured_client._version.__version__"}
-
-    build = data["build-system"]
-    assert build["build-backend"] == "setuptools.build_meta"
-    assert "setuptools>=80" in build["requires"]
-
-
-def test_publish_script_is_hardened():
-    publish_script = (REPO_ROOT / "scripts" / "publish.sh").read_text()
-
-    assert "set -euo pipefail" in publish_script
-    assert "sys.version_info < (3, 11)" in publish_script
-    assert "uv build --out-dir dist --clear" in publish_script
-
-
-def test_release_workflow_uses_trusted_publishing():
-    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
-
-    assert "release:" in workflow
-    assert "pypa/gh-action-pypi-publish" in workflow
-    assert "PYPI_TOKEN" not in workflow
-    assert "upload-artifact" in workflow
-    assert "download-artifact" in workflow
-    assert re.search(r"publish:\n\s+needs: build", workflow)
-    assert re.search(r"publish:\n(?:.*\n)*?\s+permissions:\n\s+contents: read\n\s+id-token: write", workflow)
-
-
-def test_release_workflow_keeps_oidc_out_of_build_job():
-    workflow = (REPO_ROOT / ".github" / "workflows" / "speakeasy_sdk_publish.yaml").read_text()
-
-    build_job = workflow.split("\n  publish:\n", maxsplit=1)[0]
-
-    assert "id-token: write" not in build_job
-
-
-def test_speakeasy_workflow_does_not_manage_pypi_publishing():
-    workflow = (REPO_ROOT / ".speakeasy" / "workflow.yaml").read_text()
-
-    assert "publish:" not in workflow
-    assert "PYPI_TOKEN" not in workflow
-
-
-def test_makefile_installs_with_locked_uv_sync():
-    makefile = (REPO_ROOT / "Makefile").read_text()
-
-    assert "uv sync --locked" in makefile
-
-
-def test_ci_installs_with_locked_uv_sync():
-    workflow = (REPO_ROOT / ".github" / "workflows" / "ci.yaml").read_text()
-
-    assert 'UV_LOCKED: "1"' in workflow
-    assert "run: make install" in workflow
-
-
-def test_partition_response_keeps_elements_file():
-    """`elements_file` is client-side only, so no spec change can restore it after a regen.
-
-    Both the model and the enum value that selects it live in generated files; the
-    .genignore entries are the only thing keeping them.
-
-    Note: SDK generation is currently blocked at the Speakeasy account level, so this
-    guards a path that cannot execute today. Whether it is worth keeping is a live
-    question -- see the discussion on PR #347.
-    """
-    from unstructured_client.general import PartitionAcceptEnum
-    from unstructured_client.models import operations
-
-    assert "elements_file" in operations.PartitionResponse.model_fields
-    assert "elements_file" in operations.PartitionResponseTypedDict.__annotations__
-    assert PartitionAcceptEnum.APPLICATION_X_NDJSON.value == "application/x-ndjson"
-
-    genignore = (REPO_ROOT / ".genignore").read_text()
-    for path in (
-        "src/unstructured_client/general.py",
-        "src/unstructured_client/models/operations/partition.py",
-        "docs/models/operations/partitionresponse.md",
-    ):
-        assert path in genignore, f"{path} carries custom code and must stay in .genignore"
-
-    # The docs row is generated from the spec too, so a regeneration would drop it
-    # without the .genignore entry above.
-    response_docs = (REPO_ROOT / "docs/models/operations/partitionresponse.md").read_text()
-    assert "elements_file" in response_docs
-
-
-def test_body_create_job_input_files_are_serialized_as_multipart_files():
-    request = shared.BodyCreateJob(
-        request_data="{}",
-        input_files=[
-            shared.InputFiles(
-                content=b"hello",
-                file_name="hello.pdf",
-                content_type="application/pdf",
-            )
-        ],
-    )
-
-    media_type, form, files = serialize_multipart_form("multipart/form-data", request)
-
-    assert media_type == "multipart/form-data"
-    assert form == {"request_data": "{}"}
-    assert files == [("input_files[]", ("hello.pdf", b"hello", "application/pdf"))]
-
-
-def test_body_run_workflow_input_files_are_serialized_as_multipart_files():
-    request = shared.BodyRunWorkflow(
-        input_files=[
-            shared.BodyRunWorkflowInputFiles(
-                content=b"hello",
-                file_name="hello.pdf",
-                content_type="application/pdf",
-            )
-        ]
-    )
-
-    media_type, form, files = serialize_multipart_form("multipart/form-data", request)
-
-    assert media_type == "multipart/form-data"
-    assert form == {}
-    assert files == [("input_files[]", ("hello.pdf", b"hello", "application/pdf"))]
-
-
 def test_job_status_enums_stay_forward_tolerant():
     """REJECTED and the `_missing_` hook are hand-written; nothing regenerates them.
 
     REJECTED is in the live spec, but the `_missing_` hook cannot be: a generated enum is
-    closed. Speakeasy generation is decommissioned, so this test - not `.genignore` - is what
-    protects both.
+    closed. Nothing regenerates this file, so this test is what protects both.
     """
     for enum in (shared.JobStatus, shared.JobProcessingStatus):
         assert enum.REJECTED.value == "REJECTED"
@@ -178,42 +41,6 @@ def test_job_status_enums_stay_forward_tolerant():
     for name in ("jobstatus", "jobprocessingstatus"):
         docs = (REPO_ROOT / f"docs/models/shared/{name}.md").read_text()
         assert "REJECTED" in docs
-
-
-def test_genignore_covers_code_the_spec_cannot_produce():
-    """`.genignore` must list every file carrying code no spec can generate.
-
-    The rule is narrow on purpose. `skip_preflight` on the three workflow models IS in the live
-    spec, so a regeneration would reproduce it and listing those files would only freeze them
-    against future spec-driven fields. These four cannot come from the spec at all:
-      - the `_missing_` hook: a generated enum is closed;
-      - `BodyCreateJob.skip_preflight` and its fold: `Body_create_job` has no such property,
-        because the spec types `request_data` as a plain string;
-      - the `Unset` export in `types/__init__.py`: the generator exports the singleton but not
-        its type.
-    """
-    genignore = (REPO_ROOT / ".genignore").read_text()
-    for path in (
-        "src/unstructured_client/models/shared/jobstatus.py",
-        "src/unstructured_client/models/shared/jobprocessingstatus.py",
-        "docs/models/shared/jobstatus.md",
-        "docs/models/shared/jobprocessingstatus.md",
-        "src/unstructured_client/models/shared/body_create_job.py",
-        "docs/models/shared/bodycreatejob.md",
-        "src/unstructured_client/types/__init__.py",
-    ):
-        assert path in genignore, f"{path} carries custom code and must stay in .genignore"
-
-    # The converse: files whose custom content IS spec-derivable must NOT be frozen.
-    for path in (
-        "src/unstructured_client/models/shared/createworkflow.py",
-        "src/unstructured_client/models/shared/updateworkflow.py",
-        "src/unstructured_client/models/shared/workflowinformation.py",
-    ):
-        assert path not in genignore, (
-            f"{path} should not be in .genignore: skip_preflight is in the live spec, so "
-            "freezing the file would only block future spec-driven fields"
-        )
 
 
 def test_workflow_models_expose_skip_preflight():

@@ -6,6 +6,11 @@
 ### Fixes
 * `JobStatus` and `JobProcessingStatus` gained `REJECTED`, so `jobs.get_job` and `jobs.list_jobs` no longer raise on a preflight-rejected job. Previously a single rejected job in a page failed the entire `list_jobs` call, since the page is validated as one list. Both enums now also preserve an unrecognised server-side status verbatim instead of raising, so the next status the server adds is not a client break.
 
+## 0.46.2
+
+### Fixes
+* Accept the API URL the Transform Platform hands you as `server_url`. The app's API Keys page and the docs give you `https://platform-api.transform.unstructured.io/api/v1`, which works with curl but 404'd every Platform call in the SDK: the URL cleaner only stripped a path for `unstructuredapp.io` hosts, so the `/api/v1` survived and the operation's own `/api/v1/jobs/` was appended on top, producing `/api/v1/api/v1/jobs/`. Hosts under `unstructured.io` are now recognized too, and are matched on domain boundaries so a lookalike host like `unstructuredapp.io.example.com` keeps its path and scheme. A `server_url` passed to an individual operation is cleaned as well — previously only the client-level URL was, so `client.jobs.list_jobs(request={}, server_url=...)` still 404'd.
+
 ## 0.46.1
 
 ### Fixes
