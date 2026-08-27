@@ -39,3 +39,27 @@ src/unstructured_client/models/operations/partition.py
 # moved since 2026-01. These entries are insurance for when that is restored, not a
 # defence against an imminent run.
 docs/models/operations/partitionresponse.md
+
+# Hand-written REJECTED member and the _missing_ forward-tolerance hook on the job status
+# enums. A regenerated closed enum would drop both.
+src/unstructured_client/models/shared/jobstatus.py
+src/unstructured_client/models/shared/jobprocessingstatus.py
+
+# Docs for those same enums - generated from the spec, so a regeneration drops the rows.
+docs/models/shared/jobstatus.md
+docs/models/shared/jobprocessingstatus.md
+
+# Client-side `skip_preflight` convenience field + the validator that folds it into the
+# `request_data` JSON. The spec types `request_data` as a plain string and describes the payload
+# only in `contentSchema`, so `Body_create_job` has no `skip_preflight` property at all - a
+# regenerated model would drop the field and the fold, silently sending callers back to
+# hand-editing that string. Both paths are claimed by .speakeasy/gen.lock.
+# See test_regeneration_guards.py::test_body_create_job_folds_skip_preflight_into_request_data.
+src/unstructured_client/models/shared/body_create_job.py
+docs/models/shared/bodycreatejob.md
+
+# Exports `Unset` alongside `UNSET`. Speakeasy exports the singleton but not its type, leaving no
+# public way to ask "is this value unset" - which `body_create_job.py` needs, and which otherwise
+# forces a private import of `utils.values._is_set` from a models module. A regeneration would drop
+# the export and break that import.
+src/unstructured_client/types/__init__.py

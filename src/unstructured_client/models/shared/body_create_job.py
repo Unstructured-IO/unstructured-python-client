@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 import io
+import json
 import pydantic
-from pydantic import model_serializer
+from pydantic import ConfigDict, model_serializer, model_validator
 from typing import IO, List, Optional, Union
 from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
@@ -12,6 +13,7 @@ from unstructured_client.types import (
     OptionalNullable,
     UNSET,
     UNSET_SENTINEL,
+    Unset,
 )
 from unstructured_client.utils import FieldMetadata, MultipartFormMetadata
 
@@ -43,9 +45,16 @@ class InputFiles(BaseModel):
 class BodyCreateJobTypedDict(TypedDict):
     request_data: str
     input_files: NotRequired[Nullable[List[InputFilesTypedDict]]]
+    skip_preflight: NotRequired[Nullable[bool]]
 
 
 class BodyCreateJob(BaseModel):
+    # The only model here with a derived invariant across two fields: `skip_preflight` has to
+    # end up inside `request_data`. Without this, `body.skip_preflight = True` after
+    # construction would be silently dropped - the field carries no multipart metadata, so
+    # nothing reaches the wire and nothing raises. Merged with the base config, not replacing it.
+    model_config = ConfigDict(validate_assignment=True)
+
     request_data: Annotated[str, FieldMetadata(multipart=True)]
 
     input_files: Annotated[
@@ -53,10 +62,100 @@ class BodyCreateJob(BaseModel):
         FieldMetadata(multipart=MultipartFormMetadata(file=True)),
     ] = UNSET
 
+    skip_preflight: OptionalNullable[bool] = UNSET
+    r"""Skip the job preflight check for this job. Preflight runs by default.
+
+    A convenience parameter, not a wire field: multipart has no ``skip_preflight`` part, so the
+    server reads it out of the ``request_data`` JSON. The validator below writes it there, which
+    is why this field deliberately carries no ``MultipartFormMetadata`` -- ``serialize_multipart_form``
+    skips any field without it, so it never becomes a form field of its own.
+    """
+
+    @model_validator(mode="after")
+    def fold_skip_preflight_into_request_data(self) -> "BodyCreateJob":
+        """Validator entry point. The work is in ``_fold_skip_preflight`` so that
+        ``model_copy`` can reuse it - a decorated validator is a descriptor, not a callable."""
+        return self._fold_skip_preflight()
+
+    def _fold_skip_preflight(self) -> "BodyCreateJob":
+        """Write ``skip_preflight`` into ``request_data``, where the server reads it.
+
+        Set explicitly, it wins over any value already in the JSON string: the parameter is the
+        more specific expression of intent. Left unset, ``request_data`` is passed through byte
+        for byte.
+        """
+        # Tested with `isinstance`, not `is UNSET`: pydantic deep-copies the default per
+        # instance, so an identity check against the UNSET singleton always fails and the
+        # fold would run on every call.
+        if self.skip_preflight is None or isinstance(self.skip_preflight, Unset):
+            return self
+
+        raw = self.request_data
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                "request_data must be a JSON object to use skip_preflight; "
+                f"could not parse it: {exc}"
+            ) from exc
+        if not isinstance(payload, dict):
+            raise ValueError(
+                "request_data must be a JSON object to use skip_preflight, "
+                f"got {type(payload).__name__}"
+            )
+
+        literal = "true" if self.skip_preflight else "false"
+        if payload.get("skip_preflight") is bool(self.skip_preflight):
+            # Already folded and already correct. Returning early keeps this a genuine no-op:
+            # `validate_assignment=True` re-runs the whole validator on *any* field assignment,
+            # so without this, touching an unrelated field would push the payload down the
+            # re-encode branch below and silently reformat it (1e5 -> 100000.0).
+            return self
+
+        if "skip_preflight" in payload:
+            # The caller already put the key in the string. Replacing it in place would mean
+            # locating its span in the raw text, so rewrite the document instead - and accept
+            # that a re-encode is not lexically identical (0.1000 -> 0.1, 1e5 -> 100000.0).
+            payload["skip_preflight"] = bool(self.skip_preflight)
+            folded = json.dumps(payload, ensure_ascii=False)
+        else:
+            # The common case, and deliberately a text splice rather than a re-encode: a
+            # json.loads/json.dumps round trip is lossy for number *representation* even
+            # though it preserves value, and request_data carries caller configuration that
+            # may be read by precision-sensitive consumers. Splicing leaves every other byte
+            # exactly as handed to us.
+            #
+            # json.loads succeeded and produced a dict, so the last non-space character is
+            # guaranteed to be the closing brace.
+            body = raw.rstrip()[:-1].rstrip()
+            separator = "" if body.endswith("{") else ","
+            folded = f'{body}{separator}"skip_preflight": {literal}}}'
+
+        # Written through __dict__ on purpose: a normal assignment would re-enter this
+        # validator under validate_assignment=True and recurse until the stack blows.
+        self.__dict__["request_data"] = folded
+        return self
+
+    def model_copy(self, *, update=None, deep=False) -> "BodyCreateJob":
+        """Re-apply the fold after a copy.
+
+        `model_copy` bypasses validation by design, so without this an updated
+        `skip_preflight` never reaches `request_data`. The dangerous direction is
+        `update={"skip_preflight": False}` on a body that already had it folded as `true`:
+        the copy would keep sending `true` and run the job with preflight disabled while the
+        caller believes they just re-enabled it.
+        """
+        copied = super().model_copy(update=update, deep=deep)
+        if update and not {"skip_preflight", "request_data"}.isdisjoint(update):
+            return copied._fold_skip_preflight()  # pylint: disable=protected-access
+        # A copy that touches neither field is left strictly alone. Re-folding here would push
+        # an already-folded payload down the re-encode branch and reformat it for no reason.
+        return copied
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["input_files"]
-        nullable_fields = ["input_files"]
+        optional_fields = ["input_files", "skip_preflight"]
+        nullable_fields = ["input_files", "skip_preflight"]
         null_default_fields = []
 
         serialized = handler(self)

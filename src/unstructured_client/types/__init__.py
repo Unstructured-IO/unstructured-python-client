@@ -8,6 +8,7 @@ from .basemodel import (
     UnrecognizedStr,
     UNSET,
     UNSET_SENTINEL,
+    Unset,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "UnrecognizedStr",
     "UNSET",
     "UNSET_SENTINEL",
+    "Unset",
 ]

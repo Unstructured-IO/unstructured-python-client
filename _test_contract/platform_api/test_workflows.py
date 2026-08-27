@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytest
@@ -257,3 +258,192 @@ def test_run_workflow(httpx_mock, platform_client: UnstructuredClient, platform_
     assert new_job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
     assert new_job.workflow_name == "test_workflow"
     assert new_job.status == "IN_PROGRESS"
+
+WORKFLOW_ID = "16b80fee-64dc-472d-8f26-1d7729b6423d"
+
+
+def _workflow_json(**overrides) -> dict:
+    payload = {
+        "created_at": "2025-06-22T11:37:21.648Z",
+        "destinations": ["aeebecc7-9d8e-4625-bf1d-815c2f084869"],
+        "id": WORKFLOW_ID,
+        "name": "test_workflow",
+        "sources": ["f1f7b1b2-8e4b-4a2b-8f1d-3e3c7c9e5a3c"],
+        "workflow_nodes": [],
+        "status": "active",
+        "workflow_type": "advanced",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def _sent_body(httpx_mock) -> dict:
+    requests = httpx_mock.get_requests()
+    assert len(requests) == 1
+    return json.loads(requests[0].read())
+
+
+@pytest.mark.parametrize(
+    ("skip_preflight", "expected"),
+    [(True, True), (False, False)],
+)
+def test_create_workflow_sends_skip_preflight(
+    httpx_mock,
+    platform_client: UnstructuredClient,
+    platform_api_url: str,
+    skip_preflight: bool,
+    expected: bool,
+):
+    """An explicit value reaches the wire, `False` included."""
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{platform_api_url}/api/v1/workflows/",
+        status_code=200,
+        json=_workflow_json(skip_preflight=skip_preflight),
+    )
+
+    platform_client.workflows.create_workflow(
+        request=operations.CreateWorkflowRequest(
+            create_workflow=shared.CreateWorkflow(
+                name="test_workflow",
+                workflow_type="advanced",
+                skip_preflight=skip_preflight,
+            )
+        )
+    )
+
+    assert _sent_body(httpx_mock)["skip_preflight"] is expected
+
+
+def test_create_workflow_omits_skip_preflight_when_unset(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    """Unset must be *absent*, not `false`.
+
+    Regression guard for the `optional_fields` list in `CreateWorkflow.serialize_model`: leave
+    `skip_preflight` out of it and the serializer emits the field on every create call.
+    """
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{platform_api_url}/api/v1/workflows/",
+        status_code=200,
+        json=_workflow_json(),
+    )
+
+    platform_client.workflows.create_workflow(
+        request=operations.CreateWorkflowRequest(
+            create_workflow=shared.CreateWorkflow(
+                name="test_workflow", workflow_type="advanced"
+            )
+        )
+    )
+
+    assert "skip_preflight" not in _sent_body(httpx_mock)
+
+
+@pytest.mark.parametrize("skip_preflight", [True, False])
+def test_update_workflow_sends_skip_preflight(
+    httpx_mock,
+    platform_client: UnstructuredClient,
+    platform_api_url: str,
+    skip_preflight: bool,
+):
+    """`False` must be sent, not dropped - it is how a caller opts back in to preflight."""
+    httpx_mock.add_response(
+        method="PUT",
+        url=f"{platform_api_url}/api/v1/workflows/{WORKFLOW_ID}",
+        status_code=200,
+        json=_workflow_json(skip_preflight=skip_preflight),
+    )
+
+    platform_client.workflows.update_workflow(
+        request=operations.UpdateWorkflowRequest(
+            workflow_id=WORKFLOW_ID,
+            update_workflow=shared.UpdateWorkflow(skip_preflight=skip_preflight),
+        )
+    )
+
+    assert _sent_body(httpx_mock)["skip_preflight"] is skip_preflight
+
+
+def test_update_workflow_omits_skip_preflight_when_unset(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    """Omitted means "leave unchanged" server-side, so an unrelated update must not send it."""
+    httpx_mock.add_response(
+        method="PUT",
+        url=f"{platform_api_url}/api/v1/workflows/{WORKFLOW_ID}",
+        status_code=200,
+        json=_workflow_json(skip_preflight=True),
+    )
+
+    platform_client.workflows.update_workflow(
+        request=operations.UpdateWorkflowRequest(
+            workflow_id=WORKFLOW_ID,
+            update_workflow=shared.UpdateWorkflow(name="renamed"),
+        )
+    )
+
+    body = _sent_body(httpx_mock)
+    assert body == {"name": "renamed"}
+
+
+@pytest.mark.parametrize(
+    ("response_json", "expected"),
+    [
+        (_workflow_json(skip_preflight=True), True),
+        (_workflow_json(skip_preflight=False), False),
+        # Absent in the response - defaults to False rather than None.
+        (_workflow_json(), False),
+    ],
+)
+def test_workflow_information_reads_skip_preflight(
+    httpx_mock,
+    platform_client: UnstructuredClient,
+    platform_api_url: str,
+    response_json: dict,
+    expected: bool,
+):
+    """The response echo must be readable.
+
+    Without the field on the model, `extra="ignore"` silently drops what the server sent and a
+    caller cannot tell whether preflight is skipped.
+    """
+    httpx_mock.add_response(
+        method="GET",
+        url=f"{platform_api_url}/api/v1/workflows/{WORKFLOW_ID}",
+        status_code=200,
+        json=response_json,
+    )
+
+    response = platform_client.workflows.get_workflow(
+        request=operations.GetWorkflowRequest(workflow_id=WORKFLOW_ID)
+    )
+
+    assert response.workflow_information.skip_preflight is expected
+
+
+def test_update_workflow_skip_preflight_only_sends_nothing_else(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    """A partial update must carry *only* what the caller set.
+
+    The other tests assert the key is present. This one asserts nothing else leaked in, which is
+    what makes "omit means unchanged" safe: any extra key here would overwrite server state the
+    caller never mentioned.
+    """
+    httpx_mock.add_response(
+        method="PUT",
+        url=f"{platform_api_url}/api/v1/workflows/{WORKFLOW_ID}",
+        status_code=200,
+        json=_workflow_json(skip_preflight=True),
+    )
+
+    platform_client.workflows.update_workflow(
+        request=operations.UpdateWorkflowRequest(
+            workflow_id=WORKFLOW_ID,
+            update_workflow=shared.UpdateWorkflow(skip_preflight=True),
+        )
+    )
+
+    assert _sent_body(httpx_mock) == {"skip_preflight": True}

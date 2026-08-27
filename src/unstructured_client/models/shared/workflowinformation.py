@@ -28,6 +28,7 @@ class WorkflowInformationTypedDict(TypedDict):
     workflow_nodes: List[WorkflowNodeTypedDict]
     reprocess_all: NotRequired[bool]
     schedule: NotRequired[Nullable[WorkflowScheduleTypedDict]]
+    skip_preflight: NotRequired[bool]
     updated_at: NotRequired[Nullable[datetime]]
     workflow_type: NotRequired[Nullable[WorkflowType]]
 
@@ -51,13 +52,22 @@ class WorkflowInformation(BaseModel):
 
     schedule: OptionalNullable[WorkflowSchedule] = UNSET
 
+    skip_preflight: Optional[bool] = False
+    r"""Whether the job preflight check is skipped for this workflow."""
+
     updated_at: OptionalNullable[datetime] = UNSET
 
     workflow_type: OptionalNullable[WorkflowType] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = ["reprocess_all", "schedule", "updated_at", "workflow_type"]
+        optional_fields = [
+            "reprocess_all",
+            "schedule",
+            "skip_preflight",
+            "updated_at",
+            "workflow_type",
+        ]
         nullable_fields = ["schedule", "updated_at", "workflow_type"]
         null_default_fields = []
 
