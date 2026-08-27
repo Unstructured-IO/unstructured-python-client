@@ -184,12 +184,42 @@ def test_body_create_job_fold_preserves_the_callers_bytes(request_data):
     assert json.loads(folded)["skip_preflight"] is True
 
 
-@pytest.mark.parametrize("request_data", ["{}", "{ }", '{"a":1}  '])
+@pytest.mark.parametrize("request_data", ["{}", "{ }", '{"a":1}  ', '  {"a":1}'])
 def test_body_create_job_fold_handles_empty_and_padded_objects(request_data):
     """The splice has to cope with an empty object and with surrounding whitespace."""
     folded = shared.BodyCreateJob(
         request_data=request_data, skip_preflight=True
     ).request_data
+    assert json.loads(folded)["skip_preflight"] is True
+
+
+@pytest.mark.parametrize(
+    "request_data",
+    [
+        '{\n  "a": 1\n}\n',  # indentation and a trailing newline
+        '{\n  "x": 0.123456789012345678901\n}\n',  # ...alongside a number that must not move
+        '{"a":1}  ',  # trailing spaces
+        '  {"a":1}',  # leading spaces
+        "{ }",  # the gap inside an otherwise empty object
+    ],
+)
+def test_body_create_job_fold_preserves_surrounding_whitespace(request_data):
+    """Whitespace is insignificant to a parser, but the fold claims to preserve every byte.
+
+    Splicing the flag in must put the layout back: the indentation before the closing brace,
+    the newline after it, and anything ahead of the opening brace. Otherwise the payload is
+    quietly reformatted, which is the exact thing the splice exists to avoid.
+    """
+    folded = shared.BodyCreateJob(
+        request_data=request_data, skip_preflight=True
+    ).request_data
+
+    # Removing exactly what was inserted must give back the original, byte for byte.
+    inserted = '"skip_preflight": true'
+    restored = folded.replace(f",{inserted}", "", 1) if f",{inserted}" in folded else folded.replace(inserted, "", 1)
+    assert restored == request_data, (
+        f"fold did not preserve the payload: {request_data!r} -> {folded!r}"
+    )
     assert json.loads(folded)["skip_preflight"] is True
 
 
@@ -209,3 +239,50 @@ def test_body_create_job_fold_is_a_no_op_once_correct():
 
     unchanged = body.model_copy(update={"input_files": None})
     assert unchanged.request_data == folded
+
+
+def test_body_create_job_none_clears_a_previously_folded_flag():
+    """Clearing the flag must clear it from the payload too.
+
+    `None` is "no preference", which the server reads as not set. Leaving a stale
+    `"skip_preflight": true` behind would run the job with preflight off *after* the caller
+    cleared the flag - silent, and in the permissive direction.
+    """
+    body = shared.BodyCreateJob(request_data='{"a":1}', skip_preflight=True)
+    assert json.loads(body.request_data)["skip_preflight"] is True
+
+    body.skip_preflight = None
+    assert "skip_preflight" not in json.loads(body.request_data)
+
+    copied = shared.BodyCreateJob(
+        request_data='{"a":1}', skip_preflight=True
+    ).model_copy(update={"skip_preflight": None})
+    assert "skip_preflight" not in json.loads(copied.request_data)
+
+
+def test_body_create_job_unset_still_passes_a_caller_written_flag_through():
+    """`Unset` and `None` are not the same, and only `None` may rewrite the payload.
+
+    A caller who put `skip_preflight` in the JSON themselves and never touched the argument
+    has said nothing for the SDK to override, so those bytes must survive verbatim. Clearing
+    them here would be the SDK silently reversing the caller's own instruction.
+    """
+    written = '{"a":1,"skip_preflight":true}'
+    assert shared.BodyCreateJob(request_data=written).request_data == written
+
+
+@pytest.mark.parametrize(
+    "request_data", ["not json at all", '{"x": 1e5}', "{}"]
+)
+def test_body_create_job_none_is_harmless_when_there_is_nothing_to_clear(request_data):
+    """"No preference" has nothing to reject and nothing to rewrite.
+
+    Unlike the True/False paths it must not raise on a non-JSON payload: nothing was folded
+    into it, so there is nothing to undo.
+    """
+    assert (
+        shared.BodyCreateJob(
+            request_data=request_data, skip_preflight=None
+        ).request_data
+        == request_data
+    )

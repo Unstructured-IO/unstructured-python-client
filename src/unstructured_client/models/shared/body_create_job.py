@@ -81,13 +81,35 @@ class BodyCreateJob(BaseModel):
         """Write ``skip_preflight`` into ``request_data``, where the server reads it.
 
         Set explicitly, it wins over any value already in the JSON string: the parameter is the
-        more specific expression of intent. Left unset, ``request_data`` is passed through byte
-        for byte.
+        more specific expression of intent, and that includes ``None`` - "no preference" clears
+        a value an earlier fold left behind. Left *unset*, ``request_data`` is passed through
+        byte for byte, including a ``skip_preflight`` the caller wrote themselves.
         """
         # Tested with `isinstance`, not `is UNSET`: pydantic deep-copies the default per
         # instance, so an identity check against the UNSET singleton always fails and the
         # fold would run on every call.
-        if self.skip_preflight is None or isinstance(self.skip_preflight, Unset):
+        if isinstance(self.skip_preflight, Unset):
+            # Never mentioned. `request_data` is the caller's bytes, including a
+            # `skip_preflight` they wrote themselves; pass it through untouched.
+            return self
+
+        if self.skip_preflight is None:
+            # Explicitly "no preference", which the server reads as "not set". If an earlier
+            # fold left a value behind, drop it: the explicit argument wins over whatever is
+            # in the string, and a stale `true` here would run the job with preflight off
+            # after the caller cleared the flag.
+            try:
+                payload = json.loads(self.request_data)
+            except json.JSONDecodeError:
+                # Nothing was ever folded into a non-JSON payload, so there is nothing to
+                # undo. Unlike the True/False paths, "no preference" has no reason to reject.
+                return self
+            if isinstance(payload, dict) and "skip_preflight" in payload:
+                del payload["skip_preflight"]
+                # Removing a key cannot be spliced the way adding one can - it needs the
+                # key's span in the raw text - so this path re-encodes, with the same
+                # representation caveat as the branch below.
+                self.__dict__["request_data"] = json.dumps(payload, ensure_ascii=False)
             return self
 
         raw = self.request_data
@@ -126,10 +148,18 @@ class BodyCreateJob(BaseModel):
             # exactly as handed to us.
             #
             # json.loads succeeded and produced a dict, so the last non-space character is
-            # guaranteed to be the closing brace.
-            body = raw.rstrip()[:-1].rstrip()
-            separator = "" if body.endswith("{") else ","
-            folded = f'{body}{separator}"skip_preflight": {literal}}}'
+            # guaranteed to be the closing brace. Split the text around it and put every piece
+            # back, so indentation and trailing newlines survive too - insignificant to a JSON
+            # parser, but "every other byte" has to mean every other byte.
+            stripped = raw.rstrip()
+            trailing = raw[len(stripped) :]  # whitespace after the closing brace
+            head = stripped[:-1]  # everything before the closing brace
+            inner = head.rstrip()  # ...without the whitespace that preceded it
+            gap = head[len(inner) :]  # ...and that whitespace, kept aside
+            separator = "" if inner.endswith("{") else ","
+            folded = (
+                f'{inner}{separator}"skip_preflight": {literal}{gap}}}{trailing}'
+            )
 
         # Written through __dict__ on purpose: a normal assignment would re-enter this
         # validator under validate_assignment=True and recurse until the stack blows.

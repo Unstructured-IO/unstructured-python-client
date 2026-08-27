@@ -613,10 +613,15 @@ explicit `null` on the wire rather than omitting the field — but what the serv
 | --- | --- | --- |
 | `create_workflow` | `"skip_preflight": null` | treated as not set — preflight runs |
 | `update_workflow` | `"skip_preflight": null` | **leaves the stored value unchanged** — if the workflow already had preflight skipped, it stays skipped |
-| `create_job` | field absent (`request_data` untouched) | treated as not set — preflight runs |
+| `create_job` | field absent from `request_data` | treated as not set — preflight runs |
 
 So `None` is not a way to turn preflight back on for an existing workflow. Pass
 `skip_preflight=False` explicitly for that.
+
+On `create_job`, passing `None` also *clears* a value an earlier call had folded in, so a body you
+built with `skip_preflight=True` and then reset to `None` sends no flag at all. Leaving the argument
+**unset** is different: `request_data` is then passed through byte for byte, including a
+`skip_preflight` you wrote into the JSON yourself.
 
 Note on job statuses: `JobStatus` and `JobProcessingStatus` preserve a value this client version
 does not know rather than raising, so a status added server-side is not a client break. The
@@ -625,9 +630,17 @@ REJECTED)` would not recognise a *new* terminal status and would spin until its 
 poll, give the loop a deadline and treat an unrecognised status as a reason to stop and inspect,
 rather than assuming it is non-terminal.
 
-For the same reason these enums are not input validators: `some_string in shared.JobStatus` is
-true for *any* string, since the lookup that backs `in` is the same one that tolerates unknown
-values. Validate against `shared.JobStatus.__members__` if you need to reject unknown input.
+These enums are also not input validators. Do not use `some_string in shared.JobStatus` to
+decide whether a status is one this client knows: `in` on an enum changed twice in CPython, so
+across the versions this SDK supports the same expression raises `TypeError` on 3.11, returns
+`True` on 3.12 (where `in` consults the same lookup that tolerates unknown values), and returns
+`False` on 3.13. Validate against `shared.JobStatus.__members__` instead, which is a plain
+mapping of the declared members and behaves the same everywhere:
+
+```python
+if status not in shared.JobStatus.__members__:
+    ...  # a status this client version does not declare
+```
 
 ### Maturity
 
