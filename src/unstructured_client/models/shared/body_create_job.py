@@ -18,6 +18,44 @@ from unstructured_client.types import (
 from unstructured_client.utils import FieldMetadata, MultipartFormMetadata
 
 
+def _drop_skip_preflight(raw: str, payload: dict) -> str:
+    """Remove `skip_preflight` from `raw`, keeping every other byte where possible.
+
+    The fold writes a known, fixed fragment, so clearing it can be its exact inverse rather
+    than a re-encode. That matters: a re-encode preserves values but not their representation
+    (``1e5`` becomes ``100000.0``), and it would be inconsistent to protect the caller's bytes
+    when adding the flag and discard them when removing it.
+
+    The candidate is parsed and compared before being accepted, so a fragment that happens to
+    match a *nested* `skip_preflight` is rejected rather than silently corrupting the payload.
+    A caller who wrote the key with their own spacing will not match the fragment at all; that
+    falls back to a re-encode, which is correct but not byte-preserving.
+    """
+    expected = {k: v for k, v in payload.items() if k != "skip_preflight"}
+
+    current = payload["skip_preflight"]
+    if current is True or current is False:
+        literal = "true" if current else "false"
+        # Longest first: the comma form is what a non-empty object gets.
+        for fragment in (
+            f',"skip_preflight": {literal}',
+            f'"skip_preflight": {literal}',
+        ):
+            # From the right: the fold always appends after existing content, so when the
+            # payload also carries a nested `skip_preflight`, ours is the later one.
+            index = raw.rfind(fragment)
+            if index == -1:
+                continue
+            candidate = raw[:index] + raw[index + len(fragment) :]
+            try:
+                if json.loads(candidate) == expected:
+                    return candidate
+            except json.JSONDecodeError:
+                continue
+
+    return json.dumps(expected, ensure_ascii=False)
+
+
 class InputFilesTypedDict(TypedDict):
     content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
@@ -105,11 +143,9 @@ class BodyCreateJob(BaseModel):
                 # undo. Unlike the True/False paths, "no preference" has no reason to reject.
                 return self
             if isinstance(payload, dict) and "skip_preflight" in payload:
-                del payload["skip_preflight"]
-                # Removing a key cannot be spliced the way adding one can - it needs the
-                # key's span in the raw text - so this path re-encodes, with the same
-                # representation caveat as the branch below.
-                self.__dict__["request_data"] = json.dumps(payload, ensure_ascii=False)
+                self.__dict__["request_data"] = _drop_skip_preflight(
+                    self.request_data, payload
+                )
             return self
 
         raw = self.request_data

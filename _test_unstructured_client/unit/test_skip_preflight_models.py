@@ -286,3 +286,55 @@ def test_body_create_job_none_is_harmless_when_there_is_nothing_to_clear(request
         ).request_data
         == request_data
     )
+
+
+@pytest.mark.parametrize(
+    "request_data",
+    [
+        '{"a":1}',
+        "{}",
+        "{ }",
+        '{\n  "x": 1e5\n}\n',
+        '{"x": 0.123456789012345678901}',
+        '{"n": "café"}',
+        '{"a": {"b": 1}}',
+    ],
+)
+def test_body_create_job_fold_then_clear_is_a_round_trip(request_data):
+    """Clearing the flag must restore the caller's bytes, not re-encode them.
+
+    The fold writes a fixed fragment, so clearing can be its exact inverse. Re-encoding here
+    would preserve values but not their representation (`1e5` -> `100000.0`), which would be
+    inconsistent: protecting the payload when adding the flag and discarding it when removing
+    the flag.
+    """
+    body = shared.BodyCreateJob(request_data=request_data, skip_preflight=True)
+    assert json.loads(body.request_data)["skip_preflight"] is True
+
+    body.skip_preflight = None
+    assert body.request_data == request_data
+
+
+def test_body_create_job_clear_does_not_touch_a_nested_skip_preflight():
+    """The removal must find *our* fragment, not one nested inside the payload.
+
+    A naive first-match removal would strip the nested key and corrupt the caller's data. The
+    candidate is parsed and compared before being accepted, so a wrong match is rejected.
+    """
+    nested = '{"x":{"skip_preflight": true},"a":1}'
+    body = shared.BodyCreateJob(request_data=nested, skip_preflight=False)
+    body.skip_preflight = None
+
+    assert body.request_data == nested
+    assert json.loads(body.request_data) == {"x": {"skip_preflight": True}, "a": 1}
+
+
+def test_body_create_job_clear_falls_back_when_the_key_was_written_by_hand():
+    """A caller's own spacing will not match the fold's fragment, so this re-encodes.
+
+    Correct but not byte-preserving, and the flag must still be gone.
+    """
+    body = shared.BodyCreateJob(
+        request_data='{"a":1, "skip_preflight" : true}', skip_preflight=None
+    )
+    assert json.loads(body.request_data) == {"a": 1}
