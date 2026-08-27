@@ -1,3 +1,11 @@
+## 0.47.0
+
+### Features
+* Add `skip_preflight` to `shared.CreateWorkflow` and `shared.UpdateWorkflow` to opt a workflow out of the job pre-flight check, and to `shared.WorkflowInformation` to read the current setting back. It behaves like `reprocess_all`: omitting it on update leaves the stored value unchanged, while sending `false` opts back in. `shared.BodyCreateJob` accepts it as a plain argument and folds it into the `request_data` JSON where the server reads it, so callers no longer have to hand-edit that string; an explicit argument wins over a value already present in it.
+
+### Fixes
+* `JobStatus` and `JobProcessingStatus` gained `REJECTED`, so `jobs.get_job` and `jobs.list_jobs` no longer raise on a preflight-rejected job. Previously a single rejected job in a page failed the entire `list_jobs` call, since the page is validated as one list. Both enums now also preserve an unrecognised server-side status verbatim instead of raising, so the next status the server adds is not a client break.
+
 ## 0.46.2
 
 ### Fixes

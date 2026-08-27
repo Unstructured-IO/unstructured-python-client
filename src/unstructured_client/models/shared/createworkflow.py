@@ -36,6 +36,7 @@ class CreateWorkflowTypedDict(TypedDict):
     destination_id: NotRequired[Nullable[str]]
     reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[Schedule]]
+    skip_preflight: NotRequired[Nullable[bool]]
     source_id: NotRequired[Nullable[str]]
     template_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
@@ -52,6 +53,9 @@ class CreateWorkflow(BaseModel):
 
     schedule: OptionalNullable[Schedule] = UNSET
 
+    skip_preflight: OptionalNullable[bool] = UNSET
+    r"""Skip the job preflight check for this workflow. Preflight runs by default."""
+
     source_id: OptionalNullable[str] = UNSET
 
     template_id: OptionalNullable[str] = UNSET
@@ -64,6 +68,7 @@ class CreateWorkflow(BaseModel):
             "destination_id",
             "reprocess_all",
             "schedule",
+            "skip_preflight",
             "source_id",
             "template_id",
             "workflow_nodes",
@@ -72,6 +77,7 @@ class CreateWorkflow(BaseModel):
             "destination_id",
             "reprocess_all",
             "schedule",
+            "skip_preflight",
             "source_id",
             "template_id",
             "workflow_nodes",

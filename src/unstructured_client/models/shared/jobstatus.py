@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from enum import Enum
+from typing import Optional, cast
 
 
 class JobStatus(str, Enum):
@@ -10,3 +11,19 @@ class JobStatus(str, Enum):
     COMPLETED = "COMPLETED"
     STOPPED = "STOPPED"
     FAILED = "FAILED"
+    REJECTED = "REJECTED"
+
+    @classmethod
+    def _missing_(cls, value: object) -> Optional["JobStatus"]:
+        """Preserve a status this client does not know yet, instead of raising.
+
+        The server adds values on its own schedule; a closed enum breaks clients.
+        """
+        if not isinstance(value, str):
+            return None
+        pseudo = str.__new__(cls, value)
+        pseudo._name_ = value
+        pseudo._value_ = value
+        return cast(
+            "JobStatus", cls._value2member_map_.setdefault(value, pseudo)
+        )

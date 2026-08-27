@@ -533,6 +533,115 @@ s = UnstructuredClient(debug_logger=logging.getLogger("unstructured_client"))
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
 
+### Skipping the job preflight check
+
+Jobs run a preflight check by default, which validates connector credentials and configuration
+before any documents are processed. Set `skip_preflight` to opt out.
+
+On a workflow, the setting is stored and applies to every run of that workflow — including
+scheduled runs and `run_workflow`:
+
+```python
+from unstructured_client import UnstructuredClient
+from unstructured_client.models import operations, shared
+
+uc_client = UnstructuredClient(api_key_auth="YOUR_API_KEY")
+
+created = uc_client.workflows.create_workflow(
+    request=operations.CreateWorkflowRequest(
+        create_workflow=shared.CreateWorkflow(
+            name="my-workflow",
+            workflow_type=shared.WorkflowType.ADVANCED,
+            source_id="...",
+            destination_id="...",
+            skip_preflight=True,
+        )
+    )
+)
+print(created.workflow_information.skip_preflight)  # True
+```
+
+On update, **omitting** `skip_preflight` leaves the stored value alone; send `False` to opt back in:
+
+```python
+workflow_id = created.workflow_information.id
+
+# Renames the workflow; leaves skip_preflight as it was
+uc_client.workflows.update_workflow(
+    request=operations.UpdateWorkflowRequest(
+        workflow_id=workflow_id,
+        update_workflow=shared.UpdateWorkflow(name="renamed"),
+    )
+)
+
+# Turns preflight back on
+uc_client.workflows.update_workflow(
+    request=operations.UpdateWorkflowRequest(
+        workflow_id=workflow_id,
+        update_workflow=shared.UpdateWorkflow(skip_preflight=False),
+    )
+)
+```
+
+For a one-off job, pass it to `create_job`. The API carries this field inside the `request_data`
+JSON rather than as its own form field, and the SDK writes it there for you — so you do not need to
+edit that string yourself. An explicit `skip_preflight` argument wins over any value already in it:
+
+```python
+import json
+
+uc_client.jobs.create_job(
+    request=operations.CreateJobRequest(
+        body_create_job=shared.BodyCreateJob(
+            request_data=json.dumps({"job_nodes": [...]}),
+            skip_preflight=True,
+        )
+    )
+)
+```
+
+One exception, and the reason the example above uses `job_nodes` rather than `template_id`: a job
+created from a `template_id` may not run a preflight check in the first place, because it has no
+customer-supplied connector configuration to validate. Setting `skip_preflight` on such a job is
+accepted but has no effect — it is a no-op, not an error.
+
+`skip_preflight=None` means "no preference". Note that it is *sent* — the workflow models put an
+explicit `null` on the wire rather than omitting the field — but what the server does with that
+`null` differs per call:
+
+| Call | On the wire | Effect |
+| --- | --- | --- |
+| `create_workflow` | `"skip_preflight": null` | treated as not set — preflight runs |
+| `update_workflow` | `"skip_preflight": null` | **leaves the stored value unchanged** — if the workflow already had preflight skipped, it stays skipped |
+| `create_job` | field absent from `request_data` | treated as not set — preflight runs |
+
+So `None` is not a way to turn preflight back on for an existing workflow. Pass
+`skip_preflight=False` explicitly for that.
+
+On `create_job`, passing `None` also *clears* a value an earlier call had folded in, so a body you
+built with `skip_preflight=True` and then reset to `None` sends no flag at all. Leaving the argument
+**unset** is different: `request_data` is then passed through byte for byte, including a
+`skip_preflight` you wrote into the JSON yourself.
+
+Note on job statuses: `JobStatus` and `JobProcessingStatus` preserve a value this client version
+does not know rather than raising, so a status added server-side is not a client break. The
+trade-off is that a polling loop written as `while job.status not in (COMPLETED, FAILED, STOPPED,
+REJECTED)` would not recognise a *new* terminal status and would spin until its own timeout. If you
+poll, give the loop a deadline and treat an unrecognised status as a reason to stop and inspect,
+rather than assuming it is non-terminal.
+
+These enums are also not input validators. Do not use `some_string in shared.JobStatus` to
+decide whether a status is one this client knows: `in` on an enum changed twice in CPython, so
+across the versions this SDK supports the same expression raises `TypeError` on 3.11, returns
+`True` on 3.12 (where `in` consults the same lookup that tolerates unknown values), and returns
+`False` on 3.13. Validate against `shared.JobStatus.__members__` instead, which is a plain
+mapping of the declared members and behaves the same everywhere:
+
+```python
+if status not in shared.JobStatus.__members__:
+    ...  # a status this client version does not declare
+```
+
 ### Maturity
 
 This SDK is in beta, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning usage
