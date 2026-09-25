@@ -29,8 +29,7 @@ class PartitionAcceptEnum(str, Enum):
     a large document never has to be held in memory."""
 
 
-# NDJSON elements-file support. `partition.py` and this module are both .genignore'd so
-# these edits survive regeneration; see the notes in .genignore.
+# NDJSON elements-file support. This is a client-side custom edit to `general.py`.
 def _new_elements_file():
     return tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
         mode="wb", prefix="unst_elements_", suffix=".ndjson", delete=False

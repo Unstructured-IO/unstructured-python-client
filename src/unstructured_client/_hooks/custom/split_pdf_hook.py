@@ -1419,6 +1419,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         elements = []
         ndjson_mode = self.ndjson_mode.get(operation_id, False)
         chunk_paths: list[str] = []
+        # Positionally matches `chunk_paths`. Recombination needs each chunk's declared
+        # format to tell a well-formed zero-record NDJSON body from a malformed empty JSON
+        # one; both are an empty file on disk.
+        chunk_media_types: list[Optional[str]] = []
         # Subset of `chunk_paths` this method created itself, and so must clean up. The
         # rest belong to the operation's tempdir and are removed with it.
         spilled_chunk_paths: list[str] = []
@@ -1431,6 +1435,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 )
                 successful_responses.append(res)
                 if ndjson_mode:
+                    # Read before the cached branch overwrites the body with a path; the
+                    # header still describes what the server actually sent.
+                    chunk_media_types.append(res.headers.get("Content-Type"))
                     # Neither branch parses the body; that is what keeps peak memory at
                     # roughly one chunk during recombination.
                     if self.cache_tmp_data_feature.get(operation_id, DEFAULT_CACHE_TMP_DATA):
@@ -1496,7 +1503,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         if ndjson_mode:
             try:
                 if chunk_paths:
-                    self._combine_chunks_to_ndjson(operation_id, chunk_paths)
+                    self._combine_chunks_to_ndjson(operation_id, chunk_paths, chunk_media_types)
             finally:
                 # These are ours; the cached chunk files belong to the operation tempdir.
                 _unlink_quietly(spilled_chunk_paths)
@@ -1505,7 +1512,12 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         flattened_elements = [element for sublist in elements for element in sublist]
         return flattened_elements
 
-    def _combine_chunks_to_ndjson(self, operation_id: str, chunk_paths: list[str]) -> None:
+    def _combine_chunks_to_ndjson(
+        self,
+        operation_id: str,
+        chunk_paths: list[str],
+        chunk_media_types: Optional[list[Optional[str]]] = None,
+    ) -> None:
         """Concatenate the per-chunk files into one NDJSON file and record its path.
 
         `_build_after_success_response` turns the recorded path into the response. The
@@ -1523,7 +1535,9 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
         fd, staging_path = tempfile.mkstemp(suffix=".ndjson.partial", dir=temp_dir_path)
         os.close(fd)
         try:
-            written = request_utils.combine_chunk_files_to_ndjson(chunk_paths, staging_path)
+            written = request_utils.combine_chunk_files_to_ndjson(
+                chunk_paths, staging_path, chunk_media_types
+            )
             # Same directory, so this is atomic; the caller never sees a partial file.
             os.replace(staging_path, out_path)
         except BaseException:

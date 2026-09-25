@@ -290,6 +290,28 @@ NDJSON_MEDIA_TYPE = "application/x-ndjson"
 _SNIFF_BLOCK_SIZE = 64
 
 
+class EmptyChunkResponseError(ValueError):
+    """A split-PDF chunk returned HTTP 200 with a body its own media type cannot produce.
+
+    Whether an empty body is a defect depends on the format the chunk claims. JSON has no
+    empty document -- a chunk with no elements is `[]` -- so nothing at all is malformed,
+    and skipping it would make the document silently short with no way for the caller to
+    notice (`split_pdf_allow_failed` does not cover it, because the chunk reports
+    success). NDJSON is a record per line, so an empty body is a well-formed zero-record
+    response and is accepted.
+
+    Subclasses `ValueError` so that it lands where the buffered path's `JSONDecodeError`
+    (also a `ValueError`) already does for callers that guard the parse.
+    """
+
+
+def _is_ndjson_media_type(media_type: Optional[str]) -> bool:
+    """Whether a chunk's `Content-Type` declares NDJSON, ignoring any parameters."""
+    if not media_type:
+        return False
+    return media_type.split(";", 1)[0].strip().lower() == NDJSON_MEDIA_TYPE
+
+
 def _first_non_space_char(stream: TextIO) -> str:
     """Return the first non-whitespace character in `stream`, or "" if there is none."""
     while True:
@@ -301,7 +323,11 @@ def _first_non_space_char(stream: TextIO) -> str:
             return stripped[0]
 
 
-def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
+def combine_chunk_files_to_ndjson(
+    chunk_paths: list[str],
+    out_path: str,
+    media_types: Optional[list[Optional[str]]] = None,
+) -> int:
     """Combine per-chunk split-PDF response files into one NDJSON file on disk.
 
     Recombining chunks by parsing them builds four full copies of the document (a list
@@ -316,27 +342,57 @@ def combine_chunk_files_to_ndjson(chunk_paths: list[str], out_path: str) -> int:
 
     NDJSON chunks are copied through without parsing.
 
+    An empty body is read against the chunk's declared media type, which is the only
+    thing that distinguishes the two cases: NDJSON encodes zero records as zero lines, so
+    an empty NDJSON chunk contributes nothing and is fine; JSON has no empty document, so
+    an empty one is malformed and raises rather than silently shortening the result.
+    A chunk whose media type is unknown is treated as JSON -- that is what the deployed
+    API returns, and guessing NDJSON would reinstate the silent truncation.
+
     Args:
         chunk_paths: Per-chunk response files, in element order.
         out_path: File to write the combined NDJSON to.
+        media_types: The `Content-Type` each chunk was served with, positionally matching
+            `chunk_paths`. Omit when the media types are not known.
 
     Returns:
         The number of elements written.
+
+    Raises:
+        EmptyChunkResponseError: A non-NDJSON chunk returned 200 with an empty body.
     """
     total = 0
     with open(out_path, "w", encoding="utf-8") as out:
-        for chunk_path in chunk_paths:
+        for index, chunk_path in enumerate(chunk_paths):
+            media_type = media_types[index] if media_types is not None else None
             with open(chunk_path, "r", encoding="utf-8") as chunk:
                 first_char = _first_non_space_char(chunk)
                 if not first_char:
-                    # A 200 with an empty body. Log it, because otherwise the document is
-                    # silently short and the element count cannot be reconciled against
-                    # the chunk count.
-                    logger.warning(
-                        "split_pdf event=ndjson_empty_chunk file=%s",
+                    if _is_ndjson_media_type(media_type):
+                        # Zero records, spelled the only way NDJSON can spell it.
+                        logger.debug(
+                            "split_pdf event=ndjson_empty_chunk file=%s media_type=%s",
+                            os.path.basename(chunk_path),
+                            media_type,
+                        )
+                        continue
+                    # A JSON 200 with an empty body. Fail loudly: skipping it makes the
+                    # document silently short with no way for the caller to notice, since
+                    # this function's only output is the combined path. The buffered path
+                    # raises `JSONDecodeError` on the same response, so NDJSON mode must
+                    # not turn a hard failure into truncation.
+                    logger.error(
+                        "split_pdf event=empty_chunk_body file=%s media_type=%s",
                         os.path.basename(chunk_path),
+                        media_type,
                     )
-                    continue
+                    raise EmptyChunkResponseError(
+                        "A split-PDF chunk returned HTTP 200 with an empty body "
+                        f"({os.path.basename(chunk_path)}, Content-Type: "
+                        f"{media_type or 'unset'}); its elements would be missing from the "
+                        "combined output. A JSON chunk with no elements must be an empty "
+                        "array."
+                    )
                 chunk.seek(0)
 
                 if first_char == "[":

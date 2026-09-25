@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 import re
 
+import httpx
 import pytest
 import requests
-import httpx
-from httpx import Response, ConnectError
+from httpx import ConnectError, Response
 
 from _test_unstructured_client.unit_utils import FixtureRequest, Mock, method_mock
 from unstructured_client import UnstructuredClient
-from unstructured_client.models import shared, operations
+from unstructured_client._hooks.custom.clean_server_url_hook import clean_server_url
+from unstructured_client.models import operations, shared
 from unstructured_client.models.errors import SDKError
 from unstructured_client.utils.retries import BackoffStrategy, RetryConfig
 
@@ -34,7 +35,10 @@ def test_unit_retry_with_backoff_does_retry(caplog):
 
     def mock_post(request):
         request_count[0] += 1
-        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+        if (
+            request.url == "https://api.unstructuredapp.io/general/v0/general"
+            and request.method == "POST"
+        ):
             return Response(502, request=request)
 
     transport = httpx.MockTransport(mock_post)
@@ -69,7 +73,10 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
     )
 
     def mock_post(request):
-        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+        if (
+            request.url == "https://api.unstructuredapp.io/general/v0/general"
+            and request.method == "POST"
+        ):
             return Response(status_code, request=request)
 
     transport = httpx.MockTransport(mock_post)
@@ -83,11 +90,13 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
         partition_parameters=shared.PartitionParameters(files=files)
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         session.general.partition(request=req, retries=retries)
 
-    pattern = re.compile(f"Failed to process a request due to API server error with status code {status_code}. "
-                        "Attempting retry number 1 after sleep.")
+    pattern = re.compile(
+        f"Failed to process a request due to API server error with status code {status_code}. "
+        "Attempting retry number 1 after sleep."
+    )
     assert bool(pattern.search(caplog.text))
 
 
@@ -103,9 +112,11 @@ def test_unit_backoff_strategy_logs_retries_5XX(status_code: int, caplog):
         [502, True],
         [503, True],
         [504, True],
-    ]
+    ],
 )
-def test_unit_number_of_retries_in_failed_requests(status_code: int, expect_retry: bool):
+def test_unit_number_of_retries_in_failed_requests(
+    status_code: int, expect_retry: bool
+):
     filename = "README.md"
     backoff_strategy = BackoffStrategy(
         initial_interval=1, max_interval=10, exponent=1.5, max_elapsed_time=300
@@ -115,16 +126,18 @@ def test_unit_number_of_retries_in_failed_requests(status_code: int, expect_retr
     )
 
     number_of_requests = [0]
+
     def mock_post(request):
-        if request.url == "https://api.unstructuredapp.io/general/v0/general" and request.method == "POST":
+        if (
+            request.url == "https://api.unstructuredapp.io/general/v0/general"
+            and request.method == "POST"
+        ):
             number_of_requests[0] += 1
             return Response(status_code, request=request)
-
 
     transport = httpx.MockTransport(mock_post)
     client = httpx.Client(transport=transport)
     session = UnstructuredClient(api_key_auth=FAKE_KEY, client=client)
-
 
     with open(filename, "rb") as f:
         files = shared.Files(content=f.read(), file_name=filename)
@@ -166,11 +179,13 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
         partition_parameters=shared.PartitionParameters(files=files)
     )
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         session.general.partition(request=req, retries=retries)
 
-    pattern = re.compile("Failed to process a request due to transport error .*? "
-                         "Attempting retry number 1 after sleep.")
+    pattern = re.compile(
+        "Failed to process a request due to transport error .*? "
+        "Attempting retry number 1 after sleep."
+    )
     assert bool(pattern.search(caplog.text))
 
 
@@ -187,14 +202,71 @@ def test_unit_backoff_strategy_logs_retries_connection_error(caplog):
     ],
 )
 def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
     assert (
-        client.general.sdk_configuration.server_url
+        clean_server_url(server_url)
         == "https://unstructured-000mock.api.unstructuredapp.io"
     )
+
+
+@pytest.mark.parametrize(
+    "server_url",
+    [
+        # -- the value the Transform Platform's API Keys page hands you --
+        "https://platform-api.transform.unstructured.io/api/v1",
+        "http://platform-api.transform.unstructured.io/api/v1",
+        "platform-api.transform.unstructured.io/api/v1",
+        # -- well-formed url --
+        "https://platform-api.transform.unstructured.io",
+        "platform-api.transform.unstructured.io",
+    ],
+)
+def test_unit_clean_server_url_fixes_malformed_transform_platform_url(server_url: str):
+    assert (
+        clean_server_url(server_url) == "https://platform-api.transform.unstructured.io"
+    )
+
+
+@pytest.mark.parametrize(
+    "server_url,expected_url",
+    [
+        # -- the terminal root dot is a valid fully qualified name and still ours, so
+        # -- the path goes; the host is left exactly as the caller wrote it, because the
+        # -- dot is a deliberate DNS choice that changes the Host header and SNI --
+        (
+            "https://platform-api.transform.unstructured.io./api/v1",
+            "https://platform-api.transform.unstructured.io.",
+        ),
+        (
+            "https://unstructured-000mock.api.unstructuredapp.io./general/v0/general",
+            "https://unstructured-000mock.api.unstructuredapp.io.",
+        ),
+    ],
+)
+def test_unit_clean_server_url_handles_a_fully_qualified_host(
+    server_url: str, expected_url: str
+):
+    assert clean_server_url(server_url) == expected_url
+
+
+@pytest.mark.parametrize(
+    "server_url,expected_url",
+    [
+        # -- a host that merely CONTAINS an Unstructured domain is not ours, so its
+        # -- path and scheme are left alone --
+        (
+            "http://unstructuredapp.io.example.com/api/v1",
+            "http://unstructuredapp.io.example.com/api/v1",
+        ),
+        (
+            "http://not-unstructured.io/api/v1",
+            "http://not-unstructured.io/api/v1",
+        ),
+    ],
+)
+def test_unit_clean_server_url_leaves_lookalike_domains_alone(
+    server_url: str, expected_url: str
+):
+    assert clean_server_url(server_url) == expected_url
 
 
 @pytest.mark.parametrize(
@@ -202,16 +274,21 @@ def test_unit_clean_server_url_fixes_malformed_paid_api_url(server_url: str):
     [
         ("http://localhost:8000", "http://localhost:8000"),
         ("localhost:8000", "http://localhost:8000"),
-        ("localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
-        ("http://localhost:8000/general/v0/general", "http://localhost:8000/general/v0/general"),
+        (
+            "localhost:8000/general/v0/general",
+            "http://localhost:8000/general/v0/general",
+        ),
+        (
+            "http://localhost:8000/general/v0/general",
+            "http://localhost:8000/general/v0/general",
+        ),
     ],
 )
-def test_unit_clean_server_url_fixes_non_unst_domain_url(server_url: str, expected_url: str):
-    client = UnstructuredClient(
-        server_url=server_url,
-        api_key_auth=FAKE_KEY,
-    )
-    assert client.general.sdk_configuration.server_url == expected_url
+def test_unit_clean_server_url_fixes_non_unst_domain_url(
+    server_url: str, expected_url: str
+):
+    assert clean_server_url(server_url) == expected_url
+
 
 @pytest.mark.parametrize(
     "server_url",
@@ -222,10 +299,11 @@ def test_unit_clean_server_url_fixes_non_unst_domain_url(server_url: str, expect
         "unstructured-000mock.api.unstructuredapp.io/general/v0/general",
     ],
 )
-def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(server_url: str):
-    client = UnstructuredClient(FAKE_KEY, server_url=server_url)
+def test_unit_clean_server_url_fixes_malformed_urls_with_positional_arguments(
+    server_url: str,
+):
     assert (
-        client.general.sdk_configuration.server_url
+        clean_server_url(server_url)
         == "https://unstructured-000mock.api.unstructuredapp.io"
     )
 
@@ -247,11 +325,8 @@ def test_after_error_hook_logs(caplog, session_: Mock, response_: requests.Sessi
     )
     with pytest.raises(SDKError, match="API error occurred: Status 401"):
         session.general.partition(request=req)
-    
-    assert any(
-        "Server responded with 401"
-        in message for message in caplog.messages
-    )
+
+    assert any("Server responded with 401" in message for message in caplog.messages)
 
 
 # -- fixtures --------------------------------------------------------------------------------
