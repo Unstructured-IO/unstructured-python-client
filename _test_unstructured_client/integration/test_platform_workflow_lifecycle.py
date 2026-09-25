@@ -224,7 +224,10 @@ def test_workflow_lifecycle(
         assert delete_response.status_code in [200, 204]
 
 
-def test_workflow_lifecycle_with_custom_dag_job(platform_client: UnstructuredClient):
+def test_workflow_lifecycle_with_custom_dag_job(
+    platform_client: UnstructuredClient,
+    doc_path: Path,
+):
     """
     Test creating a job with a custom DAG (ephemeral job type).
     """
@@ -253,12 +256,22 @@ def test_workflow_lifecycle_with_custom_dag_job(platform_client: UnstructuredCli
     request_data = json.dumps({
         "job_nodes": custom_nodes,
     })
-    
+
+    pdf_filename = "layout-parser-paper-fast.pdf"
+    pdf_content = (doc_path / pdf_filename).read_bytes()
+
     create_job_response = call_with_rate_limit_retry(
         platform_client.jobs.create_job,
         request=operations.CreateJobRequest(
             body_create_job=shared.BodyCreateJob(
                 request_data=request_data,
+                input_files=[
+                    shared.InputFiles(
+                        content=pdf_content,
+                        file_name=pdf_filename,
+                        content_type="application/pdf",
+                    )
+                ],
             )
         )
     )
