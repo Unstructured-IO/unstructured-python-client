@@ -35,7 +35,6 @@ from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_SPLIT_PDF_PAGE_KEY,
     PARTITION_FORM_STARTING_PAGE_NUMBER_KEY,
 )
-from unstructured_client._hooks.custom.request_utils import get_base_url
 from unstructured_client._hooks.types import (
     AfterErrorContext,
     AfterErrorHook,
@@ -64,6 +63,17 @@ TIMEOUT_BUFFER_SECONDS = 5
 DEFAULT_FUTURE_TIMEOUT_MINUTES = 60
 OPERATION_ID_EXTENSION_KEY = "split_pdf_operation_id"
 SPLIT_PDF_HEADER_PREFIX = "X-Unstructured-Split-"
+
+
+def _get_collection_url(partition_url: httpx.URL) -> httpx.URL:
+    """Keep deployment prefixes when switching to the split collection route.
+
+    Use the encoded path and replace only the terminal partition route. The
+    collection request does not inherit partition query parameters or fragments.
+    """
+    path = partition_url.raw_path.split(b"?", 1)[0]
+    collection_path = path.removesuffix(b"/general/v0/general") + b"/general/docs"
+    return partition_url.copy_with(raw_path=collection_path, query=None, fragment=None)
 
 
 class ChunkExecutionError(Exception):
@@ -719,11 +729,11 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             the synthetic collection request; otherwise, the original request.
         """
 
-        # Actually the general.partition operation overwrites the default client's base url (as
-        # the platform operations do). Here we need to get the base url from the request object.
+        # general.partition can override the client URL, so derive the collection URL
+        # from the actual partition request, preserving its deployment prefix.
         if hook_ctx.operation_id != "partition":
             return request
-        partition_base_url = get_base_url(request.url)
+        collection_url = _get_collection_url(request.url)
 
         if self.client is None:
             logger.warning("HTTP client not accessible! Continuing without splitting.")
@@ -926,7 +936,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             dummy_request_extensions[OPERATION_ID_EXTENSION_KEY] = operation_id
             return httpx.Request(
                 "GET",
-                f"{partition_base_url}/general/docs",
+                collection_url,
                 headers={"operation_id": operation_id},
                 extensions=dummy_request_extensions,
             )

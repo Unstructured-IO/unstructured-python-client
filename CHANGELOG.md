@@ -1,3 +1,8 @@
+## 0.46.3
+
+### Fixes
+* Keep the deployment path in split-PDF requests. With a `server_url` that includes a path, such as `https://host/deployment`, splitting a PDF sent its collection request to `https://host/general/docs` instead of `https://host/deployment/general/docs`, which returned 404 before any chunks were processed. The collection URL is now derived from the partition request by replacing only its trailing `/general/v0/general` route, for sync and async calls and for a `server_url` passed to the operation.
+
 ## 0.46.2
 
 ### Fixes
