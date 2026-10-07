@@ -725,14 +725,12 @@ def test_before_request_raises_pdf_validation_error_when_pdf_check_fails():
     
     with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
          patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
-         patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
-         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url:
+         patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf:
         
         # Set up the mocks
         mock_get_fields.return_value = mock_form_data
         mock_read_pdf.return_value = mock_pdf_reader
         mock_check_pdf.side_effect = pdf_utils.PDFValidationError(error_message)
-        mock_get_base_url.return_value = "http://localhost:8888"
         
         # Call the method under test and verify it raises PDFValidationError
         with pytest.raises(pdf_utils.PDFValidationError) as exc_info:
@@ -857,14 +855,12 @@ def _make_hook_with_split_request(
     with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
          patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
          patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
-         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url, \
          patch.object(hook, "_trim_large_pages", side_effect=lambda pdf, fd: pdf), \
          patch.object(hook, "_get_pdf_chunk_paths", return_value=[]), \
          patch.object(hook, "_get_pdf_chunks_in_memory", return_value=pdf_chunks or []):
         mock_get_fields.return_value = form_data
         mock_read_pdf.return_value = mock_pdf_reader
         mock_check_pdf.return_value = mock_pdf_reader
-        mock_get_base_url.return_value = "http://localhost:8888"
 
         result = hook.before_request(hook_ctx, request)
 
@@ -2169,7 +2165,6 @@ def test_before_request_failure_after_state_setup_cleans_partial_operation():
     with patch("unstructured_client._hooks.custom.request_utils.get_multipart_stream_fields") as mock_get_fields, \
          patch("unstructured_client._hooks.custom.pdf_utils.read_pdf") as mock_read_pdf, \
          patch("unstructured_client._hooks.custom.pdf_utils.check_pdf") as mock_check_pdf, \
-         patch("unstructured_client._hooks.custom.request_utils.get_base_url") as mock_get_base_url, \
          patch("unstructured_client._hooks.custom.split_pdf_hook.futures.ThreadPoolExecutor", return_value=executor), \
          patch("unstructured_client._hooks.custom.request_utils.create_pdf_chunk_request", side_effect=RuntimeError("chunk build failed")), \
          patch.object(hook, "_trim_large_pages", side_effect=lambda pdf, fd: pdf), \
@@ -2178,7 +2173,6 @@ def test_before_request_failure_after_state_setup_cleans_partial_operation():
         mock_get_fields.return_value = mock_form_data
         mock_read_pdf.return_value = mock_pdf_reader
         mock_check_pdf.return_value = mock_pdf_reader
-        mock_get_base_url.return_value = "http://localhost:8888"
 
         with pytest.raises(RuntimeError, match="chunk build failed"):
             hook.before_request(hook_ctx, request)
