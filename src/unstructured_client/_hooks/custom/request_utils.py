@@ -137,38 +137,62 @@ def create_pdf_chunk_request(
     original_request: httpx.Request,
     filename: str,
 ) -> httpx.Request:
+    """Creates a new PDF-chunk request for the partition API.
+
+    Thin wrapper over `create_document_chunk_request` that sends the chunk as a
+    PDF payload.
+    """
+    return create_document_chunk_request(
+        form_data=form_data,
+        document_chunk=pdf_chunk,
+        original_request=original_request,
+        filename=filename,
+        content_type="application/pdf",
+    )
+
+
+def create_document_chunk_request(
+    form_data: FormData,
+    document_chunk: Tuple[BinaryIO, int],
+    original_request: httpx.Request,
+    filename: str,
+    content_type: str,
+) -> httpx.Request:
     """Creates a new request object with the updated payload for the partition API.
 
     Args:
         form_data: The form data.
-        pdf_chunk: Tuple of pdf chunk contents (can be both io.BytesIO or
+        document_chunk: Tuple of chunk contents (can be both io.BytesIO or
             a file object created with e.g. open()) and the page number.
         original_request: The original request.
-        filename: The filename.
+        filename: The filename. The original filename (and therefore its
+            extension) is preserved so the server detects the chunk's file type.
+        content_type: The MIME type to declare for the chunk file (e.g.
+            "application/pdf" for PDF chunks).
 
     Returns:
         The updated request object.
     """
-    pdf_chunk_file, page_number = pdf_chunk
+    chunk_file, page_number = document_chunk
     data = create_pdf_chunk_request_params(form_data, page_number)
     original_headers = prepare_request_headers(original_request.headers)
 
-    pdf_chunk_content: BinaryIO | bytes = (
-        pdf_chunk_file.getvalue()
-        if isinstance(pdf_chunk_file, io.BytesIO)
-        else pdf_chunk_file
+    chunk_content: BinaryIO | bytes = (
+        chunk_file.getvalue()
+        if isinstance(chunk_file, io.BytesIO)
+        else chunk_file
     )
 
-    pdf_chunk_partition_params = shared.PartitionParameters(
+    chunk_partition_params = shared.PartitionParameters(
         files=shared.Files(
-            content=pdf_chunk_content,
+            content=chunk_content,
             file_name=filename,
-            content_type="application/pdf",
+            content_type=content_type,
         ),
         **data,
     )
     serialized_body = serialize_request_body(
-        pdf_chunk_partition_params,
+        chunk_partition_params,
         False,
         False,
         "multipart",
