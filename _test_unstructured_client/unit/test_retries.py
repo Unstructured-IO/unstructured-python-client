@@ -573,6 +573,12 @@ class TestPermanentErrorShortCircuit:
         (b'[{"retryable":false}]', "application/json", False),
         (b'false', "application/json", False),
         (b'{broken', "application/json", False),
+        pytest.param(
+            b'{"retryable":false,"detail":' + b"[" * 100_000 + b"]" * 100_000 + b"}",
+            "application/json",
+            False,
+            id="deeply-nested",
+        ),
         (b'upstream error', "text/plain", False),
         (b'{"retryable":false}', "text/plain", True),
         (b'{"retryable":false}', "", True),

@@ -91,7 +91,7 @@ def _declares_non_retryable(response: httpx.Response) -> bool:
     # Inspect buffered error bodies without consuming unread response streams.
     try:
         body = response.json()
-    except (ValueError, httpx.ResponseNotRead):
+    except (ValueError, RecursionError, httpx.ResponseNotRead):
         return False
     return isinstance(body, dict) and body.get("retryable") is False
 
