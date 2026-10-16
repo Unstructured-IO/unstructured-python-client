@@ -9,6 +9,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -37,6 +41,10 @@ jobs:
         GH_TOKEN: ${{ github.token }}
         RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
+        if ! grep -qE '^(New drift|Stale baseline):' drift.txt; then
+          echo "The check failed without reporting drift; see the previous step."
+          exit 0
+        fi
         title="SDK models have drifted from the API spec"
         body="$(printf '%s\n\n```\n%s\n```\n\nSee CONTRIBUTING.md, \"Keeping models in sync with the API\".' "$RUN_URL" "$(cat drift.txt)")"
         number="$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')"
