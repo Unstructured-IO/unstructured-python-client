@@ -5,6 +5,8 @@ from unittest.mock import MagicMock
 import httpx
 import pytest
 
+from unstructured_client import UnstructuredClient
+from unstructured_client.models.errors import ServerError
 from unstructured_client.utils import retries as retries_module
 from unstructured_client.utils.retries import (
     BackoffStrategy,
@@ -557,9 +559,24 @@ class TestPermanentErrorShortCircuit:
         assert call_count == 1
 
 
+def _send_with_retry(respond, config, async_mode, *, stream=False):
+    transport = httpx.MockTransport(respond)
+    if async_mode:
+        async def run():
+            async with httpx.AsyncClient(transport=transport) as client:
+                return await retry_async(
+                    lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=stream),
+                    config,
+                )
+        return asyncio.run(run())
+    with httpx.Client(transport=transport) as client:
+        return retry(
+            lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=stream),
+            config,
+        )
+
+
 @pytest.mark.parametrize("async_mode", [False, True])
-@pytest.mark.parametrize("status_code", [500, 503])
-@pytest.mark.parametrize("status_codes", [["5xx"], ["500", "503"]])
 @pytest.mark.parametrize(
     "body,content_type,stop",
     [
@@ -585,8 +602,9 @@ class TestPermanentErrorShortCircuit:
     ],
 )
 def test_declared_retry_verdict(
-    fake_clock, async_mode, status_code, status_codes, body, content_type, stop
+    fake_clock, async_mode, body, content_type, stop
 ):
+    status_code = 503
     attempts = []
 
     def respond(request):
@@ -595,16 +613,8 @@ def test_declared_retry_verdict(
             return httpx.Response(status_code, content=body, headers={"Content-Type": content_type})
         return httpx.Response(200, json=[])
 
-    config = _retries(status_codes=status_codes, initial_interval=1, max_interval=1)
-    transport = httpx.MockTransport(respond)
-    if async_mode:
-        async def run():
-            async with httpx.AsyncClient(transport=transport) as client:
-                return await retry_async(lambda: client.get("http://test.invalid"), config)
-        result = asyncio.run(run())
-    else:
-        with httpx.Client(transport=transport) as client:
-            result = retry(lambda: client.get("http://test.invalid"), config)
+    config = _retries(status_codes=["5xx"], initial_interval=1, max_interval=1)
+    result = _send_with_retry(respond, config, async_mode)
 
     assert len(attempts) == (1 if stop else 2)
     assert result.status_code == (status_code if stop else 200)
@@ -622,15 +632,8 @@ def test_declared_verdict_does_not_retry_non_matching_status(fake_clock, async_m
         return httpx.Response(400, json={"retryable": verdict})
 
     config = _retries(status_codes=["5xx"])
-    transport = httpx.MockTransport(respond)
-    if async_mode:
-        async def run():
-            async with httpx.AsyncClient(transport=transport) as client:
-                return await retry_async(lambda: client.get("http://test.invalid"), config)
-        response = asyncio.run(run())
-    else:
-        with httpx.Client(transport=transport) as client:
-            response = retry(lambda: client.get("http://test.invalid"), config)
+    response = _send_with_retry(respond, config, async_mode)
+
     assert response.status_code == 400
     assert len(attempts) == 1
 
@@ -659,19 +662,8 @@ def test_unread_stream_is_not_consumed(fake_clock, async_mode):
         return httpx.Response(200)
 
     config = _retries(status_codes=["5xx"])
-    transport = httpx.MockTransport(respond)
-    if async_mode:
-        async def run():
-            async with httpx.AsyncClient(transport=transport) as client:
-                return await retry_async(
-                    lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=True), config
-                )
-        result = asyncio.run(run())
-    else:
-        with httpx.Client(transport=transport) as client:
-            result = retry(
-                lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=True), config
-            )
+    result = _send_with_retry(respond, config, async_mode, stream=True)
+
     assert result.status_code == 200
     assert len(attempts) == 2
 
@@ -679,9 +671,6 @@ def test_unread_stream_is_not_consumed(fake_clock, async_mode):
 @pytest.mark.parametrize("async_mode", [False, True])
 @pytest.mark.parametrize("status_code", [500, 503])
 def test_public_partition_preserves_declared_error(fake_clock, async_mode, status_code):
-    from unstructured_client import UnstructuredClient
-    from unstructured_client.models.errors import ServerError
-
     body = {"detail": "unsupported document", "retryable": False}
     attempts = []
 
@@ -710,4 +699,19 @@ def test_public_partition_preserves_declared_error(fake_clock, async_mode, statu
                 assert "unsupported document" in str(exc.value)
 
     asyncio.run(run())
+    assert len(attempts) == 1
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@pytest.mark.parametrize("status_code", [500, 503])
+@pytest.mark.parametrize("status_codes", [["5xx"], ["500", "503"]])
+def test_declared_verdict_stops_matching_status(fake_clock, async_mode, status_code, status_codes):
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        return httpx.Response(status_code, json={"retryable": False})
+
+    response = _send_with_retry(respond, _retries(status_codes=status_codes), async_mode)
+    assert response.status_code == status_code
     assert len(attempts) == 1
