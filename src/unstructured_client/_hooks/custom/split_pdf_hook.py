@@ -445,7 +445,8 @@ def _create_transport_error_response(error: BaseException) -> httpx.Response:
 
 def _cancel_running_tasks() -> None:
     for task in asyncio.all_tasks():
-        if not task.done() and not request_utils._is_settling_io_task(task):
+        # Paired private hooks share ownership of settling response I/O.
+        if not task.done() and not request_utils._is_settling_io_task(task):  # pylint: disable=protected-access
             task.cancel()
 
 
