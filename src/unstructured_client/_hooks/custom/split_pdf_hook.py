@@ -298,10 +298,9 @@ async def run_tasks(
 
     limits = _resolve_pool_limits()
     verify, cert = _resolve_tls_config()
-    keepalive = resolve_tcp_keepalive()
 
     logger.debug(
-        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s tcp_keepalive=%s tcp_keepalive_idle=%d tcp_keepalive_interval=%d tcp_keepalive_count=%d",
+        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s tcp_keepalive=%s",
         operation_id,
         len(coroutines),
         concurrency_level,
@@ -311,15 +310,11 @@ async def run_tasks(
         limits.max_keepalive_connections,
         limits.keepalive_expiry,
         _describe_tls_config(verify, cert),
-        keepalive.enabled,
-        keepalive.idle,
-        keepalive.interval,
-        keepalive.count,
+        resolve_tcp_keepalive().describe(),
     )
 
     async with create_async_http_client(
-        timeout=client_timeout, keepalive=keepalive,
-        transport_options={"limits": limits, "verify": verify, "cert": cert},
+        timeout=client_timeout, limits=limits, verify=verify, cert=cert,
     ) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
         tasks = [
@@ -913,9 +908,8 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
 
             plan_limits = _resolve_pool_limits()
             plan_verify, plan_cert = _resolve_tls_config()
-            plan_keepalive = resolve_tcp_keepalive()
             logger.info(
-                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s tcp_keepalive=%s tcp_keepalive_idle=%d tcp_keepalive_interval=%d tcp_keepalive_count=%d",
+                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s tcp_keepalive=%s",
                 operation_id,
                 Path(pdf_file_meta["filename"]).name,
                 form_data.get("strategy"),
@@ -938,10 +932,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 plan_limits.max_keepalive_connections,
                 plan_limits.keepalive_expiry,
                 _describe_tls_config(plan_verify, plan_cert),
-                plan_keepalive.enabled,
-                plan_keepalive.idle,
-                plan_keepalive.interval,
-                plan_keepalive.count,
+                resolve_tcp_keepalive().describe(),
             )
 
             self.pending_operation_ids[operation_id] = operation_id

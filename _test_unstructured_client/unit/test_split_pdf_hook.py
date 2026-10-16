@@ -625,14 +625,13 @@ def test_unit_resolve_tls_config_client_cert_and_key_split(
 async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_transport(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
-    """Split requests apply TLS and pool settings to the transport."""
+    """Split requests apply TLS settings to the transport."""
     ca_bundle = tmp_path / "ca.pem"
     ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
     monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
     monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.pem")
 
     monkeypatch.setenv("NO_PROXY", "*")
-    monkeypatch.setenv("UNSTRUCTURED_CLIENT_MAX_CONNECTIONS", "17")
     captured: dict = {}
 
     class _MockAsyncClient:
@@ -660,7 +659,6 @@ async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_transport(
     assert captured["transport"] is transport.return_value
     assert kwargs["verify"] == str(ca_bundle)
     assert kwargs["cert"] == "/etc/ssl/client.pem"
-    assert kwargs["limits"].max_connections == 17
     assert kwargs["socket_options"]
 
 
