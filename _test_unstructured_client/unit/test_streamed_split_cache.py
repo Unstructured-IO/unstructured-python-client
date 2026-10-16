@@ -2,10 +2,12 @@
 import asyncio
 import io
 import gzip
+import gc
 import threading
 from pathlib import Path
 
 import httpx
+import httpcore
 import pytest
 
 from unstructured_client._hooks.custom import request_utils as ru
@@ -387,3 +389,184 @@ async def test_failed_publication_cleans_reserved_final_and_keeps_existing_artif
     assert body.closed
     assert list(tmp_path.iterdir()) == [existing]
     assert existing.read_bytes() == b"previous result"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("cancel", [False, True])
+@pytest.mark.parametrize("transport_kind", ["equivalent", "httpcore"])
+async def test_iterator_finalizer_close_stays_owned_through_failed_write(tmp_path, monkeypatch, cancel, transport_kind):
+    current = asyncio.current_task()
+    all_tasks = asyncio.all_tasks
+    monkeypatch.setattr(hook_module.asyncio, "all_tasks", lambda: all_tasks() - {current})
+    file_close_entered, file_close_release = threading.Event(), threading.Event()
+    transport_close_entered, transport_close_release = asyncio.Event(), asyncio.Event()
+    original_fdopen = ru.os.fdopen
+    class SlowFileClose:
+        def __init__(self, file):
+            self.file = file
+        @property
+        def closed(self):
+            return self.file.closed
+        def write(self, content):
+            raise OSError("primary disk failure")
+        def close(self):
+            file_close_entered.set()
+            assert file_close_release.wait(3)
+            self.file.close()
+    class FinalizerClose(Body):
+        closing = False
+        completed = False
+        closer = None
+        async def __aiter__(self):
+            try:
+                yield b"x" * 65536
+                yield b"unread"
+            finally:
+                await self.aclose()
+        async def aclose(self):
+            if self.closing:
+                return
+            self.closing = True
+            self.closer = asyncio.current_task()
+            transport_close_entered.set()
+            await transport_close_release.wait()
+            self.completed = True
+            self.closed = True
+    class NetworkStream(httpcore.AsyncNetworkStream):
+        def __init__(self, gated):
+            payload = b"x" * 131072 if gated else b"[]"
+            self.data = (b"HTTP/1.1 200 OK\r\nContent-Length: " + str(len(payload)).encode()
+                         + b"\r\nConnection: close\r\n\r\n" + payload)
+            self.gated = gated
+            self.completed = False
+            self.closer = None
+        async def read(self, max_bytes, timeout=None):
+            result, self.data = self.data[:max_bytes], self.data[max_bytes:]
+            return result
+        async def write(self, buffer, timeout=None):
+            pass
+        async def start_tls(self, ssl_context, server_hostname=None, timeout=None):
+            return self
+        async def aclose(self):
+            self.closer = asyncio.current_task()
+            if self.gated:
+                transport_close_entered.set()
+                await transport_close_release.wait()
+            self.completed = True
+    class Backend(httpcore.AsyncNetworkBackend):
+        def __init__(self):
+            self.connections = []
+        async def connect_tcp(self, host, port, **kwargs):
+            stream = NetworkStream(gated=not self.connections)
+            self.connections.append(stream)
+            return stream
+    backend = Backend()
+    first = FinalizerClose()
+    if transport_kind == "httpcore":
+        transport = httpx.AsyncHTTPTransport()
+        transport._pool = httpcore.AsyncConnectionPool(network_backend=backend)
+    else:
+        bodies = [first, Body([b"[]"])]
+        transport = httpx.MockTransport(lambda request: httpx.Response(200, stream=bodies.pop(0)))
+    monkeypatch.setattr(ru.os, "fdopen", lambda *a, **kw: SlowFileClose(original_fdopen(*a, **kw)))
+    limiter = asyncio.Semaphore(1)
+    async with httpx.AsyncClient(transport=transport) as client:
+        task = asyncio.create_task(call(client, tmp_path, limiter=limiter))
+        try:
+            assert await asyncio.to_thread(file_close_entered.wait, 2)
+            if transport_kind == "httpcore":
+                first = backend.connections[0]
+            # Give abandoned async generators a chance to initiate transport close.
+            gc.collect()
+            for _ in range(20):
+                await asyncio.sleep(0)
+            file_close_release.set()
+            await asyncio.wait_for(transport_close_entered.wait(), 2)
+            for _ in range(20):
+                await asyncio.sleep(0)
+            assert not task.done(), "attempt released admission before actual transport close"
+            assert limiter.locked()
+            assert ru._is_settling_io_task(first.closer)
+            if cancel:
+                hook_module._cancel_running_tasks()
+                await asyncio.sleep(0)
+                hook_module._cancel_running_tasks()
+                await asyncio.sleep(0)
+                assert not task.done()
+                assert not first.closer.cancelled()
+            transport_close_release.set()
+            with pytest.raises(asyncio.CancelledError if cancel else OSError, match=None if cancel else "primary disk failure"):
+                await task
+            assert first.completed
+            assert not limiter.locked()
+            assert not list(tmp_path.iterdir())
+            monkeypatch.setattr(ru.os, "fdopen", original_fdopen)
+            response = await call(client, tmp_path, limiter=limiter)
+            assert Path(response.text).read_bytes() == b"[]"
+            if transport_kind == "httpcore":
+                assert len(backend.connections) == 2
+                assert all(connection.completed for connection in backend.connections)
+                assert not transport._pool.connections
+        finally:
+            file_close_release.set()
+            transport_close_release.set()
+            await asyncio.gather(task, return_exceptions=True)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("stream_close_fails", [False, True])
+async def test_iterator_close_failure_cannot_publish_or_mask_stream_close(tmp_path, stream_close_fails):
+    class Iterator:
+        yielded = False
+        close_attempted = False
+        def __aiter__(self):
+            return self
+        async def __anext__(self):
+            if self.yielded:
+                raise StopAsyncIteration
+            self.yielded = True
+            return b"complete"
+        async def aclose(self):
+            self.close_attempted = True
+            raise ValueError("secondary iterator close failure")
+    class Stream(httpx.AsyncByteStream):
+        iterator = Iterator()
+        close_attempted = False
+        def __aiter__(self):
+            return self.iterator
+        async def aclose(self):
+            self.close_attempted = True
+            if stream_close_fails:
+                raise OSError("primary stream close failure")
+    stream = Stream()
+    response = httpx.Response(200, stream=ru._SettledResponseStream(stream))
+    with pytest.raises(OSError if stream_close_fails else ValueError,
+                       match="primary stream close failure" if stream_close_fails else "secondary iterator close failure"):
+        await ru._cache_streamed_response(response, str(tmp_path))
+    assert stream.close_attempted
+    assert stream.iterator.close_attempted
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.asyncio
+async def test_self_iterating_stream_is_closed_once(tmp_path):
+    class Stream(httpx.AsyncByteStream):
+        yielded = False
+        closes = 0
+        def __aiter__(self):
+            return self
+        async def __anext__(self):
+            if self.yielded:
+                raise StopAsyncIteration
+            self.yielded = True
+            return b"complete"
+        async def aclose(self):
+            self.closes += 1
+            assert self.closes == 1
+    stream = Stream()
+    wrapped = ru._SettledResponseStream(stream)
+    response = httpx.Response(200, stream=wrapped)
+    cached = await ru._cache_streamed_response(response, str(tmp_path))
+    await wrapped.aclose()
+    assert stream.closes == 1
+    assert Path(cached.text).read_bytes() == b"complete"

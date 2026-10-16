@@ -8,7 +8,7 @@ import os
 import tempfile
 import sys
 import weakref
-from typing import Tuple, Any, Awaitable, BinaryIO, Optional, TextIO, TypeVar
+from typing import Tuple, Any, AsyncIterator, Awaitable, BinaryIO, Optional, TextIO, TypeVar
 
 import httpx
 from httpx._multipart import DataField, FileField
@@ -224,16 +224,39 @@ class _SettledResponseStream(httpx.AsyncByteStream):
 
     def __init__(self, stream: httpx.AsyncByteStream):
         self._stream = stream
+        self._iterator: Optional[AsyncIterator[bytes]] = None
+        self._close_task: Optional[asyncio.Task[None]] = None
 
     async def __aiter__(self):
-        async for chunk in self._stream:
+        # Retain the transport iterator when a cache write interrupts iteration.
+        # Otherwise async-generator finalization can start an unowned close that
+        # sets closed flags before its actual transport cleanup has settled.
+        if self._iterator is None:
+            self._iterator = self._stream.__aiter__()
+        async for chunk in self._iterator:
             yield chunk
 
+    async def _close(self) -> None:
+        try:
+            await self._stream.aclose()
+        finally:
+            preserving_error = sys.exc_info()[0] is not None
+            iterator = self._iterator
+            self._iterator = None
+            if iterator is not None and iterator is not self._stream and hasattr(iterator, "aclose"):
+                try:
+                    await iterator.aclose()
+                except Exception:
+                    if not preserving_error:
+                        raise
+                    logger.warning("Failed to finalize a failed response iterator", exc_info=True)
+
     async def aclose(self) -> None:
-        # HTTPX marks a response closed before awaiting its stream close. A
-        # cancellation at that await must not leave the underlying close running
-        # or incomplete while our caller releases admission and deletes files.
-        await _settle_io(self._stream.aclose())
+        # Every close entry point joins the same operation, including HTTPX's
+        # automatic EOF close, which sets response.is_closed before awaiting us.
+        if self._close_task is None:
+            self._close_task = asyncio.create_task(self._close())
+        await _settle_io(self._close_task)
 
 
 def _write_all(file: BinaryIO, content: bytes) -> None:
