@@ -1,24 +1,28 @@
-"""HTTP clients with TCP keepalive and HTTPX environment proxy routing."""
+"""HTTP clients with TCP keepalive for direct connections and environment proxy routing."""
 
 import logging
 import os
 import socket
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 import httpx
-from httpx._utils import get_environment_proxies
+try:
+    from httpx._utils import get_environment_proxies
+except ImportError:
+    get_environment_proxies = None  # type: ignore[assignment]
 
 from .common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 
 logger = logging.getLogger(UNSTRUCTURED_CLIENT_LOGGER_NAME)
 
 
-def _positive_int(name: str, default: int) -> int:
+def _positive_int(name: str, default: int, maximum: int) -> int:
     value = os.getenv(name, str(default))
     try:
         parsed = int(value)
-        if parsed > 0:
+        if 1 <= parsed <= maximum:
             return parsed
     except ValueError:
         pass
@@ -54,14 +58,19 @@ class TCPKeepAlive:
 
 
 def resolve_tcp_keepalive() -> TCPKeepAlive:
-    """Read keepalive settings, falling back on invalid positive integers."""
+    """Read keepalive settings, falling back on values outside the supported bounds."""
     prefix = "UNSTRUCTURED_CLIENT_TCP_KEEPALIVE"
     return TCPKeepAlive(
         enabled=os.getenv(prefix, "1").strip().lower() not in ("0", "false"),
-        idle=_positive_int(prefix + "_IDLE", 60),
-        interval=_positive_int(prefix + "_INTERVAL", 30),
-        count=_positive_int(prefix + "_COUNT", 5),
+        idle=_positive_int(prefix + "_IDLE", 60, 32767),
+        interval=_positive_int(prefix + "_INTERVAL", 30, 32767),
+        count=_positive_int(prefix + "_COUNT", 5, 127),
     )
+
+
+@lru_cache(maxsize=1)
+def _log_keepalive_unavailable() -> None:
+    logger.debug("TCP keepalive is unavailable with this httpx version")
 
 
 def _client_transport_options(
@@ -69,10 +78,14 @@ def _client_transport_options(
     keepalive: TCPKeepAlive | None,
     transport_options: dict[str, Any],
 ) -> dict[str, Any]:
+    if get_environment_proxies is None:
+        _log_keepalive_unavailable()
+        return transport_options
     settings = keepalive if keepalive is not None else resolve_tcp_keepalive()
     options = dict(transport_options, socket_options=settings.socket_options())
     # HTTPX disables automatic environment proxy discovery with a custom transport.
     # Reuse its URL patterns, including None mounts for NO_PROXY exclusions.
+    # HTTP and SOCKS proxy connections do not apply these socket options.
     mounts = {
         pattern: transport_type(proxy=proxy, **options) if proxy else None
         for pattern, proxy in get_environment_proxies().items()

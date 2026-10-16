@@ -5,6 +5,7 @@ import socket
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from unittest.mock import patch
 
 import httpcore
 import httpx
@@ -16,6 +17,8 @@ from unstructured_client._hooks.custom import http_transport as transport
 
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch):
+    if hasattr(transport, "_log_keepalive_unavailable"):
+        transport._log_keepalive_unavailable.cache_clear()
     for suffix in ("", "_IDLE", "_INTERVAL", "_COUNT"):
         monkeypatch.delenv("UNSTRUCTURED_CLIENT_TCP_KEEPALIVE" + suffix, raising=False)
     monkeypatch.setenv("NO_PROXY", "*")
@@ -50,6 +53,43 @@ def test_unit_invalid_value(monkeypatch, caplog, suffix, default, value):
     assert "using default" in caplog.text
 
 
+@pytest.mark.parametrize("suffix,maximum,default", [
+    ("IDLE", 32767, 60), ("INTERVAL", 32767, 30), ("COUNT", 127, 5),
+])
+@pytest.mark.parametrize("above_maximum", [False, True])
+def test_unit_value_bounds(monkeypatch, caplog, suffix, maximum, default, above_maximum):
+    monkeypatch.setenv("UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_" + suffix,
+                       str(maximum + int(above_maximum)))
+    expected = default if above_maximum else maximum
+    assert getattr(transport.resolve_tcp_keepalive(), suffix.lower()) == expected
+    assert ("using default" in caplog.text) == above_maximum
+
+
+@pytest.mark.parametrize("asynchronous", [False, True])
+def test_unit_missing_proxy_helper_client_options(monkeypatch, asynchronous):
+    monkeypatch.setattr(transport, "get_environment_proxies", None)
+    if asynchronous:
+        options = {"verify": False, "cert": None, "limits": httpx.Limits(max_connections=3)}
+        with patch.object(httpx, "AsyncClient") as constructor:
+            transport.create_async_http_client(timeout=42, transport_options=options)
+        constructor.assert_called_once_with(timeout=42, **options)
+    else:
+        with patch.object(httpx, "Client") as constructor:
+            transport.create_http_client()
+        constructor.assert_called_once_with()
+
+
+def test_unit_missing_proxy_helper_logs_once(monkeypatch, caplog):
+    monkeypatch.setattr(transport, "get_environment_proxies", None)
+    caplog.set_level("DEBUG", logger=transport.logger.name)
+    with transport.create_http_client():
+        pass
+    asyncio.run(transport.create_async_http_client().aclose())
+    messages = [record for record in caplog.records if "TCP keepalive is unavailable" in record.message]
+    assert len(messages) == 1
+    assert messages[0].levelname == "DEBUG"
+
+
 def test_unit_custom_values(monkeypatch):
     for suffix, value in (("IDLE", "5"), ("INTERVAL", "6"), ("COUNT", "7")):
         monkeypatch.setenv("UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_" + suffix, value)
@@ -81,15 +121,20 @@ def test_unit_supplied_clients_untouched():
     asyncio.run(asynchronous.aclose())
 
 
+@pytest.mark.parametrize("missing_proxy_helper", [False, True])
 @pytest.mark.parametrize("asynchronous", [False, True])
-def test_unit_environment_proxy_routes(monkeypatch, asynchronous):
+def test_unit_environment_proxy_routes(monkeypatch, asynchronous, missing_proxy_helper):
+    if missing_proxy_helper:
+        monkeypatch.setattr(transport, "get_environment_proxies", None)
     monkeypatch.setenv("HTTPS_PROXY", "http://127.0.0.1:8123")
     monkeypatch.setenv("NO_PROXY", "excluded.example")
     client = transport.create_async_http_client() if asynchronous else transport.create_http_client()
     proxied = client._transport_for_url(httpx.URL("https://api.example"))
     assert isinstance(proxied._pool, httpcore.AsyncHTTPProxy if asynchronous else httpcore.HTTPProxy)
     assert proxied._pool._proxy_url.host == b"127.0.0.1"
-    assert proxied._pool._socket_options == transport.resolve_tcp_keepalive().socket_options()
+    if missing_proxy_helper:
+        assert client._transport._pool._socket_options is None
+        assert proxied._pool._socket_options is None
     assert client._transport_for_url(httpx.URL("https://excluded.example")) is client._transport
     if asynchronous:
         asyncio.run(client.aclose())

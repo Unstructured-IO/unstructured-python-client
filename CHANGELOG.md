@@ -6,7 +6,7 @@
 ## 0.46.3
 
 ### Fixes
-* Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF and environment-proxy connections. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
+* Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF requests. Connections made through an HTTP(S)/SOCKS proxy are not covered. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
 * Keep the deployment path in split-PDF requests. With a `server_url` that includes a path, such as `https://host/deployment`, splitting a PDF sent its collection request to `https://host/general/docs` instead of `https://host/deployment/general/docs`, which returned 404 before any chunks were processed. The collection URL is now derived from the partition request by replacing only its trailing `/general/v0/general` route, for sync and async calls and for a `server_url` passed to the operation.
 
 ## 0.46.2
