@@ -152,8 +152,8 @@ def test_unit_environment_proxy_routes(monkeypatch, asynchronous, missing_proxy_
     assert isinstance(proxied._pool, httpcore.AsyncHTTPProxy if asynchronous else httpcore.HTTPProxy)
     assert proxied._pool._proxy_url.host == b"127.0.0.1"
     assert proxied._pool._socket_options is None
-    if missing_proxy_helper:
-        assert client._transport._pool._socket_options is None
+    expected = None if missing_proxy_helper else transport.resolve_tcp_keepalive().socket_options()
+    assert client._transport._pool._socket_options == expected
     assert client._transport_for_url(httpx.URL("https://excluded.example")) is client._transport
     _close(client)
 
@@ -172,7 +172,11 @@ def test_unit_real_socket_keepalive(asynchronous):
     def check(response):
         stream = response.extensions["network_stream"]
         sock = stream.get_extra_info("socket")
-        assert sock.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+        for level, option, value in transport.resolve_tcp_keepalive().socket_options():
+            if (level, option) == (socket.SOL_SOCKET, socket.SO_KEEPALIVE):
+                assert sock.getsockopt(level, option)
+            else:
+                assert sock.getsockopt(level, option) == value
 
     async def request():
         async with transport.create_async_http_client() as client:
