@@ -251,9 +251,9 @@ def test_list_jobs_tolerates_rejected_and_unrecognized_statuses(
 
     jobs = platform_client.jobs.list_jobs(request=operations.ListJobsRequest()).response_list_jobs
 
-    assert [j.status for j in jobs] == ["REJECTED", "SOME_FUTURE_STATUS", "COMPLETED"]
     assert jobs[0].status is shared.JobStatus.REJECTED
     assert type(jobs[1].status) is str
+    assert jobs[1].status == "SOME_FUTURE_STATUS"
     assert jobs[2].status is shared.JobStatus.COMPLETED
 
 

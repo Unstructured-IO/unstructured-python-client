@@ -70,7 +70,7 @@ lint:
 
 .PHONY: check-spec-drift
 check-spec-drift:
-	PYTHONPATH=. uv run python scripts/check_spec_drift.py
+	uv run python scripts/check_spec_drift.py
 
 .PHONY: publish
 publish:

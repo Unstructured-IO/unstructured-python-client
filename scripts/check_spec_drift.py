@@ -2,9 +2,11 @@
 
 Each component schema in the public OpenAPI specs is matched by name to a model or
 enum in ``unstructured_client.models.shared``. A property missing from a model, or a
-value missing from an enum, is drift. Drift recorded in the baseline file is
-acknowledged; anything else, or a baseline entry that no longer applies, fails the
-check.
+value missing from an enum, is drift. An enum declared inline on a property is
+compared with the enum its model field is typed with.
+
+Drift recorded in the baseline file is acknowledged; anything else, or a baseline
+entry that no longer applies, fails the check.
 
     uv run python scripts/check_spec_drift.py
     uv run python scripts/check_spec_drift.py --update-baseline
@@ -19,7 +21,7 @@ import re
 import sys
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Set, Type, Union
+from typing import Any, Dict, List, Set, Type, Union, get_args
 
 import pydantic
 
@@ -48,9 +50,42 @@ def _sdk_types() -> Dict[str, SdkType]:
     return types
 
 
+def _inline_enum_values(schema: Any) -> Set[str]:
+    if not isinstance(schema, dict):
+        return set()
+    values = {str(value) for value in schema.get("enum", [])}
+    for key in ("anyOf", "oneOf", "allOf"):
+        for option in schema.get(key, []):
+            values |= _inline_enum_values(option)
+    return values | _inline_enum_values(schema.get("items"))
+
+
+def _enum_values(annotation: Any) -> Set[str]:
+    if isinstance(annotation, type) and issubclass(annotation, enum.Enum):
+        return {str(member.value) for member in annotation}
+    values: Set[str] = set()
+    for arg in get_args(annotation):
+        values |= _enum_values(arg)
+    return values
+
+
 def _fetch(url: str) -> dict:
     with urllib.request.urlopen(url, timeout=30) as response:
         return json.load(response)
+
+
+def _schema_drift(name: str, schema: dict, sdk_type: SdkType) -> Dict[str, Set[str]]:
+    if issubclass(sdk_type, enum.Enum):
+        return {name: _inline_enum_values(schema) - _enum_values(sdk_type)}
+
+    fields = {f.alias or n: f for n, f in sdk_type.model_fields.items()}
+    properties = schema.get("properties", {})
+    drift = {name: set(properties) - set(fields)}
+    for prop_name, prop_schema in properties.items():
+        field_enum = _enum_values(fields[prop_name].annotation) if prop_name in fields else set()
+        if field_enum:
+            drift[f"{name}.{prop_name}"] = _inline_enum_values(prop_schema) - field_enum
+    return drift
 
 
 def find_drift(specs: List[dict]) -> Drift:
@@ -61,15 +96,9 @@ def find_drift(specs: List[dict]) -> Drift:
             sdk_type = sdk_types.get(_normalize(schema_name))
             if sdk_type is None:
                 continue
-            if issubclass(sdk_type, enum.Enum):
-                known = {str(member.value) for member in sdk_type}
-                missing = {str(value) for value in schema.get("enum", [])} - known
-            else:
-                known = {f.alias or n for n, f in sdk_type.model_fields.items()}
-                missing = set(schema.get("properties", {})) - known
-            if missing:
-                drift.setdefault(schema_name, set()).update(missing)
-    return {name: sorted(values) for name, values in sorted(drift.items())}
+            for name, missing in _schema_drift(schema_name, schema, sdk_type).items():
+                drift.setdefault(name, set()).update(missing)
+    return {name: sorted(values) for name, values in sorted(drift.items()) if values}
 
 
 def _subtract(drift: Drift, other: Drift) -> Drift:
@@ -107,8 +136,8 @@ def main() -> int:
         print(f"Stale baseline: {name} is no longer missing {', '.join(values)}")
     if new or stale:
         print(
-            "\nUpdate the SDK models for new drift, or acknowledge it with "
-            "--update-baseline. Remove stale entries with --update-baseline."
+            "\nCover new drift in the SDK models, then run with --update-baseline "
+            "to record any drift left uncovered and drop stale entries."
         )
         return 1
 
