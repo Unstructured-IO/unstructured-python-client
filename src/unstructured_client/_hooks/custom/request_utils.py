@@ -6,7 +6,9 @@ import json
 import logging
 import os
 import tempfile
-from typing import Tuple, Any, BinaryIO, Optional, TextIO
+import sys
+import weakref
+from typing import Tuple, Any, Awaitable, BinaryIO, Optional, TextIO, TypeVar
 
 import httpx
 from httpx._multipart import DataField, FileField
@@ -186,6 +188,132 @@ def create_pdf_chunk_request(
     )
 
 
+_IOResult = TypeVar("_IOResult")
+_settling_tasks: weakref.WeakSet[asyncio.Future[Any]] = weakref.WeakSet()
+
+
+def _is_settling_io_task(task: asyncio.Future[Any]) -> bool:
+    """The sync worker may cancel request tasks, but must let owned I/O settle."""
+    return task in _settling_tasks
+
+
+async def _settle_io(awaitable: Awaitable[_IOResult]) -> _IOResult:
+    """Finish an owned I/O operation before cancellation can release its resources."""
+    task = asyncio.ensure_future(awaitable)
+    _settling_tasks.add(task)
+    try:
+        try:
+            return await asyncio.shield(task)
+        except asyncio.CancelledError:
+            while not task.done():
+                try:
+                    await asyncio.shield(task)
+                except asyncio.CancelledError:
+                    continue
+                except Exception:
+                    break
+            if not task.cancelled():
+                task.exception()
+            raise
+    finally:
+        _settling_tasks.discard(task)
+
+
+class _SettledResponseStream(httpx.AsyncByteStream):
+    """Protect HTTPX's automatic EOF close as well as explicit cleanup."""
+
+    def __init__(self, stream: httpx.AsyncByteStream):
+        self._stream = stream
+
+    async def __aiter__(self):
+        async for chunk in self._stream:
+            yield chunk
+
+    async def aclose(self) -> None:
+        # HTTPX marks a response closed before awaiting its stream close. A
+        # cancellation at that await must not leave the underlying close running
+        # or incomplete while our caller releases admission and deletes files.
+        await _settle_io(self._stream.aclose())
+
+
+def _write_all(file: BinaryIO, content: bytes) -> None:
+    remaining = memoryview(content)
+    while remaining:
+        written = file.write(remaining)
+        if not written:
+            raise OSError("Cache write made no progress")
+        remaining = remaining[written:]
+
+
+async def _cache_streamed_response(response: httpx.Response, directory: str) -> httpx.Response:
+    """Publish a path only after the HTTP entity and owned I/O close cleanly."""
+    path: Optional[str] = None
+    final_path: Optional[str] = None
+    file: Optional[BinaryIO] = None
+    published = False
+    try:
+        fd, path = tempfile.mkstemp(prefix="chunk-", suffix=".partial", dir=directory)
+        try:
+            file = os.fdopen(fd, "wb", buffering=0)
+        except BaseException:
+            os.close(fd)
+            raise
+        async for content in response.aiter_bytes(chunk_size=64 * 1024):
+            await _settle_io(asyncio.get_running_loop().run_in_executor(None, _write_all, file, content))
+        await _settle_io(asyncio.get_running_loop().run_in_executor(None, file.close))
+        file = None
+        await _settle_io(response.aclose())
+        # Reserve the final name exclusively: a reused partial-file stem must
+        # never overwrite a previously returned cache artifact. No final name
+        # exists until the entity, file and response have all closed cleanly.
+        final_fd, final_path = tempfile.mkstemp(prefix="chunk-", suffix=".json", dir=directory)
+        os.close(final_fd)
+        cached = httpx.Response(
+            status_code=response.status_code,
+            # Entity bytes are decoded before caching. The synthetic payload is
+            # a filename, so wire compression/framing headers no longer apply.
+            headers={key: value for key, value in response.headers.items()
+                     if key.lower() not in {"content-encoding", "content-length", "transfer-encoding"}},
+            content=final_path.encode(),
+            extensions=response.extensions,
+        )
+        os.replace(path, final_path)
+        published = True
+        return cached
+    finally:
+        preserving_error = sys.exc_info()[0] is not None
+        try:
+            try:
+                if file is not None and not file.closed:
+                    await _settle_io(asyncio.get_running_loop().run_in_executor(None, file.close))
+            except Exception:
+                if not preserving_error:
+                    raise
+                logger.warning("Failed to close a failed chunk cache", exc_info=True)
+        finally:
+            try:
+                try:
+                    if not response.is_closed:
+                        await _settle_io(response.aclose())
+                except Exception:
+                    if not preserving_error:
+                        raise
+                    logger.warning("Failed to close a failed chunk response", exc_info=True)
+            finally:
+                if not published:
+                    for failed_path in (path, final_path):
+                        if failed_path is None:
+                            continue
+                        try:
+                            os.unlink(failed_path)
+                        except FileNotFoundError:
+                            pass
+                        except OSError:
+                            if not preserving_error:
+                                raise
+                            logger.warning("Failed to remove a failed chunk cache", exc_info=True)
+
+
 async def call_api_async(
     client: httpx.AsyncClient,
     pdf_chunk_request: httpx.Request,
@@ -195,12 +323,27 @@ async def call_api_async(
     operation_id: Optional[str] = None,
     chunk_index: Optional[int] = None,
     page_number: Optional[int] = None,
+    cache_response_dir: Optional[str] = None,
 ) -> httpx.Response:
     retryable_codes = ["5xx"]
     effective_retry_config = create_split_retry_config(retry_config)
 
     async def do_request():
-        return await client.send(pdf_chunk_request)
+        if cache_response_dir is None:
+            return await client.send(pdf_chunk_request)
+        response = await client.send(pdf_chunk_request, stream=True)
+        assert isinstance(response.stream, httpx.AsyncByteStream)
+        response.stream = _SettledResponseStream(response.stream)
+        if response.status_code == 200:
+            # The retry envelope includes body reads and the admission permit
+            # remains held through cache publication and response close.
+            return await _cache_streamed_response(response, cache_response_dir)
+        try:
+            # Error bodies remain available to retry classification and callers.
+            await response.aread()
+            return response
+        finally:
+            await _settle_io(response.aclose())
 
     async with limiter:
         try:
