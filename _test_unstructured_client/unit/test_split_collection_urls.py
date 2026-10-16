@@ -62,7 +62,7 @@ def make_sdk(monkeypatch, prefix, override):
     monkeypatch.setattr(
         httpx,
         "AsyncClient",
-        lambda **kwargs: original_async_client(transport=transport, **kwargs),
+        lambda **kwargs: original_async_client(**dict(kwargs, transport=transport, mounts={})),
     )
     return sdk, sent, sync_client, async_client
 
