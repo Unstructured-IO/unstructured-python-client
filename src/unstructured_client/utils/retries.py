@@ -87,6 +87,15 @@ class PermanentError(Exception):
         self.inner = inner
 
 
+def _declares_non_retryable(response: httpx.Response) -> bool:
+    # Inspect buffered error bodies without consuming unread response streams.
+    try:
+        body = response.json()
+    except (ValueError, httpx.ResponseNotRead):
+        return False
+    return isinstance(body, dict) and body.get("retryable") is False
+
+
 def retry(func, retries: Retries):
     if retries.config.strategy == "backoff":
 
@@ -101,12 +110,18 @@ def retry(func, retries: Retries):
 
                         status_major = res.status_code / 100
 
-                        if code_range <= status_major < code_range + 1:
+                        if (
+                            code_range <= status_major < code_range + 1
+                            and not _declares_non_retryable(res)
+                        ):
                             raise TemporaryError(res)
                     else:
                         parsed_code = int(code)
 
-                        if res.status_code == parsed_code:
+                        if (
+                            res.status_code == parsed_code
+                            and not _declares_non_retryable(res)
+                        ):
                             raise TemporaryError(res)
             except httpx.TransportError as exception:
                 if retries.config.retry_connection_errors:
@@ -147,12 +162,18 @@ async def retry_async(func, retries: Retries):
 
                         status_major = res.status_code / 100
 
-                        if code_range <= status_major < code_range + 1:
+                        if (
+                            code_range <= status_major < code_range + 1
+                            and not _declares_non_retryable(res)
+                        ):
                             raise TemporaryError(res)
                     else:
                         parsed_code = int(code)
 
-                        if res.status_code == parsed_code:
+                        if (
+                            res.status_code == parsed_code
+                            and not _declares_non_retryable(res)
+                        ):
                             raise TemporaryError(res)
             except httpx.TransportError as exception:
                 if retries.config.retry_connection_errors:
