@@ -83,3 +83,9 @@ actions:
   - target: $["components"]["schemas"]["DestinationConnectorType"]
     update:
       "x-speakeasy-unknown-values": "allow"
+  - target: $["components"]["schemas"]["JobStatus"]
+    update:
+      "x-speakeasy-unknown-values": "allow"
+  - target: $["components"]["schemas"]["JobProcessingStatus"]
+    update:
+      "x-speakeasy-unknown-values": "allow"

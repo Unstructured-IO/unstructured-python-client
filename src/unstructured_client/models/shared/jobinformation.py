@@ -5,22 +5,23 @@ from .jobstatus import JobStatus
 from .nodefilemetadata import NodeFileMetadata, NodeFileMetadataTypedDict
 from .workflowjobtype import WorkflowJobType
 from datetime import datetime
-from pydantic import model_serializer
-from typing import List, Optional
-from typing_extensions import NotRequired, TypedDict
+from pydantic import Field, model_serializer
+from typing import List, Optional, Union
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
     Nullable,
     OptionalNullable,
     UNSET,
     UNSET_SENTINEL,
+    UnrecognizedStr,
 )
 
 
 class JobInformationTypedDict(TypedDict):
     created_at: datetime
     id: str
-    status: JobStatus
+    status: Union[JobStatus, UnrecognizedStr]
     workflow_id: str
     workflow_name: str
     input_file_ids: NotRequired[Nullable[List[str]]]
@@ -34,7 +35,9 @@ class JobInformation(BaseModel):
 
     id: str
 
-    status: JobStatus
+    status: Annotated[
+        Union[JobStatus, UnrecognizedStr], Field(union_mode="left_to_right")
+    ]
 
     workflow_id: str
 

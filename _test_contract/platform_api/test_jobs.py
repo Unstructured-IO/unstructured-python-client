@@ -222,3 +222,71 @@ def test_create_job(httpx_mock, platform_client: UnstructuredClient, platform_ap
     assert job.status == "SCHEDULED"
     assert job.job_type == "template"
     assert job.created_at == datetime.fromisoformat("2025-06-22T11:37:21.648+00:00")
+
+
+def test_list_jobs_tolerates_rejected_and_unrecognized_statuses(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    url = f"{platform_api_url}/api/v1/jobs/"
+
+    def job(job_id: str, status: str) -> dict:
+        return {
+            "created_at": "2025-06-22T11:37:21.648Z",
+            "id": job_id,
+            "status": status,
+            "workflow_id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
+            "workflow_name": "test_workflow",
+        }
+
+    httpx_mock.add_response(
+        method="GET",
+        headers={"Content-Type": "application/json"},
+        json=[
+            job("fcdc4994-eea5-425c-91fa-e03f2bd8030d", "REJECTED"),
+            job("a1b2c3d4-eea5-425c-91fa-e03f2bd8030d", "SOME_FUTURE_STATUS"),
+            job("b2c3d4e5-eea5-425c-91fa-e03f2bd8030d", "COMPLETED"),
+        ],
+        url=url,
+    )
+
+    jobs = platform_client.jobs.list_jobs(request=operations.ListJobsRequest()).response_list_jobs
+
+    assert [j.status for j in jobs] == ["REJECTED", "SOME_FUTURE_STATUS", "COMPLETED"]
+    assert jobs[0].status is shared.JobStatus.REJECTED
+    assert type(jobs[1].status) is str
+    assert jobs[2].status is shared.JobStatus.COMPLETED
+
+
+@pytest.mark.parametrize(
+    ("processing_status", "expected"),
+    [
+        ("REJECTED", shared.JobProcessingStatus.REJECTED),
+        ("SOME_FUTURE_STATUS", "SOME_FUTURE_STATUS"),
+    ],
+)
+def test_get_job_details_tolerates_rejected_and_unrecognized_statuses(
+    httpx_mock,
+    platform_client: UnstructuredClient,
+    platform_api_url: str,
+    processing_status: str,
+    expected,
+):
+    url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d/details"
+
+    httpx_mock.add_response(
+        method="GET",
+        headers={"Content-Type": "application/json"},
+        json={
+            "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
+            "node_stats": [],
+            "processing_status": processing_status,
+        },
+        url=url,
+    )
+
+    details = platform_client.jobs.get_job_details(
+        request=operations.GetJobDetailsRequest(job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d")
+    ).job_details
+
+    assert details.processing_status == expected
+    assert type(details.processing_status) is type(expected)

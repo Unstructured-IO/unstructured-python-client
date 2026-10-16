@@ -1,0 +1,86 @@
+{
+  "Body_create_job": [
+    "input_file_ids"
+  ],
+  "CreateDestinationConnector": [
+    "key"
+  ],
+  "CreateSourceConnector": [
+    "key"
+  ],
+  "CreateWorkflow": [
+    "destination_ids",
+    "key",
+    "source_ids"
+  ],
+  "DestinationConnectorInformation": [
+    "key"
+  ],
+  "DestinationConnectorType": [
+    "teradata"
+  ],
+  "EncryptionType": [
+    "runtime_config"
+  ],
+  "FailedFile": [
+    "node"
+  ],
+  "JobDetails": [
+    "completion_issue",
+    "progress",
+    "queued_behind_job_ids_snapshot",
+    "summary"
+  ],
+  "JobFailedFiles": [
+    "limit",
+    "next_offset",
+    "offset",
+    "total"
+  ],
+  "JobInformation": [
+    "completion_issue",
+    "created_by_id",
+    "failed_file_count",
+    "processing_status",
+    "reason",
+    "stop_requested"
+  ],
+  "JobNodeDetails": [
+    "failure_category",
+    "failure_reason",
+    "last_change_at",
+    "node_id",
+    "node_phase",
+    "node_phase_observed_at"
+  ],
+  "SourceConnectorInformation": [
+    "key"
+  ],
+  "SourceConnectorType": [
+    "teradata"
+  ],
+  "UpdateDestinationConnector": [
+    "name"
+  ],
+  "UpdateSourceConnector": [
+    "name"
+  ],
+  "UpdateWorkflow": [
+    "state"
+  ],
+  "ValidationError": [
+    "ctx",
+    "input"
+  ],
+  "WorkflowInformation": [
+    "edit_lock",
+    "key"
+  ],
+  "partition_parameters": [
+    "contextual_chunking_auth",
+    "contextual_chunking_service_name",
+    "isolate_table",
+    "skip_table_chunking",
+    "tracking_enabled"
+  ]
+}

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytest
@@ -257,3 +258,65 @@ def test_run_workflow(httpx_mock, platform_client: UnstructuredClient, platform_
     assert new_job.id == "fcdc4994-eea5-425c-91fa-e03f2bd8030d"
     assert new_job.workflow_name == "test_workflow"
     assert new_job.status == "IN_PROGRESS"
+
+WORKFLOW_RESPONSE = {
+    "created_at": "2025-06-22T11:37:21.648Z",
+    "destinations": [],
+    "id": "16b80fee-64dc-472d-8f26-1d7729b6423d",
+    "name": "test_workflow",
+    "sources": [],
+    "workflow_nodes": [],
+    "status": "active",
+}
+
+
+def test_create_workflow_sends_skip_preflight(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    httpx_mock.add_response(
+        method="POST",
+        url=f"{platform_api_url}/api/v1/workflows/",
+        json={**WORKFLOW_RESPONSE, "skip_preflight": True},
+    )
+
+    response = platform_client.workflows.create_workflow(
+        request=operations.CreateWorkflowRequest(
+            create_workflow=shared.CreateWorkflow(
+                name="test_workflow",
+                workflow_type="custom",
+                skip_preflight=True,
+            )
+        )
+    )
+
+    assert json.loads(httpx_mock.get_requests()[0].content)["skip_preflight"] is True
+    assert response.workflow_information.skip_preflight is True
+
+
+@pytest.mark.parametrize(
+    ("update_workflow", "expected_body"),
+    [
+        (shared.UpdateWorkflow(name="renamed"), {"name": "renamed"}),
+        (shared.UpdateWorkflow(skip_preflight=False), {"skip_preflight": False}),
+        (shared.UpdateWorkflow(skip_preflight=True), {"skip_preflight": True}),
+    ],
+)
+def test_update_workflow_sends_skip_preflight_only_when_set(
+    httpx_mock,
+    platform_client: UnstructuredClient,
+    platform_api_url: str,
+    update_workflow: shared.UpdateWorkflow,
+    expected_body: dict,
+):
+    url = f"{platform_api_url}/api/v1/workflows/16b80fee-64dc-472d-8f26-1d7729b6423d"
+    httpx_mock.add_response(method="PUT", url=url, json=WORKFLOW_RESPONSE)
+
+    response = platform_client.workflows.update_workflow(
+        request=operations.UpdateWorkflowRequest(
+            workflow_id="16b80fee-64dc-472d-8f26-1d7729b6423d",
+            update_workflow=update_workflow,
+        )
+    )
+
+    assert json.loads(httpx_mock.get_requests()[0].content) == expected_body
+    assert response.workflow_information.skip_preflight is False

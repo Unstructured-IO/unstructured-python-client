@@ -1,6 +1,10 @@
-## 0.46.3
+## 0.47.0
+
+### Features
+* Add `skip_preflight` to `CreateWorkflow`, `UpdateWorkflow` and `WorkflowInformation`. Set it to `True` to skip the job preflight check for a workflow's jobs; on update, leaving it unset keeps the current value. For a one-off job, set `"skip_preflight": true` in the `request_data` JSON passed to `jobs.create_job`.
 
 ### Fixes
+* Deserialize jobs the preflight check rejected. `JobStatus` and `JobProcessingStatus` gain `REJECTED`; previously `jobs.get_job` raised on a rejected job, and one rejected job failed the whole `jobs.list_jobs` page. `JobInformation.status` and `JobDetails.processing_status` now also accept a status this SDK version does not know, returning it as a plain `str` instead of raising. Known statuses are still returned as enum members, but the fields are typed `Union[JobStatus, str]` and `Union[JobProcessingStatus, str]`, so type-checked code that reads `.value` or `.name` from them needs to handle the `str` case.
 * Keep the deployment path in split-PDF requests. With a `server_url` that includes a path, such as `https://host/deployment`, splitting a PDF sent its collection request to `https://host/general/docs` instead of `https://host/deployment/general/docs`, which returned 404 before any chunks were processed. The collection URL is now derived from the partition request by replacing only its trailing `/general/v0/general` route, for sync and async calls and for a `server_url` passed to the operation.
 
 ## 0.46.2

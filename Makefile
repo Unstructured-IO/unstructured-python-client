@@ -68,6 +68,10 @@ lint:
 	uv run pylint --rcfile=pylintrc src
 	uv run mypy src
 
+.PHONY: check-spec-drift
+check-spec-drift:
+	PYTHONPATH=. uv run python scripts/check_spec_drift.py
+
 .PHONY: publish
 publish:
 	./scripts/publish.sh
