@@ -5,6 +5,8 @@ from unittest.mock import MagicMock
 import httpx
 import pytest
 
+from unstructured_client import UnstructuredClient
+from unstructured_client.models.errors import ServerError
 from unstructured_client.utils import retries as retries_module
 from unstructured_client.utils.retries import (
     BackoffStrategy,
@@ -555,3 +557,161 @@ class TestPermanentErrorShortCircuit:
         with pytest.raises(ValueError, match="permanent"):
             asyncio.run(retry_async(func, retries_config))
         assert call_count == 1
+
+
+def _send_with_retry(respond, config, async_mode, *, stream=False):
+    transport = httpx.MockTransport(respond)
+    if async_mode:
+        async def run():
+            async with httpx.AsyncClient(transport=transport) as client:
+                return await retry_async(
+                    lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=stream),
+                    config,
+                )
+        return asyncio.run(run())
+    with httpx.Client(transport=transport) as client:
+        return retry(
+            lambda: client.send(client.build_request("GET", "http://test.invalid"), stream=stream),
+            config,
+        )
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@pytest.mark.parametrize(
+    "body,content_type,stop",
+    [
+        (b'{"detail":"unsupported","retryable":false}', "application/json", True),
+        (b'{"retryable":false}', "application/problem+json; charset=utf-8", True),
+        (b'{"retryable":true}', "application/json", False),
+        (b'{"detail":"Internal server error"}', "application/json", False),
+        (b'{"retryable":"false"}', "application/json", False),
+        (b'{"retryable":0}', "application/json", False),
+        (b'{"retryable":null}', "application/json", False),
+        (b'[{"retryable":false}]', "application/json", False),
+        (b'false', "application/json", False),
+        (b'{broken', "application/json", False),
+        pytest.param(
+            b'{"retryable":false,"detail":' + b"[" * 100_000 + b"]" * 100_000 + b"}",
+            "application/json",
+            False,
+            id="deeply-nested",
+        ),
+        (b'upstream error', "text/plain", False),
+        (b'{"retryable":false}', "text/plain", True),
+        (b'{"retryable":false}', "", True),
+    ],
+)
+def test_declared_retry_verdict(
+    fake_clock, async_mode, body, content_type, stop
+):
+    status_code = 503
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        if len(attempts) == 1:
+            return httpx.Response(status_code, content=body, headers={"Content-Type": content_type})
+        return httpx.Response(200, json=[])
+
+    config = _retries(status_codes=["5xx"], initial_interval=1, max_interval=1)
+    result = _send_with_retry(respond, config, async_mode)
+
+    assert len(attempts) == (1 if stop else 2)
+    assert result.status_code == (status_code if stop else 200)
+    if stop:
+        assert result.content == body
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@pytest.mark.parametrize("verdict", [False, True])
+def test_declared_verdict_does_not_retry_non_matching_status(fake_clock, async_mode, verdict):
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        return httpx.Response(400, json={"retryable": verdict})
+
+    config = _retries(status_codes=["5xx"])
+    response = _send_with_retry(respond, config, async_mode)
+
+    assert response.status_code == 400
+    assert len(attempts) == 1
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+def test_unread_stream_is_not_consumed(fake_clock, async_mode):
+    class SyncStream(httpx.SyncByteStream):
+        def __iter__(self):
+            pytest.fail("retry inspected an unread stream")
+            yield b""
+
+    class AsyncStream(httpx.AsyncByteStream):
+        async def __aiter__(self):
+            pytest.fail("retry inspected an unread stream")
+            yield b""
+
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        if len(attempts) == 1:
+            return httpx.Response(
+                503, headers={"Content-Type": "application/json"},
+                stream=AsyncStream() if async_mode else SyncStream(),
+            )
+        return httpx.Response(200)
+
+    config = _retries(status_codes=["5xx"])
+    result = _send_with_retry(respond, config, async_mode, stream=True)
+
+    assert result.status_code == 200
+    assert len(attempts) == 2
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@pytest.mark.parametrize("status_code", [500, 503])
+def test_public_partition_preserves_declared_error(fake_clock, async_mode, status_code):
+    body = {"detail": "unsupported document", "retryable": False}
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        return httpx.Response(status_code, json=body)
+
+    async def run():
+        transport = httpx.MockTransport(respond)
+        with httpx.Client(transport=transport) as client:
+            async with httpx.AsyncClient(transport=transport) as async_client:
+                sdk = UnstructuredClient(
+                    server_url="http://test.invalid", client=client, async_client=async_client
+                )
+                request = {"partition_parameters": {
+                    "files": {"content": b"hello", "file_name": "test.txt"},
+                    "split_pdf_page": False,
+                }}
+                config = _retries(initial_interval=1, max_interval=1, max_elapsed_time=2).config
+                with pytest.raises(ServerError) as exc:
+                    if async_mode:
+                        await sdk.general.partition_async(request=request, retries=config)
+                    else:
+                        sdk.general.partition(request=request, retries=config)
+                assert exc.value.raw_response.json() == body
+                assert "unsupported document" in str(exc.value)
+
+    asyncio.run(run())
+    assert len(attempts) == 1
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@pytest.mark.parametrize("status_code", [500, 503])
+@pytest.mark.parametrize("status_codes", [["5xx"], ["500", "503"]])
+def test_declared_verdict_stops_matching_status(fake_clock, async_mode, status_code, status_codes):
+    attempts = []
+
+    def respond(request):
+        attempts.append(request)
+        return httpx.Response(status_code, json={"retryable": False})
+
+    response = _send_with_retry(respond, _retries(status_codes=status_codes), async_mode)
+    assert response.status_code == status_code
+    assert len(attempts) == 1

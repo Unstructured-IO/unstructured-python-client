@@ -87,6 +87,27 @@ class PermanentError(Exception):
         self.inner = inner
 
 
+def _declares_non_retryable(response: httpx.Response) -> bool:
+    # Inspect buffered error bodies without consuming unread response streams.
+    try:
+        body = response.json()
+    except (ValueError, RecursionError, httpx.ResponseNotRead):
+        return False
+    return isinstance(body, dict) and body.get("retryable") is False
+
+
+def _is_retry_status(response: httpx.Response, status_codes: List[str]) -> bool:
+    for code in status_codes:
+        if "X" in code.upper():
+            code_range = int(code[0])
+            status_major = response.status_code / 100
+            if code_range <= status_major < code_range + 1:
+                return True
+        elif response.status_code == int(code):
+            return True
+    return False
+
+
 def retry(func, retries: Retries):
     if retries.config.strategy == "backoff":
 
@@ -95,19 +116,8 @@ def retry(func, retries: Retries):
             try:
                 res = func()
 
-                for code in retries.status_codes:
-                    if "X" in code.upper():
-                        code_range = int(code[0])
-
-                        status_major = res.status_code / 100
-
-                        if code_range <= status_major < code_range + 1:
-                            raise TemporaryError(res)
-                    else:
-                        parsed_code = int(code)
-
-                        if res.status_code == parsed_code:
-                            raise TemporaryError(res)
+                if _is_retry_status(res, retries.status_codes) and not _declares_non_retryable(res):
+                    raise TemporaryError(res)
             except httpx.TransportError as exception:
                 if retries.config.retry_connection_errors:
                     raise
@@ -141,19 +151,8 @@ async def retry_async(func, retries: Retries):
             try:
                 res = await func()
 
-                for code in retries.status_codes:
-                    if "X" in code.upper():
-                        code_range = int(code[0])
-
-                        status_major = res.status_code / 100
-
-                        if code_range <= status_major < code_range + 1:
-                            raise TemporaryError(res)
-                    else:
-                        parsed_code = int(code)
-
-                        if res.status_code == parsed_code:
-                            raise TemporaryError(res)
+                if _is_retry_status(res, retries.status_codes) and not _declares_non_retryable(res):
+                    raise TemporaryError(res)
             except httpx.TransportError as exception:
                 if retries.config.retry_connection_errors:
                     raise
