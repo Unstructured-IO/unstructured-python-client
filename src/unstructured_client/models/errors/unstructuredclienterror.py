@@ -3,7 +3,10 @@
 import httpx
 from typing import Optional
 
-from unstructured_client.utils.declared_errors import parse_declared_error_fields
+from unstructured_client.utils.declared_errors import (
+    DeclaredErrorFields,
+    parse_declared_error_fields,
+)
 
 
 class UnstructuredClientError(Exception):
@@ -28,7 +31,13 @@ class UnstructuredClientError(Exception):
         self.headers = raw_response.headers
         self.raw_response = raw_response
 
-        declared = parse_declared_error_fields(self.body)
+        # A success response that failed validation can carry a large body that
+        # declares nothing, so only error statuses are parsed.
+        declared = (
+            parse_declared_error_fields(self.body)
+            if self.status_code >= 400
+            else DeclaredErrorFields()
+        )
         self.retryable = declared.retryable
         self.error_type = declared.error_type
         self.error_reason = declared.error_reason

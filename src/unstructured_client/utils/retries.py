@@ -7,7 +7,7 @@ from typing import List
 
 import httpx
 
-from unstructured_client.utils.declared_errors import declared_error_fields
+from unstructured_client.utils.declared_errors import parse_declared_error_fields
 
 
 class BackoffStrategy:
@@ -92,10 +92,10 @@ class PermanentError(Exception):
 def _declares_non_retryable(response: httpx.Response) -> bool:
     # Inspect buffered error bodies without consuming unread response streams.
     try:
-        body = response.json()
-    except (ValueError, RecursionError, httpx.ResponseNotRead):
+        text = response.text
+    except httpx.ResponseNotRead:
         return False
-    return declared_error_fields(body).retryable is False
+    return parse_declared_error_fields(text).retryable is False
 
 
 def _is_retry_status(response: httpx.Response, status_codes: List[str]) -> bool:

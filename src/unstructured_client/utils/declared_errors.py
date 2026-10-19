@@ -22,8 +22,7 @@ def _non_empty_str(value: Any) -> Optional[str]:
     return value if isinstance(value, str) and value.strip() else None
 
 
-def declared_error_fields(body: Any) -> DeclaredErrorFields:
-    """Read the declared fields from a decoded body, dropping any of the wrong type."""
+def _declared_error_fields(body: Any) -> DeclaredErrorFields:
     if not isinstance(body, dict):
         return DeclaredErrorFields()
     retryable = body.get("retryable")
@@ -36,9 +35,12 @@ def declared_error_fields(body: Any) -> DeclaredErrorFields:
 
 
 def parse_declared_error_fields(text: Optional[str]) -> DeclaredErrorFields:
-    """Read the declared fields from a raw body; a non-JSON body declares nothing."""
+    """Read the declared fields from a raw body, dropping any of the wrong type.
+
+    A body that is not a JSON object declares nothing.
+    """
     try:
         body = json.loads(text) if text else None
     except (ValueError, TypeError, RecursionError):
         return DeclaredErrorFields()
-    return declared_error_fields(body)
+    return _declared_error_fields(body)

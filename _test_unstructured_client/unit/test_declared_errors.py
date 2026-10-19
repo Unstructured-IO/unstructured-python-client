@@ -7,6 +7,7 @@ from unstructured_client import UnstructuredClient
 from unstructured_client.models.errors import (
     HTTPValidationError,
     HTTPValidationErrorData,
+    ResponseValidationError,
     SDKError,
     ServerError,
     ServerErrorData,
@@ -74,26 +75,17 @@ def test_parse_declared_error_fields(text, expected):
     assert parse_declared_error_fields(text) == expected
 
 
-def test_server_error_exposes_declared_fields():
-    response = _response(503, json=DECLARED_BODY)
-    error = ServerError(ServerErrorData(detail="OCR timed out"), response)
-
-    assert _declared(error) == DECLARED_FIELDS
-    assert error.data.detail == "OCR timed out"
-
-
-def test_sdk_error_exposes_declared_fields():
-    response = _response(400, json=DECLARED_BODY)
-    error = SDKError("API error occurred", response, response.text)
-
-    assert _declared(error) == DECLARED_FIELDS
-
-
-def test_http_validation_error_exposes_declared_fields():
-    response = _response(422, json=DECLARED_BODY)
-    error = HTTPValidationError(HTTPValidationErrorData(detail="OCR timed out"), response)
-
-    assert _declared(error) == DECLARED_FIELDS
+@pytest.mark.parametrize(
+    "build",
+    [
+        lambda r: ServerError(ServerErrorData(detail="OCR timed out"), r),
+        lambda r: SDKError("API error occurred", r, r.text),
+        lambda r: HTTPValidationError(HTTPValidationErrorData(detail="OCR timed out"), r),
+    ],
+    ids=["ServerError", "SDKError", "HTTPValidationError"],
+)
+def test_error_classes_expose_declared_fields(build):
+    assert _declared(build(_response(503, json=DECLARED_BODY))) == DECLARED_FIELDS
 
 
 def test_explicit_body_takes_precedence_over_response_text():
@@ -103,9 +95,9 @@ def test_explicit_body_takes_precedence_over_response_text():
     assert error.retryable is False
 
 
-def test_undeclared_error_reads_none():
-    response = _response(500, json={"detail": "Internal server error"})
-    error = ServerError(ServerErrorData(detail="Internal server error"), response)
+def test_success_response_declares_nothing():
+    response = _response(200, json=DECLARED_BODY)
+    error = ResponseValidationError("Response validation failed", response, ValueError())
 
     assert _declared(error) == DeclaredErrorFields()
 
@@ -116,24 +108,24 @@ def test_public_partition_raises_declared_fields(async_mode, status_code, error_
     def respond(request):
         return httpx.Response(status_code, json=DECLARED_BODY)
 
-    async def run():
-        transport = httpx.MockTransport(respond)
-        with httpx.Client(transport=transport) as client:
-            async with httpx.AsyncClient(transport=transport) as async_client:
-                sdk = UnstructuredClient(
-                    server_url="http://test.invalid", client=client, async_client=async_client
-                )
-                request = {"partition_parameters": {
-                    "files": {"content": b"hello", "file_name": "test.txt"},
-                    "split_pdf_page": False,
-                }}
-                retries = RetryConfig("none", BackoffStrategy(1, 1, 1.0, 1), False)
-                with pytest.raises(error_class) as exc:
-                    if async_mode:
-                        await sdk.general.partition_async(request=request, retries=retries)
-                    else:
-                        sdk.general.partition(request=request, retries=retries)
-                return exc.value
+    transport = httpx.MockTransport(respond)
+    request = {"partition_parameters": {
+        "files": {"content": b"hello", "file_name": "test.txt"},
+        "split_pdf_page": False,
+    }}
+    retries = RetryConfig("none", BackoffStrategy(1, 1, 1.0, 1), False)
 
-    error = asyncio.run(run())
-    assert _declared(error) == DECLARED_FIELDS
+    async def run_async():
+        async with httpx.AsyncClient(transport=transport) as async_client:
+            sdk = UnstructuredClient(server_url="http://test.invalid", async_client=async_client)
+            await sdk.general.partition_async(request=request, retries=retries)
+
+    with pytest.raises(error_class) as exc:
+        if async_mode:
+            asyncio.run(run_async())
+        else:
+            with httpx.Client(transport=transport) as client:
+                sdk = UnstructuredClient(server_url="http://test.invalid", client=client)
+                sdk.general.partition(request=request, retries=retries)
+
+    assert _declared(exc.value) == DECLARED_FIELDS
