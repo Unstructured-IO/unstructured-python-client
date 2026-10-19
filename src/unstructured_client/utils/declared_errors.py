@@ -7,7 +7,7 @@ carry only ``detail``, and every field reads as ``None``.
 
 import json
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 
 @dataclass(frozen=True)
@@ -34,13 +34,14 @@ def _declared_error_fields(body: Any) -> DeclaredErrorFields:
     )
 
 
-def parse_declared_error_fields(text: Optional[str]) -> DeclaredErrorFields:
+def parse_declared_error_fields(raw: Union[str, bytes, None]) -> DeclaredErrorFields:
     """Read the declared fields from a raw body, dropping any of the wrong type.
 
-    A body that is not a JSON object declares nothing.
+    Bytes are decoded as JSON, which detects UTF-8, UTF-16 and UTF-32 and skips a
+    UTF-8 byte order mark. A body that is not a JSON object declares nothing.
     """
     try:
-        body = json.loads(text) if text else None
+        body = json.loads(raw) if raw else None
     except (ValueError, TypeError, RecursionError):
         return DeclaredErrorFields()
     return _declared_error_fields(body)

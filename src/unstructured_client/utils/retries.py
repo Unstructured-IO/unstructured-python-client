@@ -92,10 +92,10 @@ class PermanentError(Exception):
 def _declares_non_retryable(response: httpx.Response) -> bool:
     # Inspect buffered error bodies without consuming unread response streams.
     try:
-        text = response.text
+        content = response.content
     except httpx.ResponseNotRead:
         return False
-    return parse_declared_error_fields(text).retryable is False
+    return parse_declared_error_fields(content).retryable is False
 
 
 def _is_retry_status(response: httpx.Response, status_codes: List[str]) -> bool:
