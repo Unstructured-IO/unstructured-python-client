@@ -7,6 +7,8 @@ from typing import List
 
 import httpx
 
+from unstructured_client.utils.declared_errors import declared_error_fields
+
 
 class BackoffStrategy:
     initial_interval: int
@@ -93,7 +95,7 @@ def _declares_non_retryable(response: httpx.Response) -> bool:
         body = response.json()
     except (ValueError, RecursionError, httpx.ResponseNotRead):
         return False
-    return isinstance(body, dict) and body.get("retryable") is False
+    return declared_error_fields(body).retryable is False
 
 
 def _is_retry_status(response: httpx.Response, status_codes: List[str]) -> bool:

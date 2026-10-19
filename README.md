@@ -156,6 +156,10 @@ with UnstructuredClient(
 | `err.body`         | `str`            | HTTP body. Can be empty string if no body is returned.                                  |
 | `err.raw_response` | `httpx.Response` | Raw HTTP response                                                                       |
 | `err.data`         |                  | Optional. Some errors may contain structured data. [See Error Classes](#error-classes). |
+| `err.retryable`    | `Optional[bool]` | Whether the API declared that sending the same request again can succeed. `None` if it declared nothing. |
+| `err.error_type`   | `Optional[str]`  | The kind of failure the API declared, eg `timeout`. `None` if it declared nothing.     |
+| `err.error_reason` | `Optional[str]`  | A stable name for the failure the API declared. `None` if it declared nothing.         |
+| `err.audience`     | `Optional[str]`  | Whose fault the API declared the failure to be, `user` or `platform`. `None` if it declared nothing. |
 
 ### Example
 ```python

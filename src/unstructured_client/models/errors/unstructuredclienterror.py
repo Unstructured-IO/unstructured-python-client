@@ -3,6 +3,8 @@
 import httpx
 from typing import Optional
 
+from unstructured_client.utils.declared_errors import parse_declared_error_fields
+
 
 class UnstructuredClientError(Exception):
     """The base class for all HTTP error responses."""
@@ -12,6 +14,10 @@ class UnstructuredClientError(Exception):
     body: str
     headers: httpx.Headers
     raw_response: httpx.Response
+    retryable: Optional[bool]
+    error_type: Optional[str]
+    error_reason: Optional[str]
+    audience: Optional[str]
 
     def __init__(
         self, message: str, raw_response: httpx.Response, body: Optional[str] = None
@@ -21,6 +27,12 @@ class UnstructuredClientError(Exception):
         self.body = body if body is not None else raw_response.text
         self.headers = raw_response.headers
         self.raw_response = raw_response
+
+        declared = parse_declared_error_fields(self.body)
+        self.retryable = declared.retryable
+        self.error_type = declared.error_type
+        self.error_reason = declared.error_reason
+        self.audience = declared.audience
 
     def __str__(self):
         return self.message

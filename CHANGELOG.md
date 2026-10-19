@@ -1,3 +1,8 @@
+## 0.47.0
+
+### Features
+* Expose the verdict the API declares on an error as typed attributes on every HTTP error: `retryable`, `error_type`, `error_reason` and `audience`. Errors the API raises deliberately publish these fields next to `detail`, eg a 503 OCR timeout with `"retryable": false`. Callers no longer need to parse `err.body` to read them. Each attribute is `None` when the body is not JSON, the field is absent, or its value has the wrong type. The retry loop reads `retryable` with the same parser.
+
 ## 0.46.4
 
 ### Fixes
