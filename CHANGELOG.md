@@ -1,3 +1,8 @@
+## 0.46.4
+
+### Fixes
+* Return API errors immediately when their JSON body declares `"retryable": false`, instead of retrying them until the retry budget expires. Applies to sync and async requests, including split-PDF chunks. Other errors keep the existing status-based retry behavior.
+
 ## 0.46.3
 
 ### Fixes
