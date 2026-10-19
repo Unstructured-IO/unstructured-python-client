@@ -498,15 +498,15 @@ async def test_unit_run_tasks_pool_limits_configurable_via_env(
     monkeypatch.setenv("UNSTRUCTURED_CLIENT_KEEPALIVE_EXPIRY", "30.0")
 
     captured: dict[str, httpx.Limits] = {}
-    real_async_client = httpx.AsyncClient
+    real_async_transport = httpx.AsyncHTTPTransport
 
-    def _capturing_async_client(*args, **kwargs):
+    def _capturing_async_transport(*args, **kwargs):
         captured["limits"] = kwargs.get("limits")
-        return real_async_client(*args, **kwargs)
+        return real_async_transport(*args, **kwargs)
 
     with patch(
-        "unstructured_client._hooks.custom.split_pdf_hook.httpx.AsyncClient",
-        side_effect=_capturing_async_client,
+        "unstructured_client._hooks.custom.http_transport.httpx.AsyncHTTPTransport",
+        side_effect=_capturing_async_transport,
     ):
         await run_tasks(
             [partial(_request_mock, fails=False, content="ok")],
@@ -622,24 +622,21 @@ def test_unit_resolve_tls_config_client_cert_and_key_split(
 
 
 @pytest.mark.asyncio
-async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_client(
+async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_transport(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
-    """run_tasks() actually wires verify+cert into httpx.AsyncClient(). End-to-
-    end check that _resolve_tls_config is called and its result reaches the
-    client construction. AsyncClient is fully mocked so we don't have to feed
-    httpx a real cert chain."""
+    """Split requests apply TLS settings to the transport."""
     ca_bundle = tmp_path / "ca.pem"
     ca_bundle.write_text("-----BEGIN CERTIFICATE-----\nfake\n-----END CERTIFICATE-----\n")
     monkeypatch.setenv("SSL_CERT_FILE", str(ca_bundle))
     monkeypatch.setenv("UNSTRUCTURED_CLIENT_TLS_CLIENT_CERT", "/etc/ssl/client.pem")
 
+    monkeypatch.setenv("NO_PROXY", "*")
     captured: dict = {}
 
     class _MockAsyncClient:
         def __init__(self, *args, **kwargs):
-            captured["verify"] = kwargs.get("verify")
-            captured["cert"] = kwargs.get("cert")
+            captured["transport"] = kwargs.get("transport")
 
         async def __aenter__(self):
             return self
@@ -648,16 +645,21 @@ async def test_unit_run_tasks_forwards_tls_config_to_httpx_async_client(
             return False
 
     with patch(
-        "unstructured_client._hooks.custom.split_pdf_hook.httpx.AsyncClient",
+        "unstructured_client._hooks.custom.http_transport.httpx.AsyncClient",
         new=_MockAsyncClient,
-    ):
+    ), patch(
+        "unstructured_client._hooks.custom.http_transport.httpx.AsyncHTTPTransport"
+    ) as transport:
         await run_tasks(
             [partial(_request_mock, fails=False, content="ok")],
             allow_failed=True,
         )
 
-    assert captured["verify"] == str(ca_bundle)
-    assert captured["cert"] == "/etc/ssl/client.pem"
+    kwargs = transport.call_args.kwargs
+    assert captured["transport"] is transport.return_value
+    assert kwargs["verify"] == str(ca_bundle)
+    assert kwargs["cert"] == "/etc/ssl/client.pem"
+    assert kwargs["socket_options"]
 
 
 @patch("unstructured_client._hooks.custom.form_utils.Path")

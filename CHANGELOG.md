@@ -6,6 +6,11 @@
 ### Fixes
 * Deserialize jobs the preflight check rejected. `JobStatus` and `JobProcessingStatus` gain `REJECTED`; previously `jobs.get_job` raised on a rejected job, and one rejected job failed the whole `jobs.list_jobs` page. `JobInformation.status` and `JobDetails.processing_status` now also accept a status this SDK version does not know, returning it as a plain `str` instead of raising. Known statuses are still returned as enum members, but the fields are typed `Union[JobStatus, str]` and `Union[JobProcessingStatus, str]`, so type-checked code that reads `.value` or `.name` from them needs to handle the `str` case.
 
+## 0.46.5
+
+### Fixes
+* Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF requests. Connections made through an HTTP(S)/SOCKS proxy are not covered. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
+
 ## 0.46.4
 
 ### Fixes

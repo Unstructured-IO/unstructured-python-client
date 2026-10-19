@@ -24,6 +24,9 @@ from pypdf import PdfReader, PdfWriter
 import pypdfium2 as pdfium  # type: ignore[import-untyped]
 
 from unstructured_client._hooks.custom import form_utils, pdf_utils, request_utils
+from unstructured_client._hooks.custom.http_transport import (
+    create_async_http_client, resolve_tcp_keepalive,
+)
 from unstructured_client._hooks.custom.common import UNSTRUCTURED_CLIENT_LOGGER_NAME
 from unstructured_client._hooks.custom.form_utils import (
     PARTITION_FORM_CONCURRENCY_LEVEL_KEY,
@@ -213,7 +216,7 @@ def _resolve_tls_config() -> tuple[Union[bool, str], Optional[Union[str, tuple[s
     """Resolve httpx TLS trust-store and mTLS client-certificate config
     from environment variables.
 
-    Returns a (verify, cert) tuple suitable for `httpx.AsyncClient(verify=..., cert=...)`.
+    Returns a (verify, cert) tuple for the HTTPX transport.
 
     Trust store (`verify`) — honors the same standard env vars other
     libraries use, so a single env-var setting applies uniformly across
@@ -297,7 +300,7 @@ async def run_tasks(
     verify, cert = _resolve_tls_config()
 
     logger.debug(
-        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s",
+        "split_pdf event=batch_async_start operation_id=%s chunk_count=%d concurrency=%d client_timeout=%s allow_failed=%s pool_max_connections=%s pool_max_keepalive=%s pool_keepalive_expiry=%s tls=%s tcp_keepalive=%s",
         operation_id,
         len(coroutines),
         concurrency_level,
@@ -307,10 +310,11 @@ async def run_tasks(
         limits.max_keepalive_connections,
         limits.keepalive_expiry,
         _describe_tls_config(verify, cert),
+        resolve_tcp_keepalive().describe(),
     )
 
-    async with httpx.AsyncClient(
-        timeout=client_timeout, limits=limits, verify=verify, cert=cert
+    async with create_async_http_client(
+        timeout=client_timeout, limits=limits, verify=verify, cert=cert,
     ) as client:
         armed_coroutines = [coro(async_client=client, limiter=limiter) for coro in coroutines] # type: ignore
         tasks = [
@@ -905,7 +909,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             plan_limits = _resolve_pool_limits()
             plan_verify, plan_cert = _resolve_tls_config()
             logger.info(
-                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s",
+                "split_pdf event=plan_created operation_id=%s filename=%s strategy=%s page_range=%s-%s page_count=%d split_size=%d chunk_count=%d concurrency=%d allow_failed=%s cache_mode=%s timeout_seconds=%s retry_config_mode=%s pool_max_connections=%d pool_max_keepalive=%d pool_keepalive_expiry=%.1fs tls=%s tcp_keepalive=%s",
                 operation_id,
                 Path(pdf_file_meta["filename"]).name,
                 form_data.get("strategy"),
@@ -928,6 +932,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                 plan_limits.max_keepalive_connections,
                 plan_limits.keepalive_expiry,
                 _describe_tls_config(plan_verify, plan_cert),
+                resolve_tcp_keepalive().describe(),
             )
 
             self.pending_operation_ids[operation_id] = operation_id
