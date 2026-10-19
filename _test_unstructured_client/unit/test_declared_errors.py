@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 import httpx
 import pytest
@@ -84,15 +85,31 @@ def test_parse_declared_error_fields(text, expected):
     ],
     ids=["ServerError", "SDKError", "HTTPValidationError"],
 )
-def test_error_classes_expose_declared_fields(build):
-    assert _declared(build(_response(503, json=DECLARED_BODY))) == DECLARED_FIELDS
+@pytest.mark.parametrize(
+    "content",
+    [
+        json.dumps(DECLARED_BODY).encode(),
+        b"\xef\xbb\xbf" + json.dumps(DECLARED_BODY).encode(),
+        json.dumps(DECLARED_BODY).encode("utf-16"),
+    ],
+    ids=["utf-8", "utf-8-bom", "utf-16"],
+)
+def test_error_classes_expose_declared_fields(build, content):
+    response = _response(503, content=content, headers={"Content-Type": "application/json"})
+
+    assert _declared(build(response)) == DECLARED_FIELDS
 
 
-def test_explicit_body_takes_precedence_over_response_text():
-    response = _response(500, json={"detail": "x"})
-    error = SDKError("API error occurred", response, '{"retryable":false}')
+def test_unread_stream_falls_back_to_body():
+    class Stream(httpx.SyncByteStream):
+        def __iter__(self):
+            pytest.fail("error construction read an unread stream")
+            yield b""
 
-    assert error.retryable is False
+    response = _response(503, stream=Stream())
+    error = SDKError("API error occurred", response, json.dumps(DECLARED_BODY))
+
+    assert _declared(error) == DECLARED_FIELDS
 
 
 def test_success_response_declares_nothing():
