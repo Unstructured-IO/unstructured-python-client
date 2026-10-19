@@ -3,6 +3,11 @@
 ### Features
 * Expose the verdict the API declares on an error as typed attributes on every HTTP error: `retryable`, `error_type`, `error_reason` and `audience`. Errors the API raises deliberately publish these fields next to `detail`, eg a 503 OCR timeout with `"retryable": false`. Callers no longer need to parse `err.body` to read them. Each attribute is `None` when the body is not JSON, the field is absent, or its value has the wrong type. The retry loop reads `retryable` with the same parser.
 
+## 0.46.5
+
+### Fixes
+* Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF requests. Connections made through an HTTP(S)/SOCKS proxy are not covered. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
+
 ## 0.46.4
 
 ### Fixes

@@ -5,11 +5,13 @@ from .httpclient import AsyncHttpClient, ClientOwner, HttpClient, close_clients
 from .sdkconfiguration import SDKConfiguration
 from .utils.logger import Logger, get_default_logger
 from .utils.retries import RetryConfig
-import httpx
 import importlib
 from typing import Any, Callable, Dict, Optional, TYPE_CHECKING, Union, cast
 from unstructured_client import utils
 from unstructured_client._hooks import SDKHooks
+from unstructured_client._hooks.custom.http_transport import (
+    create_http_client, create_async_http_client,
+)
 from unstructured_client.models import shared
 from unstructured_client.types import OptionalNullable, UNSET
 import weakref
@@ -66,7 +68,7 @@ class UnstructuredClient(BaseSDK):
         """
         client_supplied = True
         if client is None:
-            client = httpx.Client()
+            client = create_http_client()
             client_supplied = False
 
         assert issubclass(
@@ -75,7 +77,7 @@ class UnstructuredClient(BaseSDK):
 
         async_client_supplied = True
         if async_client is None:
-            async_client = httpx.AsyncClient()
+            async_client = create_async_http_client()
             async_client_supplied = False
 
         if debug_logger is None:
