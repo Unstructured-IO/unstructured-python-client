@@ -1,3 +1,8 @@
+## 0.46.5
+
+### Fixes
+* Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF requests. Connections made through an HTTP(S)/SOCKS proxy are not covered. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
+
 ## 0.46.4
 
 ### Fixes

@@ -6,6 +6,7 @@ import pytest
 from pypdf import PdfWriter
 
 from unstructured_client import UnstructuredClient
+from unstructured_client._hooks.custom import split_pdf_hook
 from unstructured_client._hooks.custom.split_pdf_hook import _get_collection_url
 from unstructured_client.models import operations, shared
 from unstructured_client.utils import BackoffStrategy, RetryConfig
@@ -60,9 +61,9 @@ def make_sdk(monkeypatch, prefix, override):
     )
     # Split chunks create their own async HTTP client; keep every request offline.
     monkeypatch.setattr(
-        httpx,
-        "AsyncClient",
-        lambda **kwargs: original_async_client(transport=transport, **kwargs),
+        split_pdf_hook,
+        "create_async_http_client",
+        lambda **kwargs: original_async_client(**kwargs, transport=transport),
     )
     return sdk, sent, sync_client, async_client
 
