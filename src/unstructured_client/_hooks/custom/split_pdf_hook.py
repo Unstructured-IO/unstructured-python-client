@@ -17,7 +17,6 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Coroutine, Optional, Tuple, Union, cast, Generator, BinaryIO
 
-import aiofiles
 import httpx
 from httpx import AsyncClient
 from pypdf import PdfReader, PdfWriter
@@ -446,7 +445,8 @@ def _create_transport_error_response(error: BaseException) -> httpx.Response:
 
 def _cancel_running_tasks() -> None:
     for task in asyncio.all_tasks():
-        if not task.done():
+        # Paired private hooks share ownership of settling response I/O.
+        if not task.done() and not request_utils._is_settling_io_task(task):  # pylint: disable=protected-access
             task.cancel()
 
 
@@ -1033,6 +1033,10 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             page_number,
             "cached" if cache_tmp_data_feature else "memory",
         )
+        if cache_tmp_data_feature and temp_dir_path is None:
+            if not isinstance(pdf_chunk_file, io.BytesIO) and not pdf_chunk_file.closed:
+                pdf_chunk_file.close()
+            raise RuntimeError("Temp directory path not found for cached split PDF operation")
         response = await request_utils.call_api_async(
             client=async_client,
             limiter=limiter,
@@ -1042,20 +1046,14 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
             operation_id=_operation_id,
             chunk_index=chunk_index,
             page_number=page_number,
+            cache_response_dir=temp_dir_path if cache_tmp_data_feature else None,
         )
 
         if response.status_code == 200:
             if cache_tmp_data_feature:
-                if temp_dir_path is None:
-                    raise RuntimeError("Temp directory path not found for cached split PDF operation")
-                # If we get 200, dump the contents to a file and return the path
-                temp_file_name = f"{temp_dir_path}/{uuid.uuid4()}.json"
-                async with aiofiles.open(temp_file_name, mode='wb') as temp_file:
-                    # Avoid reading the entire response into memory
-                    async for bytes_chunk in response.aiter_bytes():
-                        await temp_file.write(bytes_chunk)
-                # we save the path in content attribute to be used in after_success
-                response._content = temp_file_name.encode()  # pylint: disable=protected-access
+                # call_api_async consumed and closed the response under its
+                # semaphore/retry scope and returned the operation-owned path.
+                temp_file_name = response.text
                 logger.debug(
                     "split_pdf event=chunk_cached operation_id=%s chunk_index=%d page_number=%d cache_file=%s",
                     _operation_id,
@@ -1063,20 +1061,7 @@ class SplitPdfHook(SDKInitHook, BeforeRequestHook, AfterSuccessHook, AfterErrorH
                     page_number,
                     Path(temp_file_name).name,
                 )
-                response = httpx.Response(
-                    status_code=response.status_code,
-                    headers=response.headers,
-                    content=temp_file_name.encode(),
-                    extensions=response.extensions,
-                )
-            else:
-                response = httpx.Response(
-                    status_code=response.status_code,
-                    headers=response.headers,
-                    content=response.content,
-                    extensions=response.extensions,
-                )
-        else:
+        if not cache_tmp_data_feature:
             response = httpx.Response(
                 status_code=response.status_code,
                 headers=response.headers,
