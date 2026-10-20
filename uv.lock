@@ -781,6 +781,7 @@ name = "unstructured-client"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
+    { name = "certifi" },
     { name = "httpcore" },
     { name = "httpx" },
     { name = "pydantic" },
@@ -807,6 +808,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiofiles", specifier = ">=25.1.0" },
+    { name = "certifi", specifier = ">=2026.10.19" },
     { name = "httpcore", specifier = ">=1.0.9" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pydantic", specifier = ">=2.12.5" },
