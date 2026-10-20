@@ -61,6 +61,7 @@ if TYPE_CHECKING:
         Strategy,
         VLMModelProvider,
     )
+    from .preflightfailurecategory import PreflightFailureCategory
     from .secretreference import SecretReference, SecretReferenceTypedDict
     from .security import Security, SecurityTypedDict
     from .sortdirection import SortDirection
@@ -155,6 +156,7 @@ __all__ = [
     "OutputFormat",
     "PartitionParameters",
     "PartitionParametersTypedDict",
+    "PreflightFailureCategory",
     "Schedule",
     "SecretReference",
     "SecretReferenceTypedDict",
@@ -250,6 +252,7 @@ _dynamic_imports: dict[str, str] = {
     "PartitionParametersTypedDict": ".partition_parameters",
     "Strategy": ".partition_parameters",
     "VLMModelProvider": ".partition_parameters",
+    "PreflightFailureCategory": ".preflightfailurecategory",
     "SecretReference": ".secretreference",
     "SecretReferenceTypedDict": ".secretreference",
     "Security": ".security",

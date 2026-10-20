@@ -46,8 +46,6 @@
     "stop_requested"
   ],
   "JobNodeDetails": [
-    "failure_category",
-    "failure_reason",
     "last_change_at",
     "node_id",
     "node_phase",

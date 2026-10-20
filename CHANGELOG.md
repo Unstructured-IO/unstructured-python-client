@@ -5,6 +5,7 @@
 
 ### Fixes
 * Deserialize jobs the preflight check rejected. `JobStatus` and `JobProcessingStatus` gain `REJECTED`; previously `jobs.get_job` raised on a rejected job, and one rejected job failed the whole `jobs.list_jobs` page. `JobInformation.status` and `JobDetails.processing_status` now also accept a status this SDK version does not know, returning it as a plain `str` instead of raising. Known statuses are still returned as enum members, but the fields are typed `Union[JobStatus, str]` and `Union[JobProcessingStatus, str]`, so type-checked code that reads `.value` or `.name` from them needs to handle the `str` case.
+* Expose why a job was rejected. `JobNodeDetails` gains `failure_category` (a `PreflightFailureCategory`, or a plain `str` for a category this SDK version does not know) and `failure_reason`, set on the node that failed preflight in `jobs.get_job_details`. Previously both were dropped during deserialization.
 
 ## 0.46.5
 

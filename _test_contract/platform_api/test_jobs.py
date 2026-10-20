@@ -290,3 +290,50 @@ def test_get_job_details_tolerates_rejected_and_unrecognized_statuses(
 
     assert details.processing_status == expected
     assert type(details.processing_status) is type(expected)
+
+
+def test_get_job_details_exposes_preflight_failure(
+    httpx_mock, platform_client: UnstructuredClient, platform_api_url: str
+):
+    url = f"{platform_api_url}/api/v1/jobs/fcdc4994-eea5-425c-91fa-e03f2bd8030d/details"
+
+    def node(name: str, **failure) -> dict:
+        return {
+            "node_name": name,
+            "ready": 0,
+            "in_progress": 0,
+            "success": 0,
+            "failure": 0,
+            **failure,
+        }
+
+    httpx_mock.add_response(
+        method="GET",
+        headers={"Content-Type": "application/json"},
+        json={
+            "id": "fcdc4994-eea5-425c-91fa-e03f2bd8030d",
+            "processing_status": "REJECTED",
+            "node_stats": [
+                node(
+                    "s3-source",
+                    failure_category="AUTH_INVALID_CREDENTIAL",
+                    failure_reason="The AWS Access Key Id you provided does not exist.",
+                ),
+                node("future-destination", failure_category="SOME_FUTURE_CATEGORY"),
+                node("partitioner", failure_category=None, failure_reason=None),
+            ],
+        },
+        url=url,
+    )
+
+    details = platform_client.jobs.get_job_details(
+        request=operations.GetJobDetailsRequest(job_id="fcdc4994-eea5-425c-91fa-e03f2bd8030d")
+    ).job_details
+
+    source, destination, partitioner = details.node_stats
+    assert source.failure_category is shared.PreflightFailureCategory.AUTH_INVALID_CREDENTIAL
+    assert source.failure_reason == "The AWS Access Key Id you provided does not exist."
+    assert type(destination.failure_category) is str
+    assert destination.failure_category == "SOME_FUTURE_CATEGORY"
+    assert partitioner.failure_category is None
+    assert partitioner.failure_reason is None
