@@ -1,0 +1,55 @@
+name: API spec drift
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: astral-sh/setup-uv@v7
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.13"
+    - name: Install dependencies
+      env:
+        UV_LOCKED: "1"
+        UV_PYTHON: "3.13"
+      run: make install
+    - name: Check spec drift
+      id: drift
+      env:
+        UV_PYTHON: "3.13"
+      run: |
+        set -o pipefail
+        make check-spec-drift | tee drift.txt
+    - name: Report drift in an issue
+      if: failure() && steps.drift.outcome == 'failure'
+      env:
+        GH_TOKEN: ${{ github.token }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        if ! grep -qE '^(New drift|Stale baseline):' drift.txt; then
+          echo "The check failed without reporting drift; see the previous step."
+          exit 0
+        fi
+        title="SDK models have drifted from the API spec"
+        body="$(printf '%s\n\n```\n%s\n```\n\nSee CONTRIBUTING.md, \"Keeping models in sync with the API\".' "$RUN_URL" "$(cat drift.txt)")"
+        number="$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')"
+        if [ -n "$number" ]; then
+          gh issue comment "$number" --body "$body"
+        else
+          gh issue create --title "$title" --body "$body"
+        fi

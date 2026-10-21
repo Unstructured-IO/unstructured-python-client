@@ -10,3 +10,4 @@ class JobStatus(str, Enum):
     COMPLETED = "COMPLETED"
     STOPPED = "STOPPED"
     FAILED = "FAILED"
+    REJECTED = "REJECTED"

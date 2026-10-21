@@ -2,6 +2,11 @@
 
 ### Features
 * Expose the verdict the API declares on an error as typed attributes on every HTTP error: `retryable`, `error_type`, `error_reason` and `audience`. Errors the API raises deliberately publish these fields next to `detail`, eg a 503 OCR timeout with `"retryable": false`. Callers no longer need to parse `err.body` to read them. Each attribute is `None` when the body is not JSON, the field is absent, or its value has the wrong type. The retry loop reads `retryable` with the same parser.
+* Add `skip_preflight` to `CreateWorkflow` and `UpdateWorkflow`. Set it to `True` to skip the job preflight check for a workflow's jobs; on update, leaving it unset keeps the current value. `WorkflowInformation.skip_preflight` reports the workflow's current setting. For a one-off job, set `"skip_preflight": true` in the `request_data` JSON passed to `jobs.create_job`.
+
+### Fixes
+* Deserialize jobs the preflight check rejected. `JobStatus` and `JobProcessingStatus` gain `REJECTED`; previously `jobs.get_job` raised on a rejected job, and one rejected job failed the whole `jobs.list_jobs` page. `JobInformation.status` and `JobDetails.processing_status` now also accept a status this SDK version does not know, returning it as a plain `str` instead of raising. Known statuses are still returned as enum members, but the fields are typed `Union[JobStatus, str]` and `Union[JobProcessingStatus, str]`, so type-checked code that reads `.value` or `.name` from them needs to handle the `str` case.
+* Expose why a job was rejected. `JobNodeDetails` gains `failure_category` (a `PreflightFailureCategory`, or a plain `str` for a category this SDK version does not know) and `failure_reason`, set on the node that failed preflight in `jobs.get_job_details`. Previously both were dropped during deserialization.
 
 ## 0.46.6
 

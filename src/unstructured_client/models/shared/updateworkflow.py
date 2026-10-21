@@ -35,6 +35,7 @@ class UpdateWorkflowTypedDict(TypedDict):
     name: NotRequired[Nullable[str]]
     reprocess_all: NotRequired[Nullable[bool]]
     schedule: NotRequired[Nullable[UpdateWorkflowSchedule]]
+    skip_preflight: NotRequired[Nullable[bool]]
     source_id: NotRequired[Nullable[str]]
     template_id: NotRequired[Nullable[str]]
     workflow_nodes: NotRequired[Nullable[List[WorkflowNodeTypedDict]]]
@@ -49,6 +50,8 @@ class UpdateWorkflow(BaseModel):
     reprocess_all: OptionalNullable[bool] = UNSET
 
     schedule: OptionalNullable[UpdateWorkflowSchedule] = UNSET
+
+    skip_preflight: OptionalNullable[bool] = UNSET
 
     source_id: OptionalNullable[str] = UNSET
 
@@ -65,6 +68,7 @@ class UpdateWorkflow(BaseModel):
             "name",
             "reprocess_all",
             "schedule",
+            "skip_preflight",
             "source_id",
             "template_id",
             "workflow_nodes",
@@ -75,6 +79,7 @@ class UpdateWorkflow(BaseModel):
             "name",
             "reprocess_all",
             "schedule",
+            "skip_preflight",
             "source_id",
             "template_id",
             "workflow_nodes",

@@ -11,3 +11,4 @@ class JobProcessingStatus(str, Enum):
     COMPLETED_WITH_ERRORS = "COMPLETED_WITH_ERRORS"
     STOPPED = "STOPPED"
     FAILED = "FAILED"
+    REJECTED = "REJECTED"
