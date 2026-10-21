@@ -3,6 +3,11 @@
 ### Features
 * Expose the verdict the API declares on an error as typed attributes on every HTTP error: `retryable`, `error_type`, `error_reason` and `audience`. Errors the API raises deliberately publish these fields next to `detail`, eg a 503 OCR timeout with `"retryable": false`. Callers no longer need to parse `err.body` to read them. Each attribute is `None` when the body is not JSON, the field is absent, or its value has the wrong type. The retry loop reads `retryable` with the same parser.
 
+## 0.46.6
+
+### Fixes
+* Bump locked `certifi` to 2026.10.19, which removes the emSign ECC Root CA - G3 root after eight eMudhra intermediate CA private keys were compromised. `requests` and `httpx` trust certifi's bundle and do not check revocation, so with the older bundle they accepted certificates chaining to that root. `certifi` is now also a direct dependency at `>=2026.10.19`, so pip installs pick up the new bundle too.
+
 ## 0.46.5
 
 ### Fixes
