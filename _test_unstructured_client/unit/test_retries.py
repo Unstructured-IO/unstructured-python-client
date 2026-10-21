@@ -599,6 +599,8 @@ def _send_with_retry(respond, config, async_mode, *, stream=False):
         (b'upstream error', "text/plain", False),
         (b'{"retryable":false}', "text/plain", True),
         (b'{"retryable":false}', "", True),
+        (b'\xef\xbb\xbf{"retryable":false}', "application/json", True),
+        ('{"retryable":false}'.encode("utf-16"), "application/json", True),
     ],
 )
 def test_declared_retry_verdict(
