@@ -3,22 +3,23 @@
 from __future__ import annotations
 from .jobnodedetails import JobNodeDetails, JobNodeDetailsTypedDict
 from .jobprocessingstatus import JobProcessingStatus
-from pydantic import model_serializer
-from typing import List
-from typing_extensions import NotRequired, TypedDict
+from pydantic import Field, model_serializer
+from typing import List, Union
+from typing_extensions import Annotated, NotRequired, TypedDict
 from unstructured_client.types import (
     BaseModel,
     Nullable,
     OptionalNullable,
     UNSET,
     UNSET_SENTINEL,
+    UnrecognizedStr,
 )
 
 
 class JobDetailsTypedDict(TypedDict):
     id: str
     node_stats: List[JobNodeDetailsTypedDict]
-    processing_status: JobProcessingStatus
+    processing_status: Union[JobProcessingStatus, UnrecognizedStr]
     message: NotRequired[Nullable[str]]
 
 
@@ -27,7 +28,9 @@ class JobDetails(BaseModel):
 
     node_stats: List[JobNodeDetails]
 
-    processing_status: JobProcessingStatus
+    processing_status: Annotated[
+        Union[JobProcessingStatus, UnrecognizedStr], Field(union_mode="left_to_right")
+    ]
 
     message: OptionalNullable[str] = UNSET
 
