@@ -7,15 +7,7 @@
 ### Fixes
 * Deserialize jobs the preflight check rejected. `JobStatus` and `JobProcessingStatus` gain `REJECTED`; previously `jobs.get_job` raised on a rejected job, and one rejected job failed the whole `jobs.list_jobs` page. `JobInformation.status` and `JobDetails.processing_status` now also accept a status this SDK version does not know, returning it as a plain `str` instead of raising. Known statuses are still returned as enum members, but the fields are typed `Union[JobStatus, str]` and `Union[JobProcessingStatus, str]`, so type-checked code that reads `.value` or `.name` from them needs to handle the `str` case.
 * Expose why a job was rejected. `JobNodeDetails` gains `failure_category` (a `PreflightFailureCategory`, or a plain `str` for a category this SDK version does not know) and `failure_reason`, set on the node that failed preflight in `jobs.get_job_details`. Previously both were dropped during deserialization.
-
-## 0.46.6
-
-### Fixes
 * Bump locked `certifi` to 2026.10.19, which removes the emSign ECC Root CA - G3 root after eight eMudhra intermediate CA private keys were compromised. `requests` and `httpx` trust certifi's bundle and do not check revocation, so with the older bundle they accepted certificates chaining to that root. `certifi` is now also a direct dependency at `>=2026.10.19`, so pip installs pick up the new bundle too.
-
-## 0.46.5
-
-### Fixes
 * Long partitions behind a NAT or load balancer idle timeout could never return, leaving the client waiting for its full read timeout. SDK-owned HTTP clients now enable TCP keepalive, including split-PDF requests. Connections made through an HTTP(S)/SOCKS proxy are not covered. Configure probes with `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_IDLE` (60 seconds), `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_INTERVAL` (30 seconds), and `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE_COUNT` (5); set `UNSTRUCTURED_CLIENT_TCP_KEEPALIVE=0` or `false` to disable. Caller-supplied clients are unchanged.
 
 ## 0.46.4
